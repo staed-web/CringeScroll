@@ -62,7 +62,7 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
-    /* NEW: FUN CONTROL BAR */
+    /* FUN CONTROL BAR */
     .control-bar {
       display: flex;
       justify-content: center;
@@ -115,11 +115,6 @@
       position: relative;
     }
 
-    .meme-card:hover {
-      transform: translateY(-2px);
-    }
-
-    /* NEW: REACTION BADGE */
     .reaction-badge {
       position: absolute;
       top: 12px;
@@ -153,53 +148,11 @@
       -webkit-user-drag: none;
     }
 
-    /* NEW: LOADING SPINNER */
     .loading-spinner {
       text-align: center;
       padding: 20px;
       color: var(--neon-green);
       font-size: 16px;
-    }
-
-    .loading-spinner::after {
-      content: "💀";
-      animation: pulse 1.5s infinite;
-      margin-left: 8px;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
-    }
-
-    .ad-container {
-      background: var(--ad-bg);
-      border-radius: 16px;
-      margin: 20px 10px;
-      padding: 16px;
-      text-align: center;
-      border: 1px dashed var(--neon-purple);
-      min-height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      position: relative;
-    }
-
-    .ad-container::before {
-      content: "Sponsored Cringe";
-      color: var(--neon-green);
-      font-size: 14px;
-      opacity: 0.7;
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--card-bg);
-      padding: 0 8px;
-      border-radius: 4px;
     }
 
     .footer-notice {
@@ -225,10 +178,10 @@
       <h1>CringeScroll</h1>
     </header>
     
-    <!-- NEW: FUN CONTROL BAR -->
+    <!-- CONTROL BAR - NOW GUARANTEED TO EXIST BEFORE JS RUNS -->
     <div class="control-bar">
       <button class="control-btn" id="refreshBtn" title="Fresh Cringe">🔄</button>
-      <button class="control-btn" id="darkModeBtn" title="Toggle Glow">✨</button>
+      <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
       <button class="control-btn" id="shareBtn" title="Share Cringe">📤</button>
     </div>
     
@@ -242,7 +195,7 @@
   </div>
 
   <script>
-    // ===== ENHANCED CORE ENGINE =====
+    // ===== CORE ENGINE - BUTTONS FIXED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -317,9 +270,8 @@
       if (isLoading) return;
       isLoading = true;
 
-      // Remove loading spinner on first load
       if (loadCount === 0) {
-        feed.innerHTML = '';
+        feed.innerHTML = ''; // Clear loader
       }
 
       const meme = await fetchMeme();
@@ -333,46 +285,43 @@
       isLoading = false;
     };
 
-    // ===== NEW: FUN FEATURES =====
-    const initControls = () => {
+    // 🔥 BUTTONS WORKING: ATTACH LISTENERS AFTER DOM READY
+    const attachButtonListeners = () => {
       // Refresh button
       document.getElementById('refreshBtn').onclick = () => {
         loadNext();
       };
 
       // Glow mode toggle
-      document.getElementById('darkModeBtn').onclick = () => {
+      document.getElementById('glowBtn').onclick = () => {
         isGlowMode = !isGlowMode;
         document.body.style.boxShadow = isGlowMode ? 
           `0 0 30px var(--neon-purple), 0 0 60px var(--neon-green)` : 'none';
-        document.getElementById('darkModeBtn').textContent = isGlowMode ? '🕶️' : '✨';
+        document.getElementById('glowBtn').textContent = isGlowMode ? '🕶️' : '✨';
       };
 
       // Share button
-      document.getElementById('shareBtn').onclick = async () => {
+      document.getElementById('shareBtn').onclick = () => {
+        const url = window.location.href;
         if (navigator.share) {
-          try {
-            await navigator.share({
-              title: 'CringeScroll',
-              text: 'Endless cringe memes 👀',
-              url: window.location.href
-            });
-          } catch (e) {
-            // Fallback: copy URL
-            navigator.clipboard.writeText(window.location.href);
-            alert('Link copied! Paste anywhere.');
-          }
+          navigator.share({ title: 'CringeScroll', text: 'Endless cringe memes 👀', url });
         } else {
-          // Fallback for non-supporting browsers
-          navigator.clipboard.writeText(window.location.href);
-          alert('Link copied! Paste anywhere.');
+          navigator.clipboard.writeText(url).then(() => {
+            // Visual feedback
+            const btn = document.getElementById('shareBtn');
+            const original = btn.textContent;
+            btn.textContent = '✓';
+            setTimeout(() => btn.textContent = original, 1000);
+          });
         }
       };
     };
 
     const initApp = () => {
       feed = document.getElementById('feed');
-      initControls();
+      
+      // Attach button listeners IMMEDIATELY (buttons exist in HTML)
+      attachButtonListeners();
 
       // Load initial memes
       for (let i = 0; i < 6; i++) {
@@ -395,6 +344,7 @@
       }, 1000);
     };
 
+    // GUARANTEED EXECUTION
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
     } else {
