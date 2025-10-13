@@ -101,29 +101,12 @@
       -webkit-user-drag: none;
     }
 
-    #sentinel {
-      height: 30px;
-      width: 100%;
-    }
-
     .loader {
       text-align: center;
       padding: 20px;
       color: var(--neon-green);
       font-size: 16px;
       opacity: 0.8;
-    }
-
-    /* Smooth scrollbars */
-    #feed::-webkit-scrollbar {
-      width: 6px;
-    }
-    #feed::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    #feed::-webkit-scrollbar-thumb {
-      background: var(--neon-purple);
-      border-radius: 3px;
     }
   </style>
 </head>
@@ -133,123 +116,84 @@
       <h1>CringeScroll</h1>
     </header>
     <div id="feed">
-      <div id="sentinel"></div>
+      <!-- Memes load here -->
     </div>
   </div>
 
   <script>
-    // ===== CORE ENGINE WITH PRELOADING =====
+    // ===== CORE ENGINE WITH SCROLL-BASED INFINITE LOAD =====
     const feed = document.getElementById('feed');
-    const sentinel = document.getElementById('sentinel');
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
-    const MAX_RETRIES = 3;
-    const PRELOAD_BUFFER = 3; // Keep 3 memes ready
-    const memeBuffer = [];
+    const BUFFER_HEIGHT = 300; // Trigger load when 300px from bottom
 
-    // Escape HTML to prevent XSS
+    // Escape HTML
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
 
     // Fetch one unique meme
-    const fetchMeme = async (retry = 0) => {
-      if (retry >= MAX_RETRIES) return null;
-      
+    const fetchMeme = async () => {
       try {
         const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
           cache: 'no-store',
           mode: 'cors'
         });
-        
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
-        
-        if (!data?.url || seenUrls.has(data.url)) {
-          return fetchMeme(retry + 1);
-        }
-        
+        if (!data?.url || seenUrls.has(data.url)) return null;
         seenUrls.add(data.url);
-        return {
-          url: data.url,
-          title: data.title || 'Untitled Cringe'
-        };
+        return { url: data.url, title: data.title || 'Cringe' };
       } catch (e) {
-        console.warn(`Fetch attempt ${retry + 1} failed:`, e.message);
-        return fetchMeme(retry + 1);
+        console.warn("Fetch failed:", e.message);
+        return null;
       }
     };
 
-    // Preload memes into buffer
-    const preloadMemes = async (count) => {
-      for (let i = 0; i < count; i++) {
-        if (memeBuffer.length >= PRELOAD_BUFFER) break;
-        const meme = await fetchMeme();
-        if (meme) memeBuffer.push(meme);
-      }
-    };
-
-    // Render meme card
+    // Render meme
     const renderMeme = (meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
       card.innerHTML = `
         <div class="meme-title">${escapeHtml(meme.title)}</div>
-        <img class="meme-image" 
-             src="${meme.url}" 
-             loading="lazy"
-             decoding="async"
-             alt="Cringe meme"
-             onerror="this.parentElement.style.display='none'">
+        <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" onerror="this.parentElement.style.display='none'">
       `;
-      feed.insertBefore(card, sentinel);
+      feed.appendChild(card);
     };
 
-    // Load next meme (from buffer or fresh)
+    // Load next meme
     const loadNext = async () => {
       if (isLoading) return;
       isLoading = true;
 
-      let meme = memeBuffer.shift(); // Use preloaded
-      if (!meme) {
-        meme = await fetchMeme(); // Fallback to live fetch
-      }
-
+      const meme = await fetchMeme();
       if (meme) {
         renderMeme(meme);
         loadCount++;
-        // Trigger next preload
-        if (memeBuffer.length < PRELOAD_BUFFER) {
-          preloadMemes(PRELOAD_BUFFER - memeBuffer.length);
-        }
       }
 
       isLoading = false;
     };
 
-    // ===== INFINITE SCROLL (GLITCH-FREE) =====
-    const scrollObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isLoading) {
+    // ===== SCROLL HANDLER (100% RELIABLE) =====
+    let scrollTimer;
+    const handleScroll = () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const { scrollTop, scrollHeight, clientHeight } = feed;
+        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT && !isLoading) {
           loadNext();
         }
-      },
-      {
-        root: feed,
-        rootMargin: '400px' // Trigger earlier for buffer
-      }
-    );
+      }, 100);
+    };
 
-    scrollObserver.observe(sentinel);
+    feed.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Load initial batch + preload buffer
+    // Load initial batch
     const loadInitial = () => {
-      // Render first 5
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         setTimeout(loadNext, i * 200);
       }
-      // Preload next 3 immediately
-      setTimeout(() => preloadMemes(PRELOAD_BUFFER), 600);
     };
 
     if (document.readyState === 'loading') {
