@@ -177,6 +177,7 @@
 
     const fetchMeme = async () => {
       try {
+        // 🔥 FIXED: REMOVED LEADING SPACE IN URL (was " https://...")
         const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
           cache: 'no-store',
           mode: 'cors'
@@ -213,7 +214,7 @@
       ins.setAttribute('data-ad-format', 'fluid');
       ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
       ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
-      ins.setAttribute('data-ad-slot', '5669979942'); // ⚠️ REPLACE THIS
+      ins.setAttribute('data-ad-slot', '5669979942');
 
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
