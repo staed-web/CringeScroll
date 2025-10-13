@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
+  <!-- AdSense Global Script - YOUR REAL ID -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9372118866074955" crossorigin="anonymous"></script>
   <style>
     :root {
       --bg: #0d0d1a;
@@ -13,6 +15,7 @@
       --neon-green: #39FF14;
       --text: #f5f5ff;
       --border: rgba(212, 0, 255, 0.12);
+      --ad-bg: rgba(22, 22, 37, 0.4);
     }
 
     * {
@@ -101,12 +104,50 @@
       -webkit-user-drag: none;
     }
 
-    .loader {
+    /* ADSENSE BLOCK - NON-INTRUSIVE */
+    .ad-container {
+      background: var(--ad-bg);
+      border-radius: 16px;
+      margin: 20px 10px;
+      padding: 16px;
       text-align: center;
-      padding: 20px;
+      border: 1px dashed var(--neon-purple);
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .ad-container::before {
+      content: "Sponsored Cringe";
       color: var(--neon-green);
-      font-size: 16px;
-      opacity: 0.8;
+      font-size: 14px;
+      opacity: 0.7;
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      padding: 0 8px;
+      border-radius: 4px;
+    }
+
+    .footer-notice {
+      text-align: center;
+      margin: 30px 0;
+      font-size: 12px;
+      color: #8a8aa0;
+    }
+
+    .footer-notice a {
+      color: #8a8aa0;
+      text-decoration: none;
+    }
+
+    .footer-notice a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -116,23 +157,25 @@
       <h1>CringeScroll</h1>
     </header>
     <div id="feed">
-      <!-- Memes load here -->
+      <!-- Memes and ads load here -->
     </div>
   </div>
 
+  <div class="footer-notice">
+    <a href="/privacy.html">Privacy Policy</a>
+  </div>
+
   <script>
-    // ===== CORE ENGINE WITH SCROLL-BASED INFINITE LOAD =====
+    // ===== CORE ENGINE WITH ADSENSE INTEGRATION =====
     const feed = document.getElementById('feed');
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
-    const BUFFER_HEIGHT = 300; // Trigger load when 300px from bottom
+    const BUFFER_HEIGHT = 300;
 
-    // Escape HTML
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
 
-    // Fetch one unique meme
     const fetchMeme = async () => {
       try {
         const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
@@ -150,7 +193,6 @@
       }
     };
 
-    // Render meme
     const renderMeme = (meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
@@ -161,7 +203,21 @@
       feed.appendChild(card);
     };
 
-    // Load next meme
+    const renderAd = () => {
+      const adContainer = document.createElement('div');
+      adContainer.className = 'ad-container';
+      adContainer.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="fluid"
+             data-ad-layout-key="-fb+5w+4e-db+86"
+             data-ad-client="ca-pub-9372118866074955"
+             data-ad-slot="YOUR_AD_SLOT"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      `;
+      feed.appendChild(adContainer);
+    };
+
     const loadNext = async () => {
       if (isLoading) return;
       isLoading = true;
@@ -170,12 +226,16 @@
       if (meme) {
         renderMeme(meme);
         loadCount++;
+
+        // 💰 INSERT AD EVERY 5 MEMES
+        if (loadCount % 5 === 0) {
+          setTimeout(renderAd, 300);
+        }
       }
 
       isLoading = false;
     };
 
-    // ===== SCROLL HANDLER (100% RELIABLE) =====
     let scrollTimer;
     const handleScroll = () => {
       clearTimeout(scrollTimer);
@@ -189,7 +249,6 @@
 
     feed.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Load initial batch
     const loadInitial = () => {
       for (let i = 0; i < 6; i++) {
         setTimeout(loadNext, i * 200);
@@ -202,8 +261,5 @@
       loadInitial();
     }
   </script>
-  <div style="text-align:center;margin:30px 0;font-size:12px;color:#8a8aa0;">
-  <a href="/privacy.html" style="color:#8a8aa0;">Privacy Policy</a>
-  </div>
 </body>
 </html>
