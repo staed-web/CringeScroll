@@ -99,20 +99,6 @@
       transform: scale(0.95);
     }
 
-    /* NSFW BADGE */
-    .nsfw-badge {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: var(--neon-pink);
-      color: white;
-      font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      z-index: 10;
-    }
-
     #feed {
       flex: 1;
       overflow-y: auto;
@@ -132,10 +118,26 @@
       position: relative;
     }
 
-    .reaction-badge {
+    /* FIXED: BADGES DON'T OVERLAP TEXT */
+    .badge-container {
       position: absolute;
       top: 12px;
       right: 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .nsfw-badge {
+      background: var(--neon-pink);
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .reaction-badge {
       background: var(--neon-green);
       color: var(--bg);
       font-weight: bold;
@@ -152,6 +154,8 @@
       line-height: 1.4;
       color: var(--neon-green);
       word-break: break-word;
+      /* Add padding-top to avoid badge overlap */
+      padding-top: 36px; /* Matches badge container height */
     }
 
     .meme-image {
@@ -261,7 +265,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE - FIXED FOR SCROLL HIDING & GLOW =====
+    // ===== CORE ENGINE - FIXED FOR LAYOUT COLLISIONS =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -348,17 +352,30 @@
       const card = document.createElement('div');
       card.className = 'meme-card';
       
+      // Create badge container
+      const badgeContainer = document.createElement('div');
+      badgeContainer.className = 'badge-container';
+      
       let badgeHtml = '';
       if (meme.isNSFW) {
-        badgeHtml = '<div class="nsfw-badge">NSFW</div>';
+        const nsfwBadge = document.createElement('div');
+        nsfwBadge.className = 'nsfw-badge';
+        nsfwBadge.textContent = 'NSFW';
+        badgeContainer.appendChild(nsfwBadge);
       }
-      badgeHtml += `<div class="reaction-badge">🔥 ${formatNumber(meme.ups)}</div>`;
+      
+      const reactionBadge = document.createElement('div');
+      reactionBadge.className = 'reaction-badge';
+      reactionBadge.innerHTML = `🔥 ${formatNumber(meme.ups)}`;
+      badgeContainer.appendChild(reactionBadge);
       
       card.innerHTML = `
-        ${badgeHtml}
         <div class="meme-title">${escapeHtml(meme.title)}</div>
         <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" onerror="this.parentElement.style.display='none'">
       `;
+      
+      // Insert badge container at top of card
+      card.insertBefore(badgeContainer, card.firstChild);
       feed.appendChild(card);
     };
 
@@ -415,7 +432,6 @@
       document.body.style.boxShadow = isGlowMode ? 
         `0 0 30px var(--neon-purple), 0 0 60px var(--neon-green)` : 'none';
       document.getElementById('glowBtn').textContent = isGlowMode ? '🕶️' : '✨';
-      // Persist state in localStorage
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
@@ -427,11 +443,9 @@
       const updateControlBar = () => {
         const currentScrollTop = feed.scrollTop;
         if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
-          // Scrolling DOWN → hide
           controlBar.style.transform = 'translateY(-100%)';
           document.querySelector('header').style.transform = 'translateY(-100%)';
         } else if (currentScrollTop < lastScrollTop) {
-          // Scrolling UP → show
           controlBar.style.transform = 'translateY(0)';
           document.querySelector('header').style.transform = 'translateY(0)';
         }
