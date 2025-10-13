@@ -105,6 +105,26 @@
       height: 30px;
       width: 100%;
     }
+
+    .loader {
+      text-align: center;
+      padding: 20px;
+      color: var(--neon-green);
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    /* Smooth scrollbars */
+    #feed::-webkit-scrollbar {
+      width: 6px;
+    }
+    #feed::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #feed::-webkit-scrollbar-thumb {
+      background: var(--neon-purple);
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
@@ -118,27 +138,26 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE — FIXED FOR CUSTOM DOMAINS =====
+    // ===== CORE ENGINE WITH PRELOADING =====
     const feed = document.getElementById('feed');
     const sentinel = document.getElementById('sentinel');
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
     const MAX_RETRIES = 3;
-    const PRELOAD_BUFFER = 3;
+    const PRELOAD_BUFFER = 3; // Keep 3 memes ready
     const memeBuffer = [];
 
     // Escape HTML to prevent XSS
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
 
-    // Fetch one unique meme using JSONP-compatible method
+    // Fetch one unique meme
     const fetchMeme = async (retry = 0) => {
       if (retry >= MAX_RETRIES) return null;
       
       try {
-        // Use a proxy-free, CORS-friendly endpoint
-        const res = await fetch(`https://api.imgflip.com/get_memes?_=${Date.now()}`, {
+        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
           cache: 'no-store',
           mode: 'cors'
         });
@@ -146,23 +165,14 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         
-        if (!data.success || !data.data.memes || data.data.memes.length === 0) {
-          throw new Error('No memes found');
-        }
-        
-        // Pick random meme from list
-        const memes = data.data.memes;
-        const randomIndex = Math.floor(Math.random() * memes.length);
-        const meme = memes[randomIndex];
-        
-        if (!meme.url || seenUrls.has(meme.url)) {
+        if (!data?.url || seenUrls.has(data.url)) {
           return fetchMeme(retry + 1);
         }
         
-        seenUrls.add(meme.url);
+        seenUrls.add(data.url);
         return {
-          url: meme.url,
-          title: meme.name || 'Untitled Cringe'
+          url: data.url,
+          title: data.title || 'Untitled Cringe'
         };
       } catch (e) {
         console.warn(`Fetch attempt ${retry + 1} failed:`, e.message);
