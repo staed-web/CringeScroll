@@ -4,10 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a14" />
-  <meta name="description" content="Fresh, non-repeating cringe from 3 sources. Infinite scroll. Zero brain cells required." />
   <title>CringeScroll</title>
-  <link rel="manifest" href="#inline-manifest" />
-  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23D400FF%22>💀</text></svg>">
   <style>
     :root {
       --bg: #0a0a14;
@@ -15,119 +12,63 @@
       --neon-purple: #D400FF;
       --neon-green: #39FF14;
       --text: #f0f0ff;
-      --muted: #8a8aa0;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      overflow: hidden;
+      font-family: system-ui, sans-serif;
       height: 100dvh;
+      overflow: hidden;
     }
-
     #app {
       display: flex;
       flex-direction: column;
       height: 100%;
     }
-
     header {
-      padding: 14px 16px;
-      background: rgba(10, 10, 20, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--neon-purple);
+      padding: 14px;
+      background: rgba(10,10,20,0.95);
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      border-bottom: 1px solid var(--neon-purple);
     }
-
     header h1 {
-      font-size: 26px;
-      font-weight: 800;
+      font-size: 24px;
       background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      letter-spacing: -0.8px;
+      font-weight: 800;
     }
-
     #feed {
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 12px 10px 90px;
+      padding: 12px 10px 80px;
     }
-
     .meme-card {
       background: var(--card-bg);
       margin: 14px 8px;
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(212, 0, 255, 0.12);
-      transition: transform 0.2s ease;
+      border: 1px solid rgba(212,0,255,0.1);
     }
-
-    .meme-card:hover {
-      transform: translateY(-3px);
-    }
-
     .meme-title {
-      padding: 16px 18px 12px;
-      font-size: 19px;
-      font-weight: 700;
+      padding: 16px 18px 10px;
+      font-size: 18px;
       color: var(--neon-green);
-      line-height: 1.45;
+      font-weight: 700;
       word-break: break-word;
     }
-
-    .meme-source {
-      padding: 0 18px 12px;
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
     .meme-image {
       width: 100%;
       height: auto;
       display: block;
       background: #000;
-      max-height: 70vh;
-      object-fit: contain;
     }
-
-    .ad-container {
-      background: rgba(18, 18, 32, 0.8);
-      margin: 22px 8px;
-      padding: 20px;
-      border-radius: 14px;
-      border: 1px dashed var(--neon-purple);
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
-
     #sentinel {
-      height: 30px;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-    }
-
-    @media (min-width: 768px) {
-      #feed { padding: 16px 20px 90px; }
-      .meme-card { max-width: 720px; margin: 18px auto; }
+      height: 20px;
+      width: 100%;
     }
   </style>
 </head>
@@ -135,181 +76,76 @@
   <div id="app">
     <header><h1>CRINGESCROLL</h1></header>
     <div id="feed">
-      <div class="empty-state">Loading cringe...</div>
+      <!-- Initial memes will load here -->
+      <div id="sentinel"></div> <!-- MUST exist before JS runs -->
     </div>
   </div>
 
   <script>
-    // ===== PWA SETUP =====
-    const manifest = {
-      name: "CringeScroll",
-      short_name: "CringeScroll",
-      start_url: "/",
-      display: "standalone",
-      background_color: "#0a0a14",
-      theme_color: "#0a0a14",
-      icons: [{
-        src: "image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90' fill='%23D400FF'>💀</text></svg>",
-        sizes: "192x192",
-        type: "image/svg+xml"
-      }]
-    };
-    const manifestURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
-    document.head.appendChild(Object.assign(document.createElement('link'), {rel: 'manifest', href: manifestURL}));
-
-    if ('serviceWorker' in navigator) {
-      const sw = `self.addEventListener('fetch',()=>{});self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));`;
-      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], {type: 'application/javascript'}))).catch(()=>{});
-    }
-
-    // ===== ENHANCED MEME ENGINE =====
+    // ===== CORE STATE =====
     const feed = document.getElementById('feed');
-    const seenUrls = new Set(); // Prevent duplicates
-    let memeCount = 0;
+    const sentinel = document.getElementById('sentinel');
+    const seenUrls = new Set();
     let isLoading = false;
-    let consecutiveFails = 0;
-    const MAX_FAILS = 5;
 
-    // Three reliable, free meme sources
-    const SOURCES = [
-      () => `https://meme-api.com/gimme?nocache=${Date.now()}`,
-      () => `https://www.reddit.com/r/me_irl/random.json?nocache=${Date.now()}`,
-      () => `https://www.reddit.com/r/dankmemes/random.json?nocache=${Date.now()}`
-    ];
+    // ===== LOAD SINGLE MEME =====
+    async function loadMeme() {
+      if (isLoading) return;
+      isLoading = true;
+
+      try {
+        // Force fresh fetch
+        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, { 
+          cache: 'no-store' 
+        });
+        const data = await res.json();
+
+        // Skip duplicates
+        if (seenUrls.has(data.url)) {
+          isLoading = false;
+          loadMeme(); // retry
+          return;
+        }
+        seenUrls.add(data.url);
+
+        // Create card
+        const card = document.createElement('div');
+        card.className = 'meme-card';
+        card.innerHTML = `
+          <div class="meme-title">${escapeHtml(data.title || 'Cringe')}</div>
+          <img class="meme-image" src="${data.url}" loading="lazy" alt="meme">
+        `;
+        
+        // Insert BEFORE sentinel
+        feed.insertBefore(card, sentinel);
+      } catch (e) {
+        console.error("Load failed", e);
+      } finally {
+        isLoading = false;
+      }
+    }
 
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
     }
 
-    function extractFromReddit(json) {
-      if (!Array.isArray(json) || !json[0]?.data?.children?.[0]) return null;
-      const post = json[0].data.children[0].data;
-      if (!post.url || !post.title) return null;
-      // Only allow image posts
-      if (!post.url.match(/\.(jpg|jpeg|png|gif)$/i)) return null;
-      return {
-        url: post.url,
-        title: post.title,
-        source: `r/${post.subreddit}`
-      };
-    }
-
-    async function fetchFromSource(url) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-
-      try {
-        const res = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeout);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        
-        if (url.includes('meme-api.com')) {
-          return {
-            url: data.url,
-            title: data.title,
-            source: data.subreddit ? `r/${data.subreddit}` : 'MemeAPI'
-          };
-        } else {
-          return extractFromReddit(data);
-        }
-      } catch (e) {
-        clearTimeout(timeout);
-        throw e;
-      }
-    }
-
-    async function loadMeme() {
-      if (isLoading || consecutiveFails >= MAX_FAILS) return;
-      isLoading = true;
-
-      let attempts = 0;
-      const maxAttempts = SOURCES.length * 2;
-
-      while (attempts < maxAttempts && seenUrls.size < 500) {
-        try {
-          // Rotate sources fairly
-          const sourceIndex = attempts % SOURCES.length;
-          const url = SOURCES[sourceIndex]();
-          
-          const meme = await fetchFromSource(url);
-          
-          if (!meme || !meme.url || seenUrls.has(meme.url)) {
-            attempts++;
-            continue;
-          }
-
-          // Success! Add to seen set
-          seenUrls.add(meme.url);
-          consecutiveFails = 0;
-          memeCount++;
-
-          // Build card
-          const card = document.createElement('div');
-          card.className = 'meme-card';
-          card.innerHTML = `
-            <div class="meme-title">${escapeHtml(meme.title)}</div>
-            <div class="meme-source">via ${escapeHtml(meme.source)}</div>
-            <img class="meme-image" src="${meme.url}" loading="lazy" alt="Cringe meme" 
-                 onerror="this.parentElement.style.display='none'">
-          `;
-          feed.insertBefore(card, document.getElementById('sentinel') || null);
-
-          // Insert ad every 5 memes
-          if (memeCount % 5 === 0) {
-            const ad = document.createElement('div');
-            ad.className = 'ad-container';
-            ad.innerHTML = `
-              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3940256099942544" crossorigin="anonymous"><\/script>
-              <ins class="adsbygoogle" style="display:block" data-ad-format="fluid" data-ad-layout-key="-fb+5w+4e-db+86" data-ad-client="ca-pub-3940256099942544" data-ad-slot="6300978111"></ins>
-              <script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>
-            `;
-            feed.insertBefore(ad, document.getElementById('sentinel') || null);
-          }
-
-          isLoading = false;
-          return;
-        } catch (e) {
-          console.warn(`Source ${attempts % SOURCES.length} failed:`, e.message);
-          attempts++;
-        }
-      }
-
-      // All sources failed
-      consecutiveFails++;
-      isLoading = false;
-      
-      if (consecutiveFails === 1) {
-        feed.innerHTML += `<div class="empty-state">⚠️ Meme drought. Pull to refresh!</div>`;
-      }
-    }
-
-    // ===== INFINITE SCROLL =====
-    const sentinel = document.createElement('div');
-    sentinel.id = 'sentinel';
-    feed.appendChild(sentinel);
-
+    // ===== INFINITE SCROLL (FIXED) =====
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !isLoading) {
         loadMeme();
       }
-    }, { root: feed, rootMargin: '200px' });
+    }, {
+      root: feed,
+      rootMargin: '200px' // trigger early
+    });
 
+    // Observe the sentinel (which exists in HTML)
     observer.observe(sentinel);
 
-    // Load initial batch
-    feed.innerHTML = ''; // Clear loading text
-    for (let i = 0; i < 6; i++) loadMeme();
-
-    // Pull-to-refresh (mobile)
-    let startY = 0;
-    feed.addEventListener('touchstart', e => { startY = e.touches[0].clientY; });
-    feed.addEventListener('touchend', e => {
-      const endY = e.changedTouches[0].clientY;
-      if (endY - startY > 80 && feed.scrollTop === 0) {
-        location.reload();
-      }
-    });
+    // Load initial batch AFTER DOM ready
+    setTimeout(() => {
+      for (let i = 0; i < 6; i++) loadMeme();
+    }, 100);
   </script>
 </body>
 </html>
