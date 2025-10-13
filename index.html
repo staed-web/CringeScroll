@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
-  <!-- Add manifest for installability -->
+  <!-- Add manifest for PWA install -->
   <link rel="manifest" href="#inline-manifest" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9372118866074955" crossorigin="anonymous"></script>
   <style>
@@ -40,12 +40,17 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+      /* Hide browser UI */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     #app {
       display: flex;
       flex-direction: column;
       height: 100%;
+      /* Compensate for browser UI */
+      height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
     header {
