@@ -104,7 +104,6 @@
       -webkit-user-drag: none;
     }
 
-    /* ADSENSE BLOCK - NON-INTRUSIVE */
     .ad-container {
       background: var(--ad-bg);
       border-radius: 16px;
@@ -166,7 +165,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE WITH ADSENSE INTEGRATION =====
+    // ===== CORE ENGINE - FIXED FOR ADSENSE + SCROLL =====
     const feed = document.getElementById('feed');
     const seenUrls = new Set();
     let isLoading = false;
@@ -203,19 +202,28 @@
       feed.appendChild(card);
     };
 
+    // 💥 FIXED AD RENDERING: NO SCRIPT TAG IN INNERHTML
     const renderAd = () => {
       const adContainer = document.createElement('div');
       adContainer.className = 'ad-container';
-      adContainer.innerHTML = `
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="fluid"
-             data-ad-layout-key="-fb+5w+4e-db+86"
-             data-ad-client="ca-pub-9372118866074955"
-             data-ad-slot="YOUR_AD_SLOT"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      `;
+      
+      const ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.display = 'block';
+      ins.setAttribute('data-ad-format', 'fluid');
+      ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
+      ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
+      ins.setAttribute('data-ad-slot', 'YOUR_REAL_AD_SLOT_ID'); // ⚠️ REPLACE THIS
+
+      adContainer.appendChild(ins);
       feed.appendChild(adContainer);
+
+      // Safely push to AdSense AFTER DOM insertion
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.warn("Ad load failed:", e);
+      }
     };
 
     const loadNext = async () => {
@@ -227,15 +235,16 @@
         renderMeme(meme);
         loadCount++;
 
-        // 💰 INSERT AD EVERY 5 MEMES
         if (loadCount % 5 === 0) {
-          setTimeout(renderAd, 300);
+          // Render ad AFTER meme is in DOM
+          setTimeout(renderAd, 100);
         }
       }
 
       isLoading = false;
     };
 
+    // 🔄 FIXED SCROLL HANDLER: NO CONFLICT WITH ADS
     let scrollTimer;
     const handleScroll = () => {
       clearTimeout(scrollTimer);
@@ -249,6 +258,7 @@
 
     feed.addEventListener('scroll', handleScroll, { passive: true });
 
+    // Load initial memes
     const loadInitial = () => {
       for (let i = 0; i < 6; i++) {
         setTimeout(loadNext, i * 200);
