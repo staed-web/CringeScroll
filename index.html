@@ -74,11 +74,12 @@
       margin: 16px 10px;
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
       border: 1px solid var(--border);
-      transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0;
+      animation: fadeIn 0.3s forwards;
     }
 
-    .meme-card:hover {
-      transform: translateY(-2px);
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
 
     .meme-title {
@@ -101,29 +102,8 @@
       -webkit-user-drag: none;
     }
 
-    #sentinel {
-      height: 30px;
-      width: 100%;
-    }
-
-    .loader {
-      text-align: center;
-      padding: 20px;
-      color: var(--neon-green);
-      font-size: 16px;
-      opacity: 0.8;
-    }
-
-    /* Smooth scrollbars */
-    #feed::-webkit-scrollbar {
-      width: 6px;
-    }
-    #feed::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    #feed::-webkit-scrollbar-thumb {
-      background: var(--neon-purple);
-      border-radius: 3px;
+    #buffer-zone {
+      height: 50px;
     }
   </style>
 </head>
@@ -133,108 +113,121 @@
       <h1>CringeScroll</h1>
     </header>
     <div id="feed">
-      <div id="sentinel"></div>
+      <!-- Memes will populate here -->
+      <div id="buffer-zone"></div>
     </div>
   </div>
 
   <script>
     // ===== CORE ENGINE =====
     const feed = document.getElementById('feed');
-    const sentinel = document.getElementById('sentinel');
+    const bufferZone = document.getElementById('buffer-zone');
     const seenUrls = new Set();
-    let isLoading = false;
-    let loadCount = 0;
-    const MAX_RETRIES = 3;
+    let isLoadingBatch = false;
+    let memeCount = 0;
+    const BUFFER_THRESHOLD = 3; // Start loading when only 3 memes left in buffer
 
-    // Escape HTML to prevent XSS
+    // Escape HTML
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
 
     // Fetch one unique meme
     const fetchMeme = async (retry = 0) => {
-      if (retry >= MAX_RETRIES) return null;
-      
+      if (retry > 2) return null;
       try {
-        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
-          cache: 'no-store',
-          mode: 'cors'
+        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now() + retry}`, {
+          cache: 'no-store'
         });
-        
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
-        
-        if (!data?.url || seenUrls.has(data.url)) {
-          return fetchMeme(retry + 1);
-        }
-        
+        if (!data?.url || seenUrls.has(data.url)) return fetchMeme(retry + 1);
         seenUrls.add(data.url);
-        return {
-          url: data.url,
-          title: data.title || 'Untitled Cringe'
-        };
+        return { url: data.url, title: data.title || 'Cringe' };
       } catch (e) {
-        console.warn(`Fetch attempt ${retry + 1} failed:`, e.message);
         return fetchMeme(retry + 1);
       }
     };
 
-    // Render meme card
+    // Render meme
     const renderMeme = (meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
       card.innerHTML = `
         <div class="meme-title">${escapeHtml(meme.title)}</div>
-        <img class="meme-image" 
-             src="${meme.url}" 
-             loading="lazy"
-             decoding="async"
-             alt="Cringe meme"
+        <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" 
              onerror="this.parentElement.style.display='none'">
       `;
-      feed.insertBefore(card, sentinel);
+      feed.insertBefore(card, bufferZone);
+      memeCount++;
     };
 
-    // Load next meme
-    const loadNext = async () => {
-      if (isLoading) return;
-      isLoading = true;
+    // Load a batch of memes (3 at a time)
+    const loadBatch = async () => {
+      if (isLoadingBatch) return;
+      isLoadingBatch = true;
 
-      const meme = await fetchMeme();
-      if (meme) {
-        renderMeme(meme);
-        loadCount++;
+      const batch = [];
+      for (let i = 0; i < 3; i++) {
+        const meme = await fetchMeme();
+        if (meme) batch.push(meme);
       }
 
-      isLoading = false;
+      // Render all at once for smoothness
+      batch.forEach(renderMeme);
+      isLoadingBatch = false;
     };
 
-    // ===== INFINITE SCROLL (GLITCH-FREE) =====
-    const scrollObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isLoading) {
-          loadNext();
+    // ===== PROACTIVE LOADING ENGINE =====
+    let lastScrollTop = 0;
+    let direction = 'down';
+
+    feed.addEventListener('scroll', () => {
+      const scrollTop = feed.scrollTop;
+      const scrollHeight = feed.scrollHeight;
+      const clientHeight = feed.clientHeight;
+      
+      // Detect scroll direction
+      direction = scrollTop > lastScrollTop ? 'down' : 'up';
+      lastScrollTop = scrollTop;
+
+      // Only preload when scrolling down
+      if (direction !== 'down') return;
+
+      // Calculate how many memes are below viewport
+      const visibleBottom = scrollTop + clientHeight;
+      const cards = feed.querySelectorAll('.meme-card');
+      let cardsBelow = 0;
+
+      for (let i = cards.length - 1; i >= 0; i--) {
+        const cardTop = cards[i].offsetTop;
+        if (cardTop > visibleBottom) cardsBelow++;
+        else break;
+      }
+
+      // If fewer than BUFFER_THRESHOLD memes below, load more
+      if (cardsBelow < BUFFER_THRESHOLD && !isLoadingBatch) {
+        loadBatch();
+      }
+    });
+
+    // Initial load
+    const init = () => {
+      // Load first 8 memes immediately
+      const loadInitial = async () => {
+        for (let i = 0; i < 8; i++) {
+          const meme = await fetchMeme();
+          if (meme) renderMeme(meme);
         }
-      },
-      {
-        root: feed,
-        rootMargin: '300px' // load early for smoothness
-      }
-    );
-
-    scrollObserver.observe(sentinel);
-
-    // Load initial batch
-    const loadInitial = () => {
-      for (let i = 0; i < 5; i++) {
-        setTimeout(loadNext, i * 300); // staggered load for smoothness
-      }
+        // Then load first batch proactively
+        loadBatch();
+      };
+      loadInitial();
     };
 
-    // Start when DOM is ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadInitial);
+      document.addEventListener('DOMContentLoaded', init);
     } else {
-      loadInitial();
+      init();
     }
   </script>
 </body>
