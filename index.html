@@ -165,8 +165,8 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE - FIXED FOR ADSENSE + SCROLL =====
-    const feed = document.getElementById('feed');
+    // ===== CORE ENGINE - FIXED FOR FIRST-VISIT SCROLL =====
+    let feed;
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
@@ -177,7 +177,6 @@
 
     const fetchMeme = async () => {
       try {
-        // 🔥 FIXED: REMOVED LEADING SPACE IN URL (was " https://...")
         const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
           cache: 'no-store',
           mode: 'cors'
@@ -203,7 +202,6 @@
       feed.appendChild(card);
     };
 
-    // 💥 FIXED AD RENDERING: NO SCRIPT TAG IN INNERHTML
     const renderAd = () => {
       const adContainer = document.createElement('div');
       adContainer.className = 'ad-container';
@@ -219,7 +217,6 @@
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
 
-      // Safely push to AdSense AFTER DOM insertion
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
@@ -235,41 +232,49 @@
       if (meme) {
         renderMeme(meme);
         loadCount++;
-
         if (loadCount % 5 === 0) {
-          // Render ad AFTER meme is in DOM
           setTimeout(renderAd, 100);
         }
       }
-
       isLoading = false;
     };
 
-    // 🔄 FIXED SCROLL HANDLER: NO CONFLICT WITH ADS
-    let scrollTimer;
-    const handleScroll = () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        const { scrollTop, scrollHeight, clientHeight } = feed;
-        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT && !isLoading) {
-          loadNext();
+    // 🚀 CRITICAL FIX: INITIAL LOAD + SCROLL ATTACHMENT IN CORRECT ORDER
+    const initApp = () => {
+      feed = document.getElementById('feed');
+
+      // Load 6 memes FIRST to ensure scrollHeight > clientHeight
+      const initialLoad = () => {
+        for (let i = 0; i < 6; i++) {
+          setTimeout(loadNext, i * 150);
         }
-      }, 100);
+      };
+
+      // Attach scroll listener AFTER initial content exists
+      const attachScroll = () => {
+        let scrollTimer;
+        const handleScroll = () => {
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(() => {
+            const { scrollTop, scrollHeight, clientHeight } = feed;
+            if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT && !isLoading) {
+              loadNext();
+            }
+          }, 100);
+        };
+        feed.addEventListener('scroll', handleScroll, { passive: true });
+      };
+
+      // Execute in sequence
+      initialLoad();
+      setTimeout(attachScroll, 1000); // Wait for initial memes to render
     };
 
-    feed.addEventListener('scroll', handleScroll, { passive: true });
-
-    // Load initial memes
-    const loadInitial = () => {
-      for (let i = 0; i < 6; i++) {
-        setTimeout(loadNext, i * 200);
-      }
-    };
-
+    // GUARANTEED DOM READY
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadInitial);
+      document.addEventListener('DOMContentLoaded', initApp);
     } else {
-      loadInitial();
+      initApp();
     }
   </script>
 </body>
