@@ -121,6 +121,8 @@
       scroll-behavior: auto;
       /* Fix for mobile browser UI overlap */
       padding-bottom: max(100px, env(safe-area-inset-bottom));
+      /* ✅ FIXED: Ensure feed fills entire screen */
+      min-height: 0; /* Prevents shrinkage */
     }
 
     .meme-card {
@@ -279,7 +281,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE - FIXED FOR MOBILE BROWSER UI =====
+    // ===== CORE ENGINE - FIXED FOR BLACK BOX =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
