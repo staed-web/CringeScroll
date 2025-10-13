@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
-  <!-- AdSense Global Script - YOUR REAL ID -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9372118866074955" crossorigin="anonymous"></script>
   <style>
     :root {
@@ -13,6 +12,7 @@
       --card-bg: #161625;
       --neon-purple: #D400FF;
       --neon-green: #39FF14;
+      --neon-pink: #FF2A6D;
       --text: #f5f5ff;
       --border: rgba(212, 0, 255, 0.12);
       --ad-bg: rgba(22, 22, 37, 0.4);
@@ -27,7 +27,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Segoe UI', system-ui, sans-serif;
       height: 100dvh;
       overflow: hidden;
       overscroll-behavior: none;
@@ -62,6 +62,40 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
+    /* NEW: FUN CONTROL BAR */
+    .control-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      padding: 12px 0;
+      background: rgba(13, 13, 26, 0.7);
+      border-bottom: 1px solid rgba(212, 0, 255, 0.3);
+    }
+
+    .control-btn {
+      background: transparent;
+      border: 2px solid var(--neon-pink);
+      color: var(--neon-pink);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 42, 109, 0.2);
+      transform: scale(1.1);
+    }
+
+    .control-btn:active {
+      transform: scale(0.95);
+    }
+
     #feed {
       flex: 1;
       overflow-y: auto;
@@ -78,10 +112,25 @@
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
       border: 1px solid var(--border);
       transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
     }
 
     .meme-card:hover {
       transform: translateY(-2px);
+    }
+
+    /* NEW: REACTION BADGE */
+    .reaction-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--neon-green);
+      color: var(--bg);
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
     }
 
     .meme-title {
@@ -102,6 +151,26 @@
       object-fit: contain;
       user-select: none;
       -webkit-user-drag: none;
+    }
+
+    /* NEW: LOADING SPINNER */
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+      color: var(--neon-green);
+      font-size: 16px;
+    }
+
+    .loading-spinner::after {
+      content: "💀";
+      animation: pulse 1.5s infinite;
+      margin-left: 8px;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
     }
 
     .ad-container {
@@ -155,8 +224,16 @@
     <header>
       <h1>CringeScroll</h1>
     </header>
+    
+    <!-- NEW: FUN CONTROL BAR -->
+    <div class="control-bar">
+      <button class="control-btn" id="refreshBtn" title="Fresh Cringe">🔄</button>
+      <button class="control-btn" id="darkModeBtn" title="Toggle Glow">✨</button>
+      <button class="control-btn" id="shareBtn" title="Share Cringe">📤</button>
+    </div>
+    
     <div id="feed">
-      <!-- Memes and ads load here -->
+      <div class="loading-spinner">Loading cringe...</div>
     </div>
   </div>
 
@@ -165,12 +242,13 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE - FIXED FOR FIRST-VISIT SCROLL =====
+    // ===== ENHANCED CORE ENGINE =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
     const BUFFER_HEIGHT = 300;
+    let isGlowMode = false;
 
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
@@ -185,7 +263,11 @@
         const data = await res.json();
         if (!data?.url || seenUrls.has(data.url)) return null;
         seenUrls.add(data.url);
-        return { url: data.url, title: data.title || 'Cringe' };
+        return { 
+          url: data.url, 
+          title: data.title || 'Cringe',
+          ups: data.ups || Math.floor(Math.random() * 10000) + 1000
+        };
       } catch (e) {
         console.warn("Fetch failed:", e.message);
         return null;
@@ -196,10 +278,17 @@
       const card = document.createElement('div');
       card.className = 'meme-card';
       card.innerHTML = `
+        <div class="reaction-badge">🔥 ${formatNumber(meme.ups)}</div>
         <div class="meme-title">${escapeHtml(meme.title)}</div>
         <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" onerror="this.parentElement.style.display='none'">
       `;
       feed.appendChild(card);
+    };
+
+    const formatNumber = (num) => {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num;
     };
 
     const renderAd = () => {
@@ -228,6 +317,11 @@
       if (isLoading) return;
       isLoading = true;
 
+      // Remove loading spinner on first load
+      if (loadCount === 0) {
+        feed.innerHTML = '';
+      }
+
       const meme = await fetchMeme();
       if (meme) {
         renderMeme(meme);
@@ -239,19 +333,54 @@
       isLoading = false;
     };
 
-    // 🚀 CRITICAL FIX: INITIAL LOAD + SCROLL ATTACHMENT IN CORRECT ORDER
-    const initApp = () => {
-      feed = document.getElementById('feed');
-
-      // Load 6 memes FIRST to ensure scrollHeight > clientHeight
-      const initialLoad = () => {
-        for (let i = 0; i < 6; i++) {
-          setTimeout(loadNext, i * 150);
-        }
+    // ===== NEW: FUN FEATURES =====
+    const initControls = () => {
+      // Refresh button
+      document.getElementById('refreshBtn').onclick = () => {
+        loadNext();
       };
 
-      // Attach scroll listener AFTER initial content exists
-      const attachScroll = () => {
+      // Glow mode toggle
+      document.getElementById('darkModeBtn').onclick = () => {
+        isGlowMode = !isGlowMode;
+        document.body.style.boxShadow = isGlowMode ? 
+          `0 0 30px var(--neon-purple), 0 0 60px var(--neon-green)` : 'none';
+        document.getElementById('darkModeBtn').textContent = isGlowMode ? '🕶️' : '✨';
+      };
+
+      // Share button
+      document.getElementById('shareBtn').onclick = async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: 'CringeScroll',
+              text: 'Endless cringe memes 👀',
+              url: window.location.href
+            });
+          } catch (e) {
+            // Fallback: copy URL
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied! Paste anywhere.');
+          }
+        } else {
+          // Fallback for non-supporting browsers
+          navigator.clipboard.writeText(window.location.href);
+          alert('Link copied! Paste anywhere.');
+        }
+      };
+    };
+
+    const initApp = () => {
+      feed = document.getElementById('feed');
+      initControls();
+
+      // Load initial memes
+      for (let i = 0; i < 6; i++) {
+        setTimeout(loadNext, i * 150);
+      }
+
+      // Attach scroll after content
+      setTimeout(() => {
         let scrollTimer;
         const handleScroll = () => {
           clearTimeout(scrollTimer);
@@ -263,14 +392,9 @@
           }, 100);
         };
         feed.addEventListener('scroll', handleScroll, { passive: true });
-      };
-
-      // Execute in sequence
-      initialLoad();
-      setTimeout(attachScroll, 1000); // Wait for initial memes to render
+      }, 1000);
     };
 
-    // GUARANTEED DOM READY
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
     } else {
