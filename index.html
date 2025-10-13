@@ -3,149 +3,239 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a0a14" />
+  <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
   <style>
     :root {
-      --bg: #0a0a14;
-      --card-bg: #121220;
+      --bg: #0d0d1a;
+      --card-bg: #161625;
       --neon-purple: #D400FF;
       --neon-green: #39FF14;
-      --text: #f0f0ff;
+      --text: #f5f5ff;
+      --border: rgba(212, 0, 255, 0.12);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       height: 100dvh;
       overflow: hidden;
+      overscroll-behavior: none;
     }
+
     #app {
       display: flex;
       flex-direction: column;
       height: 100%;
     }
+
     header {
-      padding: 14px;
-      background: rgba(10,10,20,0.95);
+      padding: 16px 20px;
+      background: rgba(13, 13, 26, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       border-bottom: 1px solid var(--neon-purple);
     }
+
     header h1 {
-      font-size: 24px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      font-weight: 800;
+      font-family: 'Segoe UI', system-ui, sans-serif;
     }
+
     #feed {
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 12px 10px 80px;
+      padding: 16px 12px 100px;
+      scroll-behavior: auto;
     }
+
     .meme-card {
       background: var(--card-bg);
-      margin: 14px 8px;
-      border-radius: 16px;
+      border-radius: 20px;
       overflow: hidden;
-      border: 1px solid rgba(212,0,255,0.1);
+      margin: 16px 10px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border);
+      transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
+
+    .meme-card:hover {
+      transform: translateY(-2px);
+    }
+
     .meme-title {
-      padding: 16px 18px 10px;
-      font-size: 18px;
-      color: var(--neon-green);
+      padding: 18px 20px 14px;
+      font-size: 20px;
       font-weight: 700;
+      line-height: 1.4;
+      color: var(--neon-green);
       word-break: break-word;
     }
+
     .meme-image {
       width: 100%;
       height: auto;
       display: block;
       background: #000;
+      max-height: 75vh;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
     }
+
     #sentinel {
-      height: 20px;
+      height: 30px;
       width: 100%;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 20px;
+      color: var(--neon-green);
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    /* Smooth scrollbars */
+    #feed::-webkit-scrollbar {
+      width: 6px;
+    }
+    #feed::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #feed::-webkit-scrollbar-thumb {
+      background: var(--neon-purple);
+      border-radius: 3px;
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <header><h1>CRINGESCROLL</h1></header>
+    <header>
+      <h1>CringeScroll</h1>
+    </header>
     <div id="feed">
-      <!-- Initial memes will load here -->
-      <div id="sentinel"></div> <!-- MUST exist before JS runs -->
+      <div id="sentinel"></div>
     </div>
   </div>
 
   <script>
-    // ===== CORE STATE =====
+    // ===== CORE ENGINE =====
     const feed = document.getElementById('feed');
     const sentinel = document.getElementById('sentinel');
     const seenUrls = new Set();
     let isLoading = false;
+    let loadCount = 0;
+    const MAX_RETRIES = 3;
 
-    // ===== LOAD SINGLE MEME =====
-    async function loadMeme() {
+    // Escape HTML to prevent XSS
+    const escapeHtml = (str) => 
+      str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
+
+    // Fetch one unique meme
+    const fetchMeme = async (retry = 0) => {
+      if (retry >= MAX_RETRIES) return null;
+      
+      try {
+        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
+          cache: 'no-store',
+          mode: 'cors'
+        });
+        
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        
+        if (!data?.url || seenUrls.has(data.url)) {
+          return fetchMeme(retry + 1);
+        }
+        
+        seenUrls.add(data.url);
+        return {
+          url: data.url,
+          title: data.title || 'Untitled Cringe'
+        };
+      } catch (e) {
+        console.warn(`Fetch attempt ${retry + 1} failed:`, e.message);
+        return fetchMeme(retry + 1);
+      }
+    };
+
+    // Render meme card
+    const renderMeme = (meme) => {
+      const card = document.createElement('div');
+      card.className = 'meme-card';
+      card.innerHTML = `
+        <div class="meme-title">${escapeHtml(meme.title)}</div>
+        <img class="meme-image" 
+             src="${meme.url}" 
+             loading="lazy"
+             decoding="async"
+             alt="Cringe meme"
+             onerror="this.parentElement.style.display='none'">
+      `;
+      feed.insertBefore(card, sentinel);
+    };
+
+    // Load next meme
+    const loadNext = async () => {
       if (isLoading) return;
       isLoading = true;
 
-      try {
-        // Force fresh fetch
-        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, { 
-          cache: 'no-store' 
-        });
-        const data = await res.json();
+      const meme = await fetchMeme();
+      if (meme) {
+        renderMeme(meme);
+        loadCount++;
+      }
 
-        // Skip duplicates
-        if (seenUrls.has(data.url)) {
-          isLoading = false;
-          loadMeme(); // retry
-          return;
+      isLoading = false;
+    };
+
+    // ===== INFINITE SCROLL (GLITCH-FREE) =====
+    const scrollObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading) {
+          loadNext();
         }
-        seenUrls.add(data.url);
-
-        // Create card
-        const card = document.createElement('div');
-        card.className = 'meme-card';
-        card.innerHTML = `
-          <div class="meme-title">${escapeHtml(data.title || 'Cringe')}</div>
-          <img class="meme-image" src="${data.url}" loading="lazy" alt="meme">
-        `;
-        
-        // Insert BEFORE sentinel
-        feed.insertBefore(card, sentinel);
-      } catch (e) {
-        console.error("Load failed", e);
-      } finally {
-        isLoading = false;
+      },
+      {
+        root: feed,
+        rootMargin: '300px' // load early for smoothness
       }
-    }
+    );
 
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
-    }
+    scrollObserver.observe(sentinel);
 
-    // ===== INFINITE SCROLL (FIXED) =====
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !isLoading) {
-        loadMeme();
+    // Load initial batch
+    const loadInitial = () => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(loadNext, i * 300); // staggered load for smoothness
       }
-    }, {
-      root: feed,
-      rootMargin: '200px' // trigger early
-    });
+    };
 
-    // Observe the sentinel (which exists in HTML)
-    observer.observe(sentinel);
-
-    // Load initial batch AFTER DOM ready
-    setTimeout(() => {
-      for (let i = 0; i < 6; i++) loadMeme();
-    }, 100);
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadInitial);
+    } else {
+      loadInitial();
+    }
   </script>
 </body>
 </html>
