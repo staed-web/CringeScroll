@@ -180,7 +180,7 @@
       -webkit-user-drag: none;
     }
 
-    /* NEW: REACTIONS */
+    /* REACTIONS */
     .reactions {
       display: flex;
       justify-content: center;
@@ -205,7 +205,7 @@
       margin-top: 4px;
     }
 
-    /* NEW: AD CONTAINER (NATIVE STYLE) */
+    /* AD CONTAINER (NATIVE STYLE) */
     .ad-container {
       background: var(--card-bg);
       border-radius: 20px;
@@ -314,6 +314,45 @@
       cursor: pointer;
     }
 
+    /* NSFW CONFIRM MODAL - RESTORED */
+    #nsfwModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 90%;
+      border: 2px solid var(--neon-pink);
+    }
+
+    .modal-content h2 {
+      color: var(--neon-pink);
+      margin-bottom: 20px;
+    }
+
+    .modal-btn {
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     .footer-notice {
       text-align: center;
       margin: 30px 0;
@@ -351,6 +390,16 @@
     <div class="leaderboard-title">🔥 Cringe of the Day</div>
     <div id="leaderboardList">
       <!-- Top memes will load here -->
+    </div>
+  </div>
+
+  <!-- NSFW CONFIRMATION MODAL - RESTORED -->
+  <div id="nsfwModal">
+    <div class="modal-content">
+      <h2>🔞 NSFW Content Warning</h2>
+      <p>This mode contains adult-oriented memes.<br>Are you 18+ and sure you want to proceed?</p>
+      <button class="modal-btn" id="nsfwConfirm">Yes, Enter NSFW</button>
+      <button class="modal-btn" id="nsfwCancel" style="background:#555;">Cancel</button>
     </div>
   </div>
 
@@ -456,7 +505,6 @@
       const leaderboardList = document.getElementById('leaderboardList');
       leaderboardList.innerHTML = '';
       
-      // Sort top memes by total reactions
       const sorted = [...topMemes].sort((a, b) => {
         const aTotal = (reactionCounts[a.id]?.total || 0);
         const bTotal = (reactionCounts[b.id]?.total || 0);
@@ -482,7 +530,6 @@
       card.className = 'meme-card';
       card.dataset.id = meme.id;
       
-      // Badge container
       const badgeContainer = document.createElement('div');
       badgeContainer.className = 'badge-container';
       
@@ -498,7 +545,6 @@
       reactionBadge.innerHTML = `🔥 ${formatNumber(meme.ups)}`;
       badgeContainer.appendChild(reactionBadge);
       
-      // Reactions
       const reactionsDiv = document.createElement('div');
       reactionsDiv.className = 'reactions';
       const emojis = ['💀', '😂', '🤡', '🥴'];
@@ -513,7 +559,6 @@
           reactionCounts[meme.id] = counts;
           localStorage.setItem('cringeReactions', JSON.stringify(reactionCounts));
           
-          // Update UI
           const countEl = btn.nextElementSibling;
           if (countEl) {
             countEl.textContent = counts[emoji];
@@ -524,7 +569,6 @@
             btn.parentNode.appendChild(countDisplay);
           }
           
-          // Add to top memes
           if (!topMemes.find(m => m.id === meme.id)) {
             topMemes.push(meme);
             localStorage.setItem('cringeTopMemes', JSON.stringify(topMemes));
@@ -560,7 +604,7 @@
       ins.setAttribute('data-ad-format', 'fluid');
       ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
       ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
-      ins.setAttribute('data-ad-slot', 'YOUR_REAL_AD_SLOT_ID'); // ⚠️ REPLACE THIS
+      ins.setAttribute('data-ad-slot', 'YOUR_REAL_AD_SLOT_ID');
 
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
@@ -584,7 +628,7 @@
       if (meme) {
         renderMeme(meme);
         loadCount++;
-        if (loadCount % 7 === 0) { // Reduced ad frequency
+        if (loadCount % 7 === 0) {
           setTimeout(renderAd, 100);
         }
       }
@@ -603,7 +647,6 @@
         if (meme) tempMemes.push(meme);
       }
       
-      // Rapidly show memes
       let i = 0;
       const interval = setInterval(() => {
         if (i < 5) {
@@ -614,7 +657,6 @@
           clearInterval(interval);
           rouletteBtn.textContent = '🎯';
           rouletteBtn.disabled = false;
-          // Keep last meme
           loadCount++;
           if (loadCount % 7 === 0) setTimeout(renderAd, 100);
         }
@@ -678,6 +720,10 @@
       document.getElementById('closeLeaderboard').onclick = () => {
         document.getElementById('leaderboard').classList.remove('open');
       };
+      document.getElementById('nsfwConfirm').onclick = enableNSFW;
+      document.getElementById('nsfwCancel').onclick = () => {
+        document.getElementById('nsfwModal').style.display = 'none';
+      };
       
       // Install prompt
       document.getElementById('installBtn').onclick = () => {
@@ -715,7 +761,6 @@
     const initApp = () => {
       feed = document.getElementById('feed');
       
-      // Restore glow state
       const savedGlow = localStorage.getItem('cringeGlow') === 'true';
       if (savedGlow) {
         isGlowMode = true;
@@ -728,19 +773,16 @@
       initScrollHiding();
       updateLeaderboard();
 
-      // Show install prompt
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
           document.getElementById('installPrompt').style.display = 'block';
         }, 10000);
       }
 
-      // Load initial memes
       for (let i = 0; i < 6; i++) {
         setTimeout(loadNext, i * 150);
       }
 
-      // Attach infinite scroll
       setTimeout(() => {
         let scrollTimer;
         const handleScroll = () => {
@@ -756,7 +798,6 @@
       }, 1000);
     };
 
-    // PWA INSTALL PROMPT
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
