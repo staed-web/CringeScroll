@@ -19,14 +19,6 @@
       --ad-bg: rgba(22, 22, 37, 0.4);
     }
 
-    /* LIGHT MODE */
-    .light-mode {
-      --bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --text: #212529;
-      --border: rgba(212, 0, 255, 0.1);
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -45,7 +37,6 @@
       user-select: none;
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
-      transition: background 0.3s, color 0.3s;
     }
 
     #app {
@@ -64,12 +55,7 @@
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--neon-purple);
-      transition: transform 0.3s ease, background 0.3s;
-    }
-
-    .light-mode header {
-      background: rgba(248, 249, 250, 0.9);
-      border-bottom: 1px solid #e9ecef;
+      transition: transform 0.3s ease;
     }
 
     header h1 {
@@ -89,13 +75,8 @@
       padding: 12px 0;
       background: rgba(13, 13, 26, 0.7);
       border-bottom: 1px solid rgba(212, 0, 255, 0.3);
-      transition: transform 0.3s ease, background 0.3s;
+      transition: transform 0.3s ease;
       z-index: 99;
-    }
-
-    .light-mode .control-bar {
-      background: rgba(248, 249, 250, 0.8);
-      border-bottom: 1px solid #e9ecef;
     }
 
     .control-btn {
@@ -143,11 +124,6 @@
       position: relative;
     }
 
-    .light-mode .meme-card {
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e9ecef;
-    }
-
     .badge-container {
       position: absolute;
       top: 12px;
@@ -183,11 +159,6 @@
       box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
     }
 
-    .light-mode .reaction-badge {
-      color: #0d0d1a;
-      box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-    }
-
     .meme-title {
       padding: 18px 20px 14px;
       font-size: 20px;
@@ -209,6 +180,7 @@
       -webkit-user-drag: none;
     }
 
+    /* NEW: REACTIONS (FIXED) */
     .reactions {
       display: flex;
       justify-content: center;
@@ -216,11 +188,6 @@
       padding: 12px 0 20px;
       background: rgba(0,0,0,0.2);
       border-top: 1px solid rgba(212, 0, 255, 0.1);
-    }
-
-    .light-mode .reactions {
-      background: rgba(0,0,0,0.05);
-      border-top: 1px solid #e9ecef;
     }
 
     .reaction-item {
@@ -253,10 +220,6 @@
       transition: all 0.2s;
     }
 
-    .light-mode .reaction-count {
-      background: rgba(57, 255, 20, 0.2);
-    }
-
     .reaction-count.animated {
       animation: bounce 0.3s;
     }
@@ -267,6 +230,7 @@
       100% { transform: scale(1); }
     }
 
+    /* AD CONTAINER (NATIVE STYLE) */
     .ad-container {
       background: var(--card-bg);
       border-radius: 20px;
@@ -276,11 +240,6 @@
       border: 1px solid var(--border);
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
       position: relative;
-    }
-
-    .light-mode .ad-container {
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e9ecef;
     }
 
     .ad-container::before {
@@ -295,10 +254,6 @@
       border-radius: 4px;
     }
 
-    .light-mode .ad-container::before {
-      background: rgba(0,0,0,0.1);
-    }
-
     .loading-spinner {
       text-align: center;
       padding: 20px;
@@ -306,6 +261,7 @@
       font-size: 16px;
     }
 
+    /* INSTALL PROMPT */
     #installPrompt {
       position: fixed;
       bottom: 0;
@@ -319,10 +275,6 @@
       display: none;
     }
 
-    .light-mode #installPrompt {
-      border-top: 1px solid #e9ecef;
-    }
-
     .prompt-btn {
       background: var(--neon-purple);
       color: white;
@@ -334,6 +286,7 @@
       cursor: pointer;
     }
 
+    /* LEADERBOARD SIDEBAR */
     #leaderboard {
       position: fixed;
       top: 0;
@@ -346,11 +299,6 @@
       z-index: 200;
       transition: right 0.3s ease;
       border-left: 1px solid var(--neon-purple);
-    }
-
-    .light-mode #leaderboard {
-      background: rgba(248, 249, 250, 0.95);
-      border-left: 1px solid #e9ecef;
     }
 
     #leaderboard.open {
@@ -372,10 +320,6 @@
       border: 1px solid var(--border);
     }
 
-    .light-mode .leaderboard-item {
-      border: 1px solid #e9ecef;
-    }
-
     .leaderboard-rank {
       float: right;
       background: var(--neon-purple);
@@ -395,6 +339,7 @@
       cursor: pointer;
     }
 
+    /* NSFW CONFIRM MODAL */
     #nsfwModal {
       display: none;
       position: fixed;
@@ -440,17 +385,9 @@
       color: #8a8aa0;
     }
 
-    .light-mode .footer-notice {
-      color: #6c757d;
-    }
-
     .footer-notice a {
       color: #8a8aa0;
       text-decoration: none;
-    }
-
-    .light-mode .footer-notice a {
-      color: #6c757d;
     }
   </style>
 </head>
@@ -462,7 +399,7 @@
     
     <div class="control-bar" id="controlBar">
       <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
-      <button class="control-btn" id="themeBtn" title="Toggle Theme">🌓</button>
+      <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
       <button class="control-btn" id="nsfwBtn" title="NSFW Mode">🔞</button>
       <button class="control-btn" id="leaderboardBtn" title="Top Cringe">🏆</button>
     </div>
@@ -503,27 +440,23 @@
   </div>
 
   <script>
-    // ===== GLOBAL REACTIONS + THEME =====
+    // ===== CORE ENGINE WITH FIXED REACTIONS =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
     const BUFFER_HEIGHT = 300;
+    let isGlowMode = false;
     let isNSFW = false;
     let lastScrollTop = 0;
+    let reactionCounts = JSON.parse(localStorage.getItem('cringeReactions')) || {};
     let topMemes = JSON.parse(localStorage.getItem('cringeTopMemes')) || [];
-    
-    // Firebase config (FREE - no auth needed)
-    const FIREBASE_URL = 'https://cringescroll-default-rtdb.firebaseio.com';
-    
-    // Theme
-    let isLightMode = localStorage.getItem('cringeTheme') === 'light';
-    if (isLightMode) document.body.classList.add('light-mode');
 
     // SOURCES
     const NSFW_SOURCES = [
       'https://meme-api.com/gimme/NSFW',
       'https://meme-api.com/gimme/NSFW_GIF',
+      'https://meme-api.com/gimme/RealGirls',
       'https://meme-api.com/gimme/ComedyCemetery',
       'https://meme-api.com/gimme/NSFW_Memes'
     ];
@@ -593,105 +526,31 @@
       }
     };
 
-    // 🔥 GLOBAL REACTIONS (SAFE FALLBACK)
-    const getGlobalReactions = async (memeId) => {
-      try {
-        const res = await fetch(`${FIREBASE_URL}/reactions/${memeId}.json`);
-        const data = await res.json();
-        return data || { total: 0, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
-      } catch (e) {
-        console.warn("Global reactions fetch failed:", e);
-        // Fallback to local storage
-        const local = JSON.parse(localStorage.getItem('cringeReactions')) || {};
-        return local[memeId] || { total: 0, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
-      }
-    };
-
-    const addReaction = async (memeId, emoji) => {
-      try {
-        // Get current reactions
-        const current = await getGlobalReactions(memeId);
-        current[emoji] = (current[emoji] || 0) + 1;
-        current.total = (current.total || 0) + 1;
-        
-        // Try to push to Firebase
-        try {
-          await fetch(`${FIREBASE_URL}/reactions/${memeId}.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(current)
-          });
-        } catch (firebaseError) {
-          console.warn("Firebase sync failed, using local fallback");
-          // Save locally as fallback
-          const local = JSON.parse(localStorage.getItem('cringeReactions')) || {};
-          local[memeId] = current;
-          localStorage.setItem('cringeReactions', JSON.stringify(local));
-        }
-        
-        return current;
-      } catch (e) {
-        console.warn("Reaction sync failed:", e);
-        return null;
-      }
-    };
-
-    const updateLeaderboard = async () => {
+    const updateLeaderboard = () => {
       const leaderboardList = document.getElementById('leaderboardList');
       leaderboardList.innerHTML = '';
       
-      // Get top 3 memes by global reactions
-      try {
-        const allReactions = await fetch(`${FIREBASE_URL}/reactions.json`).then(r => r.json());
-        if (!allReactions) return;
-        
-        const memeEntries = Object.entries(allReactions);
-        const sorted = memeEntries
-          .map(([id, counts]) => ({ id, ...counts }))
-          .sort((a, b) => (b.total || 0) - (a.total || 0))
-          .slice(0, 3);
-        
-        // Match with topMemes for titles
-        sorted.forEach((meme, index) => {
-          const fullMeme = topMemes.find(m => m.id === meme.id);
-          if (!fullMeme) return;
-          
-          const item = document.createElement('div');
-          item.className = 'leaderboard-item';
-          item.innerHTML = `
-            <div class="leaderboard-rank">#${index + 1}</div>
-            <div>${escapeHtml(fullMeme.title)}</div>
-            <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
-              Reactions: ${meme.total || 0}
-            </div>
-          `;
-          leaderboardList.appendChild(item);
-        });
-      } catch (e) {
-        console.warn("Leaderboard sync failed, using local data");
-        // Fallback to local leaderboard
-        const sortedLocal = [...topMemes].sort((a, b) => {
-          const aTotal = (JSON.parse(localStorage.getItem('cringeReactions'))?.[a.id]?.total || 0);
-          const bTotal = (JSON.parse(localStorage.getItem('cringeReactions'))?.[b.id]?.total || 0);
-          return bTotal - aTotal;
-        }).slice(0, 3);
-        
-        sortedLocal.forEach((meme, index) => {
-          const item = document.createElement('div');
-          item.className = 'leaderboard-item';
-          item.innerHTML = `
-            <div class="leaderboard-rank">#${index + 1}</div>
-            <div>${escapeHtml(meme.title)}</div>
-            <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
-              Reactions: ${JSON.parse(localStorage.getItem('cringeReactions'))?.[meme.id]?.total || 0}
-            </div>
-          `;
-          leaderboardList.appendChild(item);
-        });
-      }
+      const sorted = [...topMemes].sort((a, b) => {
+        const aTotal = (reactionCounts[a.id]?.total || 0);
+        const bTotal = (reactionCounts[b.id]?.total || 0);
+        return bTotal - aTotal;
+      }).slice(0, 3);
+      
+      sorted.forEach((meme, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+        item.innerHTML = `
+          <div class="leaderboard-rank">#${index + 1}</div>
+          <div>${escapeHtml(meme.title)}</div>
+          <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
+            Reactions: ${reactionCounts[meme.id]?.total || 0}
+          </div>
+        `;
+        leaderboardList.appendChild(item);
+      });
     };
 
-    const renderMeme = async (meme) => {
+    const renderMeme = (meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
       card.dataset.id = meme.id;
@@ -711,9 +570,7 @@
       reactionBadge.innerHTML = `🔥 ${formatNumber(meme.ups)}`;
       badgeContainer.appendChild(reactionBadge);
       
-      // Get global reactions
-      const globalReactions = await getGlobalReactions(meme.id);
-      
+      // Reactions
       const reactionsDiv = document.createElement('div');
       reactionsDiv.className = 'reactions';
       
@@ -725,27 +582,37 @@
         const btn = document.createElement('div');
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
-        btn.onclick = async () => {
-          const updated = await addReaction(meme.id, emoji);
-          if (updated) {
-            // Update UI
-            const countEl = item.querySelector('.reaction-count');
-            countEl.textContent = updated[emoji];
+        btn.onclick = () => {
+          const counts = reactionCounts[meme.id] || { total: 0 };
+          counts[emoji] = (counts[emoji] || 0) + 1;
+          counts.total = (counts.total || 0) + 1;
+          reactionCounts[meme.id] = counts;
+          localStorage.setItem('cringeReactions', JSON.stringify(reactionCounts));
+          
+          // Update UI with animation
+          const countEl = item.querySelector('.reaction-count');
+          if (countEl) {
+            countEl.textContent = counts[emoji];
             countEl.classList.add('animated');
             setTimeout(() => countEl.classList.remove('animated'), 300);
-            
-            // Add to top memes if new
-            if (!topMemes.find(m => m.id === meme.id)) {
-              topMemes.push(meme);
-              localStorage.setItem('cringeTopMemes', JSON.stringify(topMemes));
-            }
-            updateLeaderboard();
+          } else {
+            const countDisplay = document.createElement('div');
+            countDisplay.className = 'reaction-count';
+            countDisplay.textContent = counts[emoji];
+            item.appendChild(countDisplay);
           }
+          
+          // Add to top memes
+          if (!topMemes.find(m => m.id === meme.id)) {
+            topMemes.push(meme);
+            localStorage.setItem('cringeTopMemes', JSON.stringify(topMemes));
+          }
+          updateLeaderboard();
         };
         
         const countDisplay = document.createElement('div');
         countDisplay.className = 'reaction-count';
-        countDisplay.textContent = globalReactions[emoji] || 0;
+        countDisplay.textContent = reactionCounts[meme.id]?.[emoji] || 0;
         
         item.appendChild(btn);
         item.appendChild(countDisplay);
@@ -754,7 +621,7 @@
       
       card.innerHTML = `
         <div class="meme-title">${escapeHtml(meme.title)}</div>
-        <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" onerror="this.parentElement.style.display='none'; loadNext();">
+        <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" onerror="this.parentElement.style.display='none'">
       `;
       
       card.insertBefore(badgeContainer, card.firstChild);
@@ -778,7 +645,7 @@
       ins.setAttribute('data-ad-format', 'fluid');
       ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
       ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
-      ins.setAttribute('data-ad-slot', '937211886607');
+      ins.setAttribute('data-ad-slot', 'YOUR_REAL_AD_SLOT_ID');
 
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
@@ -837,17 +704,18 @@
       }, 200);
     };
 
-    // 🔥 THEME TOGGLE
-    const toggleTheme = () => {
-      isLightMode = !isLightMode;
-      if (isLightMode) {
-        document.body.classList.add('light-mode');
-        document.getElementById('themeBtn').textContent = '🌙';
+    // 🔥 GLOW MODE
+    const toggleGlowMode = () => {
+      isGlowMode = !isGlowMode;
+      if (isGlowMode) {
+        document.body.style.background = 'linear-gradient(120deg, #0d0d1a, #1a0d1a, #0d1a1a)';
+        document.body.style.animation = 'glowPulse 4s infinite alternate';
       } else {
-        document.body.classList.remove('light-mode');
-        document.getElementById('themeBtn').textContent = '🌓';
+        document.body.style.background = 'var(--bg)';
+        document.body.style.animation = 'none';
       }
-      localStorage.setItem('cringeTheme', isLightMode ? 'light' : 'dark');
+      document.getElementById('glowBtn').textContent = isGlowMode ? '🕶️' : '✨';
+      localStorage.setItem('cringeGlow', isGlowMode);
     };
 
     // 🔥 AUTO HIDE/SHOW CONTROL BAR
@@ -879,7 +747,7 @@
     // BUTTONS
     const attachButtonListeners = () => {
       document.getElementById('rouletteBtn').onclick = cringeRoulette;
-      document.getElementById('themeBtn').onclick = toggleTheme;
+      document.getElementById('glowBtn').onclick = toggleGlowMode;
       document.getElementById('nsfwBtn').onclick = () => {
         if (isNSFW) {
           disableNSFW();
@@ -934,13 +802,17 @@
     const initApp = () => {
       feed = document.getElementById('feed');
       
-      // Restore theme
-      if (isLightMode) {
-        document.getElementById('themeBtn').textContent = '🌙';
+      const savedGlow = localStorage.getItem('cringeGlow') === 'true';
+      if (savedGlow) {
+        isGlowMode = true;
+        document.body.style.background = 'linear-gradient(120deg, #0d0d1a, #1a0d1a, #0d1a1a)';
+        document.body.style.animation = 'glowPulse 4s infinite alternate';
+        document.getElementById('glowBtn').textContent = '🕶️';
       }
 
       attachButtonListeners();
       initScrollHiding();
+      updateLeaderboard();
 
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
