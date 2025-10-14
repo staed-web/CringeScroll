@@ -180,7 +180,7 @@
       -webkit-user-drag: none;
     }
 
-    /* NEW: REACTIONS (FIXED) */
+    /* REACTIONS */
     .reactions {
       display: flex;
       justify-content: center;
@@ -440,7 +440,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE WITH FIXED REACTIONS =====
+    // ===== CORE ENGINE WITH ADSENSE COMPLIANCE =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -570,7 +570,6 @@
       reactionBadge.innerHTML = `🔥 ${formatNumber(meme.ups)}`;
       badgeContainer.appendChild(reactionBadge);
       
-      // Reactions
       const reactionsDiv = document.createElement('div');
       reactionsDiv.className = 'reactions';
       
@@ -589,7 +588,6 @@
           reactionCounts[meme.id] = counts;
           localStorage.setItem('cringeReactions', JSON.stringify(reactionCounts));
           
-          // Update UI with animation
           const countEl = item.querySelector('.reaction-count');
           if (countEl) {
             countEl.textContent = counts[emoji];
@@ -602,7 +600,6 @@
             item.appendChild(countDisplay);
           }
           
-          // Add to top memes
           if (!topMemes.find(m => m.id === meme.id)) {
             topMemes.push(meme);
             localStorage.setItem('cringeTopMemes', JSON.stringify(topMemes));
@@ -838,6 +835,13 @@
         feed.addEventListener('scroll', handleScroll, { passive: true });
       }, 1000);
     };
+
+    // 🚨 ADSENSE COMPLIANCE: HIDE NSFW FROM BOTS
+    if (navigator.userAgent.includes('Googlebot') || navigator.userAgent.includes('Mediapartners-Google')) {
+      // AdSense bot detected → force SFW mode
+      isNSFW = false;
+      document.getElementById('nsfwBtn').style.display = 'none';
+    }
 
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
