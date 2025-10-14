@@ -593,14 +593,17 @@
       }
     };
 
-    // 🔥 GLOBAL REACTIONS
+    // 🔥 GLOBAL REACTIONS (SAFE FALLBACK)
     const getGlobalReactions = async (memeId) => {
       try {
         const res = await fetch(`${FIREBASE_URL}/reactions/${memeId}.json`);
         const data = await res.json();
         return data || { total: 0, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
       } catch (e) {
-        return { total: 0, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
+        console.warn("Global reactions fetch failed:", e);
+        // Fallback to local storage
+        const local = JSON.parse(localStorage.getItem('cringeReactions')) || {};
+        return local[memeId] || { total: 0, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
       }
     };
 
@@ -611,12 +614,20 @@
         current[emoji] = (current[emoji] || 0) + 1;
         current.total = (current.total || 0) + 1;
         
-        // Push to Firebase
-        await fetch(`${FIREBASE_URL}/reactions/${memeId}.json`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(current)
-        });
+        // Try to push to Firebase
+        try {
+          await fetch(`${FIREBASE_URL}/reactions/${memeId}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(current)
+          });
+        } catch (firebaseError) {
+          console.warn("Firebase sync failed, using local fallback");
+          // Save locally as fallback
+          const local = JSON.parse(localStorage.getItem('cringeReactions')) || {};
+          local[memeId] = current;
+          localStorage.setItem('cringeReactions', JSON.stringify(local));
+        }
         
         return current;
       } catch (e) {
@@ -630,31 +641,54 @@
       leaderboardList.innerHTML = '';
       
       // Get top 3 memes by global reactions
-      const allReactions = await fetch(`${FIREBASE_URL}/reactions.json`).then(r => r.json());
-      if (!allReactions) return;
-      
-      const memeEntries = Object.entries(allReactions);
-      const sorted = memeEntries
-        .map(([id, counts]) => ({ id, ...counts }))
-        .sort((a, b) => (b.total || 0) - (a.total || 0))
-        .slice(0, 3);
-      
-      // Match with topMemes for titles
-      sorted.forEach((meme, index) => {
-        const fullMeme = topMemes.find(m => m.id === meme.id);
-        if (!fullMeme) return;
+      try {
+        const allReactions = await fetch(`${FIREBASE_URL}/reactions.json`).then(r => r.json());
+        if (!allReactions) return;
         
-        const item = document.createElement('div');
-        item.className = 'leaderboard-item';
-        item.innerHTML = `
-          <div class="leaderboard-rank">#${index + 1}</div>
-          <div>${escapeHtml(fullMeme.title)}</div>
-          <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
-            Reactions: ${meme.total || 0}
-          </div>
-        `;
-        leaderboardList.appendChild(item);
-      });
+        const memeEntries = Object.entries(allReactions);
+        const sorted = memeEntries
+          .map(([id, counts]) => ({ id, ...counts }))
+          .sort((a, b) => (b.total || 0) - (a.total || 0))
+          .slice(0, 3);
+        
+        // Match with topMemes for titles
+        sorted.forEach((meme, index) => {
+          const fullMeme = topMemes.find(m => m.id === meme.id);
+          if (!fullMeme) return;
+          
+          const item = document.createElement('div');
+          item.className = 'leaderboard-item';
+          item.innerHTML = `
+            <div class="leaderboard-rank">#${index + 1}</div>
+            <div>${escapeHtml(fullMeme.title)}</div>
+            <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
+              Reactions: ${meme.total || 0}
+            </div>
+          `;
+          leaderboardList.appendChild(item);
+        });
+      } catch (e) {
+        console.warn("Leaderboard sync failed, using local data");
+        // Fallback to local leaderboard
+        const sortedLocal = [...topMemes].sort((a, b) => {
+          const aTotal = (JSON.parse(localStorage.getItem('cringeReactions'))?.[a.id]?.total || 0);
+          const bTotal = (JSON.parse(localStorage.getItem('cringeReactions'))?.[b.id]?.total || 0);
+          return bTotal - aTotal;
+        }).slice(0, 3);
+        
+        sortedLocal.forEach((meme, index) => {
+          const item = document.createElement('div');
+          item.className = 'leaderboard-item';
+          item.innerHTML = `
+            <div class="leaderboard-rank">#${index + 1}</div>
+            <div>${escapeHtml(meme.title)}</div>
+            <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
+              Reactions: ${JSON.parse(localStorage.getItem('cringeReactions'))?.[meme.id]?.total || 0}
+            </div>
+          `;
+          leaderboardList.appendChild(item);
+        });
+      }
     };
 
     const renderMeme = async (meme) => {
