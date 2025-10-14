@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
   <link rel="manifest" href="#inline-manifest" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9372118866074955" crossorigin="anonymous"></script>
   <style>
     :root {
@@ -440,7 +443,23 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE WITH ADSENSE COMPLIANCE =====
+    // ===== FIREBASE CONFIG (FREE) =====
+    const firebaseConfig = {
+    apiKey: "AIzaSyB8b3KKubjQgxVUftLfeoGt62Si4BxH2MI",
+    authDomain: "cringescroll.firebaseapp.com",
+    databaseURL: "https://cringescroll-default-rtdb.firebaseio.com",
+    projectId: "cringescroll",
+    storageBucket: "cringescroll.firebasestorage.app",
+    messagingSenderId: "1095507876027",
+    appId: "1:1095507876027:web:b0cc1b47c5ea840622719e",
+    measurementId: "G-6TGYMBT87T"
+  };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // ===== CORE ENGINE WITH GLOBAL REACTIONS =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -456,7 +475,6 @@
     const NSFW_SOURCES = [
       'https://meme-api.com/gimme/NSFW',
       'https://meme-api.com/gimme/NSFW_GIF',
-      'https://meme-api.com/gimme/RealGirls',
       'https://meme-api.com/gimme/ComedyCemetery',
       'https://meme-api.com/gimme/NSFW_Memes'
     ];
@@ -526,6 +544,30 @@
       }
     };
 
+    // 🔥 GLOBAL REACTION SYNC
+    const syncGlobalReactions = (memeId) => {
+      const ref = database.ref('reactions/' + memeId);
+      
+      // Listen for global updates
+      ref.on('value', (snapshot) => {
+        const globalData = snapshot.val() || { total: 0, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
+        
+        // Update local storage
+        reactionCounts[memeId] = globalData;
+        localStorage.setItem('cringeReactions', JSON.stringify(reactionCounts));
+        
+        // Update UI
+        const items = document.querySelectorAll(`.meme-card[data-id="${memeId}"] .reaction-item`);
+        items.forEach(item => {
+          const emoji = item.querySelector('.reaction-btn').textContent;
+          const countEl = item.querySelector('.reaction-count');
+          if (countEl) {
+            countEl.textContent = globalData[emoji] || 0;
+          }
+        });
+      });
+    };
+
     const updateLeaderboard = () => {
       const leaderboardList = document.getElementById('leaderboardList');
       leaderboardList.innerHTML = '';
@@ -582,29 +624,24 @@
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
         btn.onclick = () => {
-          const counts = reactionCounts[meme.id] || { total: 0 };
-          counts[emoji] = (counts[emoji] || 0) + 1;
-          counts.total = (counts.total || 0) + 1;
-          reactionCounts[meme.id] = counts;
-          localStorage.setItem('cringeReactions', JSON.stringify(reactionCounts));
+          // Update Firebase
+          const ref = database.ref('reactions/' + meme.id);
+          ref.transaction((currentData) => {
+            if (currentData === null) {
+              return { total: 1, [emoji]: 1, 💀: 0, 😂: 0, 🤡: 0, 🥴: 0 };
+            } else {
+              currentData[emoji] = (currentData[emoji] || 0) + 1;
+              currentData.total = (currentData.total || 0) + 1;
+              return currentData;
+            }
+          });
           
+          // Local animation
           const countEl = item.querySelector('.reaction-count');
           if (countEl) {
-            countEl.textContent = counts[emoji];
             countEl.classList.add('animated');
             setTimeout(() => countEl.classList.remove('animated'), 300);
-          } else {
-            const countDisplay = document.createElement('div');
-            countDisplay.className = 'reaction-count';
-            countDisplay.textContent = counts[emoji];
-            item.appendChild(countDisplay);
           }
-          
-          if (!topMemes.find(m => m.id === meme.id)) {
-            topMemes.push(meme);
-            localStorage.setItem('cringeTopMemes', JSON.stringify(topMemes));
-          }
-          updateLeaderboard();
         };
         
         const countDisplay = document.createElement('div');
@@ -624,6 +661,9 @@
       card.insertBefore(badgeContainer, card.firstChild);
       card.appendChild(reactionsDiv);
       feed.appendChild(card);
+      
+      // Sync global reactions for this meme
+      syncGlobalReactions(meme.id);
     };
 
     const formatNumber = (num) => {
@@ -642,7 +682,7 @@
       ins.setAttribute('data-ad-format', 'fluid');
       ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
       ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
-      ins.setAttribute('data-ad-slot', 'YOUR_REAL_AD_SLOT_ID');
+      ins.setAttribute('data-ad-slot', '5669979942');
 
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
@@ -838,7 +878,6 @@
 
     // 🚨 ADSENSE COMPLIANCE: HIDE NSFW FROM BOTS
     if (navigator.userAgent.includes('Googlebot') || navigator.userAgent.includes('Mediapartners-Google')) {
-      // AdSense bot detected → force SFW mode
       isNSFW = false;
       document.getElementById('nsfwBtn').style.display = 'none';
     }
