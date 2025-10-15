@@ -616,6 +616,17 @@
       cursor: pointer;
     }
 
+    .close-login {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--neon-green);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
     #logoutBtn {
       display: none;
       background: var(--neon-pink);
@@ -804,6 +815,7 @@
   <!-- ✅ LOGIN MODAL -->
   <div id="loginModal">
     <div class="login-content">
+      <button class="close-login" id="closeLogin">✕</button>
       <h2>🔒 Login or Sign Up</h2>
       <input type="text" id="loginEmail" class="login-input" placeholder="Email" required>
       <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
@@ -850,7 +862,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.5 — LOGIN + CHAT + NO BLACK BOX =====
+    // ===== CORE ENGINE v2.6 — BLACK BOX GONE + LOGIN FIXED + CLOSE BUTTON ADDED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -919,7 +931,7 @@
       }
     });
 
-    // 🔥 STORE MEME ON FIRST REACTION (FIXES LEADERBOARD)
+    // 🔥 STORE MEME ON FIRST REACTION
     const ensureMemeInDB = async (meme) => {
       if (!db) return;
       try {
@@ -1252,7 +1264,7 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 LEADERBOARD — NOW CHAT
+    // 🔥 CHAT — REPLACES LEADERBOARD
     const loadChatMessages = async () => {
       if (!db || !currentUser) return;
       const chatMessages = document.getElementById('chatMessages');
@@ -1302,7 +1314,7 @@
       }
     };
 
-    // 🔥 LOGIN / SIGNUP
+    // 🔥 LOGIN / SIGNUP — FIXED
     const login = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
@@ -1421,6 +1433,9 @@
         const password = document.getElementById('loginPassword').value;
         document.getElementById('loginEmail').value = email;
         document.getElementById('loginPassword').value = password;
+      };
+      document.getElementById('closeLogin').onclick = () => {
+        document.getElementById('loginModal').style.display = 'none';
       };
       document.getElementById('logoutBtn').onclick = logout;
       document.getElementById('nsfwConfirm').onclick = enableNSFW;
