@@ -71,6 +71,7 @@
       height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
+    /* ✅ HEADER — SMOOTH HIDE */
     header {
       padding: 16px 20px;
       background: rgba(13, 13, 26, 0.92);
@@ -81,6 +82,13 @@
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--neon-purple);
+      transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease;
+      will-change: transform, opacity;
+    }
+
+    header.hidden {
+      transform: translateY(-100%);
+      opacity: 0;
     }
 
     .logo-container {
@@ -146,18 +154,22 @@
       width: 100%;
     }
 
-    /* ✅ UI BAR — HIDE WITH display:none TO REMOVE FROM LAYOUT */
+    /* ✅ UI BAR — SMOOTH COLLAPSE */
     .ui-bar {
       display: flex;
       flex-direction: column;
       background: rgba(13, 13, 26, 0.7);
       border-bottom: 1px solid rgba(212, 0, 255, 0.3);
       z-index: 99;
-      transition: all 0.3s ease;
+      transition: height 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease;
+      overflow: hidden;
+      height: auto;
+      will-change: height, opacity;
     }
 
     .ui-bar.hidden {
-      display: none; /* ✅ REMOVES FROM LAYOUT — NO BLACK BOX */
+      height: 0 !important;
+      opacity: 0;
     }
 
     .tab-bar {
@@ -225,6 +237,7 @@
       transform: scale(0.95);
     }
 
+    /* ✅ FEED — FULL SCREEN EXPANSION */
     #feed {
       flex: 1;
       overflow-y: auto;
@@ -233,10 +246,10 @@
       scroll-behavior: auto;
       min-height: 0;
       padding-bottom: max(100px, env(safe-area-inset-bottom));
-      transition: padding-top 0.3s ease;
+      transition: padding-top 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+      will-change: padding-top;
     }
 
-    /* ✅ FEED EXPANDS TO FILL SPACE WHEN UI-BAR HIDES */
     #feed.fullscreen {
       padding-top: 0;
     }
@@ -667,7 +680,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.3 — BLACK BOX ELIMINATED =====
+    // ===== CORE ENGINE v2.4 — ULTRA-SMOOTH FULL SCREEN HIDE =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1084,24 +1097,38 @@
       }
     };
 
-    // 🔥 PERFECT SCROLL HIDING — NO BLACK BOX
+    // 🔥 ULTRA-SMOOTH SCROLL HIDING — YOUTUBE-LEVEL FLUIDITY
     const initScrollHiding = () => {
+      const header = document.querySelector('header');
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
+      let isHidden = false;
+      let lastDirection = 0; // 1 = down, -1 = up
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
-        const isScrollingDown = currentScrollTop > lastScrollTop;
+        const scrollDelta = currentScrollTop - lastScrollTop;
+        const direction = scrollDelta > 0 ? 1 : -1;
         
-        if (isScrollingDown && currentScrollTop > 100) {
-          uiBar.classList.add('hidden'); // ✅ display: none — removes from layout
-          feed.classList.add('fullscreen');
-        } else if (!isScrollingDown) {
-          uiBar.classList.remove('hidden'); // ✅ display: flex — restores layout
-          feed.classList.remove('fullscreen');
+        // Only trigger on meaningful scroll (>10px)
+        if (Math.abs(scrollDelta) > 10) {
+          const shouldHide = direction === 1 && currentScrollTop > 100;
+          
+          if (shouldHide && !isHidden) {
+            header.classList.add('hidden');
+            uiBar.classList.add('hidden');
+            feed.classList.add('fullscreen');
+            isHidden = true;
+          } else if (direction === -1 && isHidden) {
+            header.classList.remove('hidden');
+            uiBar.classList.remove('hidden');
+            feed.classList.remove('fullscreen');
+            isHidden = false;
+          }
         }
         
         lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+        lastDirection = direction;
         ticking = false;
       };
 
