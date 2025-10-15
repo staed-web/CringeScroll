@@ -6,9 +6,7 @@
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
   <link rel="manifest" href="#inline-manifest" />
-  <!-- AdSense only loads in SFW mode -->
   <script>
-    // Only load AdSense if NOT in NSFW mode
     if (!localStorage.getItem('cringeNSFW') || localStorage.getItem('cringeNSFW') === 'false') {
       const script = document.createElement('script');
       script.async = true;
@@ -55,6 +53,7 @@
       height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
+    /* ✨ ADVANCED HEADER WITH LOGO */
     header {
       padding: 16px 20px;
       background: rgba(13, 13, 26, 0.92);
@@ -68,7 +67,47 @@
       transition: transform 0.3s ease;
     }
 
-    header h1 {
+    /* ✨ FUN LOGO CONTAINER */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .logo-container:hover {
+      transform: scale(1.03);
+    }
+
+    /* ✨ CUSTOM CRINGE LOGO */
+    .cringe-logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-green));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(212, 0, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cringe-logo::before {
+      content: "💀";
+      font-size: 24px;
+      animation: pulseLogo 2s infinite alternate;
+    }
+
+    @keyframes pulseLogo {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.1); }
+    }
+
+    /* ✨ ANIMATED TITLE */
+    .logo-title {
       font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.5px;
@@ -76,6 +115,22 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      position: relative;
+    }
+
+    .logo-title::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--neon-green);
+      transition: width 0.3s ease;
+    }
+
+    .logo-container:hover .logo-title::after {
+      width: 100%;
     }
 
     .control-bar {
@@ -190,7 +245,6 @@
       -webkit-user-drag: none;
     }
 
-    /* REACTIONS */
     .reactions {
       display: flex;
       justify-content: center;
@@ -240,7 +294,6 @@
       100% { transform: scale(1); }
     }
 
-    /* AD CONTAINER (NATIVE STYLE) - ONLY IN SFW */
     .ad-container {
       background: var(--card-bg);
       border-radius: 20px;
@@ -271,7 +324,6 @@
       font-size: 16px;
     }
 
-    /* INSTALL PROMPT */
     #installPrompt {
       position: fixed;
       bottom: 0;
@@ -296,7 +348,6 @@
       cursor: pointer;
     }
 
-    /* LEADERBOARD SIDEBAR */
     #leaderboard {
       position: fixed;
       top: 0;
@@ -349,7 +400,6 @@
       cursor: pointer;
     }
 
-    /* NSFW CONFIRM MODAL */
     #nsfwModal {
       display: none;
       position: fixed;
@@ -403,8 +453,12 @@
 </head>
 <body>
   <div id="app">
+    <!-- ✨ ADVANCED HEADER WITH CLICKABLE LOGO -->
     <header>
-      <h1>CringeScroll</h1>
+      <div class="logo-container" id="logoLink">
+        <div class="cringe-logo"></div>
+        <div class="logo-title">CringeScroll</div>
+      </div>
     </header>
     
     <div class="control-bar" id="controlBar">
@@ -419,16 +473,12 @@
     </div>
   </div>
 
-  <!-- LEADERBOARD SIDEBAR -->
   <div id="leaderboard">
     <button class="close-leaderboard" id="closeLeaderboard">✕</button>
     <div class="leaderboard-title">🔥 Cringe of the Day</div>
-    <div id="leaderboardList">
-      <!-- Top memes will load here -->
-    </div>
+    <div id="leaderboardList"></div>
   </div>
 
-  <!-- NSFW CONFIRMATION MODAL -->
   <div id="nsfwModal">
     <div class="modal-content">
       <h2>🔞 Mature Content Warning</h2>
@@ -438,7 +488,6 @@
     </div>
   </div>
 
-  <!-- INSTALL PROMPT -->
   <div id="installPrompt">
     <p>💡 Install for fullscreen cringe & no black bars!</p>
     <button class="prompt-btn" id="installBtn">Install</button>
@@ -462,11 +511,10 @@
     let reactionCounts = JSON.parse(localStorage.getItem('cringeReactions')) || {};
     let topMemes = JSON.parse(localStorage.getItem('cringeTopMemes')) || [];
 
-    // ✅ SAFE SOURCES ONLY (NO EXPLICIT CONTENT)
     const NSFW_SOURCES = [
-      'https://meme-api.com/gimme/ComedyCemetery', // Dark humor (allowed)
-      'https://meme-api.com/gimme/terriblefacebookmemes', // Cringe satire
-      'https://meme-api.com/gimme/okbuddyretard' // Edgy but no nudity
+      'https://meme-api.com/gimme/ComedyCemetery',
+      'https://meme-api.com/gimme/terriblefacebookmemes',
+      'https://meme-api.com/gimme/okbuddyretard'
     ];
 
     const SFW_SOURCES = [
@@ -640,9 +688,8 @@
       return num;
     };
 
-    // ✅ ADS ONLY IN SFW MODE
     const renderAd = () => {
-      if (isNSFW) return; // NEVER show ads in NSFW mode
+      if (isNSFW) return;
       
       const adContainer = document.createElement('div');
       adContainer.className = 'ad-container';
@@ -653,7 +700,7 @@
       ins.setAttribute('data-ad-format', 'fluid');
       ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
       ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
-      ins.setAttribute('data-ad-slot', '937211886607');
+      ins.setAttribute('data-ad-slot', 'YOUR_REAL_AD_SLOT_ID');
 
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
@@ -677,14 +724,13 @@
       if (meme) {
         renderMeme(meme);
         loadCount++;
-        if (!isNSFW && loadCount % 7 === 0) { // Ads only in SFW
+        if (!isNSFW && loadCount % 7 === 0) {
           setTimeout(renderAd, 100);
         }
       }
       isLoading = false;
     };
 
-    // 🔥 CRINGE ROULETTE
     const cringeRoulette = async () => {
       const rouletteBtn = document.getElementById('rouletteBtn');
       rouletteBtn.textContent = '🎰';
@@ -712,7 +758,6 @@
       }, 200);
     };
 
-    // 🔥 GLOW MODE
     const toggleGlowMode = () => {
       isGlowMode = !isGlowMode;
       if (isGlowMode) {
@@ -726,7 +771,6 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 AUTO HIDE/SHOW CONTROL BAR
     const initScrollHiding = () => {
       const controlBar = document.getElementById('controlBar');
       let ticking = false;
@@ -752,7 +796,6 @@
       });
     };
 
-    // BUTTONS
     const attachButtonListeners = () => {
       document.getElementById('rouletteBtn').onclick = cringeRoulette;
       document.getElementById('glowBtn').onclick = toggleGlowMode;
@@ -774,7 +817,11 @@
         document.getElementById('nsfwModal').style.display = 'none';
       };
       
-      // Install prompt
+      // ✨ LOGO CLICK HANDLER
+      document.getElementById('logoLink').onclick = () => {
+        window.location.href = window.location.origin + window.location.pathname;
+      };
+      
       document.getElementById('installBtn').onclick = () => {
         alert("Tap 'Share' → 'Add to Home Screen' for fullscreen mode!");
         document.getElementById('installPrompt').style.display = 'none';
@@ -808,7 +855,6 @@
       for (let i = 0; i < 6; i++) setTimeout(loadNext, i * 150);
     };
 
-    // INIT
     const initApp = () => {
       feed = document.getElementById('feed');
       
@@ -820,7 +866,6 @@
         document.getElementById('glowBtn').textContent = '🕶️';
       }
 
-      // Update button text based on NSFW state
       document.getElementById('nsfwBtn').textContent = isNSFW ? '✅' : '🔞';
 
       attachButtonListeners();
