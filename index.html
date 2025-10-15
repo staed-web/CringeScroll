@@ -146,19 +146,18 @@
       width: 100%;
     }
 
-    /* ✅ TAB BAR + CONTROL BAR — HIDE ON SCROLL-DOWN */
+    /* ✅ UI BAR — HIDE WITH display:none TO REMOVE FROM LAYOUT */
     .ui-bar {
       display: flex;
       flex-direction: column;
       background: rgba(13, 13, 26, 0.7);
       border-bottom: 1px solid rgba(212, 0, 255, 0.3);
-      transition: transform 0.3s ease;
-      will-change: transform;
       z-index: 99;
+      transition: all 0.3s ease;
     }
 
     .ui-bar.hidden {
-      transform: translateY(-100%);
+      display: none; /* ✅ REMOVES FROM LAYOUT — NO BLACK BOX */
     }
 
     .tab-bar {
@@ -668,7 +667,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.2 — PERFECT SCROLL HIDING + LEADERBOARD FIXED =====
+    // ===== CORE ENGINE v2.3 — BLACK BOX ELIMINATED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1085,7 +1084,7 @@
       }
     };
 
-    // 🔥 PERFECT SCROLL HIDING — NO BLACK GAP
+    // 🔥 PERFECT SCROLL HIDING — NO BLACK BOX
     const initScrollHiding = () => {
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
@@ -1095,10 +1094,10 @@
         const isScrollingDown = currentScrollTop > lastScrollTop;
         
         if (isScrollingDown && currentScrollTop > 100) {
-          uiBar.classList.add('hidden');
+          uiBar.classList.add('hidden'); // ✅ display: none — removes from layout
           feed.classList.add('fullscreen');
         } else if (!isScrollingDown) {
-          uiBar.classList.remove('hidden');
+          uiBar.classList.remove('hidden'); // ✅ display: flex — restores layout
           feed.classList.remove('fullscreen');
         }
         
