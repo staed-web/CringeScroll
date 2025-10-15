@@ -146,10 +146,10 @@
       width: 100%;
     }
 
-    /* ✅ SCROLL-HIDING BARS */
-    .scroll-hide-bar {
+    /* ✅ TAB BAR + CONTROL BAR — HIDE ON SCROLL-DOWN */
+    .ui-bar {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       background: rgba(13, 13, 26, 0.7);
       border-bottom: 1px solid rgba(212, 0, 255, 0.3);
       transition: transform 0.3s ease;
@@ -157,15 +157,22 @@
       z-index: 99;
     }
 
-    .scroll-hide-bar.hidden {
+    .ui-bar.hidden {
       transform: translateY(-100%);
+    }
+
+    .tab-bar {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(212, 0, 255, 0.1);
     }
 
     .tab-btn {
       background: transparent;
       border: none;
       color: var(--text);
-      padding: 12px 20px;
+      padding: 8px 16px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
@@ -185,6 +192,14 @@
       right: 0;
       height: 2px;
       background: var(--neon-green);
+    }
+
+    .control-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      padding: 12px 0;
+      border-top: 1px solid rgba(212, 0, 255, 0.1);
     }
 
     .control-btn {
@@ -222,14 +237,11 @@
       transition: padding-top 0.3s ease;
     }
 
-    /* ✅ FEED EXPANDS WHEN BARS HIDE */
-    #feed.expanded {
+    /* ✅ FEED EXPANDS TO FILL SPACE WHEN UI-BAR HIDES */
+    #feed.fullscreen {
       padding-top: 0;
     }
 
-    /* ... (rest of your CSS remains identical — .meme-card, .ad-container, etc.) ... */
-    
-    /* Keep all your existing styles from .meme-card down to .generator-btn.cancel */
     .meme-card {
       background: var(--card-bg);
       border-radius: 20px;
@@ -594,18 +606,20 @@
       </div>
     </header>
     
-    <div class="scroll-hide-bar" id="tabBar">
-      <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
-      <button class="tab-btn" data-tab="fresh">💀 Fresh</button>
-      <button class="tab-btn" data-tab="crowned">👑 Crowned</button>
-    </div>
-    
-    <div class="scroll-hide-bar" id="controlBar">
-      <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
-      <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
-      <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
-      <button class="control-btn" id="leaderboardBtn" title="Top Cringe">🏆</button>
-      <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
+    <!-- ✅ SINGLE UI-BAR CONTAINER FOR TABS + CONTROL BUTTONS -->
+    <div class="ui-bar" id="uiBar">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
+        <button class="tab-btn" data-tab="fresh">💀 Fresh</button>
+        <button class="tab-btn" data-tab="crowned">👑 Crowned</button>
+      </div>
+      <div class="control-bar">
+        <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
+        <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
+        <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
+        <button class="control-btn" id="leaderboardBtn" title="Top Cringe">🏆</button>
+        <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
+      </div>
     </div>
     
     <div id="feed">
@@ -654,7 +668,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.1 — SCROLL HIDING + LEADERBOARD FIXED =====
+    // ===== CORE ENGINE v2.2 — PERFECT SCROLL HIDING + LEADERBOARD FIXED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -757,9 +771,7 @@
       }
     };
 
-    // ... (rest of your functions: createMeme, fetchMeme, fetchUserMemes, renderMeme, renderAd, loadFeed, switchTab, cringeRoulette, toggleGlowMode)
-
-    // 🔥 RENDER MEME (PASS FULL MEME DATA TO REACTIONS)
+    // 🔥 RENDER MEME
     const renderMeme = async (meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
@@ -1075,8 +1087,7 @@
 
     // 🔥 PERFECT SCROLL HIDING — NO BLACK GAP
     const initScrollHiding = () => {
-      const tabBar = document.getElementById('tabBar');
-      const controlBar = document.getElementById('controlBar');
+      const uiBar = document.getElementById('uiBar');
       let ticking = false;
 
       const updateBars = () => {
@@ -1084,13 +1095,11 @@
         const isScrollingDown = currentScrollTop > lastScrollTop;
         
         if (isScrollingDown && currentScrollTop > 100) {
-          tabBar.classList.add('hidden');
-          controlBar.classList.add('hidden');
-          feed.classList.add('expanded');
+          uiBar.classList.add('hidden');
+          feed.classList.add('fullscreen');
         } else if (!isScrollingDown) {
-          tabBar.classList.remove('hidden');
-          controlBar.classList.remove('hidden');
-          feed.classList.remove('expanded');
+          uiBar.classList.remove('hidden');
+          feed.classList.remove('fullscreen');
         }
         
         lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
