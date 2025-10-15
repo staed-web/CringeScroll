@@ -71,6 +71,7 @@
       height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
+    /* ✅ HEADER — SMOOTH HIDE */
     header {
       padding: 16px 20px;
       background: rgba(13, 13, 26, 0.92);
@@ -81,6 +82,12 @@
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--neon-purple);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    header.hidden {
+      transform: translateY(-100%);
+      opacity: 0;
     }
 
     .logo-container {
@@ -146,18 +153,21 @@
       width: 100%;
     }
 
-    /* ✅ UI BAR — HIDE WITH display:none TO REMOVE FROM LAYOUT */
+    /* ✅ UI BAR — SMOOTH HIDE */
     .ui-bar {
       display: flex;
       flex-direction: column;
       background: rgba(13, 13, 26, 0.7);
       border-bottom: 1px solid rgba(212, 0, 255, 0.3);
       z-index: 99;
-      transition: all 0.3s ease;
+      transition: height 0.3s ease, opacity 0.3s ease;
+      overflow: hidden;
+      height: auto;
     }
 
     .ui-bar.hidden {
-      display: none; /* ✅ REMOVES FROM LAYOUT — NO BLACK BOX */
+      height: 0 !important;
+      opacity: 0;
     }
 
     .tab-bar {
@@ -236,7 +246,6 @@
       transition: padding-top 0.3s ease;
     }
 
-    /* ✅ FEED EXPANDS TO FILL SPACE WHEN UI-BAR HIDES */
     #feed.fullscreen {
       padding-top: 0;
     }
@@ -594,6 +603,32 @@
       background: #555;
       color: white;
     }
+
+    /* Username Prompt */
+    #usernamePrompt {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      padding: 16px;
+      text-align: center;
+      z-index: 1000;
+      border-top: 1px solid var(--neon-purple);
+      display: none;
+    }
+
+    #usernameInput {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--neon-green);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      margin: 0 8px;
+      width: 60%;
+      max-width: 200px;
+    }
   </style>
 </head>
 <body>
@@ -605,7 +640,6 @@
       </div>
     </header>
     
-    <!-- ✅ SINGLE UI-BAR CONTAINER FOR TABS + CONTROL BUTTONS -->
     <div class="ui-bar" id="uiBar">
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
@@ -662,12 +696,18 @@
     <button class="prompt-btn" id="dismissBtn">No thanks</button>
   </div>
 
+  <div id="usernamePrompt">
+    <p>🏆 Enter a username to appear on the leaderboard (optional):</p>
+    <input type="text" id="usernameInput" placeholder="e.g., SkullLord" maxlength="20">
+    <button class="prompt-btn" id="saveUsername">Save</button>
+  </div>
+
   <div class="footer-notice">
     <a href="/privacy.html">Privacy Policy</a>
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.3 — BLACK BOX ELIMINATED =====
+    // ===== CORE ENGINE v3.0 — FULL SCREEN + USERNAME LEADERBOARD =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -678,6 +718,7 @@
     let lastScrollTop = 0;
     let currentTab = 'hot';
     let db = null;
+    let scrollPoints = parseInt(localStorage.getItem('cringeScrollPoints')) || 0;
 
     const NSFW_SOURCES = [
       'https://meme-api.com/gimme/ComedyCemetery',
@@ -717,7 +758,7 @@
       }
     });
 
-    // 🔥 STORE MEME ON FIRST REACTION (FIXES LEADERBOARD)
+    // 🔥 STORE MEME ON FIRST REACTION
     const ensureMemeInDB = async (meme) => {
       if (!db) return;
       try {
@@ -754,9 +795,7 @@
     const addReaction = async (memeId, emoji, memeData) => {
       if (!db) return;
       try {
-        // ✅ STORE MEME IF NOT EXISTS
         await ensureMemeInDB(memeData);
-        
         const docRef = db.collection('reactions').doc(memeId);
         await db.runTransaction(async (transaction) => {
           const doc = await transaction.get(docRef);
@@ -805,7 +844,7 @@
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
         btn.onclick = async () => {
-          await addReaction(meme.id, emoji, meme); // ✅ PASS MEME DATA
+          await addReaction(meme.id, emoji, meme);
           const countEl = item.querySelector('.reaction-count');
           const newCount = (reactionData.counts[emoji] || 0) + 1;
           if (countEl) {
@@ -899,6 +938,8 @@
       if (meme) {
         await renderMeme(meme);
         loadCount++;
+        scrollPoints++;
+        localStorage.setItem('cringeScrollPoints', scrollPoints.toString());
         if (!isNSFW && loadCount > 0) {
           const nextAdAt = [5, 6, 7][Math.floor(Math.random() * 3)];
           if (loadCount % nextAdAt === 0) {
@@ -1031,6 +1072,8 @@
           rouletteBtn.textContent = '🎯';
           rouletteBtn.disabled = false;
           loadCount++;
+          scrollPoints++;
+          localStorage.setItem('cringeScrollPoints', scrollPoints.toString());
           if (!isNSFW && loadCount % 7 === 0) setTimeout(renderAd, 100);
         }
       }, 200);
@@ -1050,27 +1093,48 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 LEADERBOARD — NOW WORKS
+    // 🔥 LEADERBOARD — WITH USERNAME + SCROLL POINTS
     const updateLeaderboard = async () => {
       if (!db) return;
       const leaderboardList = document.getElementById('leaderboardList');
       leaderboardList.innerHTML = '<div class="loading-spinner">Crunching cringe...</div>';
       
       try {
-        const snapshot = await db.collection('reactions')
+        // Get top reaction leaders
+        const reactionSnapshot = await db.collection('reactions')
           .orderBy('total', 'desc')
           .limit(3)
           .get();
         
+        // Get scroll points leader
+        const username = localStorage.getItem('cringeUsername') || 'Anonymous';
+        const points = scrollPoints;
+        
         leaderboardList.innerHTML = '';
-        for (const doc of snapshot.docs) {
+        
+        // Add scroll points leader at top
+        if (points > 0) {
+          const item = document.createElement('div');
+          item.className = 'leaderboard-item';
+          item.innerHTML = `
+            <div class="leaderboard-rank">👑</div>
+            <div>${escapeHtml(username)}</div>
+            <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
+              Scroll Points: ${points}
+            </div>
+          `;
+          leaderboardList.appendChild(item);
+        }
+        
+        // Add reaction leaders
+        reactionSnapshot.docs.forEach((doc, index) => {
           const memeDoc = await db.collection('memes').doc(doc.id).get();
           if (memeDoc.exists) {
             const meme = memeDoc.data();
             const item = document.createElement('div');
             item.className = 'leaderboard-item';
             item.innerHTML = `
-              <div class="leaderboard-rank">#${snapshot.docs.indexOf(doc) + 1}</div>
+              <div class="leaderboard-rank">#${index + 1}</div>
               <div>${escapeHtml(meme.title)}</div>
               <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
                 Reactions: ${doc.data().total}
@@ -1078,27 +1142,34 @@
             `;
             leaderboardList.appendChild(item);
           }
-        }
+        });
       } catch (e) {
         leaderboardList.innerHTML = '<div style="color:var(--neon-pink);">Error loading</div>';
       }
     };
 
-    // 🔥 PERFECT SCROLL HIDING — NO BLACK BOX
+    // 🔥 SMOOTH SCROLL HIDING — FULL SCREEN LIKE YOUTUBE
     const initScrollHiding = () => {
+      const header = document.querySelector('header');
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
+      let isHidden = false;
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
         const isScrollingDown = currentScrollTop > lastScrollTop;
+        const shouldHide = isScrollingDown && currentScrollTop > 100;
         
-        if (isScrollingDown && currentScrollTop > 100) {
-          uiBar.classList.add('hidden'); // ✅ display: none — removes from layout
+        if (shouldHide && !isHidden) {
+          header.classList.add('hidden');
+          uiBar.classList.add('hidden');
           feed.classList.add('fullscreen');
-        } else if (!isScrollingDown) {
-          uiBar.classList.remove('hidden'); // ✅ display: flex — restores layout
+          isHidden = true;
+        } else if (!shouldHide && isHidden) {
+          header.classList.remove('hidden');
+          uiBar.classList.remove('hidden');
           feed.classList.remove('fullscreen');
+          isHidden = false;
         }
         
         lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
@@ -1131,6 +1202,14 @@
       document.getElementById('leaderboardBtn').onclick = () => {
         document.getElementById('leaderboard').classList.add('open');
         updateLeaderboard();
+        
+        // Show username prompt if not set
+        if (!localStorage.getItem('cringeUsername') && !localStorage.getItem('usernamePromptSeen')) {
+          setTimeout(() => {
+            document.getElementById('usernamePrompt').style.display = 'block';
+            localStorage.setItem('usernamePromptSeen', 'true');
+          }, 500);
+        }
       };
       document.getElementById('closeLeaderboard').onclick = () => {
         document.getElementById('leaderboard').classList.remove('open');
@@ -1166,6 +1245,16 @@
           return;
         }
         createMeme(top, bottom, url);
+      };
+      
+      // Username save
+      document.getElementById('saveUsername').onclick = () => {
+        const username = document.getElementById('usernameInput').value.trim();
+        if (username) {
+          localStorage.setItem('cringeUsername', username);
+        }
+        document.getElementById('usernamePrompt').style.display = 'none';
+        updateLeaderboard();
       };
     };
 
