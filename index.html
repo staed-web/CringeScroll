@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
-  <title>CringeScroll</title>
-    <!-- ✅ FIXED FAVICON + ADDRESS BAR ICON -->
+    <title>CringeScroll</title>
+  <!-- ✨ CUSTOM FAVICON + ADDRESS BAR ICON (DATA URI) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZDBkMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+QzwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRDQwMEZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwzKSI+UjwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMzlGRjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+STwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw5KSI+RzwvdGV4dD4KPC9zdmc+Cg=="/>
   <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZDBkMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+QzwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRDQwMEZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwzKSI+UjwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMzlGRjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+STwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw5KSI+RzwvdGV4dD4KPC9zdmc+Cg=="/>
   <link rel="manifest" href="#inline-manifest" />
@@ -56,6 +56,7 @@
       height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
+    /* ✨ ADVANCED HEADER WITH LOGO */
     header {
       padding: 16px 20px;
       background: rgba(13, 13, 26, 0.92);
@@ -69,6 +70,7 @@
       transition: transform 0.3s ease;
     }
 
+    /* ✨ FUN LOGO CONTAINER */
     .logo-container {
       display: flex;
       align-items: center;
@@ -82,6 +84,7 @@
       transform: scale(1.03);
     }
 
+    /* ✨ CUSTOM CRINGE LOGO */
     .cringe-logo {
       width: 40px;
       height: 40px;
@@ -106,6 +109,7 @@
       100% { transform: scale(1.1); }
     }
 
+    /* ✨ ANIMATED TITLE */
     .logo-title {
       font-size: 28px;
       font-weight: 800;
@@ -231,23 +235,6 @@
       color: var(--neon-green);
       word-break: break-word;
       padding-top: 36px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .share-btn {
-      background: rgba(57, 255, 20, 0.2);
-      border: none;
-      color: var(--neon-green);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .meme-image {
@@ -465,45 +452,11 @@
       color: #8a8aa0;
       text-decoration: none;
     }
-
-    /* ZOOM MODAL */
-    #zoomModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 300;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #zoomImage {
-      max-width: 95%;
-      max-height: 95%;
-      object-fit: contain;
-    }
-
-    /* STREAK BADGE */
-    #streakBadge {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: var(--neon-purple);
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: bold;
-      z-index: 150;
-      display: none;
-      box-shadow: 0 0 10px var(--neon-purple);
-    }
   </style>
 </head>
 <body>
   <div id="app">
+    <!-- ✨ ADVANCED HEADER WITH CLICKABLE LOGO -->
     <header>
       <div class="logo-container" id="logoLink">
         <div class="cringe-logo"></div>
@@ -514,8 +467,7 @@
     <div class="control-bar" id="controlBar">
       <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
       <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
-      <button class="control-btn" id="soundBtn" title="Toggle Sound">🔊</button>
-      <button class="control-btn" id="moodBtn" title="Mood Mode">🎭</button>
+      <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
       <button class="control-btn" id="leaderboardBtn" title="Top Cringe">🏆</button>
     </div>
     
@@ -539,12 +491,6 @@
     </div>
   </div>
 
-  <div id="zoomModal">
-    <img id="zoomImage" />
-  </div>
-
-  <div id="streakBadge"></div>
-
   <div id="installPrompt">
     <p>💡 Install for fullscreen cringe & no black bars!</p>
     <button class="prompt-btn" id="installBtn">Install</button>
@@ -556,7 +502,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE - FIXED & ENHANCED =====
+    // ===== CORE ENGINE - ADSENSE COMPLIANT =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -567,161 +513,68 @@
     let lastScrollTop = 0;
     let reactionCounts = JSON.parse(localStorage.getItem('cringeReactions')) || {};
     let topMemes = JSON.parse(localStorage.getItem('cringeTopMemes')) || [];
-    let isSoundOn = localStorage.getItem('cringeSound') !== 'false';
-    let currentMood = localStorage.getItem('cringeMood') || 'default';
 
-    // CLEANED SOURCES - NO SPACES
-    const MOOD_SOURCES = {
-      default: {
-        nsfw: [
-          'https://meme-api.com/gimme/ComedyCemetery',
-          'https://meme-api.com/gimme/terriblefacebookmemes',
-          'https://meme-api.com/gimme/okbuddyretard',
-          'https://meme-api.com/gimme/2meirl4meirl',
-          'https://meme-api.com/gimme/antiwork',
-          'https://meme-api.com/gimme/iamverysmart'
-        ],
-        sfw: [
-          'https://meme-api.com/gimme/memes',
-          'https://meme-api.com/gimme/dankmemes',
-          'https://meme-api.com/gimme/me_irl',
-          'https://meme-api.com/gimme/wholesomememes',
-          'https://meme-api.com/gimme/funny',
-          'https://meme-api.com/gimme/HistoryMemes',
-          'https://meme-api.com/gimme/ProgrammerHumor'
-        ]
-      },
-      wholesome: {
-        nsfw: [],
-        sfw: ['https://meme-api.com/gimme/wholesomememes', 'https://meme-api.com/gimme/wholesomegreentext']
-      },
-      rage: {
-        nsfw: ['https://meme-api.com/gimme/antiwork', 'https://meme-api.com/gimme/pcmasterrace'],
-        sfw: ['https://meme-api.com/gimme/pcmasterrace']
-      },
-      surreal: {
-        nsfw: ['https://meme-api.com/gimme/2meirl4meirl', 'https://meme-api.com/gimme/deepfriedmemes'],
-        sfw: ['https://meme-api.com/gimme/deepfriedmemes']
-      }
-    };
+    const NSFW_SOURCES = [
+  'https://meme-api.com/gimme/ComedyCemetery',
+  'https://meme-api.com/gimme/terriblefacebookmemes',
+  'https://meme-api.com/gimme/okbuddyretard',
+  'https://meme-api.com/gimme/2meirl4meirl',
+  'https://meme-api.com/gimme/antiwork',
+  'https://meme-api.com/gimme/iamverysmart'
+];
+
+const SFW_SOURCES = [
+  'https://meme-api.com/gimme/memes',
+  'https://meme-api.com/gimme/dankmemes',
+  'https://meme-api.com/gimme/me_irl',
+  'https://meme-api.com/gimme/wholesomememes',
+  'https://meme-api.com/gimme/funny',
+  'https://meme-api.com/gimme/HistoryMemes',
+  'https://meme-api.com/gimme/ProgrammerHumor'
+];
 
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
 
-    // LIGHTWEIGHT CONFETTI
-    const confetti = (opts = {}) => {
-      const canvas = document.createElement('canvas');
-      canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:10000';
-      document.body.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const particles = [];
-      const count = opts.particleCount || 50;
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-          angle: Math.random() * Math.PI * 2,
-          speed: 2 + Math.random() * 3,
-          size: 5 + Math.random() * 5,
-          color: ['#D400FF', '#39FF14', '#FF2A6D'][Math.floor(Math.random() * 3)]
-        });
-      }
-      const draw = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let alive = false;
-        particles.forEach(p => {
-          p.x += Math.cos(p.angle) * p.speed;
-          p.y += Math.sin(p.angle) * p.speed + 0.1;
-          p.speed *= 0.98;
-          if (p.speed > 0.1) alive = true;
-          ctx.fillStyle = p.color;
-          ctx.fillRect(p.x, p.y, p.size, p.size);
-        });
-        if (alive) requestAnimationFrame(draw);
-        else document.body.removeChild(canvas);
-      };
-      requestAnimationFrame(draw);
-    };
-
-    // SOUND EFFECTS
-    const playSound = (type) => {
-      if (!isSoundOn) return;
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        if (type === 'boop') {
-          osc.frequency.value = 600;
-          gain.gain.value = 0.1;
-          osc.type = 'sine';
-        } else if (type === 'laugh') {
-          osc.frequency.value = 300 + Math.random() * 200;
-          gain.gain.value = 0.05;
-          osc.type = 'square';
-        }
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-        setTimeout(() => ctx.close(), 300);
-      } catch (e) {
-        console.warn("Sound failed:", e);
-      }
-    };
-
     const fetchMeme = async () => {
       try {
-        const mood = MOOD_SOURCES[currentMood] || MOOD_SOURCES.default;
-        const sources = isNSFW ? mood.nsfw : mood.sfw;
-        if (sources.length === 0) {
-          const fallback = MOOD_SOURCES.default;
-          return await _fetchFromSources(isNSFW ? fallback.nsfw : fallback.sfw);
+        const sources = isNSFW ? NSFW_SOURCES : SFW_SOURCES;
+        const shuffled = [...sources].sort(() => 0.5 - Math.random());
+        
+        for (let i = 0; i < shuffled.length; i++) {
+          const url = `${shuffled[i]}?_=${Date.now()}`;
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+            const res = await fetch(url, {
+              cache: 'no-store',
+              mode: 'cors',
+              signal: controller.signal
+            });
+            clearTimeout(timeout);
+            
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (!data?.url || seenUrls.has(data.url)) continue;
+            
+            seenUrls.add(data.url);
+            return { 
+              url: data.url, 
+              title: data.title || (isNSFW ? 'Mature Cringe' : 'Cringe'),
+              ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
+              isNSFW: isNSFW,
+              id: data.url.split('/').pop()
+            };
+          } catch (e) {
+            continue;
+          }
         }
-        return await _fetchFromSources(sources);
-      } catch (e) {
-        console.warn("Fetch failed:", e.message);
-        return null;
-      }
-    };
-
-    const _fetchFromSources = async (sources) => {
-      const shuffled = [...sources].sort(() => 0.5 - Math.random());
-      for (let url of shuffled) {
-        try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 5000);
-          const res = await fetch(`${url}?_=${Date.now()}`, {
-            cache: 'no-store',
-            mode: 'cors',
-            signal: controller.signal
-          });
-          clearTimeout(timeout);
-          if (!res.ok) continue;
-          const data = await res.json();
-          if (!data?.url || seenUrls.has(data.url)) continue;
-          seenUrls.add(data.url);
-          return { 
-            url: data.url, 
-            title: data.title || (isNSFW ? 'Mature Cringe' : 'Cringe'),
-            ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
-            isNSFW: isNSFW,
-            id: data.url.split('/').pop() || Date.now().toString()
-          };
-        } catch (e) {
-          continue;
-        }
-      }
-      // Final fallback
-      try {
-        const res = await fetch(`https://meme-api.com/gimme?_=${Date.now()}`, {
+        
+        const fallback = await fetch('https://meme-api.com/gimme?_=' + Date.now(), {
           cache: 'no-store',
           mode: 'cors'
         });
-        const data = await res.json();
+        const data = await fallback.json();
         if (!data?.url || seenUrls.has(data.url)) return null;
         seenUrls.add(data.url);
         return { 
@@ -729,9 +582,10 @@
           title: data.title || 'Cringe',
           ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
           isNSFW: false,
-          id: data.url.split('/').pop() || Date.now().toString()
+          id: data.url.split('/').pop()
         };
       } catch (e) {
+        console.warn("Fetch failed:", e.message);
         return null;
       }
     };
@@ -740,14 +594,7 @@
       const leaderboardList = document.getElementById('leaderboardList');
       leaderboardList.innerHTML = '';
       
-      const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000;
-      const recentMemes = topMemes.filter(m => {
-        const reactions = reactionCounts[m.id];
-        return reactions && reactions.timestamp && (now - reactions.timestamp < oneDay);
-      });
-
-      const sorted = [...recentMemes].sort((a, b) => {
+      const sorted = [...topMemes].sort((a, b) => {
         const aTotal = (reactionCounts[a.id]?.total || 0);
         const bTotal = (reactionCounts[b.id]?.total || 0);
         return bTotal - aTotal;
@@ -799,11 +646,9 @@
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
         btn.onclick = () => {
-          playSound('boop');
-          const counts = reactionCounts[meme.id] || { total: 0, timestamp: Date.now() };
+          const counts = reactionCounts[meme.id] || { total: 0 };
           counts[emoji] = (counts[emoji] || 0) + 1;
           counts.total = (counts.total || 0) + 1;
-          counts.timestamp = Date.now();
           reactionCounts[meme.id] = counts;
           localStorage.setItem('cringeReactions', JSON.stringify(reactionCounts));
           
@@ -824,10 +669,6 @@
             localStorage.setItem('cringeTopMemes', JSON.stringify(topMemes));
           }
           updateLeaderboard();
-
-          if (counts.total >= 100) {
-            confetti({ particleCount: 50 });
-          }
         };
         
         const countDisplay = document.createElement('div');
@@ -839,50 +680,11 @@
         reactionsDiv.appendChild(item);
       });
       
-      const shareBtn = document.createElement('button');
-      shareBtn.className = 'share-btn';
-      shareBtn.innerHTML = '📤';
-      shareBtn.onclick = () => {
-        const newUrl = `${window.location.origin}${window.location.pathname}#meme=${meme.id}`;
-        history.replaceState(null, '', newUrl);
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(newUrl).then(() => {
-            shareBtn.textContent = '✓';
-            setTimeout(() => shareBtn.innerHTML = '📤', 1000);
-          }).catch(() => {});
-        }
-      };
+      card.innerHTML = `
+        <div class="meme-title">${escapeHtml(meme.title)}</div>
+        <img class="meme-image" src="${meme.url}" loading="lazy" alt="meme" onerror="this.parentElement.style.display='none'">
+      `;
       
-      const titleDiv = document.createElement('div');
-      titleDiv.className = 'meme-title';
-      titleDiv.innerHTML = escapeHtml(meme.title);
-      titleDiv.appendChild(shareBtn);
-      
-      const img = document.createElement('img');
-      img.className = 'meme-image';
-      img.src = meme.url;
-      img.loading = 'lazy';
-      img.alt = 'meme';
-      img.onerror = () => {
-        card.style.display = 'none';
-        // Try loading next meme
-        setTimeout(loadNext, 100);
-      };
-      
-      // DOUBLE TAP TO ZOOM
-      let lastTap = 0;
-      img.addEventListener('click', () => {
-        const currentTime = Date.now();
-        const tapLength = currentTime - lastTap;
-        if (tapLength < 300 && tapLength > 0) {
-          document.getElementById('zoomImage').src = meme.url;
-          document.getElementById('zoomModal').style.display = 'flex';
-        }
-        lastTap = currentTime;
-      });
-      
-      card.appendChild(titleDiv);
-      card.appendChild(img);
       card.insertBefore(badgeContainer, card.firstChild);
       card.appendChild(reactionsDiv);
       feed.appendChild(card);
@@ -952,9 +754,7 @@
       const interval = setInterval(() => {
         if (i < 5) {
           feed.innerHTML = '';
-          if (tempMemes.length > 0) {
-            renderMeme(tempMemes[i % tempMemes.length]);
-          }
+          renderMeme(tempMemes[i % tempMemes.length]);
           i++;
         } else {
           clearInterval(interval);
@@ -977,30 +777,6 @@
       }
       document.getElementById('glowBtn').textContent = isGlowMode ? '🕶️' : '✨';
       localStorage.setItem('cringeGlow', isGlowMode);
-    };
-
-    const toggleSound = () => {
-      isSoundOn = !isSoundOn;
-      localStorage.setItem('cringeSound', isSoundOn ? 'true' : 'false');
-      document.getElementById('soundBtn').textContent = isSoundOn ? '🔊' : '🔇';
-    };
-
-    const cycleMood = () => {
-      const moods = ['default', 'wholesome', 'rage', 'surreal'];
-      const currentIndex = moods.indexOf(currentMood);
-      currentMood = moods[(currentIndex + 1) % moods.length];
-      localStorage.setItem('cringeMood', currentMood);
-      
-      let emoji = '🎭';
-      if (currentMood === 'wholesome') emoji = '❤️';
-      else if (currentMood === 'rage') emoji = '😡';
-      else if (currentMood === 'surreal') emoji = '🌀';
-      
-      document.getElementById('moodBtn').textContent = emoji;
-      seenUrls.clear();
-      loadCount = 0;
-      feed.innerHTML = '<div class="loading-spinner">Loading cringe...</div>';
-      for (let i = 0; i < 6; i++) setTimeout(loadNext, i * 150);
     };
 
     const initScrollHiding = () => {
@@ -1031,8 +807,13 @@
     const attachButtonListeners = () => {
       document.getElementById('rouletteBtn').onclick = cringeRoulette;
       document.getElementById('glowBtn').onclick = toggleGlowMode;
-      document.getElementById('soundBtn').onclick = toggleSound;
-      document.getElementById('moodBtn').onclick = cycleMood;
+      document.getElementById('nsfwBtn').onclick = () => {
+        if (isNSFW) {
+          disableNSFW();
+        } else {
+          document.getElementById('nsfwModal').style.display = 'flex';
+        }
+      };
       document.getElementById('leaderboardBtn').onclick = () => {
         document.getElementById('leaderboard').classList.add('open');
       };
@@ -1043,9 +824,12 @@
       document.getElementById('nsfwCancel').onclick = () => {
         document.getElementById('nsfwModal').style.display = 'none';
       };
+      
+      // ✨ LOGO CLICK HANDLER
       document.getElementById('logoLink').onclick = () => {
         window.location.href = window.location.origin + window.location.pathname;
       };
+      
       document.getElementById('installBtn').onclick = () => {
         alert("Tap 'Share' → 'Add to Home Screen' for fullscreen mode!");
         document.getElementById('installPrompt').style.display = 'none';
@@ -1054,9 +838,6 @@
       document.getElementById('dismissBtn').onclick = () => {
         document.getElementById('installPrompt').style.display = 'none';
         localStorage.setItem('installPromptSeen', 'true');
-      };
-      document.getElementById('zoomModal').onclick = () => {
-        document.getElementById('zoomModal').style.display = 'none';
       };
     };
 
@@ -1082,62 +863,8 @@
       for (let i = 0; i < 6; i++) setTimeout(loadNext, i * 150);
     };
 
-    // EASTER EGGS
-    let cringeTyped = '';
-    document.addEventListener('keydown', (e) => {
-      if (e.key.length === 1) {
-        cringeTyped += e.key.toLowerCase();
-        if (cringeTyped.endsWith('cringe')) {
-          document.body.style.animation = 'glitch 0.5s infinite';
-          setTimeout(() => document.body.style.animation = '', 2000);
-          cringeTyped = '';
-        }
-        if (cringeTyped.length > 10) cringeTyped = cringeTyped.slice(-6);
-      }
-    });
-
-    let rouletteHoldTimer = null;
-    const rouletteBtn = document.getElementById('rouletteBtn');
-    rouletteBtn.addEventListener('mousedown', () => {
-      rouletteHoldTimer = setTimeout(() => {
-        alert('✨ Ultra Roulette Unlocked! (Just kidding... or am I?)');
-      }, 3000);
-    });
-    rouletteBtn.addEventListener('mouseup', () => {
-      clearTimeout(rouletteHoldTimer);
-    });
-    rouletteBtn.addEventListener('mouseleave', () => {
-      clearTimeout(rouletteHoldTimer);
-    });
-
-    // STREAK COUNTER
-    const updateStreak = () => {
-      const today = new Date().toDateString();
-      const lastVisit = localStorage.getItem('cringeLastVisit');
-      let streak = parseInt(localStorage.getItem('cringeStreak') || '0');
-      
-      if (lastVisit === today) {
-        // already visited
-      } else if (lastVisit === new Date(Date.now() - 86400000).toDateString()) {
-        streak++;
-      } else {
-        streak = 1;
-      }
-      
-      localStorage.setItem('cringeStreak', streak.toString());
-      localStorage.setItem('cringeLastVisit', today);
-      
-      if (streak > 1) {
-        document.getElementById('streakBadge').textContent = `🔥 ${streak}-Day Streak!`;
-        document.getElementById('streakBadge').style.display = 'block';
-      }
-    };
-
     const initApp = () => {
       feed = document.getElementById('feed');
-      
-      // Check hash for direct meme link (future-proof)
-      // (Not implemented fully, but won't break)
       
       const savedGlow = localStorage.getItem('cringeGlow') === 'true';
       if (savedGlow) {
@@ -1147,20 +874,11 @@
         document.getElementById('glowBtn').textContent = '🕶️';
       }
 
-      document.getElementById('soundBtn').textContent = isSoundOn ? '🔊' : '🔇';
-
-      let emoji = '🎭';
-      if (currentMood === 'wholesome') emoji = '❤️';
-      else if (currentMood === 'rage') emoji = '😡';
-      else if (currentMood === 'surreal') emoji = '🌀';
-      document.getElementById('moodBtn').textContent = emoji;
-
       document.getElementById('nsfwBtn').textContent = isNSFW ? '✅' : '🔞';
 
       attachButtonListeners();
       initScrollHiding();
       updateLeaderboard();
-      updateStreak();
 
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
@@ -1186,6 +904,12 @@
         feed.addEventListener('scroll', handleScroll, { passive: true });
       }, 1000);
     };
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
