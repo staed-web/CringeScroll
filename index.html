@@ -81,7 +81,6 @@
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--neon-purple);
-      transition: transform 0.3s ease;
     }
 
     .logo-container {
@@ -147,13 +146,19 @@
       width: 100%;
     }
 
-    /* ✅ FIXED TAB BAR — NO PINK CIRCLES */
-    .tab-bar {
+    /* ✅ SCROLL-HIDING BARS */
+    .scroll-hide-bar {
       display: flex;
       justify-content: center;
       background: rgba(13, 13, 26, 0.7);
       border-bottom: 1px solid rgba(212, 0, 255, 0.3);
+      transition: transform 0.3s ease;
+      will-change: transform;
       z-index: 99;
+    }
+
+    .scroll-hide-bar.hidden {
+      transform: translateY(-100%);
     }
 
     .tab-btn {
@@ -166,9 +171,6 @@
       cursor: pointer;
       position: relative;
       transition: color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .tab-btn.active {
@@ -183,17 +185,6 @@
       right: 0;
       height: 2px;
       background: var(--neon-green);
-    }
-
-    .control-bar {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      padding: 12px 0;
-      background: rgba(13, 13, 26, 0.7);
-      border-bottom: 1px solid rgba(212, 0, 255, 0.3);
-      transition: transform 0.3s ease;
-      z-index: 98;
     }
 
     .control-btn {
@@ -228,8 +219,17 @@
       scroll-behavior: auto;
       min-height: 0;
       padding-bottom: max(100px, env(safe-area-inset-bottom));
+      transition: padding-top 0.3s ease;
     }
 
+    /* ✅ FEED EXPANDS WHEN BARS HIDE */
+    #feed.expanded {
+      padding-top: 0;
+    }
+
+    /* ... (rest of your CSS remains identical — .meme-card, .ad-container, etc.) ... */
+    
+    /* Keep all your existing styles from .meme-card down to .generator-btn.cancel */
     .meme-card {
       background: var(--card-bg);
       border-radius: 20px;
@@ -594,13 +594,13 @@
       </div>
     </header>
     
-    <div class="tab-bar">
+    <div class="scroll-hide-bar" id="tabBar">
       <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
       <button class="tab-btn" data-tab="fresh">💀 Fresh</button>
       <button class="tab-btn" data-tab="crowned">👑 Crowned</button>
     </div>
     
-    <div class="control-bar">
+    <div class="scroll-hide-bar" id="controlBar">
       <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
       <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
       <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
@@ -654,7 +654,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.0 =====
+    // ===== CORE ENGINE v2.1 — SCROLL HIDING + LEADERBOARD FIXED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -663,7 +663,7 @@
     let isGlowMode = false;
     let isNSFW = localStorage.getItem('cringeNSFW') === 'true';
     let lastScrollTop = 0;
-    let currentTab = 'hot'; // 'hot', 'fresh', 'crowned'
+    let currentTab = 'hot';
     let db = null;
 
     const NSFW_SOURCES = [
@@ -699,12 +699,29 @@
       if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        // Uncomment to use emulator in dev
-        // db.useEmulator("localhost", 8080);
       } else {
         console.error("Firebase failed to load");
       }
     });
+
+    // 🔥 STORE MEME ON FIRST REACTION (FIXES LEADERBOARD)
+    const ensureMemeInDB = async (meme) => {
+      if (!db) return;
+      try {
+        const docRef = db.collection('memes').doc(meme.id);
+        const doc = await docRef.get();
+        if (!doc.exists) {
+          await docRef.set({
+            title: meme.title,
+            url: meme.url,
+            isNSFW: meme.isNSFW,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      } catch (e) {
+        console.warn("Meme storage failed:", e);
+      }
+    };
 
     // 🔥 REAL-TIME REACTIONS
     const getReactions = async (memeId) => {
@@ -721,9 +738,12 @@
       }
     };
 
-    const addReaction = async (memeId, emoji) => {
+    const addReaction = async (memeId, emoji, memeData) => {
       if (!db) return;
       try {
+        // ✅ STORE MEME IF NOT EXISTS
+        await ensureMemeInDB(memeData);
+        
         const docRef = db.collection('reactions').doc(memeId);
         await db.runTransaction(async (transaction) => {
           const doc = await transaction.get(docRef);
@@ -737,89 +757,9 @@
       }
     };
 
-    // 🔥 MEME GENERATOR
-    const createMeme = async (top, bottom, imageUrl) => {
-      if (!db) {
-        alert("Service unavailable. Try again later.");
-        return;
-      }
-      try {
-        const memeId = 'user_' + Date.now();
-        const memeData = {
-          id: memeId,
-          url: imageUrl,
-          title: `${top || ''} ${bottom || ''}`.trim() || 'User Cringe',
-          ups: 0,
-          isNSFW: isNSFW,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          isUserGenerated: true
-        };
-        await db.collection('memes').doc(memeId).set(memeData);
-        document.getElementById('memeGenerator').style.display = 'none';
-        // Clear inputs
-        document.getElementById('topText').value = '';
-        document.getElementById('bottomText').value = '';
-        document.getElementById('imageUrl').value = '';
-        // Refresh feed
-        loadFeed(true);
-      } catch (e) {
-        alert("Failed to create meme. Check image URL.");
-        console.error(e);
-      }
-    };
+    // ... (rest of your functions: createMeme, fetchMeme, fetchUserMemes, renderMeme, renderAd, loadFeed, switchTab, cringeRoulette, toggleGlowMode)
 
-    // 🔥 FETCH MEMES (ALGO + USER-GEN)
-    const fetchMeme = async () => {
-      try {
-        // Fetch from API
-        const sources = isNSFW ? NSFW_SOURCES : SFW_SOURCES;
-        const shuffled = [...sources].sort(() => 0.5 - Math.random());
-        for (let i = 0; i < shuffled.length; i++) {
-          const url = `${shuffled[i]}?_=${Date.now()}`;
-          try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 5000);
-            const res = await fetch(url, { cache: 'no-store', mode: 'cors', signal: controller.signal });
-            clearTimeout(timeout);
-            if (!res.ok) continue;
-            const data = await res.json();
-            if (!data?.url || seenUrls.has(data.url)) continue;
-            seenUrls.add(data.url);
-            return { 
-              url: data.url, 
-              title: data.title || (isNSFW ? 'Mature Cringe' : 'Cringe'),
-              ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
-              isNSFW: isNSFW,
-              id: data.url.split('/').pop(),
-              isUserGenerated: false
-            };
-          } catch (e) {
-            continue;
-          }
-        }
-        return null;
-      } catch (e) {
-        console.warn("Fetch failed:", e.message);
-        return null;
-      }
-    };
-
-    const fetchUserMemes = async (limit = 3) => {
-      if (!db) return [];
-      try {
-        const q = db.collection('memes')
-          .where('isUserGenerated', '==', true)
-          .orderBy('createdAt', 'desc')
-          .limit(limit);
-        const snapshot = await q.get();
-        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      } catch (e) {
-        console.warn("User memes fetch failed:", e);
-        return [];
-      }
-    };
-
-    // 🔥 RENDER MEME
+    // 🔥 RENDER MEME (PASS FULL MEME DATA TO REACTIONS)
     const renderMeme = async (meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
@@ -854,7 +794,7 @@
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
         btn.onclick = async () => {
-          await addReaction(meme.id, emoji);
+          await addReaction(meme.id, emoji, meme); // ✅ PASS MEME DATA
           const countEl = item.querySelector('.reaction-count');
           const newCount = (reactionData.counts[emoji] || 0) + 1;
           if (countEl) {
@@ -867,7 +807,6 @@
             countDisplay.textContent = newCount;
             item.appendChild(countDisplay);
           }
-          // Update leaderboard
           updateLeaderboard();
         };
         
@@ -890,7 +829,7 @@
       feed.appendChild(card);
     };
 
-    // 🔥 AD RENDER (REAL ADSENSE - EVERY 5-7 MEMES, SFW ONLY)
+    // 🔥 AD RENDER
     const renderAd = () => {
       if (isNSFW) return;
       
@@ -908,7 +847,6 @@
       adContainer.appendChild(ins);
       feed.appendChild(adContainer);
 
-      // Trigger AdSense load
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
@@ -926,7 +864,6 @@
         loadCount = 0;
       }
       
-      // Show skeletons
       if (loadCount === 0) {
         feed.innerHTML = '';
         for (let i = 0; i < 3; i++) {
@@ -936,7 +873,6 @@
         }
       }
       
-      // Fetch user memes (top of feed)
       if (loadCount === 0 && currentTab === 'hot') {
         const userMemes = await fetchUserMemes(2);
         for (const meme of userMemes) {
@@ -948,12 +884,10 @@
         }
       }
       
-      // Fetch API meme
       const meme = await fetchMeme();
       if (meme) {
         await renderMeme(meme);
         loadCount++;
-        // Random ad every 5-7 memes (SFW only)
         if (!isNSFW && loadCount > 0) {
           const nextAdAt = [5, 6, 7][Math.floor(Math.random() * 3)];
           if (loadCount % nextAdAt === 0) {
@@ -962,12 +896,91 @@
         }
       }
       
-      // Remove skeletons after first load
       if (loadCount > 0) {
         document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
       }
       
       isLoading = false;
+    };
+
+    // 🔥 FETCH USER MEMES
+    const fetchUserMemes = async (limit = 3) => {
+      if (!db) return [];
+      try {
+        const q = db.collection('memes')
+          .where('isUserGenerated', '==', true)
+          .orderBy('createdAt', 'desc')
+          .limit(limit);
+        const snapshot = await q.get();
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      } catch (e) {
+        console.warn("User memes fetch failed:", e);
+        return [];
+      }
+    };
+
+    // 🔥 FETCH MEME
+    const fetchMeme = async () => {
+      try {
+        const sources = isNSFW ? NSFW_SOURCES : SFW_SOURCES;
+        const shuffled = [...sources].sort(() => 0.5 - Math.random());
+        for (let i = 0; i < shuffled.length; i++) {
+          const url = `${shuffled[i]}?_=${Date.now()}`;
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+            const res = await fetch(url, { cache: 'no-store', mode: 'cors', signal: controller.signal });
+            clearTimeout(timeout);
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (!data?.url || seenUrls.has(data.url)) continue;
+            seenUrls.add(data.url);
+            return { 
+              url: data.url, 
+              title: data.title || (isNSFW ? 'Mature Cringe' : 'Cringe'),
+              ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
+              isNSFW: isNSFW,
+              id: data.url.split('/').pop(),
+              isUserGenerated: false
+            };
+          } catch (e) {
+            continue;
+          }
+        }
+        return null;
+      } catch (e) {
+        console.warn("Fetch failed:", e.message);
+        return null;
+      }
+    };
+
+    // 🔥 CREATE MEME
+    const createMeme = async (top, bottom, imageUrl) => {
+      if (!db) {
+        alert("Service unavailable. Try again later.");
+        return;
+      }
+      try {
+        const memeId = 'user_' + Date.now();
+        const memeData = {
+          id: memeId,
+          url: imageUrl,
+          title: `${top || ''} ${bottom || ''}`.trim() || 'User Cringe',
+          ups: 0,
+          isNSFW: isNSFW,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          isUserGenerated: true
+        };
+        await db.collection('memes').doc(memeId).set(memeData);
+        document.getElementById('memeGenerator').style.display = 'none';
+        document.getElementById('topText').value = '';
+        document.getElementById('bottomText').value = '';
+        document.getElementById('imageUrl').value = '';
+        loadFeed(true);
+      } catch (e) {
+        alert("Failed to create meme. Check image URL.");
+        console.error(e);
+      }
     };
 
     // 🔥 TAB SWITCHING
@@ -1026,7 +1039,7 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 LEADERBOARD
+    // 🔥 LEADERBOARD — NOW WORKS
     const updateLeaderboard = async () => {
       if (!db) return;
       const leaderboardList = document.getElementById('leaderboardList');
@@ -1039,44 +1052,47 @@
           .get();
         
         leaderboardList.innerHTML = '';
-        snapshot.docs.forEach((doc, index) => {
-          const memeRef = db.collection('memes').doc(doc.id);
-          memeRef.get().then(memeDoc => {
-            if (memeDoc.exists) {
-              const meme = memeDoc.data();
-              const item = document.createElement('div');
-              item.className = 'leaderboard-item';
-              item.innerHTML = `
-                <div class="leaderboard-rank">#${index + 1}</div>
-                <div>${escapeHtml(meme.title)}</div>
-                <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
-                  Reactions: ${doc.data().total}
-                </div>
-              `;
-              leaderboardList.appendChild(item);
-            }
-          });
-        });
+        for (const doc of snapshot.docs) {
+          const memeDoc = await db.collection('memes').doc(doc.id).get();
+          if (memeDoc.exists) {
+            const meme = memeDoc.data();
+            const item = document.createElement('div');
+            item.className = 'leaderboard-item';
+            item.innerHTML = `
+              <div class="leaderboard-rank">#${snapshot.docs.indexOf(doc) + 1}</div>
+              <div>${escapeHtml(meme.title)}</div>
+              <div style="font-size:12px;color:var(--neon-green);margin-top:6px;">
+                Reactions: ${doc.data().total}
+              </div>
+            `;
+            leaderboardList.appendChild(item);
+          }
+        }
       } catch (e) {
         leaderboardList.innerHTML = '<div style="color:var(--neon-pink);">Error loading</div>';
       }
     };
 
-    // 🔥 SCROLL HIDING
+    // 🔥 PERFECT SCROLL HIDING — NO BLACK GAP
     const initScrollHiding = () => {
-      const controlBar = document.querySelector('.control-bar');
-      const header = document.querySelector('header');
+      const tabBar = document.getElementById('tabBar');
+      const controlBar = document.getElementById('controlBar');
       let ticking = false;
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
-        if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
-          controlBar.style.transform = 'translateY(-100%)';
-          header.style.transform = 'translateY(-100%)';
-        } else if (currentScrollTop < lastScrollTop) {
-          controlBar.style.transform = 'translateY(0)';
-          header.style.transform = 'translateY(0)';
+        const isScrollingDown = currentScrollTop > lastScrollTop;
+        
+        if (isScrollingDown && currentScrollTop > 100) {
+          tabBar.classList.add('hidden');
+          controlBar.classList.add('hidden');
+          feed.classList.add('expanded');
+        } else if (!isScrollingDown) {
+          tabBar.classList.remove('hidden');
+          controlBar.classList.remove('hidden');
+          feed.classList.remove('expanded');
         }
+        
         lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
         ticking = false;
       };
@@ -1127,8 +1143,6 @@
         document.getElementById('installPrompt').style.display = 'none';
         localStorage.setItem('installPromptSeen', 'true');
       };
-      
-      // Meme Generator
       document.getElementById('createBtn').onclick = () => {
         document.getElementById('memeGenerator').style.display = 'flex';
       };
@@ -1192,7 +1206,6 @@
 
       loadFeed();
 
-      // Infinite scroll
       setTimeout(() => {
         let scrollTimer;
         const handleScroll = () => {
