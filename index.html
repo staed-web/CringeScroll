@@ -439,7 +439,7 @@
       cursor: pointer;
     }
 
-    /* ✅ CHAT PANEL */
+    /* ✅ CHAT PANEL — REPLACES LEADERBOARD */
     #chatPanel {
       position: fixed;
       top: 0;
@@ -542,8 +542,8 @@
       cursor: pointer;
     }
 
-    /* ✅ USERNAME MODAL */
-    #usernameModal {
+    /* ✅ LOGIN MODAL */
+    #loginModal {
       display: none;
       position: fixed;
       top: 0;
@@ -556,7 +556,7 @@
       align-items: center;
     }
 
-    .username-content {
+    .login-content {
       background: var(--card-bg);
       padding: 20px;
       border-radius: 20px;
@@ -568,13 +568,13 @@
       gap: 10px;
     }
 
-    .username-content h2 {
+    .login-content h2 {
       color: var(--neon-purple);
       margin-bottom: 15px;
       text-align: center;
     }
 
-    #usernameInput {
+    .login-input {
       background: rgba(0,0,0,0.3);
       border: 1px solid var(--neon-green);
       color: var(--text);
@@ -583,80 +583,119 @@
       font-size: 14px;
     }
 
-    #usernameSubmit {
-      background: var(--neon-green);
-      color: var(--bg);
-      border: none;
+    .login-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .login-btn {
+      flex: 1;
       padding: 8px;
+      border: none;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    .close-username {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--neon-green);
-      font-size: 24px;
-      cursor: pointer;
+    .login-btn.login {
+      background: var(--neon-green);
+      color: var(--bg);
     }
 
-    /* ✅ LOGIN ICON */
-    #loginIcon {
-      display: none;
-      background: transparent;
-      border: 2px solid var(--neon-pink);
-      color: var(--neon-pink);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .login-btn.signup {
+      background: var(--neon-purple);
+      color: var(--bg);
     }
 
-    #loginIcon.show {
-      display: flex;
-    }
-
-    /* ✅ USER INFO POPUP */
-    #userInfoPopup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 20px;
-      border: 2px solid var(--neon-purple);
-      z-index: 3000;
-      display: none;
+    .login-switch {
       text-align: center;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--neon-green);
+      cursor: pointer;
     }
 
-    #userInfoPopup p {
-      margin: 10px 0;
-      font-size: 16px;
-    }
-
-    #closeUserInfo {
+    .close-login {
+      position: absolute;
+      top: 10px;
+      right: 10px;
       background: none;
       border: none;
       color: var(--neon-green);
       font-size: 24px;
       cursor: pointer;
-      position: absolute;
-      top: 10px;
-      right: 10px;
     }
 
-    /* ✅ MEME GENERATOR MODAL */
+    #logoutBtn {
+      display: none;
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #userStatus {
+      display: none;
+      color: var(--neon-green);
+      font-size: 12px;
+      margin-right: 10px;
+    }
+
+    #nsfwModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 90%;
+      border: 2px solid var(--neon-pink);
+    }
+
+    .modal-content h2 {
+      color: var(--neon-pink);
+      margin-bottom: 20px;
+    }
+
+    .modal-btn {
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .footer-notice {
+      text-align: center;
+      margin: 30px 0;
+      font-size: 12px;
+      color: #8a8aa0;
+    }
+
+    .footer-notice a {
+      color: #8a8aa0;
+      text-decoration: none;
+    }
+
+    /* Meme Generator Modal */
     #memeGenerator {
       display: none;
       position: fixed;
@@ -723,45 +762,6 @@
       background: #555;
       color: white;
     }
-
-    /* ✅ NSFW MODAL */
-    #nsfwModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: var(--card-bg);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 90%;
-      border: 2px solid var(--neon-pink);
-    }
-
-    .modal-content h2 {
-      color: var(--neon-pink);
-      margin-bottom: 20px;
-    }
-
-    .modal-btn {
-      background: var(--neon-pink);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      margin: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -773,7 +773,7 @@
       </div>
     </header>
     
-    <!-- ✅ SINGLE UI-BAR CONTAINER -->
+    <!-- ✅ SINGLE UI-BAR CONTAINER FOR TABS + CONTROL BUTTONS -->
     <div class="ui-bar" id="uiBar">
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
@@ -787,7 +787,8 @@
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
         <button class="control-btn" id="loginBtn" title="Login">👤</button>
-        <button id="loginIcon" title="Logged in">👤</button>
+        <span id="userStatus">Logged in as: <span id="userName">User</span></span>
+        <button id="logoutBtn">Logout</button>
       </div>
     </div>
     
@@ -796,7 +797,7 @@
     </div>
   </div>
 
-  <!-- ✅ CHAT PANEL -->
+  <!-- ✅ CHAT PANEL — REPLACES LEADERBOARD -->
   <div id="chatPanel">
     <div class="chat-header">
       <div class="chat-title">💬 CringeChat</div>
@@ -811,25 +812,21 @@
     </div>
   </div>
 
-  <!-- ✅ USERNAME MODAL -->
-  <div id="usernameModal">
-    <div class="username-content">
-      <button class="close-username" id="closeUsername">✕</button>
-      <h2>📛 Choose a Username</h2>
-      <input type="text" id="usernameInput" placeholder="Enter username (3-15 chars)" maxlength="15" minlength="3">
-      <button id="usernameSubmit">Join Chat</button>
+  <!-- ✅ LOGIN MODAL -->
+  <div id="loginModal">
+    <div class="login-content">
+      <button class="close-login" id="closeLogin">✕</button>
+      <h2>🔒 Login or Sign Up</h2>
+      <input type="text" id="loginEmail" class="login-input" placeholder="Email" required>
+      <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
+      <div class="login-btns">
+        <button class="login-btn login" id="loginSubmit">Login</button>
+        <button class="login-btn signup" id="signupSubmit">Sign Up</button>
+      </div>
+      <div class="login-switch" id="switchToSignup">Don't have an account? Sign up</div>
     </div>
   </div>
 
-  <!-- ✅ USER INFO POPUP -->
-  <div id="userInfoPopup">
-    <button id="closeUserInfo">✕</button>
-    <h3>👤 User Info</h3>
-    <p id="userNameDisplay">Username: <span id="userNameText">Anonymous</span></p>
-    <p>Joined: <span id="userJoined">Just now</span></p>
-  </div>
-
-  <!-- ✅ NSFW MODAL -->
   <div id="nsfwModal">
     <div class="modal-content">
       <h2>🔞 Mature Content Warning</h2>
@@ -839,7 +836,6 @@
     </div>
   </div>
 
-  <!-- ✅ MEME GENERATOR MODAL -->
   <div id="memeGenerator">
     <div class="generator-content">
       <h2>🖼️ Create Your Cringe</h2>
@@ -866,7 +862,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.9 — BLACK BOX GONE + ALL FUNCTIONS WORKING =====
+    // ===== CORE ENGINE v2.6 — BLACK BOX GONE + LOGIN FIXED + CLOSE BUTTON ADDED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -879,7 +875,6 @@
     let db = null;
     let auth = null;
     let currentUser = null;
-    let username = null;
 
     const NSFW_SOURCES = [
       'https://meme-api.com/gimme/ComedyCemetery',
@@ -915,30 +910,20 @@
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
         auth = firebase.auth();
-        // Enable persistence
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         // Check auth state
         auth.onAuthStateChanged(user => {
+          currentUser = user;
           if (user) {
-            currentUser = user;
-            // Check if username exists
-            const savedUsername = localStorage.getItem('cringeUsername');
-            if (savedUsername) {
-              username = savedUsername;
-              document.getElementById('loginBtn').style.display = 'none';
-              document.getElementById('loginIcon').classList.add('show');
-              // Set user info
-              document.getElementById('userNameText').textContent = username;
-              const joined = new Date().toLocaleString();
-              document.getElementById('userJoined').textContent = joined;
-            } else {
-              document.getElementById('usernameModal').style.display = 'flex';
-            }
+            document.getElementById('userStatus').style.display = 'block';
+            document.getElementById('userName').textContent = user.email.split('@')[0];
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            // Load chat messages
+            loadChatMessages();
           } else {
-            // Anonymous login
-            auth.signInAnonymously().catch(e => {
-              console.error("Anonymous login failed:", e);
-            });
+            document.getElementById('userStatus').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
           }
         });
       } else {
@@ -983,7 +968,9 @@
     const addReaction = async (memeId, emoji, memeData) => {
       if (!db) return;
       try {
+        // ✅ STORE MEME IF NOT EXISTS
         await ensureMemeInDB(memeData);
+        
         const docRef = db.collection('reactions').doc(memeId);
         await db.runTransaction(async (transaction) => {
           const doc = await transaction.get(docRef);
@@ -1045,6 +1032,7 @@
             countDisplay.textContent = newCount;
             item.appendChild(countDisplay);
           }
+          updateLeaderboard();
         };
         
         const countDisplay = document.createElement('div');
@@ -1276,9 +1264,9 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 CHAT
+    // 🔥 CHAT — REPLACES LEADERBOARD
     const loadChatMessages = async () => {
-      if (!db) return;
+      if (!db || !currentUser) return;
       const chatMessages = document.getElementById('chatMessages');
       chatMessages.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
       
@@ -1303,8 +1291,8 @@
     };
 
     const sendChatMessage = async () => {
-      if (!currentUser || !username) {
-        document.getElementById('usernameModal').style.display = 'flex';
+      if (!db || !currentUser) {
+        document.getElementById('loginModal').style.display = 'flex';
         return;
       }
       const input = document.getElementById('chatMessage');
@@ -1314,7 +1302,7 @@
       try {
         await db.collection('chat').add({
           uid: currentUser.uid,
-          username: username,
+          username: currentUser.email.split('@')[0],
           text: text,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -1326,63 +1314,61 @@
       }
     };
 
-    // 🔥 AUTO-DELETE CHAT AFTER 24 HOURS
-    const cleanupOldChats = async () => {
-      if (!db) return;
+    // 🔥 LOGIN / SIGNUP — FIXED
+    const login = async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if (!email || !password) {
+        alert("Please enter email and password.");
+        return;
+      }
       try {
-        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
-        const q = db.collection('chat').where('timestamp', '<', cutoff);
-        const snapshot = await q.get();
-        snapshot.docs.forEach(doc => {
-          doc.ref.delete();
-        });
+        await auth.signInWithEmailAndPassword(email, password);
+        document.getElementById('loginModal').style.display = 'none';
       } catch (e) {
-        console.warn("Failed to cleanup old chats:", e);
+        alert("Login failed: " + e.message);
       }
     };
 
-    // 🔥 USERNAME HANDLING
-    const setUserName = () => {
-      const input = document.getElementById('usernameInput');
-      const name = input.value.trim();
-      if (name.length < 3 || name.length > 15) {
-        alert("Username must be 3-15 characters.");
+    const signup = async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if (!email || !password) {
+        alert("Please enter email and password.");
         return;
       }
-      username = name;
-      localStorage.setItem('cringeUsername', username);
-      document.getElementById('usernameModal').style.display = 'none';
-      document.getElementById('loginBtn').style.display = 'none';
-      document.getElementById('loginIcon').classList.add('show');
-      // Set user info
-      document.getElementById('userNameText').textContent = username;
-      const joined = new Date().toLocaleString();
-      document.getElementById('userJoined').textContent = joined;
-      loadChatMessages();
-    };
-
-    // 🔥 USER INFO POPUP
-    const showUserInfo = () => {
-      if (!username) {
-        document.getElementById('usernameModal').style.display = 'flex';
-        return;
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        document.getElementById('loginModal').style.display = 'none';
+      } catch (e) {
+        alert("Sign up failed: " + e.message);
       }
-      document.getElementById('userInfoPopup').style.display = 'block';
     };
 
-    // 🔥 ULTRA-SMOOTH SCROLL HIDING — BLACK BOX GONE
+    // 🔥 LOGOUT
+    const logout = async () => {
+      try {
+        await auth.signOut();
+        document.getElementById('chatMessages').innerHTML = '';
+      } catch (e) {
+        console.warn("Logout failed:", e);
+      }
+    };
+
+    // 🔥 ULTRA-SMOOTH SCROLL HIDING — YOUTUBE-LEVEL FLUIDITY
     const initScrollHiding = () => {
       const header = document.querySelector('header');
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
       let isHidden = false;
-      let lastDirection = 0;
+      let lastDirection = 0; // 1 = down, -1 = up
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
         const scrollDelta = currentScrollTop - lastScrollTop;
         const direction = scrollDelta > 0 ? 1 : -1;
         
+        // Only trigger on meaningful scroll (>10px)
         if (Math.abs(scrollDelta) > 10) {
           const shouldHide = direction === 1 && currentScrollTop > 100;
           
@@ -1414,73 +1400,76 @@
 
     // 🔥 BUTTON LISTENERS
     const attachButtonListeners = () => {
-      // Wait for DOM to fully load
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          btn.onclick = () => switchTab(btn.dataset.tab);
-        });
-        
-        document.getElementById('rouletteBtn').onclick = cringeRoulette;
-        document.getElementById('glowBtn').onclick = toggleGlowMode;
-        document.getElementById('nsfwBtn').onclick = () => {
-          if (isNSFW) {
-            disableNSFW();
-          } else {
-            document.getElementById('nsfwModal').style.display = 'flex';
-          }
-        };
-        document.getElementById('chatBtn').onclick = () => {
-          document.getElementById('chatPanel').classList.add('open');
-          loadChatMessages();
-        };
-        document.getElementById('closeChat').onclick = () => {
-          document.getElementById('chatPanel').classList.remove('open');
-        };
-        document.getElementById('sendChat').onclick = sendChatMessage;
-        document.getElementById('loginBtn').onclick = () => {
-          document.getElementById('usernameModal').style.display = 'flex';
-        };
-        document.getElementById('usernameSubmit').onclick = setUserName;
-        document.getElementById('closeUsername').onclick = () => {
-          document.getElementById('usernameModal').style.display = 'none';
-        };
-        document.getElementById('loginIcon').onclick = showUserInfo;
-        document.getElementById('closeUserInfo').onclick = () => {
-          document.getElementById('userInfoPopup').style.display = 'none';
-        };
-        document.getElementById('nsfwConfirm').onclick = enableNSFW;
-        document.getElementById('nsfwCancel').onclick = () => {
-          document.getElementById('nsfwModal').style.display = 'none';
-        };
-        document.getElementById('logoLink').onclick = () => {
-          window.location.href = window.location.origin + window.location.pathname;
-        };
-        document.getElementById('installBtn').onclick = () => {
-          alert("Tap 'Share' → 'Add to Home Screen' for fullscreen mode!");
-          document.getElementById('installPrompt').style.display = 'none';
-          localStorage.setItem('installPromptSeen', 'true');
-        };
-        document.getElementById('dismissBtn').onclick = () => {
-          document.getElementById('installPrompt').style.display = 'none';
-          localStorage.setItem('installPromptSeen', 'true');
-        };
-        document.getElementById('createBtn').onclick = () => {
-          document.getElementById('memeGenerator').style.display = 'flex';
-        };
-        document.getElementById('cancelGenerator').onclick = () => {
-          document.getElementById('memeGenerator').style.display = 'none';
-        };
-        document.getElementById('generateMeme').onclick = () => {
-          const top = document.getElementById('topText').value.trim();
-          const bottom = document.getElementById('bottomText').value.trim();
-          const url = document.getElementById('imageUrl').value.trim();
-          if (!url) {
-            alert("Image URL is required!");
-            return;
-          }
-          createMeme(top, bottom, url);
-        };
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => switchTab(btn.dataset.tab);
       });
+      
+      document.getElementById('rouletteBtn').onclick = cringeRoulette;
+      document.getElementById('glowBtn').onclick = toggleGlowMode;
+      document.getElementById('nsfwBtn').onclick = () => {
+        if (isNSFW) {
+          disableNSFW();
+        } else {
+          document.getElementById('nsfwModal').style.display = 'flex';
+        }
+      };
+      document.getElementById('chatBtn').onclick = () => {
+        document.getElementById('chatPanel').classList.add('open');
+        if (currentUser) {
+          loadChatMessages();
+        }
+      };
+      document.getElementById('closeChat').onclick = () => {
+        document.getElementById('chatPanel').classList.remove('open');
+      };
+      document.getElementById('sendChat').onclick = sendChatMessage;
+      document.getElementById('loginBtn').onclick = () => {
+        document.getElementById('loginModal').style.display = 'flex';
+      };
+      document.getElementById('loginSubmit').onclick = login;
+      document.getElementById('signupSubmit').onclick = signup;
+      document.getElementById('switchToSignup').onclick = () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        document.getElementById('loginEmail').value = email;
+        document.getElementById('loginPassword').value = password;
+      };
+      document.getElementById('closeLogin').onclick = () => {
+        document.getElementById('loginModal').style.display = 'none';
+      };
+      document.getElementById('logoutBtn').onclick = logout;
+      document.getElementById('nsfwConfirm').onclick = enableNSFW;
+      document.getElementById('nsfwCancel').onclick = () => {
+        document.getElementById('nsfwModal').style.display = 'none';
+      };
+      document.getElementById('logoLink').onclick = () => {
+        window.location.href = window.location.origin + window.location.pathname;
+      };
+      document.getElementById('installBtn').onclick = () => {
+        alert("Tap 'Share' → 'Add to Home Screen' for fullscreen mode!");
+        document.getElementById('installPrompt').style.display = 'none';
+        localStorage.setItem('installPromptSeen', 'true');
+      };
+      document.getElementById('dismissBtn').onclick = () => {
+        document.getElementById('installPrompt').style.display = 'none';
+        localStorage.setItem('installPromptSeen', 'true');
+      };
+      document.getElementById('createBtn').onclick = () => {
+        document.getElementById('memeGenerator').style.display = 'flex';
+      };
+      document.getElementById('cancelGenerator').onclick = () => {
+        document.getElementById('memeGenerator').style.display = 'none';
+      };
+      document.getElementById('generateMeme').onclick = () => {
+        const top = document.getElementById('topText').value.trim();
+        const bottom = document.getElementById('bottomText').value.trim();
+        const url = document.getElementById('imageUrl').value.trim();
+        if (!url) {
+          alert("Image URL is required!");
+          return;
+        }
+        createMeme(top, bottom, url);
+      };
     };
 
     // 🔥 NSFW TOGGLE
@@ -1519,9 +1508,6 @@
 
       attachButtonListeners();
       initScrollHiding();
-
-      // Cleanup old chats every hour
-      setInterval(cleanupOldChats, 60 * 60 * 1000);
 
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
