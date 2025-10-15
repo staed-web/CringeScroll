@@ -439,7 +439,7 @@
       cursor: pointer;
     }
 
-    /* ✅ CHAT PANEL — REPLACES LEADERBOARD */
+    /* ✅ CHAT PANEL */
     #chatPanel {
       position: fixed;
       top: 0;
@@ -542,6 +542,89 @@
       cursor: pointer;
     }
 
+    /* ✅ PROFILE ICON */
+    #userStatus {
+      display: none;
+    }
+
+    #profileIcon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-green));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-size: 16px;
+      color: white;
+    }
+
+    #profileIcon:hover {
+      transform: scale(1.1);
+    }
+
+    #profileModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1002;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile-content {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      border: 2px solid var(--neon-purple);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .profile-content h2 {
+      color: var(--neon-purple);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .profile-info {
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .profile-btn {
+      background: var(--neon-green);
+      color: var(--bg);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      align-self: center;
+    }
+
+    #logoutBtn {
+      display: block;
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
     /* ✅ LOGIN MODAL */
     #loginModal {
       display: none;
@@ -614,35 +697,6 @@
       font-size: 12px;
       color: var(--neon-green);
       cursor: pointer;
-    }
-
-    .close-login {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--neon-green);
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    #logoutBtn {
-      display: none;
-      background: var(--neon-pink);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #userStatus {
-      display: none;
-      color: var(--neon-green);
-      font-size: 12px;
-      margin-right: 10px;
     }
 
     #nsfwModal {
@@ -786,8 +840,7 @@
         <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
-        <button class="control-btn" id="loginBtn" title="Login">👤</button>
-        <span id="userStatus">Logged in as: <span id="userName">User</span></span>
+        <div id="profileIcon" title="Profile">👤</div>
         <button id="logoutBtn">Logout</button>
       </div>
     </div>
@@ -797,7 +850,7 @@
     </div>
   </div>
 
-  <!-- ✅ CHAT PANEL — REPLACES LEADERBOARD -->
+  <!-- ✅ CHAT PANEL -->
   <div id="chatPanel">
     <div class="chat-header">
       <div class="chat-title">💬 CringeChat</div>
@@ -812,10 +865,20 @@
     </div>
   </div>
 
+  <!-- ✅ PROFILE MODAL -->
+  <div id="profileModal">
+    <div class="profile-content">
+      <h2>👤 Profile</h2>
+      <div id="profileInfo">
+        <!-- Profile info will appear here -->
+      </div>
+      <button class="profile-btn" id="closeProfile">Close</button>
+    </div>
+  </div>
+
   <!-- ✅ LOGIN MODAL -->
   <div id="loginModal">
     <div class="login-content">
-      <button class="close-login" id="closeLogin">✕</button>
       <h2>🔒 Login or Sign Up</h2>
       <input type="text" id="loginEmail" class="login-input" placeholder="Email" required>
       <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
@@ -862,7 +925,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.6 — BLACK BOX GONE + LOGIN FIXED + CLOSE BUTTON ADDED =====
+    // ===== CORE ENGINE v2.6 — PROFILE ICON + WORKING CHAT + 24H CLEANUP =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -875,6 +938,9 @@
     let db = null;
     let auth = null;
     let currentUser = null;
+
+    // ✅ CHAT MESSAGES ARRAY — FOR 24H CLEANUP
+    let chatMessages = [];
 
     const NSFW_SOURCES = [
       'https://meme-api.com/gimme/ComedyCemetery',
@@ -914,14 +980,13 @@
         auth.onAuthStateChanged(user => {
           currentUser = user;
           if (user) {
-            document.getElementById('userStatus').style.display = 'block';
-            document.getElementById('userName').textContent = user.email.split('@')[0];
+            document.getElementById('profileIcon').style.display = 'flex';
             document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'block';
             // Load chat messages
             loadChatMessages();
           } else {
-            document.getElementById('userStatus').style.display = 'none';
+            document.getElementById('profileIcon').style.display = 'none';
             document.getElementById('loginBtn').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'none';
           }
@@ -1264,16 +1329,17 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 CHAT — REPLACES LEADERBOARD
+    // 🔥 CHAT — FIXED & 24H CLEANUP
     const loadChatMessages = async () => {
       if (!db || !currentUser) return;
-      const chatMessages = document.getElementById('chatMessages');
-      chatMessages.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
+      const chatMessagesEl = document.getElementById('chatMessages');
+      chatMessagesEl.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
       
       try {
         const q = db.collection('chat').orderBy('timestamp', 'desc').limit(50);
         const snapshot = await q.get();
-        chatMessages.innerHTML = '';
+        chatMessages = []; // Reset array
+        chatMessagesEl.innerHTML = '';
         snapshot.docs.reverse().forEach(doc => {
           const msg = doc.data();
           const msgDiv = document.createElement('div');
@@ -1282,11 +1348,14 @@
             <span class="username">${msg.username}</span>
             <span class="content">${escapeHtml(msg.text)}</span>
           `;
-          chatMessages.appendChild(msgDiv);
+          chatMessagesEl.appendChild(msgDiv);
+          chatMessages.push({ id: doc.id, ...msg }); // Store for cleanup
         });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        // Cleanup old messages
+        cleanupOldMessages();
       } catch (e) {
-        chatMessages.innerHTML = '<div style="color:var(--neon-pink);">Error loading chat</div>';
+        chatMessagesEl.innerHTML = '<div style="color:var(--neon-pink);">Error loading chat</div>';
       }
     };
 
@@ -1314,7 +1383,19 @@
       }
     };
 
-    // 🔥 LOGIN / SIGNUP — FIXED
+    // 🔥 CLEANUP OLD MESSAGES AFTER 24H
+    const cleanupOldMessages = () => {
+      if (!db || chatMessages.length === 0) return;
+      const now = Date.now();
+      chatMessages.forEach(msg => {
+        const msgTime = msg.timestamp?.toDate?.()?.getTime() || 0;
+        if (now - msgTime > 24 * 60 * 60 * 1000) { // 24 hours
+          db.collection('chat').doc(msg.id).delete().catch(console.warn);
+        }
+      });
+    };
+
+    // 🔥 LOGIN / SIGNUP
     const login = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
@@ -1350,25 +1431,38 @@
       try {
         await auth.signOut();
         document.getElementById('chatMessages').innerHTML = '';
+        document.getElementById('profileModal').style.display = 'none';
       } catch (e) {
         console.warn("Logout failed:", e);
       }
     };
 
-    // 🔥 ULTRA-SMOOTH SCROLL HIDING — YOUTUBE-LEVEL FLUIDITY
+    // 🔥 SHOW PROFILE MODAL
+    const showProfile = () => {
+      if (!currentUser) return;
+      const profileModal = document.getElementById('profileModal');
+      profileModal.style.display = 'flex';
+      const profileInfo = document.getElementById('profileInfo');
+      profileInfo.innerHTML = `
+        <div><strong>Email:</strong> ${currentUser.email}</div>
+        <div><strong>UID:</strong> ${currentUser.uid}</div>
+        <div><strong>Created:</strong> ${currentUser.metadata.creationTime}</div>
+      `;
+    };
+
+    // 🔥 ULTRA-SMOOTH SCROLL HIDING
     const initScrollHiding = () => {
       const header = document.querySelector('header');
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
       let isHidden = false;
-      let lastDirection = 0; // 1 = down, -1 = up
+      let lastDirection = 0;
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
         const scrollDelta = currentScrollTop - lastScrollTop;
         const direction = scrollDelta > 0 ? 1 : -1;
         
-        // Only trigger on meaningful scroll (>10px)
         if (Math.abs(scrollDelta) > 10) {
           const shouldHide = direction === 1 && currentScrollTop > 100;
           
@@ -1434,9 +1528,6 @@
         document.getElementById('loginEmail').value = email;
         document.getElementById('loginPassword').value = password;
       };
-      document.getElementById('closeLogin').onclick = () => {
-        document.getElementById('loginModal').style.display = 'none';
-      };
       document.getElementById('logoutBtn').onclick = logout;
       document.getElementById('nsfwConfirm').onclick = enableNSFW;
       document.getElementById('nsfwCancel').onclick = () => {
@@ -1469,6 +1560,11 @@
           return;
         }
         createMeme(top, bottom, url);
+      };
+      // ✅ PROFILE ICON
+      document.getElementById('profileIcon').onclick = showProfile;
+      document.getElementById('closeProfile').onclick = () => {
+        document.getElementById('profileModal').style.display = 'none';
       };
     };
 
