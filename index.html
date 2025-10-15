@@ -9,15 +9,16 @@
   <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZDBkMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+QzwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRDQwMEZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwzKSI+UjwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMzlGRjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+STwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw5KSI+RzwvdGV4dD4KPC9zdmc+Cg=="/>
   <link rel="manifest" href="#inline-manifest" />
   <script>
-    // 🔥 FIREBASE EMULATOR (DEV) — REPLACE WITH PROD CONFIG IN PRODUCTION
+    // 🔥 YOUR REAL FIREBASE CONFIG
     const firebaseConfig = {
-  apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
-  authDomain: "cringescroll-prod.firebaseapp.com",
-  projectId: "cringescroll-prod",
-  storageBucket: "cringescroll-prod.firebasestorage.app",
-  messagingSenderId: "802266413389",
-  appId: "1:802266413389:web:22a7274e4edc8a0529df04"
-};
+      apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
+      authDomain: "cringescroll-prod.firebaseapp.com",
+      projectId: "cringescroll-prod",
+      storageBucket: "cringescroll-prod.firebasestorage.app",
+      messagingSenderId: "802266413389",
+      appId: "1:802266413389:web:22a7274e4edc8a0529df04"
+    };
+
     // Load Firebase SDKs
     const scripts = [
       'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
@@ -30,6 +31,8 @@
       document.head.appendChild(s);
     });
   </script>
+  <!-- 🔥 ADSENSE SCRIPT -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9372118866074955" crossorigin="anonymous"></script>
   <style>
     :root {
       --bg: #0d0d1a;
@@ -144,6 +147,7 @@
       width: 100%;
     }
 
+    /* ✅ FIXED TAB BAR — NO PINK CIRCLES */
     .tab-bar {
       display: flex;
       justify-content: center;
@@ -162,6 +166,9 @@
       cursor: pointer;
       position: relative;
       transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .tab-btn.active {
@@ -692,7 +699,7 @@
       if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        // Use emulator in dev (comment out for prod)
+        // Uncomment to use emulator in dev
         // db.useEmulator("localhost", 8080);
       } else {
         console.error("Firebase failed to load");
@@ -883,20 +890,30 @@
       feed.appendChild(card);
     };
 
-    // 🔥 AD RENDER (NATIVE)
+    // 🔥 AD RENDER (REAL ADSENSE - EVERY 5-7 MEMES, SFW ONLY)
     const renderAd = () => {
       if (isNSFW) return;
       
       const adContainer = document.createElement('div');
       adContainer.className = 'ad-container';
-      adContainer.innerHTML = `
-        <div style="font-size:14px;color:var(--neon-green);margin-bottom:10px;">Sponsored Cringe</div>
-        <div style="background:var(--ad-bg);padding:20px;border-radius:12px;">
-          <div style="font-weight:bold;color:var(--neon-purple);margin-bottom:8px;">Upgrade Your Cringe!</div>
-          <div style="font-size:13px;color:var(--text);">Go ad-free + unlock NSFW roulette</div>
-        </div>
-      `;
+      
+      const ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.display = 'block';
+      ins.setAttribute('data-ad-format', 'fluid');
+      ins.setAttribute('data-ad-layout-key', '-fb+5w+4e-db+86');
+      ins.setAttribute('data-ad-client', 'ca-pub-9372118866074955');
+      ins.setAttribute('data-ad-slot', '5669979942');
+
+      adContainer.appendChild(ins);
       feed.appendChild(adContainer);
+
+      // Trigger AdSense load
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.warn("AdSense failed to load:", e.message);
+      }
     };
 
     // 🔥 LOAD FEED
@@ -936,8 +953,12 @@
       if (meme) {
         await renderMeme(meme);
         loadCount++;
-        if (!isNSFW && loadCount % 7 === 0) {
-          setTimeout(renderAd, 100);
+        // Random ad every 5-7 memes (SFW only)
+        if (!isNSFW && loadCount > 0) {
+          const nextAdAt = [5, 6, 7][Math.floor(Math.random() * 3)];
+          if (loadCount % nextAdAt === 0) {
+            setTimeout(renderAd, 100);
+          }
         }
       }
       
