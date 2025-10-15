@@ -624,6 +624,37 @@
     #loginIcon.show {
       display: flex;
     }
+
+    /* ✅ USER INFO POPUP */
+    #userInfoPopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 20px;
+      border: 2px solid var(--neon-purple);
+      z-index: 3000;
+      display: none;
+      text-align: center;
+    }
+
+    #userInfoPopup p {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    #closeUserInfo {
+      background: none;
+      border: none;
+      color: var(--neon-green);
+      font-size: 24px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
   </style>
 </head>
 <body>
@@ -683,6 +714,14 @@
     </div>
   </div>
 
+  <!-- ✅ USER INFO POPUP -->
+  <div id="userInfoPopup">
+    <button id="closeUserInfo">✕</button>
+    <h3>👤 User Info</h3>
+    <p id="userNameDisplay">Username: <span id="userNameText">Anonymous</span></p>
+    <p>Joined: <span id="userJoined">Just now</span></p>
+  </div>
+
   <div id="nsfwModal">
     <div class="modal-content">
       <h2>🔞 Mature Content Warning</h2>
@@ -718,7 +757,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.7 — ANONYMOUS LOGIN + BLACK BOX GONE =====
+    // ===== CORE ENGINE v2.8 — BLACK BOX GONE + CHAT FIXED + USER INFO =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -779,6 +818,10 @@
               username = savedUsername;
               document.getElementById('loginBtn').style.display = 'none';
               document.getElementById('loginIcon').classList.add('show');
+              // Set user info
+              document.getElementById('userNameText').textContent = username;
+              const joined = new Date().toLocaleString();
+              document.getElementById('userJoined').textContent = joined;
             } else {
               document.getElementById('usernameModal').style.display = 'flex';
             }
@@ -1137,7 +1180,7 @@
         snapshot.docs.reverse().forEach(doc => {
           const msg = doc.data();
           const msgDiv = document.createElement('div');
-          msgDiv.className = msg.uid === currentUser?.uid ? 'chat-message self' : 'chat-message';
+          msgDiv.className = msg.uid === currentUser.uid ? 'chat-message self' : 'chat-message';
           msgDiv.innerHTML = `
             <span class="username">${msg.username}</span>
             <span class="content">${escapeHtml(msg.text)}</span>
@@ -1187,7 +1230,20 @@
       document.getElementById('usernameModal').style.display = 'none';
       document.getElementById('loginBtn').style.display = 'none';
       document.getElementById('loginIcon').classList.add('show');
+      // Set user info
+      document.getElementById('userNameText').textContent = username;
+      const joined = new Date().toLocaleString();
+      document.getElementById('userJoined').textContent = joined;
       loadChatMessages();
+    };
+
+    // 🔥 USER INFO POPUP
+    const showUserInfo = () => {
+      if (!username) {
+        document.getElementById('usernameModal').style.display = 'flex';
+        return;
+      }
+      document.getElementById('userInfoPopup').style.display = 'block';
     };
 
     // 🔥 ULTRA-SMOOTH SCROLL HIDING — BLACK BOX GONE
@@ -1261,6 +1317,10 @@
       document.getElementById('usernameSubmit').onclick = setUserName;
       document.getElementById('closeUsername').onclick = () => {
         document.getElementById('usernameModal').style.display = 'none';
+      };
+      document.getElementById('loginIcon').onclick = showUserInfo;
+      document.getElementById('closeUserInfo').onclick = () => {
+        document.getElementById('userInfoPopup').style.display = 'none';
       };
       document.getElementById('nsfwConfirm').onclick = enableNSFW;
       document.getElementById('nsfwCancel').onclick = () => {
