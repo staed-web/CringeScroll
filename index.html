@@ -655,6 +655,113 @@
       top: 10px;
       right: 10px;
     }
+
+    /* ✅ MEME GENERATOR MODAL */
+    #memeGenerator {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1001;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .generator-content {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      border: 2px solid var(--neon-purple);
+    }
+
+    .generator-content h2 {
+      color: var(--neon-purple);
+      margin-bottom: 15px;
+    }
+
+    .generator-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input[type="text"] {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--neon-green);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .generator-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .generator-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .generator-btn.create {
+      background: var(--neon-green);
+      color: var(--bg);
+    }
+
+    .generator-btn.cancel {
+      background: #555;
+      color: white;
+    }
+
+    /* ✅ NSFW MODAL */
+    #nsfwModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 90%;
+      border: 2px solid var(--neon-pink);
+    }
+
+    .modal-content h2 {
+      color: var(--neon-pink);
+      margin-bottom: 20px;
+    }
+
+    .modal-btn {
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -722,6 +829,7 @@
     <p>Joined: <span id="userJoined">Just now</span></p>
   </div>
 
+  <!-- ✅ NSFW MODAL -->
   <div id="nsfwModal">
     <div class="modal-content">
       <h2>🔞 Mature Content Warning</h2>
@@ -731,6 +839,7 @@
     </div>
   </div>
 
+  <!-- ✅ MEME GENERATOR MODAL -->
   <div id="memeGenerator">
     <div class="generator-content">
       <h2>🖼️ Create Your Cringe</h2>
@@ -757,7 +866,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.8 — BLACK BOX GONE + CHAT FIXED + USER INFO =====
+    // ===== CORE ENGINE v2.9 — BLACK BOX GONE + ALL FUNCTIONS WORKING =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -923,7 +1032,7 @@
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
         btn.onclick = async () => {
-          await addReaction(meme.id, emoji, meme);
+          await addReaction(meme.id, emoji, meme); // ✅ PASS MEME DATA
           const countEl = item.querySelector('.reaction-count');
           const newCount = (reactionData.counts[emoji] || 0) + 1;
           if (countEl) {
@@ -1217,6 +1326,21 @@
       }
     };
 
+    // 🔥 AUTO-DELETE CHAT AFTER 24 HOURS
+    const cleanupOldChats = async () => {
+      if (!db) return;
+      try {
+        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
+        const q = db.collection('chat').where('timestamp', '<', cutoff);
+        const snapshot = await q.get();
+        snapshot.docs.forEach(doc => {
+          doc.ref.delete();
+        });
+      } catch (e) {
+        console.warn("Failed to cleanup old chats:", e);
+      }
+    };
+
     // 🔥 USERNAME HANDLING
     const setUserName = () => {
       const input = document.getElementById('usernameInput');
@@ -1290,70 +1414,73 @@
 
     // 🔥 BUTTON LISTENERS
     const attachButtonListeners = () => {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.onclick = () => switchTab(btn.dataset.tab);
+      // Wait for DOM to fully load
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.onclick = () => switchTab(btn.dataset.tab);
+        });
+        
+        document.getElementById('rouletteBtn').onclick = cringeRoulette;
+        document.getElementById('glowBtn').onclick = toggleGlowMode;
+        document.getElementById('nsfwBtn').onclick = () => {
+          if (isNSFW) {
+            disableNSFW();
+          } else {
+            document.getElementById('nsfwModal').style.display = 'flex';
+          }
+        };
+        document.getElementById('chatBtn').onclick = () => {
+          document.getElementById('chatPanel').classList.add('open');
+          loadChatMessages();
+        };
+        document.getElementById('closeChat').onclick = () => {
+          document.getElementById('chatPanel').classList.remove('open');
+        };
+        document.getElementById('sendChat').onclick = sendChatMessage;
+        document.getElementById('loginBtn').onclick = () => {
+          document.getElementById('usernameModal').style.display = 'flex';
+        };
+        document.getElementById('usernameSubmit').onclick = setUserName;
+        document.getElementById('closeUsername').onclick = () => {
+          document.getElementById('usernameModal').style.display = 'none';
+        };
+        document.getElementById('loginIcon').onclick = showUserInfo;
+        document.getElementById('closeUserInfo').onclick = () => {
+          document.getElementById('userInfoPopup').style.display = 'none';
+        };
+        document.getElementById('nsfwConfirm').onclick = enableNSFW;
+        document.getElementById('nsfwCancel').onclick = () => {
+          document.getElementById('nsfwModal').style.display = 'none';
+        };
+        document.getElementById('logoLink').onclick = () => {
+          window.location.href = window.location.origin + window.location.pathname;
+        };
+        document.getElementById('installBtn').onclick = () => {
+          alert("Tap 'Share' → 'Add to Home Screen' for fullscreen mode!");
+          document.getElementById('installPrompt').style.display = 'none';
+          localStorage.setItem('installPromptSeen', 'true');
+        };
+        document.getElementById('dismissBtn').onclick = () => {
+          document.getElementById('installPrompt').style.display = 'none';
+          localStorage.setItem('installPromptSeen', 'true');
+        };
+        document.getElementById('createBtn').onclick = () => {
+          document.getElementById('memeGenerator').style.display = 'flex';
+        };
+        document.getElementById('cancelGenerator').onclick = () => {
+          document.getElementById('memeGenerator').style.display = 'none';
+        };
+        document.getElementById('generateMeme').onclick = () => {
+          const top = document.getElementById('topText').value.trim();
+          const bottom = document.getElementById('bottomText').value.trim();
+          const url = document.getElementById('imageUrl').value.trim();
+          if (!url) {
+            alert("Image URL is required!");
+            return;
+          }
+          createMeme(top, bottom, url);
+        };
       });
-      
-      document.getElementById('rouletteBtn').onclick = cringeRoulette;
-      document.getElementById('glowBtn').onclick = toggleGlowMode;
-      document.getElementById('nsfwBtn').onclick = () => {
-        if (isNSFW) {
-          disableNSFW();
-        } else {
-          document.getElementById('nsfwModal').style.display = 'flex';
-        }
-      };
-      document.getElementById('chatBtn').onclick = () => {
-        document.getElementById('chatPanel').classList.add('open');
-        loadChatMessages();
-      };
-      document.getElementById('closeChat').onclick = () => {
-        document.getElementById('chatPanel').classList.remove('open');
-      };
-      document.getElementById('sendChat').onclick = sendChatMessage;
-      document.getElementById('loginBtn').onclick = () => {
-        document.getElementById('usernameModal').style.display = 'flex';
-      };
-      document.getElementById('usernameSubmit').onclick = setUserName;
-      document.getElementById('closeUsername').onclick = () => {
-        document.getElementById('usernameModal').style.display = 'none';
-      };
-      document.getElementById('loginIcon').onclick = showUserInfo;
-      document.getElementById('closeUserInfo').onclick = () => {
-        document.getElementById('userInfoPopup').style.display = 'none';
-      };
-      document.getElementById('nsfwConfirm').onclick = enableNSFW;
-      document.getElementById('nsfwCancel').onclick = () => {
-        document.getElementById('nsfwModal').style.display = 'none';
-      };
-      document.getElementById('logoLink').onclick = () => {
-        window.location.href = window.location.origin + window.location.pathname;
-      };
-      document.getElementById('installBtn').onclick = () => {
-        alert("Tap 'Share' → 'Add to Home Screen' for fullscreen mode!");
-        document.getElementById('installPrompt').style.display = 'none';
-        localStorage.setItem('installPromptSeen', 'true');
-      };
-      document.getElementById('dismissBtn').onclick = () => {
-        document.getElementById('installPrompt').style.display = 'none';
-        localStorage.setItem('installPromptSeen', 'true');
-      };
-      document.getElementById('createBtn').onclick = () => {
-        document.getElementById('memeGenerator').style.display = 'flex';
-      };
-      document.getElementById('cancelGenerator').onclick = () => {
-        document.getElementById('memeGenerator').style.display = 'none';
-      };
-      document.getElementById('generateMeme').onclick = () => {
-        const top = document.getElementById('topText').value.trim();
-        const bottom = document.getElementById('bottomText').value.trim();
-        const url = document.getElementById('imageUrl').value.trim();
-        if (!url) {
-          alert("Image URL is required!");
-          return;
-        }
-        createMeme(top, bottom, url);
-      };
     };
 
     // 🔥 NSFW TOGGLE
@@ -1392,6 +1519,9 @@
 
       attachButtonListeners();
       initScrollHiding();
+
+      // Cleanup old chats every hour
+      setInterval(cleanupOldChats, 60 * 60 * 1000);
 
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
