@@ -515,18 +515,23 @@
     let topMemes = JSON.parse(localStorage.getItem('cringeTopMemes')) || [];
 
     const NSFW_SOURCES = [
-      'https://meme-api.com/gimme/ComedyCemetery',
-      'https://meme-api.com/gimme/terriblefacebookmemes',
-      'https://meme-api.com/gimme/okbuddyretard'
-    ];
+  'https://meme-api.com/gimme/ComedyCemetery',
+  'https://meme-api.com/gimme/terriblefacebookmemes',
+  'https://meme-api.com/gimme/okbuddyretard',
+  'https://meme-api.com/gimme/2meirl4meirl',
+  'https://meme-api.com/gimme/antiwork',
+  'https://meme-api.com/gimme/iamverysmart'
+];
 
-    const SFW_SOURCES = [
-      'https://meme-api.com/gimme/memes',
-      'https://meme-api.com/gimme/dankmemes',
-      'https://meme-api.com/gimme/me_irl',
-      'https://meme-api.com/gimme/wholesomememes',
-      'https://meme-api.com/gimme/funny'
-    ];
+const SFW_SOURCES = [
+  'https://meme-api.com/gimme/memes',
+  'https://meme-api.com/gimme/dankmemes',
+  'https://meme-api.com/gimme/me_irl',
+  'https://meme-api.com/gimme/wholesomememes',
+  'https://meme-api.com/gimme/funny',
+  'https://meme-api.com/gimme/HistoryMemes',
+  'https://meme-api.com/gimme/ProgrammerHumor'
+];
 
     const escapeHtml = (str) => 
       str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#039;'}[m]));
