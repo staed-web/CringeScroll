@@ -465,6 +465,32 @@
       cursor: pointer;
     }
 
+    /* ✅ USER STATUS INSIDE CHAT */
+    .user-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--neon-green);
+      margin-bottom: 10px;
+    }
+
+    .user-status .username {
+      font-weight: bold;
+      color: var(--neon-purple);
+    }
+
+    .logout-btn {
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     #chatMessages {
       flex: 1;
       overflow-y: auto;
@@ -576,24 +602,6 @@
       cursor: pointer;
     }
 
-    #userStatus {
-      display: none;
-      color: var(--neon-green);
-      font-size: 12px;
-      margin-right: 10px;
-    }
-
-    #logoutBtn {
-      display: none;
-      background: var(--neon-pink);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
     .footer-notice {
       text-align: center;
       margin: 30px 0;
@@ -696,8 +704,6 @@
         <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
-        <span id="userStatus">Chat as: <span id="userName">Guest</span></span>
-        <button id="logoutBtn">Logout</button>
       </div>
     </div>
     
@@ -711,6 +717,11 @@
     <div class="chat-header">
       <div class="chat-title">💬 CringeChat</div>
       <button class="close-chat" id="closeChat">✕</button>
+    </div>
+    <div class="user-status" id="chatUserStatus" style="display:none;">
+      <span>Chat as:</span>
+      <span class="username" id="chatUserName">Guest</span>
+      <button class="logout-btn" id="chatLogoutBtn">Logout</button>
     </div>
     <div id="chatMessages">
       <!-- Messages will appear here -->
@@ -756,7 +767,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.6 — NO NSFW, USERNAME CHAT =====
+    // ===== CORE ENGINE v2.7 — USERNAME IN CHAT PANEL =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -803,9 +814,6 @@
         const savedUsername = localStorage.getItem('cringeUsername');
         if (savedUsername) {
           currentUsername = savedUsername;
-          document.getElementById('userStatus').style.display = 'block';
-          document.getElementById('userName').textContent = savedUsername;
-          document.getElementById('logoutBtn').style.display = 'block';
         }
       } else {
         console.error("Firebase failed to load");
@@ -1193,20 +1201,31 @@
       }
       currentUsername = username;
       localStorage.setItem('cringeUsername', username);
-      document.getElementById('userStatus').style.display = 'block';
-      document.getElementById('userName').textContent = username;
-      document.getElementById('logoutBtn').style.display = 'block';
       document.getElementById('usernameModal').style.display = 'none';
       input.value = '';
+      updateChatUserStatus();
       loadChatMessages();
     };
 
     const logout = () => {
       currentUsername = null;
       localStorage.removeItem('cringeUsername');
-      document.getElementById('userStatus').style.display = 'none';
-      document.getElementById('logoutBtn').style.display = 'none';
+      updateChatUserStatus();
       document.getElementById('chatMessages').innerHTML = '';
+    };
+
+    // 🔥 UPDATE CHAT USER STATUS
+    const updateChatUserStatus = () => {
+      const userStatus = document.getElementById('chatUserStatus');
+      const userName = document.getElementById('chatUserName');
+      const logoutBtn = document.getElementById('chatLogoutBtn');
+      if (currentUsername) {
+        userStatus.style.display = 'flex';
+        userName.textContent = currentUsername;
+        logoutBtn.onclick = logout;
+      } else {
+        userStatus.style.display = 'none';
+      }
     };
 
     // 🔥 ULTRA-SMOOTH SCROLL HIDING
@@ -1270,7 +1289,6 @@
       };
       document.getElementById('sendChat').onclick = sendChatMessage;
       document.getElementById('usernameSubmit').onclick = setUsername;
-      document.getElementById('logoutBtn').onclick = logout;
       document.getElementById('logoLink').onclick = () => {
         window.location.href = window.location.origin + window.location.pathname;
       };
@@ -1315,6 +1333,7 @@
 
       attachButtonListeners();
       initScrollHiding();
+      updateChatUserStatus(); // Initial render
 
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
