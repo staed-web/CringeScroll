@@ -602,6 +602,30 @@
       cursor: pointer;
     }
 
+    /* ✅ STREAK & CRINGECOIN BADGE */
+    #cringeCoin {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--neon-green);
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 101;
+      display: none;
+    }
+
+    .streak-badge {
+      background: var(--neon-pink);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
     .footer-notice {
       text-align: center;
       margin: 30px 0;
@@ -712,6 +736,9 @@
     </div>
   </div>
 
+  <!-- ✅ CRINGECOIN DISPLAY -->
+  <div id="cringeCoin">💎 <span id="coinCount">0</span> <span id="streakBadge" class="streak-badge" style="display:none;"></span></div>
+
   <!-- ✅ CHAT PANEL -->
   <div id="chatPanel">
     <div class="chat-header">
@@ -767,7 +794,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.7 — USERNAME IN CHAT PANEL =====
+    // ===== CORE ENGINE v2.8 — STREAKS + CRINGECOIN + UNIQUE USERNAMES =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -778,6 +805,8 @@
     let currentTab = 'hot';
     let db = null;
     let currentUsername = null;
+    let cringeCoin = 0;
+    let streak = 0;
 
     // 🔥 COMBINED MEME SOURCES (NO NSFW)
     const MEME_SOURCES = [
@@ -814,11 +843,95 @@
         const savedUsername = localStorage.getItem('cringeUsername');
         if (savedUsername) {
           currentUsername = savedUsername;
+          // Load user profile
+          loadUserProfile(savedUsername);
         }
       } else {
         console.error("Firebase failed to load");
       }
     });
+
+    // 🔥 LOAD USER PROFILE (FOR CROSS-DEVICE)
+    const loadUserProfile = async (username) => {
+      try {
+        const userDoc = await db.collection('users').doc(username).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          cringeCoin = data.cringeCoin || 0;
+          streak = data.streak || 0;
+          document.getElementById('cringeCoin').style.display = 'block';
+          document.getElementById('coinCount').textContent = cringeCoin;
+          updateStreakBadge();
+          updateChatUserStatus();
+        } else {
+          // New user on this device
+          await db.collection('users').doc(username).set({
+            cringeCoin: 0,
+            streak: 0,
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          cringeCoin = 0;
+          streak = 0;
+          document.getElementById('cringeCoin').style.display = 'block';
+          document.getElementById('coinCount').textContent = cringeCoin;
+          updateChatUserStatus();
+        }
+      } catch (e) {
+        console.warn("User profile load failed:", e);
+      }
+    };
+
+    // 🔥 UPDATE CRINGECOIN
+    const updateCringeCoin = async (amount) => {
+      if (!currentUsername) return;
+      cringeCoin += amount;
+      document.getElementById('coinCount').textContent = cringeCoin;
+      try {
+        await db.collection('users').doc(currentUsername).update({
+          cringeCoin: cringeCoin
+        });
+      } catch (e) {
+        console.warn("CringeCoin update failed:", e);
+      }
+    };
+
+    // 🔥 UPDATE STREAK
+    const updateStreak = async () => {
+      if (!currentUsername) return;
+      const today = new Date().toDateString();
+      const lastActive = localStorage.getItem('lastActive');
+      if (lastActive !== today) {
+        if (lastActive === new Date(Date.now() - 86400000).toDateString()) {
+          streak += 1;
+        } else {
+          streak = 1;
+        }
+        localStorage.setItem('lastActive', today);
+        try {
+          await db.collection('users').doc(currentUsername).update({
+            streak: streak,
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          updateStreakBadge();
+        } catch (e) {
+          console.warn("Streak update failed:", e);
+        }
+      }
+    };
+
+    // 🔥 UPDATE STREAK BADGE
+    const updateStreakBadge = () => {
+      const badge = document.getElementById('streakBadge');
+      if (streak >= 7) {
+        badge.textContent = `🔥${streak}D`;
+        badge.style.display = 'inline';
+      } else if (streak > 0) {
+        badge.textContent = `🔥${streak}D`;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    };
 
     // 🔥 STORE MEME ON FIRST REACTION
     const ensureMemeInDB = async (meme) => {
@@ -865,6 +978,19 @@
           data.total += 1;
           transaction.set(docRef, data);
         });
+        // Reward CringeCoin
+        if (currentUsername) {
+          updateCringeCoin(1);
+          updateStreak();
+          // Daily quest: react with 💀
+          if (emoji === '💀') {
+            const questKey = `quest_react_${new Date().toDateString()}`;
+            if (!localStorage.getItem(questKey)) {
+              localStorage.setItem(questKey, 'completed');
+              updateCringeCoin(5); // Bonus for daily quest
+            }
+          }
+        }
       } catch (e) {
         console.warn("Reaction update failed:", e);
       }
@@ -1059,6 +1185,10 @@
         alert("Service unavailable. Try again later.");
         return;
       }
+      if (!currentUsername) {
+        document.getElementById('usernameModal').style.display = 'flex';
+        return;
+      }
       try {
         const memeId = 'user_' + Date.now();
         const memeData = {
@@ -1075,6 +1205,15 @@
         document.getElementById('bottomText').value = '';
         document.getElementById('imageUrl').value = '';
         loadFeed(true);
+        // Reward CringeCoin
+        updateCringeCoin(10);
+        updateStreak();
+        // Daily quest: post meme
+        const questKey = `quest_post_${new Date().toDateString()}`;
+        if (!localStorage.getItem(questKey)) {
+          localStorage.setItem(questKey, 'completed');
+          updateCringeCoin(10); // Bonus for daily quest
+        }
       } catch (e) {
         alert("Failed to create meme. Check image URL.");
         console.error(e);
@@ -1180,13 +1319,16 @@
         });
         input.value = '';
         loadChatMessages();
+        // Reward CringeCoin
+        updateCringeCoin(2);
+        updateStreak();
       } catch (e) {
         alert("Failed to send message.");
         console.error(e);
       }
     };
 
-    const setUsername = () => {
+    const setUsername = async () => {
       const input = document.getElementById('usernameInput');
       let username = input.value.trim();
       if (!username) {
@@ -1199,17 +1341,36 @@
         alert("Username must be at least 2 characters (letters/numbers only).");
         return;
       }
-      currentUsername = username;
-      localStorage.setItem('cringeUsername', username);
-      document.getElementById('usernameModal').style.display = 'none';
-      input.value = '';
-      updateChatUserStatus();
-      loadChatMessages();
+      // Check uniqueness
+      try {
+        const userDoc = await db.collection('users').doc(username).get();
+        if (userDoc.exists) {
+          alert("Username already taken! Try another.");
+          return;
+        }
+        // Create user profile
+        await db.collection('users').doc(username).set({
+          cringeCoin: 0,
+          streak: 0,
+          lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        currentUsername = username;
+        localStorage.setItem('cringeUsername', username);
+        document.getElementById('usernameModal').style.display = 'none';
+        input.value = '';
+        loadUserProfile(username);
+        loadChatMessages();
+      } catch (e) {
+        alert("Username check failed. Try again.");
+        console.error(e);
+      }
     };
 
     const logout = () => {
       currentUsername = null;
       localStorage.removeItem('cringeUsername');
+      localStorage.removeItem('lastActive');
+      document.getElementById('cringeCoin').style.display = 'none';
       updateChatUserStatus();
       document.getElementById('chatMessages').innerHTML = '';
     };
@@ -1302,6 +1463,10 @@
         localStorage.setItem('installPromptSeen', 'true');
       };
       document.getElementById('createBtn').onclick = () => {
+        if (!currentUsername) {
+          document.getElementById('usernameModal').style.display = 'flex';
+          return;
+        }
         document.getElementById('memeGenerator').style.display = 'flex';
       };
       document.getElementById('cancelGenerator').onclick = () => {
@@ -1333,7 +1498,6 @@
 
       attachButtonListeners();
       initScrollHiding();
-      updateChatUserStatus(); // Initial render
 
       if (!localStorage.getItem('installPromptSeen')) {
         setTimeout(() => {
