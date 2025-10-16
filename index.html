@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZDBkMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+QzwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRDQwMEZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwzKSI+UjwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMzlGRjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+STwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw5KSI+RzwvdGV4dD4KPC9zdmc+Cg=="/>
   <link rel="manifest" href="#inline-manifest" />
   <script>
-    // 🔥 YOUR REAL FIREBASE CONFIG
+    // 🔥 FIREBASE CONFIG (FOR CHAT ONLY)
     const firebaseConfig = {
       apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
       authDomain: "cringescroll-prod.firebaseapp.com",
@@ -22,7 +22,6 @@
     // Load Firebase SDKs
     const scripts = [
       'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
-      'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
       'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
     ];
     scripts.forEach(src => {
@@ -275,22 +274,6 @@
       z-index: 10;
     }
 
-    .nsfw-badge {
-      background: var(--neon-pink);
-      color: white;
-      font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.7; }
-      50% { opacity: 1; }
-      100% { opacity: 0.7; }
-    }
-
     .reaction-badge {
       background: var(--neon-green);
       color: var(--bg);
@@ -439,7 +422,7 @@
       cursor: pointer;
     }
 
-    /* ✅ CHAT PANEL — REPLACES LEADERBOARD */
+    /* ✅ CHAT PANEL */
     #chatPanel {
       position: fixed;
       top: 0;
@@ -542,59 +525,8 @@
       cursor: pointer;
     }
 
-    /* ✅ PROFILE DROPDOWN */
-    .profile-dropdown {
-      position: absolute;
-      top: 60px;
-      right: 10px;
-      background: var(--card-bg);
-      border: 1px solid var(--neon-purple);
-      border-radius: 10px;
-      padding: 12px;
-      z-index: 1000;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-
-    .profile-dropdown .username {
-      color: var(--neon-green);
-      font-weight: bold;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .profile-dropdown .logout-btn {
-      background: var(--neon-pink);
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-    }
-
-    #profileIcon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-green));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 18px;
-      color: white;
-      transition: transform 0.2s;
-    }
-
-    #profileIcon:hover {
-      transform: scale(1.1);
-    }
-
-    /* ✅ LOGIN MODAL */
-    #loginModal {
+    /* ✅ USERNAME MODAL */
+    #usernameModal {
       display: none;
       position: fixed;
       top: 0;
@@ -607,7 +539,7 @@
       align-items: center;
     }
 
-    .login-content {
+    .username-content {
       background: var(--card-bg);
       padding: 20px;
       border-radius: 20px;
@@ -619,13 +551,13 @@
       gap: 10px;
     }
 
-    .login-content h2 {
+    .username-content h2 {
       color: var(--neon-purple);
       margin-bottom: 15px;
       text-align: center;
     }
 
-    .login-input {
+    .username-input {
       background: rgba(0,0,0,0.3);
       border: 1px solid var(--neon-green);
       color: var(--text);
@@ -634,73 +566,30 @@
       font-size: 14px;
     }
 
-    .login-btns {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .login-btn {
-      flex: 1;
-      padding: 8px;
+    .username-btn {
+      background: var(--neon-green);
+      color: var(--bg);
       border: none;
+      padding: 8px;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    .login-btn.login {
-      background: var(--neon-green);
-      color: var(--bg);
-    }
-
-    .login-btn.signup {
-      background: var(--neon-purple);
-      color: var(--bg);
-    }
-
-    .login-switch {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--neon-green);
-      cursor: pointer;
-    }
-
-    #nsfwModal {
+    #userStatus {
       display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
+      color: var(--neon-green);
+      font-size: 12px;
+      margin-right: 10px;
     }
 
-    .modal-content {
-      background: var(--card-bg);
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 90%;
-      border: 2px solid var(--neon-pink);
-    }
-
-    .modal-content h2 {
-      color: var(--neon-pink);
-      margin-bottom: 20px;
-    }
-
-    .modal-btn {
+    #logoutBtn {
+      display: none;
       background: var(--neon-pink);
       color: white;
       border: none;
-      padding: 12px 24px;
-      margin: 10px;
-      border-radius: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -805,16 +694,10 @@
       <div class="control-bar">
         <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
         <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
-        <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
-        <div id="profileContainer" style="position: relative;">
-          <div id="profileIcon">👤</div>
-          <div class="profile-dropdown" id="profileDropdown">
-            <div class="username" id="profileUsername">User</div>
-            <button class="logout-btn" id="logoutBtn">Logout</button>
-          </div>
-        </div>
+        <span id="userStatus">Chat as: <span id="userName">Guest</span></span>
+        <button id="logoutBtn">Logout</button>
       </div>
     </div>
     
@@ -823,7 +706,7 @@
     </div>
   </div>
 
-  <!-- ✅ CHAT PANEL — REPLACES LEADERBOARD -->
+  <!-- ✅ CHAT PANEL -->
   <div id="chatPanel">
     <div class="chat-header">
       <div class="chat-title">💬 CringeChat</div>
@@ -838,26 +721,12 @@
     </div>
   </div>
 
-  <!-- ✅ LOGIN MODAL -->
-  <div id="loginModal">
-    <div class="login-content">
-      <h2>🔒 Login or Sign Up</h2>
-      <input type="text" id="loginEmail" class="login-input" placeholder="Email" required>
-      <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
-      <div class="login-btns">
-        <button class="login-btn login" id="loginSubmit">Login</button>
-        <button class="login-btn signup" id="signupSubmit">Sign Up</button>
-      </div>
-      <div class="login-switch" id="switchToSignup">Don't have an account? Sign up</div>
-    </div>
-  </div>
-
-  <div id="nsfwModal">
-    <div class="modal-content">
-      <h2>🔞 Mature Content Warning</h2>
-      <p>This mode contains dark humor and edgy memes.<br>Not suitable for minors.</p>
-      <button class="modal-btn" id="nsfwConfirm">Enter Mature Mode</button>
-      <button class="modal-btn" id="nsfwCancel" style="background:#555;">Cancel</button>
+  <!-- ✅ USERNAME MODAL -->
+  <div id="usernameModal">
+    <div class="username-content">
+      <h2>💬 Enter a Username</h2>
+      <input type="text" id="usernameInput" class="username-input" placeholder="Your name (no spaces)" maxlength="15" required>
+      <button class="username-btn" id="usernameSubmit">Join Chat</button>
     </div>
   </div>
 
@@ -887,37 +756,33 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.6 — PROFILE ICON + AUTO-DELETE CHAT + NO LAYOUT DISTORTION =====
+    // ===== CORE ENGINE v2.6 — NO NSFW, USERNAME CHAT =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
     let loadCount = 0;
     const BUFFER_HEIGHT = 300;
     let isGlowMode = false;
-    let isNSFW = localStorage.getItem('cringeNSFW') === 'true';
     let lastScrollTop = 0;
     let currentTab = 'hot';
     let db = null;
-    let auth = null;
-    let currentUser = null;
+    let currentUsername = null;
 
-    const NSFW_SOURCES = [
-      'https://meme-api.com/gimme/ComedyCemetery',
-      'https://meme-api.com/gimme/terriblefacebookmemes',
-      'https://meme-api.com/gimme/okbuddyretard',
-      'https://meme-api.com/gimme/2meirl4meirl',
-      'https://meme-api.com/gimme/antiwork',
-      'https://meme-api.com/gimme/iamverysmart'
-    ];
-
-    const SFW_SOURCES = [
+    // 🔥 COMBINED MEME SOURCES (NO NSFW)
+    const MEME_SOURCES = [
       'https://meme-api.com/gimme/memes',
       'https://meme-api.com/gimme/dankmemes',
       'https://meme-api.com/gimme/me_irl',
       'https://meme-api.com/gimme/wholesomememes',
       'https://meme-api.com/gimme/funny',
       'https://meme-api.com/gimme/HistoryMemes',
-      'https://meme-api.com/gimme/ProgrammerHumor'
+      'https://meme-api.com/gimme/ProgrammerHumor',
+      'https://meme-api.com/gimme/ComedyCemetery',
+      'https://meme-api.com/gimme/terriblefacebookmemes',
+      'https://meme-api.com/gimme/okbuddyretard',
+      'https://meme-api.com/gimme/2meirl4meirl',
+      'https://meme-api.com/gimme/antiwork',
+      'https://meme-api.com/gimme/iamverysmart'
     ];
 
     const escapeHtml = (str) => 
@@ -934,18 +799,14 @@
       if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        auth = firebase.auth();
-        // Check auth state
-        auth.onAuthStateChanged(user => {
-          currentUser = user;
-          if (user) {
-            document.getElementById('profileIcon').style.display = 'flex';
-            document.getElementById('profileUsername').textContent = user.email.split('@')[0];
-            document.getElementById('profileDropdown').style.display = 'none';
-          } else {
-            document.getElementById('profileIcon').style.display = 'none';
-          }
-        });
+        // Check for saved username
+        const savedUsername = localStorage.getItem('cringeUsername');
+        if (savedUsername) {
+          currentUsername = savedUsername;
+          document.getElementById('userStatus').style.display = 'block';
+          document.getElementById('userName').textContent = savedUsername;
+          document.getElementById('logoutBtn').style.display = 'block';
+        }
       } else {
         console.error("Firebase failed to load");
       }
@@ -961,7 +822,6 @@
           await docRef.set({
             title: meme.title,
             url: meme.url,
-            isNSFW: meme.isNSFW,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
@@ -988,9 +848,7 @@
     const addReaction = async (memeId, emoji, memeData) => {
       if (!db) return;
       try {
-        // ✅ STORE MEME IF NOT EXISTS
         await ensureMemeInDB(memeData);
-        
         const docRef = db.collection('reactions').doc(memeId);
         await db.runTransaction(async (transaction) => {
           const doc = await transaction.get(docRef);
@@ -1013,13 +871,6 @@
       const badgeContainer = document.createElement('div');
       badgeContainer.className = 'badge-container';
       
-      if (meme.isNSFW) {
-        const nsfwBadge = document.createElement('div');
-        nsfwBadge.className = 'nsfw-badge';
-        nsfwBadge.textContent = 'MATURE';
-        badgeContainer.appendChild(nsfwBadge);
-      }
-      
       const reactionBadge = document.createElement('div');
       reactionBadge.className = 'reaction-badge';
       reactionBadge.innerHTML = `🔥 ${formatNumber(meme.ups)}`;
@@ -1039,7 +890,7 @@
         btn.className = 'reaction-btn';
         btn.textContent = emoji;
         btn.onclick = async () => {
-          await addReaction(meme.id, emoji, meme); // ✅ PASS MEME DATA
+          await addReaction(meme.id, emoji, meme);
           const countEl = item.querySelector('.reaction-count');
           const newCount = (reactionData.counts[emoji] || 0) + 1;
           if (countEl) {
@@ -1052,7 +903,6 @@
             countDisplay.textContent = newCount;
             item.appendChild(countDisplay);
           }
-          updateLeaderboard();
         };
         
         const countDisplay = document.createElement('div');
@@ -1076,8 +926,6 @@
 
     // 🔥 AD RENDER
     const renderAd = () => {
-      if (isNSFW) return;
-      
       const adContainer = document.createElement('div');
       adContainer.className = 'ad-container';
       
@@ -1133,7 +981,7 @@
       if (meme) {
         await renderMeme(meme);
         loadCount++;
-        if (!isNSFW && loadCount > 0) {
+        if (loadCount > 0) {
           const nextAdAt = [5, 6, 7][Math.floor(Math.random() * 3)];
           if (loadCount % nextAdAt === 0) {
             setTimeout(renderAd, 100);
@@ -1167,8 +1015,7 @@
     // 🔥 FETCH MEME
     const fetchMeme = async () => {
       try {
-        const sources = isNSFW ? NSFW_SOURCES : SFW_SOURCES;
-        const shuffled = [...sources].sort(() => 0.5 - Math.random());
+        const shuffled = [...MEME_SOURCES].sort(() => 0.5 - Math.random());
         for (let i = 0; i < shuffled.length; i++) {
           const url = `${shuffled[i]}?_=${Date.now()}`;
           try {
@@ -1182,9 +1029,8 @@
             seenUrls.add(data.url);
             return { 
               url: data.url, 
-              title: data.title || (isNSFW ? 'Mature Cringe' : 'Cringe'),
+              title: data.title || 'Cringe',
               ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
-              isNSFW: isNSFW,
               id: data.url.split('/').pop(),
               isUserGenerated: false
             };
@@ -1212,7 +1058,6 @@
           url: imageUrl,
           title: `${top || ''} ${bottom || ''}`.trim() || 'User Cringe',
           ups: 0,
-          isNSFW: isNSFW,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           isUserGenerated: true
         };
@@ -1265,7 +1110,7 @@
           rouletteBtn.textContent = '🎯';
           rouletteBtn.disabled = false;
           loadCount++;
-          if (!isNSFW && loadCount % 7 === 0) setTimeout(renderAd, 100);
+          if (loadCount % 7 === 0) setTimeout(renderAd, 100);
         }
       }, 200);
     };
@@ -1284,9 +1129,9 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 CHAT — AUTO-DELETE AFTER 24H
+    // 🔥 CHAT FUNCTIONS
     const loadChatMessages = async () => {
-      if (!db || !currentUser) return;
+      if (!db) return;
       const chatMessages = document.getElementById('chatMessages');
       chatMessages.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
       
@@ -1297,7 +1142,7 @@
         snapshot.docs.reverse().forEach(doc => {
           const msg = doc.data();
           const msgDiv = document.createElement('div');
-          msgDiv.className = msg.uid === currentUser.uid ? 'chat-message self' : 'chat-message';
+          msgDiv.className = msg.username === currentUsername ? 'chat-message self' : 'chat-message';
           msgDiv.innerHTML = `
             <span class="username">${msg.username}</span>
             <span class="content">${escapeHtml(msg.text)}</span>
@@ -1311,8 +1156,8 @@
     };
 
     const sendChatMessage = async () => {
-      if (!db || !currentUser) {
-        document.getElementById('loginModal').style.display = 'flex';
+      if (!currentUsername) {
+        document.getElementById('usernameModal').style.display = 'flex';
         return;
       }
       const input = document.getElementById('chatMessage');
@@ -1321,11 +1166,9 @@
       
       try {
         await db.collection('chat').add({
-          uid: currentUser.uid,
-          username: currentUser.email.split('@')[0],
+          username: currentUsername,
           text: text,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Auto-delete after 24h
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         input.value = '';
         loadChatMessages();
@@ -1335,63 +1178,50 @@
       }
     };
 
-    // 🔥 LOGIN / SIGNUP
-    const login = async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
-      if (!email || !password) {
-        alert("Please enter email and password.");
+    const setUsername = () => {
+      const input = document.getElementById('usernameInput');
+      let username = input.value.trim();
+      if (!username) {
+        alert("Please enter a username.");
         return;
       }
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        document.getElementById('loginModal').style.display = 'none';
-      } catch (e) {
-        alert("Login failed: " + e.message);
-      }
-    };
-
-    const signup = async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
-      if (!email || !password) {
-        alert("Please enter email and password.");
+      // Remove spaces and special chars
+      username = username.replace(/[^a-zA-Z0-9]/g, '');
+      if (username.length < 2) {
+        alert("Username must be at least 2 characters (letters/numbers only).");
         return;
       }
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        document.getElementById('loginModal').style.display = 'none';
-      } catch (e) {
-        alert("Sign up failed: " + e.message);
-      }
+      currentUsername = username;
+      localStorage.setItem('cringeUsername', username);
+      document.getElementById('userStatus').style.display = 'block';
+      document.getElementById('userName').textContent = username;
+      document.getElementById('logoutBtn').style.display = 'block';
+      document.getElementById('usernameModal').style.display = 'none';
+      input.value = '';
+      loadChatMessages();
     };
 
-    // 🔥 LOGOUT
-    const logout = async () => {
-      try {
-        await auth.signOut();
-        document.getElementById('profileDropdown').style.display = 'none';
-        document.getElementById('profileIcon').style.display = 'none';
-        document.getElementById('chatMessages').innerHTML = '';
-      } catch (e) {
-        console.warn("Logout failed:", e);
-      }
+    const logout = () => {
+      currentUsername = null;
+      localStorage.removeItem('cringeUsername');
+      document.getElementById('userStatus').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('chatMessages').innerHTML = '';
     };
 
-    // 🔥 ULTRA-SMOOTH SCROLL HIDING — YOUTUBE-LEVEL FLUIDITY
+    // 🔥 ULTRA-SMOOTH SCROLL HIDING
     const initScrollHiding = () => {
       const header = document.querySelector('header');
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
       let isHidden = false;
-      let lastDirection = 0; // 1 = down, -1 = up
+      let lastDirection = 0;
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
         const scrollDelta = currentScrollTop - lastScrollTop;
         const direction = scrollDelta > 0 ? 1 : -1;
         
-        // Only trigger on meaningful scroll (>10px)
         if (Math.abs(scrollDelta) > 10) {
           const shouldHide = direction === 1 && currentScrollTop > 100;
           
@@ -1429,16 +1259,9 @@
       
       document.getElementById('rouletteBtn').onclick = cringeRoulette;
       document.getElementById('glowBtn').onclick = toggleGlowMode;
-      document.getElementById('nsfwBtn').onclick = () => {
-        if (isNSFW) {
-          disableNSFW();
-        } else {
-          document.getElementById('nsfwModal').style.display = 'flex';
-        }
-      };
       document.getElementById('chatBtn').onclick = () => {
         document.getElementById('chatPanel').classList.add('open');
-        if (currentUser) {
+        if (currentUsername) {
           loadChatMessages();
         }
       };
@@ -1446,26 +1269,8 @@
         document.getElementById('chatPanel').classList.remove('open');
       };
       document.getElementById('sendChat').onclick = sendChatMessage;
-      document.getElementById('profileIcon').onclick = () => {
-        const dropdown = document.getElementById('profileDropdown');
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-      };
+      document.getElementById('usernameSubmit').onclick = setUsername;
       document.getElementById('logoutBtn').onclick = logout;
-      document.getElementById('loginBtn').onclick = () => {
-        document.getElementById('loginModal').style.display = 'flex';
-      };
-      document.getElementById('loginSubmit').onclick = login;
-      document.getElementById('signupSubmit').onclick = signup;
-      document.getElementById('switchToSignup').onclick = () => {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        document.getElementById('loginEmail').value = email;
-        document.getElementById('loginPassword').value = password;
-      };
-      document.getElementById('nsfwConfirm').onclick = enableNSFW;
-      document.getElementById('nsfwCancel').onclick = () => {
-        document.getElementById('nsfwModal').style.display = 'none';
-      };
       document.getElementById('logoLink').onclick = () => {
         window.location.href = window.location.origin + window.location.pathname;
       };
@@ -1496,26 +1301,6 @@
       };
     };
 
-    // 🔥 NSFW TOGGLE
-    const enableNSFW = () => {
-      isNSFW = true;
-      localStorage.setItem('cringeNSFW', 'true');
-      document.getElementById('nsfwBtn').textContent = '✅';
-      document.getElementById('nsfwModal').style.display = 'none';
-      seenUrls.clear();
-      loadCount = 0;
-      loadFeed(true);
-    };
-
-    const disableNSFW = () => {
-      isNSFW = false;
-      localStorage.setItem('cringeNSFW', 'false');
-      document.getElementById('nsfwBtn').textContent = '🔞';
-      seenUrls.clear();
-      loadCount = 0;
-      loadFeed(true);
-    };
-
     // 🔥 INIT
     const initApp = () => {
       feed = document.getElementById('feed');
@@ -1527,8 +1312,6 @@
         document.body.style.animation = 'glowPulse 4s infinite alternate';
         document.getElementById('glowBtn').textContent = '🕶️';
       }
-
-      document.getElementById('nsfwBtn').textContent = isNSFW ? '✅' : '🔞';
 
       attachButtonListeners();
       initScrollHiding();
