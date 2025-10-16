@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZDBkMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+QzwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRDQwMEZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwzKSI+UjwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMzlGRjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+STwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw5KSI+RzwvdGV4dD4KPC9zdmc+Cg=="/>
   <link rel="manifest" href="#inline-manifest" />
   <script>
-    // 🔥 FIREBASE CONFIG (FOR CHAT ONLY)
+    // 🔥 FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
       authDomain: "cringescroll-prod.firebaseapp.com",
@@ -22,6 +22,7 @@
     // Load Firebase SDKs
     const scripts = [
       'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
       'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
     ];
     scripts.forEach(src => {
@@ -152,6 +153,30 @@
 
     .logo-container:hover .logo-title::after {
       width: 100%;
+    }
+
+    /* ✅ CRINGECOIN BADGE — TOP-RIGHT BELOW HEADER */
+    #cringeCoin {
+      position: fixed;
+      top: 60px; /* Below header */
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--neon-green);
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 101;
+      display: none;
+    }
+
+    .streak-badge {
+      background: var(--neon-pink);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-left: 8px;
     }
 
     /* ✅ UI BAR — SMOOTH COLLAPSE */
@@ -551,8 +576,8 @@
       cursor: pointer;
     }
 
-    /* ✅ USERNAME MODAL */
-    #usernameModal {
+    /* ✅ LOGIN MODAL */
+    #loginModal {
       display: none;
       position: fixed;
       top: 0;
@@ -565,7 +590,7 @@
       align-items: center;
     }
 
-    .username-content {
+    .login-content {
       background: var(--card-bg);
       padding: 20px;
       border-radius: 20px;
@@ -577,13 +602,13 @@
       gap: 10px;
     }
 
-    .username-content h2 {
+    .login-content h2 {
       color: var(--neon-purple);
       margin-bottom: 15px;
       text-align: center;
     }
 
-    .username-input {
+    .login-input {
       background: rgba(0,0,0,0.3);
       border: 1px solid var(--neon-green);
       color: var(--text);
@@ -592,38 +617,55 @@
       font-size: 14px;
     }
 
-    .username-btn {
-      background: var(--neon-green);
-      color: var(--bg);
-      border: none;
+    .login-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .login-btn {
+      flex: 1;
       padding: 8px;
+      border: none;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    /* ✅ STREAK & CRINGECOIN BADGE */
-    #cringeCoin {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 6px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--neon-green);
-      font-weight: bold;
-      font-size: 14px;
-      z-index: 101;
-      display: none;
+    .login-btn.login {
+      background: var(--neon-green);
+      color: var(--bg);
     }
 
-    .streak-badge {
+    .login-btn.signup {
+      background: var(--neon-purple);
+      color: var(--bg);
+    }
+
+    .login-switch {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--neon-green);
+      cursor: pointer;
+    }
+
+    #logoutBtn {
+      display: none;
       background: var(--neon-pink);
       color: white;
-      padding: 2px 8px;
-      border-radius: 10px;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #userStatus {
+      display: none;
+      color: var(--neon-green);
       font-size: 12px;
-      margin-left: 8px;
+      margin-right: 10px;
     }
 
     .footer-notice {
@@ -716,6 +758,9 @@
       </div>
     </header>
     
+    <!-- ✅ CRINGECOIN BADGE — FIXED POSITION -->
+    <div id="cringeCoin">💎 <span id="coinCount">0</span> <span id="streakBadge" class="streak-badge" style="display:none;"></span></div>
+    
     <!-- ✅ SINGLE UI-BAR CONTAINER FOR TABS + CONTROL BUTTONS -->
     <div class="ui-bar" id="uiBar">
       <div class="tab-bar">
@@ -728,6 +773,9 @@
         <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
+        <button class="control-btn" id="loginBtn" title="Login">👤</button>
+        <span id="userStatus">Logged in as: <span id="userName">User</span></span>
+        <button id="logoutBtn">Logout</button>
       </div>
     </div>
     
@@ -735,9 +783,6 @@
       <!-- Feed populated by JS -->
     </div>
   </div>
-
-  <!-- ✅ CRINGECOIN DISPLAY -->
-  <div id="cringeCoin">💎 <span id="coinCount">0</span> <span id="streakBadge" class="streak-badge" style="display:none;"></span></div>
 
   <!-- ✅ CHAT PANEL -->
   <div id="chatPanel">
@@ -759,12 +804,17 @@
     </div>
   </div>
 
-  <!-- ✅ USERNAME MODAL -->
-  <div id="usernameModal">
-    <div class="username-content">
-      <h2>💬 Enter a Username</h2>
-      <input type="text" id="usernameInput" class="username-input" placeholder="Your name (no spaces)" maxlength="15" required>
-      <button class="username-btn" id="usernameSubmit">Join Chat</button>
+  <!-- ✅ LOGIN MODAL -->
+  <div id="loginModal">
+    <div class="login-content">
+      <h2>🔒 Login or Sign Up</h2>
+      <input type="text" id="loginEmail" class="login-input" placeholder="Email" required>
+      <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
+      <div class="login-btns">
+        <button class="login-btn login" id="loginSubmit">Login</button>
+        <button class="login-btn signup" id="signupSubmit">Sign Up</button>
+      </div>
+      <div class="login-switch" id="switchToSignup">Don't have an account? Sign up</div>
     </div>
   </div>
 
@@ -794,7 +844,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.8 — STREAKS + CRINGECOIN + UNIQUE USERNAMES =====
+    // ===== CORE ENGINE v2.9 — PASSWORD LOGIN + FIXED COIN POSITION =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -804,11 +854,12 @@
     let lastScrollTop = 0;
     let currentTab = 'hot';
     let db = null;
-    let currentUsername = null;
+    let auth = null;
+    let currentUser = null;
     let cringeCoin = 0;
     let streak = 0;
 
-    // 🔥 COMBINED MEME SOURCES (NO NSFW)
+    // 🔥 COMBINED MEME SOURCES
     const MEME_SOURCES = [
       'https://meme-api.com/gimme/memes',
       'https://meme-api.com/gimme/dankmemes',
@@ -839,22 +890,32 @@
       if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        // Check for saved username
-        const savedUsername = localStorage.getItem('cringeUsername');
-        if (savedUsername) {
-          currentUsername = savedUsername;
-          // Load user profile
-          loadUserProfile(savedUsername);
-        }
+        auth = firebase.auth();
+        // Check auth state
+        auth.onAuthStateChanged(user => {
+          currentUser = user;
+          if (user) {
+            document.getElementById('userStatus').style.display = 'block';
+            document.getElementById('userName').textContent = user.email.split('@')[0];
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            // Load user profile
+            loadUserProfile(user.uid);
+          } else {
+            document.getElementById('userStatus').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+          }
+        });
       } else {
         console.error("Firebase failed to load");
       }
     });
 
-    // 🔥 LOAD USER PROFILE (FOR CROSS-DEVICE)
-    const loadUserProfile = async (username) => {
+    // 🔥 LOAD USER PROFILE
+    const loadUserProfile = async (uid) => {
       try {
-        const userDoc = await db.collection('users').doc(username).get();
+        const userDoc = await db.collection('users').doc(uid).get();
         if (userDoc.exists) {
           const data = userDoc.data();
           cringeCoin = data.cringeCoin || 0;
@@ -862,10 +923,9 @@
           document.getElementById('cringeCoin').style.display = 'block';
           document.getElementById('coinCount').textContent = cringeCoin;
           updateStreakBadge();
-          updateChatUserStatus();
         } else {
-          // New user on this device
-          await db.collection('users').doc(username).set({
+          // New user
+          await db.collection('users').doc(uid).set({
             cringeCoin: 0,
             streak: 0,
             lastActive: firebase.firestore.FieldValue.serverTimestamp()
@@ -874,7 +934,7 @@
           streak = 0;
           document.getElementById('cringeCoin').style.display = 'block';
           document.getElementById('coinCount').textContent = cringeCoin;
-          updateChatUserStatus();
+          updateStreakBadge();
         }
       } catch (e) {
         console.warn("User profile load failed:", e);
@@ -883,11 +943,11 @@
 
     // 🔥 UPDATE CRINGECOIN
     const updateCringeCoin = async (amount) => {
-      if (!currentUsername) return;
+      if (!currentUser) return;
       cringeCoin += amount;
       document.getElementById('coinCount').textContent = cringeCoin;
       try {
-        await db.collection('users').doc(currentUsername).update({
+        await db.collection('users').doc(currentUser.uid).update({
           cringeCoin: cringeCoin
         });
       } catch (e) {
@@ -897,7 +957,7 @@
 
     // 🔥 UPDATE STREAK
     const updateStreak = async () => {
-      if (!currentUsername) return;
+      if (!currentUser) return;
       const today = new Date().toDateString();
       const lastActive = localStorage.getItem('lastActive');
       if (lastActive !== today) {
@@ -908,7 +968,7 @@
         }
         localStorage.setItem('lastActive', today);
         try {
-          await db.collection('users').doc(currentUsername).update({
+          await db.collection('users').doc(currentUser.uid).update({
             streak: streak,
             lastActive: firebase.firestore.FieldValue.serverTimestamp()
           });
@@ -979,7 +1039,7 @@
           transaction.set(docRef, data);
         });
         // Reward CringeCoin
-        if (currentUsername) {
+        if (currentUser) {
           updateCringeCoin(1);
           updateStreak();
           // Daily quest: react with 💀
@@ -1185,8 +1245,8 @@
         alert("Service unavailable. Try again later.");
         return;
       }
-      if (!currentUsername) {
-        document.getElementById('usernameModal').style.display = 'flex';
+      if (!currentUser) {
+        document.getElementById('loginModal').style.display = 'flex';
         return;
       }
       try {
@@ -1278,7 +1338,7 @@
 
     // 🔥 CHAT FUNCTIONS
     const loadChatMessages = async () => {
-      if (!db) return;
+      if (!db || !currentUser) return;
       const chatMessages = document.getElementById('chatMessages');
       chatMessages.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
       
@@ -1289,7 +1349,7 @@
         snapshot.docs.reverse().forEach(doc => {
           const msg = doc.data();
           const msgDiv = document.createElement('div');
-          msgDiv.className = msg.username === currentUsername ? 'chat-message self' : 'chat-message';
+          msgDiv.className = msg.uid === currentUser.uid ? 'chat-message self' : 'chat-message';
           msgDiv.innerHTML = `
             <span class="username">${msg.username}</span>
             <span class="content">${escapeHtml(msg.text)}</span>
@@ -1303,8 +1363,8 @@
     };
 
     const sendChatMessage = async () => {
-      if (!currentUsername) {
-        document.getElementById('usernameModal').style.display = 'flex';
+      if (!currentUser) {
+        document.getElementById('loginModal').style.display = 'flex';
         return;
       }
       const input = document.getElementById('chatMessage');
@@ -1313,7 +1373,8 @@
       
       try {
         await db.collection('chat').add({
-          username: currentUsername,
+          uid: currentUser.uid,
+          username: currentUser.email.split('@')[0],
           text: text,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -1328,64 +1389,44 @@
       }
     };
 
-    const setUsername = async () => {
-      const input = document.getElementById('usernameInput');
-      let username = input.value.trim();
-      if (!username) {
-        alert("Please enter a username.");
+    // 🔥 LOGIN / SIGNUP
+    const login = async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if (!email || !password) {
+        alert("Please enter email and password.");
         return;
       }
-      // Remove spaces and special chars
-      username = username.replace(/[^a-zA-Z0-9]/g, '');
-      if (username.length < 2) {
-        alert("Username must be at least 2 characters (letters/numbers only).");
-        return;
-      }
-      // Check uniqueness
       try {
-        const userDoc = await db.collection('users').doc(username).get();
-        if (userDoc.exists) {
-          alert("Username already taken! Try another.");
-          return;
-        }
-        // Create user profile
-        await db.collection('users').doc(username).set({
-          cringeCoin: 0,
-          streak: 0,
-          lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        currentUsername = username;
-        localStorage.setItem('cringeUsername', username);
-        document.getElementById('usernameModal').style.display = 'none';
-        input.value = '';
-        loadUserProfile(username);
-        loadChatMessages();
+        await auth.signInWithEmailAndPassword(email, password);
+        document.getElementById('loginModal').style.display = 'none';
       } catch (e) {
-        alert("Username check failed. Try again.");
-        console.error(e);
+        alert("Login failed: " + e.message);
       }
     };
 
-    const logout = () => {
-      currentUsername = null;
-      localStorage.removeItem('cringeUsername');
-      localStorage.removeItem('lastActive');
-      document.getElementById('cringeCoin').style.display = 'none';
-      updateChatUserStatus();
-      document.getElementById('chatMessages').innerHTML = '';
+    const signup = async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if (!email || !password) {
+        alert("Please enter email and password.");
+        return;
+      }
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        document.getElementById('loginModal').style.display = 'none';
+      } catch (e) {
+        alert("Sign up failed: " + e.message);
+      }
     };
 
-    // 🔥 UPDATE CHAT USER STATUS
-    const updateChatUserStatus = () => {
-      const userStatus = document.getElementById('chatUserStatus');
-      const userName = document.getElementById('chatUserName');
-      const logoutBtn = document.getElementById('chatLogoutBtn');
-      if (currentUsername) {
-        userStatus.style.display = 'flex';
-        userName.textContent = currentUsername;
-        logoutBtn.onclick = logout;
-      } else {
-        userStatus.style.display = 'none';
+    // 🔥 LOGOUT
+    const logout = async () => {
+      try {
+        await auth.signOut();
+        document.getElementById('chatMessages').innerHTML = '';
+      } catch (e) {
+        console.warn("Logout failed:", e);
       }
     };
 
@@ -1441,7 +1482,7 @@
       document.getElementById('glowBtn').onclick = toggleGlowMode;
       document.getElementById('chatBtn').onclick = () => {
         document.getElementById('chatPanel').classList.add('open');
-        if (currentUsername) {
+        if (currentUser) {
           loadChatMessages();
         }
       };
@@ -1449,7 +1490,18 @@
         document.getElementById('chatPanel').classList.remove('open');
       };
       document.getElementById('sendChat').onclick = sendChatMessage;
-      document.getElementById('usernameSubmit').onclick = setUsername;
+      document.getElementById('loginBtn').onclick = () => {
+        document.getElementById('loginModal').style.display = 'flex';
+      };
+      document.getElementById('loginSubmit').onclick = login;
+      document.getElementById('signupSubmit').onclick = signup;
+      document.getElementById('switchToSignup').onclick = () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        document.getElementById('loginEmail').value = email;
+        document.getElementById('loginPassword').value = password;
+      };
+      document.getElementById('logoutBtn').onclick = logout;
       document.getElementById('logoLink').onclick = () => {
         window.location.href = window.location.origin + window.location.pathname;
       };
@@ -1463,10 +1515,6 @@
         localStorage.setItem('installPromptSeen', 'true');
       };
       document.getElementById('createBtn').onclick = () => {
-        if (!currentUsername) {
-          document.getElementById('usernameModal').style.display = 'flex';
-          return;
-        }
         document.getElementById('memeGenerator').style.display = 'flex';
       };
       document.getElementById('cancelGenerator').onclick = () => {
