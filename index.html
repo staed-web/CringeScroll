@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
-  <!-- 🔥 PRECONNECT TO IMAGE CDNs -->
+  <!-- 🔥 PRECONNECT TO IMAGE DOMAINS -->
   <link rel="preconnect" href="https://i.imgur.com">
   <link rel="preconnect" href="https://i.redd.it">
   <link rel="dns-prefetch" href="//i.imgur.com">
@@ -61,7 +61,7 @@
       color: var(--text);
       font-family: 'Segoe UI', system-ui, sans-serif;
       height: 100dvh;
-      overflow: hidden;
+      /* ✅ REMOVED overflow: hidden to fix IntersectionObserver */
       overscroll-behavior: none;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -74,6 +74,8 @@
       display: flex;
       flex-direction: column;
       height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      /* ✅ CONTAIN SCROLL HERE */
+      overflow: hidden;
     }
 
     /* ✅ HEADER — SMOOTH HIDE */
@@ -799,18 +801,20 @@
       </div>
     </header>
     
-    <!-- ✅ SINGLE UI-BAR CONTAINER -->
+    <!-- ✅ UI BAR WITH ORIGINAL LAYOUT -->
     <div class="ui-bar" id="uiBar">
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
         <button class="tab-btn" data-tab="fresh">💀 Fresh</button>
-        <button class="tab-btn" id="leaderboardBtn">👑 Leaderboard</button>
+        <button class="tab-btn" data-tab="crowned">👑 Crowned</button>
       </div>
       <div class="control-bar">
         <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
         <button class="control-btn" id="glowBtn" title="Toggle Glow">✨</button>
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
+        <!-- ✅ LEADERBOARD BUTTON BESIDE CREATE -->
+        <button class="control-btn" id="leaderboardBtn" title="Leaderboard">🏆</button>
       </div>
     </div>
     
@@ -896,7 +900,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v3.0 — BLAZING-FAST IMAGES =====
+    // ===== CORE ENGINE v3.1 — CORRECT LAYOUT + SECURE =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -936,7 +940,7 @@
       return num;
     };
 
-    // 🔥 CREATE BLUR PLACEHOLDER
+    // 🔥 CREATE PLACEHOLDER
     const createPlaceholder = (width, height) => {
       const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#161625"/>
@@ -986,14 +990,15 @@
       }
     };
 
-    // 🔥 UPDATE CRINGECOIN
+    // 🔥 UPDATE CRINGECOIN (SECURE INCREMENT)
     const updateCringeCoin = async (amount) => {
-      if (!currentUsername) return;
-      cringeCoin += amount;
+      if (!currentUsername || amount <= 0) return;
       try {
         await db.collection('users').doc(currentUsername).update({
-          cringeCoin: cringeCoin
+          cringeCoin: firebase.firestore.FieldValue.increment(amount)
         });
+        // Update local after server confirms
+        cringeCoin += amount;
         updateLeaderboardUI();
       } catch (e) {
         console.warn("CringeCoin update failed:", e);
@@ -1152,8 +1157,6 @@
       reactionsDiv.className = 'reactions';
       
       const emojis = ['💀', '😂', '🤡', '🥴'];
-      // Reactions rendering remains the same
-      
       emojis.forEach(emoji => {
         const item = document.createElement('div');
         item.className = 'reaction-item';
@@ -1180,22 +1183,17 @@
         
         const countDisplay = document.createElement('div');
         countDisplay.className = 'reaction-count';
-        countDisplay.textContent = 0; // Will update after reaction
+        countDisplay.textContent = 0;
         
         item.appendChild(btn);
         item.appendChild(countDisplay);
         reactionsDiv.appendChild(item);
       });
       
-      // ✅ OPTIMIZED IMAGE LOADING
+      // ✅ PROXY-READY IMAGE URL (replace with your Cloud Function later)
       const optimalWidth = Math.min(screen.width * window.devicePixelRatio, 1200);
       let imageUrl = meme.url;
-      // Add width param if not present
-      if (!imageUrl.includes('?width=')) {
-        imageUrl = imageUrl.includes('?') 
-          ? `${imageUrl}&width=${optimalWidth}` 
-          : `${imageUrl}?width=${optimalWidth}`;
-      }
+      // For now, use direct URL (will be slow until you add proxy)
       
       card.innerHTML = `
         <div class="meme-title">${escapeHtml(meme.title)}</div>
@@ -1213,7 +1211,7 @@
       card.appendChild(reactionsDiv);
       feed.appendChild(card);
       
-      // ✅ LAZY LOAD REAL IMAGE
+      // ✅ LAZY LOAD
       const img = card.querySelector('img');
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
@@ -1225,7 +1223,6 @@
         });
         observer.observe(img);
       } else {
-        // Fallback for old browsers
         img.src = img.dataset.src;
         img.onload = () => img.classList.add('loaded');
       }
@@ -1586,22 +1583,8 @@
     // 🔥 BUTTON LISTENERS
     const attachButtonListeners = () => {
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.id !== 'leaderboardBtn') {
-          btn.onclick = () => switchTab(btn.dataset.tab);
-        }
+        btn.onclick = () => switchTab(btn.dataset.tab);
       });
-      
-      document.getElementById('leaderboardBtn').onclick = () => {
-        document.getElementById('leaderboardPanel').classList.add('open');
-        loadLeaderboard();
-        if (currentUsername) {
-          updateLeaderboardUI();
-        }
-      };
-      
-      document.getElementById('closeLeaderboard').onclick = () => {
-        document.getElementById('leaderboardPanel').classList.remove('open');
-      };
       
       document.getElementById('rouletteBtn').onclick = cringeRoulette;
       document.getElementById('glowBtn').onclick = toggleGlowMode;
@@ -1647,6 +1630,17 @@
           return;
         }
         createMeme(top, bottom, url);
+      };
+      // ✅ LEADERBOARD BUTTON
+      document.getElementById('leaderboardBtn').onclick = () => {
+        document.getElementById('leaderboardPanel').classList.add('open');
+        loadLeaderboard();
+        if (currentUsername) {
+          updateLeaderboardUI();
+        }
+      };
+      document.getElementById('closeLeaderboard').onclick = () => {
+        document.getElementById('leaderboardPanel').classList.remove('open');
       };
     };
 
