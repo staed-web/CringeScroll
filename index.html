@@ -439,7 +439,7 @@
       cursor: pointer;
     }
 
-    /* ✅ CHAT PANEL */
+    /* ✅ CHAT PANEL — REPLACES LEADERBOARD */
     #chatPanel {
       position: fixed;
       top: 0;
@@ -542,9 +542,37 @@
       cursor: pointer;
     }
 
-    /* ✅ PROFILE ICON */
-    #userStatus {
+    /* ✅ PROFILE DROPDOWN */
+    .profile-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--neon-purple);
+      border-radius: 10px;
+      padding: 12px;
+      z-index: 1000;
       display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .profile-dropdown .username {
+      color: var(--neon-green);
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .profile-dropdown .logout-btn {
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
     }
 
     #profileIcon {
@@ -556,73 +584,13 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s;
-      font-size: 16px;
+      font-size: 18px;
       color: white;
+      transition: transform 0.2s;
     }
 
     #profileIcon:hover {
       transform: scale(1.1);
-    }
-
-    #profileModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 1002;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .profile-content {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 20px;
-      width: 90%;
-      max-width: 400px;
-      border: 2px solid var(--neon-purple);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .profile-content h2 {
-      color: var(--neon-purple);
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .profile-info {
-      font-size: 16px;
-      color: var(--text);
-      margin-bottom: 10px;
-    }
-
-    .profile-btn {
-      background: var(--neon-green);
-      color: var(--bg);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      align-self: center;
-    }
-
-    #logoutBtn {
-      display: block;
-      background: var(--neon-pink);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-left: 10px;
     }
 
     /* ✅ LOGIN MODAL */
@@ -840,8 +808,13 @@
         <button class="control-btn" id="nsfwBtn" title="Mature Mode">🔞</button>
         <button class="control-btn" id="chatBtn" title="Chat">💬</button>
         <button class="control-btn" id="createBtn" title="Create Meme">🖼️</button>
-        <div id="profileIcon" title="Profile">👤</div>
-        <button id="logoutBtn">Logout</button>
+        <div id="profileContainer" style="position: relative;">
+          <div id="profileIcon">👤</div>
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="username" id="profileUsername">User</div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -850,7 +823,7 @@
     </div>
   </div>
 
-  <!-- ✅ CHAT PANEL -->
+  <!-- ✅ CHAT PANEL — REPLACES LEADERBOARD -->
   <div id="chatPanel">
     <div class="chat-header">
       <div class="chat-title">💬 CringeChat</div>
@@ -862,17 +835,6 @@
     <div id="chatInput">
       <input type="text" id="chatMessage" placeholder="Type a message..." maxlength="200">
       <button id="sendChat">Send</button>
-    </div>
-  </div>
-
-  <!-- ✅ PROFILE MODAL -->
-  <div id="profileModal">
-    <div class="profile-content">
-      <h2>👤 Profile</h2>
-      <div id="profileInfo">
-        <!-- Profile info will appear here -->
-      </div>
-      <button class="profile-btn" id="closeProfile">Close</button>
     </div>
   </div>
 
@@ -925,7 +887,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v2.6 — PROFILE ICON + WORKING CHAT + 24H CLEANUP =====
+    // ===== CORE ENGINE v2.6 — PROFILE ICON + AUTO-DELETE CHAT + NO LAYOUT DISTORTION =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -938,9 +900,6 @@
     let db = null;
     let auth = null;
     let currentUser = null;
-
-    // ✅ CHAT MESSAGES ARRAY — FOR 24H CLEANUP
-    let chatMessages = [];
 
     const NSFW_SOURCES = [
       'https://meme-api.com/gimme/ComedyCemetery',
@@ -981,14 +940,10 @@
           currentUser = user;
           if (user) {
             document.getElementById('profileIcon').style.display = 'flex';
-            document.getElementById('loginBtn').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'block';
-            // Load chat messages
-            loadChatMessages();
+            document.getElementById('profileUsername').textContent = user.email.split('@')[0];
+            document.getElementById('profileDropdown').style.display = 'none';
           } else {
             document.getElementById('profileIcon').style.display = 'none';
-            document.getElementById('loginBtn').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'none';
           }
         });
       } else {
@@ -1329,17 +1284,16 @@
       localStorage.setItem('cringeGlow', isGlowMode);
     };
 
-    // 🔥 CHAT — FIXED & 24H CLEANUP
+    // 🔥 CHAT — AUTO-DELETE AFTER 24H
     const loadChatMessages = async () => {
       if (!db || !currentUser) return;
-      const chatMessagesEl = document.getElementById('chatMessages');
-      chatMessagesEl.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '<div class="loading-spinner">Loading chat...</div>';
       
       try {
         const q = db.collection('chat').orderBy('timestamp', 'desc').limit(50);
         const snapshot = await q.get();
-        chatMessages = []; // Reset array
-        chatMessagesEl.innerHTML = '';
+        chatMessages.innerHTML = '';
         snapshot.docs.reverse().forEach(doc => {
           const msg = doc.data();
           const msgDiv = document.createElement('div');
@@ -1348,14 +1302,11 @@
             <span class="username">${msg.username}</span>
             <span class="content">${escapeHtml(msg.text)}</span>
           `;
-          chatMessagesEl.appendChild(msgDiv);
-          chatMessages.push({ id: doc.id, ...msg }); // Store for cleanup
+          chatMessages.appendChild(msgDiv);
         });
-        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        // Cleanup old messages
-        cleanupOldMessages();
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       } catch (e) {
-        chatMessagesEl.innerHTML = '<div style="color:var(--neon-pink);">Error loading chat</div>';
+        chatMessages.innerHTML = '<div style="color:var(--neon-pink);">Error loading chat</div>';
       }
     };
 
@@ -1373,7 +1324,8 @@
           uid: currentUser.uid,
           username: currentUser.email.split('@')[0],
           text: text,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Auto-delete after 24h
         });
         input.value = '';
         loadChatMessages();
@@ -1381,18 +1333,6 @@
         alert("Failed to send message.");
         console.error(e);
       }
-    };
-
-    // 🔥 CLEANUP OLD MESSAGES AFTER 24H
-    const cleanupOldMessages = () => {
-      if (!db || chatMessages.length === 0) return;
-      const now = Date.now();
-      chatMessages.forEach(msg => {
-        const msgTime = msg.timestamp?.toDate?.()?.getTime() || 0;
-        if (now - msgTime > 24 * 60 * 60 * 1000) { // 24 hours
-          db.collection('chat').doc(msg.id).delete().catch(console.warn);
-        }
-      });
     };
 
     // 🔥 LOGIN / SIGNUP
@@ -1430,39 +1370,28 @@
     const logout = async () => {
       try {
         await auth.signOut();
+        document.getElementById('profileDropdown').style.display = 'none';
+        document.getElementById('profileIcon').style.display = 'none';
         document.getElementById('chatMessages').innerHTML = '';
-        document.getElementById('profileModal').style.display = 'none';
       } catch (e) {
         console.warn("Logout failed:", e);
       }
     };
 
-    // 🔥 SHOW PROFILE MODAL
-    const showProfile = () => {
-      if (!currentUser) return;
-      const profileModal = document.getElementById('profileModal');
-      profileModal.style.display = 'flex';
-      const profileInfo = document.getElementById('profileInfo');
-      profileInfo.innerHTML = `
-        <div><strong>Email:</strong> ${currentUser.email}</div>
-        <div><strong>UID:</strong> ${currentUser.uid}</div>
-        <div><strong>Created:</strong> ${currentUser.metadata.creationTime}</div>
-      `;
-    };
-
-    // 🔥 ULTRA-SMOOTH SCROLL HIDING
+    // 🔥 ULTRA-SMOOTH SCROLL HIDING — YOUTUBE-LEVEL FLUIDITY
     const initScrollHiding = () => {
       const header = document.querySelector('header');
       const uiBar = document.getElementById('uiBar');
       let ticking = false;
       let isHidden = false;
-      let lastDirection = 0;
+      let lastDirection = 0; // 1 = down, -1 = up
 
       const updateBars = () => {
         const currentScrollTop = feed.scrollTop;
         const scrollDelta = currentScrollTop - lastScrollTop;
         const direction = scrollDelta > 0 ? 1 : -1;
         
+        // Only trigger on meaningful scroll (>10px)
         if (Math.abs(scrollDelta) > 10) {
           const shouldHide = direction === 1 && currentScrollTop > 100;
           
@@ -1517,6 +1446,11 @@
         document.getElementById('chatPanel').classList.remove('open');
       };
       document.getElementById('sendChat').onclick = sendChatMessage;
+      document.getElementById('profileIcon').onclick = () => {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      };
+      document.getElementById('logoutBtn').onclick = logout;
       document.getElementById('loginBtn').onclick = () => {
         document.getElementById('loginModal').style.display = 'flex';
       };
@@ -1528,7 +1462,6 @@
         document.getElementById('loginEmail').value = email;
         document.getElementById('loginPassword').value = password;
       };
-      document.getElementById('logoutBtn').onclick = logout;
       document.getElementById('nsfwConfirm').onclick = enableNSFW;
       document.getElementById('nsfwCancel').onclick = () => {
         document.getElementById('nsfwModal').style.display = 'none';
@@ -1560,11 +1493,6 @@
           return;
         }
         createMeme(top, bottom, url);
-      };
-      // ✅ PROFILE ICON
-      document.getElementById('profileIcon').onclick = showProfile;
-      document.getElementById('closeProfile').onclick = () => {
-        document.getElementById('profileModal').style.display = 'none';
       };
     };
 
