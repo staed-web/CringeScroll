@@ -13,43 +13,26 @@
   <link rel="apple-touch-icon" href="image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZDBkMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+QzwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRDQwMEZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwzKSI+UjwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMzlGRjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw2KSI+STwvdGV4dD4KICA8dGV4dCB4PSIxNiIgeT0iMTYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjRjVGNUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCw5KSI+RzwvdGV4dD4KPC9zdmc+Cg=="/>
   <link rel="manifest" href="#inline-manifest" />
   <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
-    authDomain: "cringescroll-prod.firebaseapp.com",
-    projectId: "cringescroll-prod",
-    storageBucket: "cringescroll-prod.firebasestorage.app",
-    messagingSenderId: "802266413389",
-    appId: "1:802266413389:web:22a7274e4edc8a0529df04"
-  };
-
-  // Load Firebase SDKs
-  const scripts = [
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
-    'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js' // 👈 ADD THIS LINE
-  ];
-
-  scripts.forEach(src => {
-    const s = document.createElement('script');
-    s.src = src;
-    s.async = true;
-    document.head.appendChild(s);
-  });
-
-  // Initialize Firebase
-  let db = null;
-  let auth = null;
-
-  window.addEventListener('load', () => {
-    if (typeof firebase !== 'undefined') {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-      auth = firebase.auth(); // 👈 NOW IT WORKS
-    } else {
-      console.error("Firebase failed to load");
-    }
-  });
-</script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
+      authDomain: "cringescroll-prod.firebaseapp.com",
+      projectId: "cringescroll-prod",
+      storageBucket: "cringescroll-prod.firebasestorage.app",
+      messagingSenderId: "802266413389",
+      appId: "1:802266413389:web:22a7274e4edc8a0529df04"
+    };
+    const scripts = [
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js'
+    ];
+    scripts.forEach(src => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      document.head.appendChild(s);
+    });
+  </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9372118866074955" crossorigin="anonymous"></script>
   <style>
     :root {
