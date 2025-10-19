@@ -337,7 +337,7 @@
       gap: 12px;
       padding: 0 0 20px;
     }
-    .tip-btn, .claim-btn {
+    .tip-btn, .claim-btn, .save-btn {
       border: none;
       padding: 6px 14px;
       border-radius: 12px;
@@ -357,6 +357,10 @@
     .claim-btn {
       background: var(--neon-purple);
       color: white;
+    }
+    .save-btn {
+      background: var(--neon-green);
+      color: var(--bg);
     }
     .claimed-by {
       font-size: 12px;
@@ -785,7 +789,6 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    /* MODAL STYLES */
     .modal {
       display: none;
       position: fixed;
@@ -864,6 +867,89 @@
       margin: 6px 0;
       font-size: 14px;
     }
+    /* 🔥 NEW: COLLECTIONS MODAL */
+    .collection-item {
+      background: rgba(57, 255, 20, 0.1);
+      padding: 10px;
+      border-radius: 10px;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+    .collection-item:hover {
+      background: rgba(57, 255, 20, 0.2);
+    }
+    /* 🔥 NEW: MEME EDITOR */
+    #memeEditor {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1001;
+      overflow: auto;
+    }
+    .editor-content {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 20px;
+      width: 95%;
+      max-width: 800px;
+      border: 2px solid var(--neon-purple);
+      margin: 20px auto;
+    }
+    .editor-preview {
+      position: relative;
+      width: 100%;
+      margin: 20px 0;
+      border: 1px dashed var(--neon-green);
+      overflow: hidden;
+    }
+    .editor-image {
+      width: 100%;
+      display: block;
+    }
+    .editable-text {
+      position: absolute;
+      color: white;
+      font-family: Impact, Arial, sans-serif;
+      font-size: 32px;
+      text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+      cursor: move;
+      user-select: none;
+    }
+    .editor-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .template-btn {
+      padding: 8px 12px;
+      background: rgba(212, 0, 255, 0.2);
+      border: 1px solid var(--neon-purple);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .template-btn:hover {
+      background: rgba(212, 0, 255, 0.3);
+    }
+    .editor-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    /* 🔥 HOT NOW BADGE */
+    .hot-now-badge {
+      background: var(--neon-pink);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
@@ -886,6 +972,8 @@
         <button class="tab-btn active" data-tab="hot">🔥 Hot</button>
         <button class="tab-btn" data-tab="fresh">💀 Fresh</button>
         <button class="tab-btn" data-tab="crowned">👑 Crowned</button>
+        <!-- 🔥 NEW HOT NOW TAB -->
+        <button class="tab-btn" data-tab="hotnow">🚀 Hot Now</button>
       </div>
       <div class="control-bar">
         <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
@@ -897,6 +985,7 @@
     </div>
     <div id="feed"></div>
   </div>
+  <!-- ... (panels remain same as v4.3) ... -->
   <div id="leaderboardPanel">
     <div class="panel-header">
       <div class="panel-title">🏆 Cringe Lords</div>
@@ -1067,6 +1156,40 @@
       </div>
     </div>
   </div>
+  <!-- 🔥 NEW: COLLECTIONS MODAL -->
+  <div id="collectionsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">💾 Save to Collection</h2>
+        <button class="close-modal" id="closeCollections">✕</button>
+      </div>
+      <div id="collectionsList"></div>
+      <input type="text" id="newCollectionInput" class="modal-input" placeholder="New collection name">
+      <button class="modal-btn" id="createCollectionBtn">Create Collection</button>
+    </div>
+  </div>
+  <!-- 🔥 NEW: MEME EDITOR MODAL -->
+  <div id="memeEditor">
+    <div class="editor-content">
+      <h2>🎨 Meme Editor</h2>
+      <div class="editor-preview">
+        <img id="editorImage" class="editor-image" src="" alt="Meme">
+        <!-- Editable text layers will be added here -->
+      </div>
+      <div class="editor-controls">
+        <button class="template-btn" data-template="drake">Drake</button>
+        <button class="template-btn" data-template="distracted">Distracted BF</button>
+        <button class="template-btn" data-template="change">Change My Mind</button>
+        <button class="template-btn" data-template="blank">Blank</button>
+      </div>
+      <input type="text" id="editorImageUrl" class="modal-input" placeholder="Image URL (or use template)">
+      <div class="editor-btns">
+        <button class="modal-btn" id="addTextBtn">+ Add Text</button>
+        <button class="modal-btn" style="background:var(--neon-green);" id="postMemeBtn">Post Meme</button>
+        <button class="modal-btn" id="cancelEditor">Cancel</button>
+      </div>
+    </div>
+  </div>
   <div id="installPrompt">
     <p>💡 Install for fullscreen cringe & no black bars!</p>
     <button class="prompt-btn" id="installBtn">Install</button>
@@ -1074,9 +1197,9 @@
   </div>
   <div class="footer-notice">
     <a href="/privacy.html">Privacy Policy</a>
-  </div>
-  <script>
-    // ===== CORE ENGINE v4.3 — FULLY FUNCTIONAL HAMBURGER MENU =====
+  </div> 
+<script>
+    // ===== CORE ENGINE v4.4 — LAYER 1 FEATURES ADDED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1119,6 +1242,29 @@
         <text x="50%" y="50%" fill="#39FF14" font-size="10" text-anchor="middle" dominant-baseline="middle">Cringe...</text>
       </svg>`;
       return `image/svg+xml;base64,${btoa(svg)}`;
+    };
+    // 🔊 SOUND REACTIONS
+    const playSound = (type) => {
+      if (localStorage.getItem('soundReactions') !== 'enabled') return;
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      if (type === 'oof') {
+        oscillator.frequency.value = 100;
+        gain.gain.value = 0.3;
+        oscillator.type = 'sine';
+      } else if (type === 'bruh') {
+        oscillator.frequency.value = 200;
+        gain.gain.value = 0.2;
+        oscillator.type = 'square';
+      }
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+        ctx.close();
+      }, 300);
     };
     window.addEventListener('load', () => {
       if (typeof firebase !== 'undefined') {
@@ -1282,7 +1428,8 @@
             url: meme.url,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             isUserGenerated: meme.isUserGenerated || false,
-            claimedBy: null
+            claimedBy: null,
+            collections: []
           });
         }
       } catch (e) {
@@ -1318,6 +1465,7 @@
           updateCringeCoin(1);
           updateStreak();
           if (emoji === '💀') {
+            playSound('oof');
             const questKey = `quest_react_${new Date().toDateString()}`;
             if (!localStorage.getItem(questKey)) {
               localStorage.setItem(questKey, 'completed');
@@ -1386,6 +1534,13 @@
         console.warn("Claim failed:", e);
       }
     };
+    // 🔥 HOT NOW SCORING
+    const calculateHotScore = (reactions, createdAt) => {
+      const now = Date.now();
+      const ageMinutes = (now - createdAt) / (1000 * 60);
+      if (ageMinutes <= 0) return 0;
+      return reactions / ageMinutes;
+    };
     const renderMeme = (meme, index) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
@@ -1396,6 +1551,13 @@
       reactionBadge.className = 'reaction-badge';
       reactionBadge.innerHTML = `🔥 ${formatNumber(meme.ups)}`;
       badgeContainer.appendChild(reactionBadge);
+      // 🔥 HOT NOW BADGE
+      if (meme.hotScore && meme.hotScore > 5) {
+        const hotBadge = document.createElement('div');
+        hotBadge.className = 'hot-now-badge';
+        hotBadge.textContent = '🚀 Hot Now';
+        badgeContainer.appendChild(hotBadge);
+      }
       const reactionsDiv = document.createElement('div');
       reactionsDiv.className = 'reactions';
       const emojis = ['💀', '😂', '🤡', '🥴'];
@@ -1448,6 +1610,18 @@
         claimBtn.onclick = () => claimMeme(meme.id);
         actionDiv.appendChild(claimBtn);
       }
+      // 🔥 SAVE TO COLLECTION BUTTON
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'save-btn';
+      saveBtn.textContent = '💾 Save';
+      saveBtn.onclick = () => {
+        if (!currentUser) {
+          document.getElementById('authModal').style.display = 'flex';
+          return;
+        }
+        showCollectionsModal(meme.id);
+      };
+      actionDiv.appendChild(saveBtn);
       if (meme.claimedBy) {
         const claimedEl = document.createElement('span');
         claimedEl.className = 'claimed-by';
@@ -1541,7 +1715,12 @@
           }
         }
       }
-      const meme = await fetchMeme();
+      let meme;
+      if (currentTab === 'hotnow') {
+        meme = await fetchHotMeme();
+      } else {
+        meme = await fetchMeme();
+      }
       if (meme) {
         renderMeme(meme, loadCount);
         loadCount++;
@@ -1591,7 +1770,8 @@
               ups: data.ups || Math.floor(Math.random() * 10000) + 1000,
               id: data.url.split('/').pop(),
               isUserGenerated: false,
-              claimedBy: null
+              claimedBy: null,
+              createdAt: Date.now()
             };
           } catch (e) {
             continue;
@@ -1601,6 +1781,36 @@
       } catch (e) {
         console.warn("Fetch failed:", e.message);
         return null;
+      }
+    };
+    // 🔥 HOT NOW FETCH
+    const fetchHotMeme = async () => {
+      if (!db) return null;
+      try {
+        const q = db.collection('reactions')
+          .orderBy('total', 'desc')
+          .limit(20);
+        const snapshot = await q.get();
+        const candidates = [];
+        for (const doc of snapshot.docs) {
+          const memeId = doc.id;
+          const memeDoc = await db.collection('memes').doc(memeId).get();
+          if (memeDoc.exists) {
+            const memeData = memeDoc.data();
+            const score = calculateHotScore(doc.data().total, memeData.createdAt.toMillis());
+            if (score > 1) {
+              candidates.push({ ...memeData, id: memeId, hotScore: score, ups: doc.data().total });
+            }
+          }
+        }
+        if (candidates.length > 0) {
+          // Shuffle and pick one
+          return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+        return await fetchMeme();
+      } catch (e) {
+        console.warn("Hot fetch failed:", e);
+        return await fetchMeme();
       }
     };
     const createMeme = async (top, bottom, imageUrl, isAnonymous = false) => {
@@ -1619,7 +1829,8 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           isUserGenerated: true,
           createdBy: username,
-          isAnonymous: isAnonymous
+          isAnonymous: isAnonymous,
+          collections: []
         };
         await db.collection('memes').doc(memeId).set(memeData);
         document.getElementById('memeGenerator').style.display = 'none';
@@ -1908,7 +2119,134 @@
         }
       });
     };
-    // 🔥 NEW: QUEST SYSTEM
+    // 🔥 NEW: COLLECTIONS
+    const loadCollections = () => {
+      return JSON.parse(localStorage.getItem('collections') || '["Savage", "Wholesome", "CringeCoin Grinders"]');
+    };
+    const saveToCollection = async (memeId, collectionName) => {
+      if (!currentUser) return;
+      try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const collections = userDoc.data().collections || {};
+        if (!collections[collectionName]) {
+          collections[collectionName] = [];
+        }
+        if (!collections[collectionName].includes(memeId)) {
+          collections[collectionName].push(memeId);
+          await db.collection('users').doc(currentUser.uid).update({ collections });
+          alert(`Saved to "${collectionName}"!`);
+        }
+      } catch (e) {
+        console.warn("Save failed:", e);
+      }
+    };
+    const showCollectionsModal = (memeId) => {
+      const collections = loadCollections();
+      const list = document.getElementById('collectionsList');
+      list.innerHTML = collections.map(name => 
+        `<div class="collection-item" data-meme="${memeId}" data-collection="${escapeHtml(name)}">${escapeHtml(name)}</div>`
+      ).join('');
+      document.querySelectorAll('.collection-item').forEach(item => {
+        item.onclick = () => {
+          saveToCollection(memeId, item.dataset.collection);
+          document.getElementById('collectionsModal').style.display = 'none';
+        };
+      });
+      document.getElementById('collectionsModal').style.display = 'flex';
+    };
+    document.getElementById('createCollectionBtn').onclick = () => {
+      const input = document.getElementById('newCollectionInput');
+      const name = input.value.trim();
+      if (name && name.length <= 20) {
+        let collections = loadCollections();
+        if (!collections.includes(name)) {
+          collections.push(name);
+          localStorage.setItem('collections', JSON.stringify(collections));
+          input.value = '';
+          showCollectionsModal(document.querySelector('.collection-item')?.dataset.meme || '');
+        }
+      }
+    };
+    // 🔥 NEW: MEME EDITOR
+    let editableTexts = [];
+    const initMemeEditor = () => {
+      const templates = {
+        drake: 'https://i.imgur.com/DrakeMemeTemplate.jpg',
+        distracted: 'https://i.imgur.com/DistractedBoyfriend.jpg',
+        change: 'https://i.imgur.com/ChangeMyMind.jpg',
+        blank: ''
+      };
+      document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.onclick = () => {
+          const template = btn.dataset.template;
+          const url = templates[template];
+          document.getElementById('editorImageUrl').value = url;
+          document.getElementById('editorImage').src = url || 'https://via.placeholder.com/600x400/161625/39FF14?text=Upload+Image';
+          editableTexts = [];
+          document.querySelectorAll('.editable-text').forEach(el => el.remove());
+          if (template === 'drake') {
+            addEditableText('Top text', 50, 100);
+            addEditableText('Bottom text', 50, 300);
+          } else if (template === 'distracted') {
+            addEditableText('Boyfriend', 100, 100);
+            addEditableText('Girlfriend', 300, 100);
+            addEditableText('Other girl', 500, 100);
+          } else if (template === 'change') {
+            addEditableText('Your text here', 300, 300);
+          }
+        };
+      });
+      document.getElementById('editorImageUrl').onchange = () => {
+        document.getElementById('editorImage').src = this.value || 'https://via.placeholder.com/600x400/161625/39FF14?text=Upload+Image';
+        editableTexts = [];
+        document.querySelectorAll('.editable-text').forEach(el => el.remove());
+      };
+      document.getElementById('addTextBtn').onclick = () => {
+        addEditableText('Your text', 200, 200);
+      };
+      document.getElementById('postMemeBtn').onclick = () => {
+        // Capture editor state
+        const canvas = document.createElement('canvas');
+        const img = document.getElementById('editorImage');
+        canvas.width = img.naturalWidth || 600;
+        canvas.height = img.naturalHeight || 400;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        // TODO: In real app, upload to Cloud Storage and get URL
+        // For now, use placeholder
+        const imageUrl = 'https://via.placeholder.com/600x400/161625/39FF14?text=Custom+Meme';
+        createMeme('', '', imageUrl, false);
+        document.getElementById('memeEditor').style.display = 'none';
+      };
+      document.getElementById('cancelEditor').onclick = () => {
+        document.getElementById('memeEditor').style.display = 'none';
+      };
+    };
+    const addEditableText = (text, x, y) => {
+      const el = document.createElement('div');
+      el.className = 'editable-text';
+      el.contentEditable = true;
+      el.textContent = text;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      document.querySelector('.editor-preview').appendChild(el);
+      editableTexts.push(el);
+      // Make draggable
+      el.onmousedown = (e) => {
+        const startX = e.clientX - el.offsetLeft;
+        const startY = e.clientY - el.offsetTop;
+        const onMouseMove = (e) => {
+          el.style.left = (e.clientX - startX) + 'px';
+          el.style.top = (e.clientY - startY) + 'px';
+        };
+        const onMouseUp = () => {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        };
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      };
+    };
     const loadQuests = () => {
       const today = new Date().toDateString();
       const stored = JSON.parse(localStorage.getItem('quests') || '{}');
@@ -1921,7 +2259,6 @@
         ];
         localStorage.setItem('quests', JSON.stringify(stored));
       }
-      // Restore progress from localStorage
       const progress = JSON.parse(localStorage.getItem('questProgress') || '{}');
       stored.quests.forEach(q => {
         if (progress[q.id]) {
@@ -1946,7 +2283,6 @@
         ));
       }
     };
-    // 🔥 NEW: PROFILE MODAL
     const showProfile = async () => {
       if (!currentUser) return;
       const content = document.getElementById('profileContent');
@@ -1978,7 +2314,6 @@
         }
       };
     };
-    // 🔥 NEW: INVENTORY
     const showInventory = () => {
       const unlocked = JSON.parse(localStorage.getItem('unlockedMilestones') || '[]');
       const badges = [];
@@ -1994,7 +2329,6 @@
       }
       document.getElementById('inventoryModal').style.display = 'flex';
     };
-    // 🔥 NEW: CHANGE PASSWORD
     const changePassword = () => {
       const newPassword = prompt("Enter new password (min 6 chars):");
       if (newPassword && newPassword.length >= 6) {
@@ -2003,7 +2337,6 @@
         }).catch(e => alert("Failed: " + e.message));
       }
     };
-    // 🔥 NEW: DELETE ACCOUNT
     const deleteAccount = async () => {
       if (!confirm("⚠️ This will delete your account permanently. Continue?")) return;
       try {
@@ -2048,7 +2381,8 @@
           document.getElementById('authModal').style.display = 'flex';
           return;
         }
-        document.getElementById('memeGenerator').style.display = 'flex';
+        document.getElementById('memeEditor').style.display = 'flex';
+        initMemeEditor();
       };
       document.getElementById('cancelGenerator').onclick = () => {
         document.getElementById('memeGenerator').style.display = 'none';
@@ -2083,7 +2417,6 @@
       document.getElementById('closeAuth').onclick = () => {
         document.getElementById('authModal').style.display = 'none';
       };
-      // HAMBURGER
       document.getElementById('hamburgerBtn').onclick = () => {
         document.getElementById('hamburgerPanel').classList.add('open');
       };
@@ -2108,7 +2441,24 @@
       };
       document.getElementById('menuLabs').onclick = (e) => {
         e.preventDefault();
-        alert("Cringe Labs:\n- Sound Reactions: Coming soon\n- Haptic Feedback: Coming soon\nEnable via future updates!");
+        const soundEnabled = localStorage.getItem('soundReactions') === 'enabled';
+        const html = `
+          <div style="margin-bottom:15px;">
+            <div><strong>Sound Reactions:</strong> ${soundEnabled ? '✅ Enabled' : '❌ Disabled'}</div>
+          </div>
+          <button class="modal-btn" id="toggleSound">${soundEnabled ? 'Disable' : 'Enable'} Sound</button>
+        `;
+        document.getElementById('profileContent').innerHTML = html;
+        document.getElementById('profileModal').style.display = 'flex';
+        document.getElementById('toggleSound').onclick = () => {
+          if (soundEnabled) {
+            localStorage.removeItem('soundReactions');
+          } else {
+            localStorage.setItem('soundReactions', 'enabled');
+          }
+          document.getElementById('profileModal').style.display = 'none';
+          alert(soundEnabled ? "Sound disabled." : "Sound enabled! React with 💀 to hear it.");
+        };
       };
       document.getElementById('menuInventory').onclick = (e) => {
         e.preventDefault();
@@ -2139,19 +2489,17 @@
         logout();
         document.getElementById('hamburgerPanel').classList.remove('open');
       };
-      // MODAL CLOSE BUTTONS
       document.getElementById('closeProfile').onclick = () => document.getElementById('profileModal').style.display = 'none';
       document.getElementById('closeQuests').onclick = () => document.getElementById('questsModal').style.display = 'none';
       document.getElementById('closeInventory').onclick = () => document.getElementById('inventoryModal').style.display = 'none';
       document.getElementById('closeSecurity').onclick = () => document.getElementById('securityModal').style.display = 'none';
       document.getElementById('closeUI').onclick = () => document.getElementById('uiModal').style.display = 'none';
+      document.getElementById('closeCollections').onclick = () => document.getElementById('collectionsModal').style.display = 'none';
       document.getElementById('changePasswordBtn').onclick = changePassword;
       document.getElementById('deleteAccountBtn').onclick = deleteAccount;
-      // TRACK QUEST PROGRESS
       const originalUpdateCringeCoin = updateCringeCoin;
       window.updateCringeCoin = async (amount) => {
         await originalUpdateCringeCoin(amount);
-        // Auto-check tip quest
         if (amount > 0 && amount <= 5) {
           updateQuestProgress('tip');
         }
