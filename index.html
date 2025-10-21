@@ -337,7 +337,7 @@
       gap: 12px;
       padding: 0 0 20px;
     }
-    .tip-btn, .claim-btn, .save-btn, .remix-btn, .nft-btn {
+    .tip-btn, .claim-btn, .save-btn {
       border: none;
       padding: 6px 14px;
       border-radius: 12px;
@@ -346,13 +346,23 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .tip-btn { background: var(--neon-pink); color: white; }
-    .tip-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .claim-btn { background: var(--neon-purple); color: white; }
-    .save-btn { background: var(--neon-green); color: var(--bg); }
-    .remix-btn { background: var(--neon-pink); color: white; }
-    .nft-btn { background: gold; color: black; }
-    .claimed-by, .meme-dna {
+    .tip-btn {
+      background: var(--neon-pink);
+      color: white;
+    }
+    .tip-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .claim-btn {
+      background: var(--neon-purple);
+      color: white;
+    }
+    .save-btn {
+      background: var(--neon-green);
+      color: var(--bg);
+    }
+    .claimed-by {
       font-size: 12px;
       color: var(--neon-green);
       margin-top: 6px;
@@ -937,37 +947,16 @@
       font-size: 12px;
       margin-left: 8px;
     }
-    .meme-dna-badge {
-      background: var(--neon-green);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 12px;
-      margin-left: 8px;
+    /* FIX: Prevent double scroll on modals */
+    .modal, #memeEditor, #authModal, #memeGenerator {
+      -webkit-overflow-scrolling: touch;
     }
-    .confession-input {
-      height: 120px;
-      resize: none;
-    }
-    .ai-meme-result {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .ai-meme-option {
-      border: 1px solid var(--neon-purple);
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .ai-meme-option img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .ai-meme-option:hover {
-      transform: scale(1.02);
+    /* FIX: Ensure feed doesn't jump on ad load */
+    .ad-container ins {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -992,8 +981,6 @@
         <button class="tab-btn" data-tab="fresh">💀 Fresh</button>
         <button class="tab-btn" data-tab="crowned">👑 Crowned</button>
         <button class="tab-btn" data-tab="hotnow">🚀 Hot Now</button>
-        <button class="tab-btn" data-tab="rewind">⏪ Rewind</button>
-        <button class="tab-btn" data-tab="cursed">🎭 Cursed</button>
       </div>
       <div class="control-bar">
         <button class="control-btn" id="rouletteBtn" title="Cringe Roulette">🎯</button>
@@ -1005,7 +992,7 @@
     </div>
     <div id="feed"></div>
   </div>
-  <!-- Panels remain identical to v5.0 -->
+  <!-- Panels remain identical to v4.4 -->
   <div id="leaderboardPanel">
     <div class="panel-header">
       <div class="panel-title">🏆 Cringe Lords</div>
@@ -1038,6 +1025,43 @@
     <div id="chatInput">
       <input type="text" id="chatMessage" placeholder="Type a message... /duel @user" maxlength="200">
       <button id="sendChat">Send</button>
+    </div>
+  </div>
+  <div id="authModal">
+    <div class="auth-content">
+      <div class="auth-header">
+        <h2 class="auth-title" id="authModeTitle">Sign Up</h2>
+        <button class="close-auth" id="closeAuth">✕</button>
+      </div>
+      <form class="auth-form" id="authForm">
+        <input type="email" id="emailInput" class="auth-input" placeholder="Email" required>
+        <input type="text" id="usernameInput" class="auth-input" placeholder="Username (letters/numbers)" required>
+        <input type="password" id="passwordInput" class="auth-input" placeholder="Password (min 6 chars)" minlength="6" required>
+        <button type="submit" class="auth-btn" id="authSubmit">Sign Up</button>
+      </form>
+      <div class="auth-toggle">
+        Already have an account? <a href="#" id="toggleAuthMode">Log In</a>
+      </div>
+    </div>
+  </div>
+  <div id="memeGenerator">
+    <div class="generator-content">
+      <h2>🖼️ Create Your Cringe</h2>
+      <div class="generator-inputs">
+        <input type="text" id="topText" placeholder="Top text (optional)" maxlength="50">
+        <input type="text" id="bottomText" placeholder="Bottom text (optional)" maxlength="50">
+        <input type="text" id="imageUrl" placeholder="Image URL (PNG/JPG)" required>
+        <div class="anonymous-toggle">
+          <input type="checkbox" id="anonymousMode">
+          <label for="anonymousMode">🕶️ Anonymous Mode (no rewards)</label>
+        </div>
+        <button class="ai-caption-btn" id="aiCaptionBtn">🤖 Generate Caption</button>
+        <div class="ai-caption-result" id="aiCaptionResult" style="display:none;"></div>
+      </div>
+      <div class="generator-btns">
+        <button class="generator-btn create" id="generateMeme">Create & Post</button>
+        <button class="generator-btn cancel" id="cancelGenerator">Cancel</button>
+      </div>
     </div>
   </div>
   <div id="hamburgerPanel">
@@ -1078,7 +1102,6 @@
       Logout
     </a>
   </div>
-  <!-- Modals: profile, quests, etc. remain -->
   <div id="profileModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1165,27 +1188,6 @@
       </div>
     </div>
   </div>
-  <div id="confessionModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">🎭 Anonymous Confession</h2>
-        <button class="close-modal" id="closeConfession">✕</button>
-      </div>
-      <textarea id="confessionText" class="modal-input confession-input" placeholder="Spill your cringe..."></textarea>
-      <button class="modal-btn" id="postConfession">Post Confession</button>
-    </div>
-  </div>
-  <div id="aiMemeModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">🤖 AI Meme Generator</h2>
-        <button class="close-modal" id="closeAiMeme">✕</button>
-      </div>
-      <input type="text" id="aiMemePrompt" class="modal-input" placeholder="Describe your meme (e.g., Elon crying over Dogecoin)">
-      <button class="modal-btn" id="generateAiMeme">Generate Meme</button>
-      <div id="aiMemeResults" class="ai-meme-result" style="display:none;"></div>
-    </div>
-  </div>
   <div id="installPrompt">
     <p>💡 Install for fullscreen cringe & no black bars!</p>
     <button class="prompt-btn" id="installBtn">Install</button>
@@ -1193,9 +1195,9 @@
   </div>
   <div class="footer-notice">
     <a href="/privacy.html">Privacy Policy</a>
-  </div>
- <script>
-    // ===== CORE ENGINE v5.1 — ALL BUGS FIXED, HAMBURGER HIDDEN BY DEFAULT =====
+  </div> 
+<script>
+    // ===== CORE ENGINE v4.5 — GLITCH-FREE, UX-PERFECTED =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1239,6 +1241,7 @@
       </svg>`;
       return `image/svg+xml;base64,${btoa(svg)}`;
     };
+    // 🔊 SOUND REACTIONS — FIXED AUDIO CONTEXT LIFECYCLE
     const playSound = (type) => {
       if (localStorage.getItem('soundReactions') !== 'enabled') return;
       try {
@@ -1267,16 +1270,6 @@
         console.warn("Sound failed:", e);
       }
     };
-    const getMemeDNA = async (imageUrl) => {
-      const templates = ['Drake', 'Wojak', 'Distracted BF', 'Change My Mind'];
-      const objects = ['Elon Musk', 'Crypto', 'Cat', 'AI', 'Reddit'];
-      const sentiments = ['Savage', 'Wholesome', 'Cursed', 'Relatable'];
-      return {
-        template: templates[Math.floor(Math.random() * templates.length)],
-        object: objects[Math.floor(Math.random() * objects.length)],
-        sentiment: sentiments[Math.floor(Math.random() * sentiments.length)]
-      };
-    };
     window.addEventListener('load', () => {
       if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
@@ -1297,13 +1290,6 @@
               updateChatUserStatus();
               unlockMilestoneRewards();
               loadQuests();
-              const lastFaucet = localStorage.getItem('lastFaucet');
-              const today = new Date().toDateString();
-              if (lastFaucet !== today) {
-                updateCringeCoin(5);
-                localStorage.setItem('lastFaucet', today);
-                alert("💧 +5 CringeCoin from daily faucet!");
-              }
             } else {
               await auth.signOut();
             }
@@ -1447,9 +1433,7 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             isUserGenerated: meme.isUserGenerated || false,
             claimedBy: null,
-            collections: [],
-            remixes: [],
-            nft: false
+            collections: []
           });
         }
       } catch (e) {
@@ -1554,62 +1538,13 @@
         console.warn("Claim failed:", e);
       }
     };
+    // 🔥 HOT NOW SCORING — FIXED TIME CALCULATION
     const calculateHotScore = (reactions, createdAt) => {
       const now = Date.now();
       const ageMs = now - createdAt;
       const ageMinutes = ageMs / (1000 * 60);
-      if (ageMinutes <= 0.1) return 0;
+      if (ageMinutes <= 0.1) return 0; // Prevent division by near-zero
       return reactions / ageMinutes;
-    };
-    const fetchRewindMeme = async () => {
-      if (!db) return await fetchMeme();
-      try {
-        const q = db.collection('memes')
-          .where('isUserGenerated', '==', true)
-          .orderBy('createdAt', 'desc')
-          .limit(100);
-        const snapshot = await q.get();
-        const candidates = [];
-        for (const doc of snapshot.docs) {
-          const memeData = doc.data();
-          const ageDays = (Date.now() - memeData.createdAt.toMillis()) / (1000 * 3600 * 24);
-          if (ageDays > 7) {
-            candidates.push({ ...memeData, id: doc.id });
-          }
-        }
-        if (candidates.length > 0) {
-          return candidates[Math.floor(Math.random() * candidates.length)];
-        }
-        return await fetchMeme();
-      } catch (e) {
-        console.warn("Rewind fetch failed:", e);
-        return await fetchMeme();
-      }
-    };
-    const startBattleRoyale = async () => {
-      try {
-        const memes = [];
-        for (let i = 0; i < 4; i++) {
-          const meme = await fetchMeme();
-          if (meme) memes.push(meme);
-        }
-        if (memes.length < 4) return;
-        await db.collection('chat').add({
-          username: 'CringeBot',
-          text: `👑 BATTLE ROYALE: Vote for your king!`,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        memes.forEach((meme, i) => {
-          db.collection('chat').add({
-            username: 'CringeBot',
-            text: `Option ${i+1}: ${meme.title}`,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        });
-        alert("Battle Royale started! Vote in chat with 1,2,3,4");
-      } catch (e) {
-        console.warn("Battle failed:", e);
-      }
     };
     const renderMeme = (meme, index) => {
       const card = document.createElement('div');
@@ -1626,12 +1561,6 @@
         hotBadge.className = 'hot-now-badge';
         hotBadge.textContent = '🚀 Hot Now';
         badgeContainer.appendChild(hotBadge);
-      }
-      if (meme.dna) {
-        const dnaBadge = document.createElement('div');
-        dnaBadge.className = 'meme-dna-badge';
-        dnaBadge.textContent = `${meme.dna.template} + ${meme.dna.sentiment}`;
-        badgeContainer.appendChild(dnaBadge);
       }
       const reactionsDiv = document.createElement('div');
       reactionsDiv.className = 'reactions';
@@ -1696,32 +1625,6 @@
         showCollectionsModal(meme.id);
       };
       actionDiv.appendChild(saveBtn);
-      const remixBtn = document.createElement('button');
-      remixBtn.className = 'remix-btn';
-      remixBtn.textContent = '🔄 Remix';
-      remixBtn.onclick = () => {
-        if (!currentUser) {
-          document.getElementById('authModal').style.display = 'flex';
-          return;
-        }
-        document.getElementById('editorImageUrl').value = meme.url;
-        document.getElementById('editorImage').src = meme.url;
-        document.getElementById('memeEditor').style.display = 'flex';
-        initMemeEditor();
-      };
-      actionDiv.appendChild(remixBtn);
-      if (meme.ups > 1000 && !meme.nft) {
-        const nftBtn = document.createElement('button');
-        nftBtn.className = 'nft-btn';
-        nftBtn.textContent = '📜 Mint NFT';
-        nftBtn.onclick = async () => {
-          if (!currentUser) return;
-          await db.collection('memes').doc(meme.id).update({ nft: true });
-          alert("Minted as CringeArtifact! Badge added.");
-          card.querySelector('.nft-btn').disabled = true;
-        };
-        actionDiv.appendChild(nftBtn);
-      }
       if (meme.claimedBy) {
         const claimedEl = document.createElement('span');
         claimedEl.className = 'claimed-by';
@@ -1756,12 +1659,6 @@
         claimedEl.textContent = `Spotted by @${meme.claimedBy}`;
         card.querySelector('.meme-title').after(claimedEl);
       }
-      if (meme.dna) {
-        const dnaEl = document.createElement('span');
-        dnaEl.className = 'meme-dna';
-        dnaEl.textContent = `Meme DNA: ${meme.dna.template} • ${meme.dna.object} • ${meme.dna.sentiment}`;
-        card.querySelector('.meme-title').after(dnaEl);
-      }
       feed.appendChild(card);
       const img = card.querySelector('img');
       if ('IntersectionObserver' in window) {
@@ -1769,13 +1666,6 @@
           if (entries[0].isIntersecting) {
             img.src = img.dataset.src;
             img.onload = () => img.classList.add('loaded');
-            getMemeDNA(img.src).then(dna => {
-              meme.dna = dna;
-              const dnaEl = card.querySelector('.meme-dna');
-              if (dnaEl) {
-                dnaEl.textContent = `Meme DNA: ${dna.template} • ${dna.object} • ${dna.sentiment}`;
-              }
-            });
             observer.disconnect();
           }
         });
@@ -1818,15 +1708,19 @@
           feed.appendChild(skeleton);
         }
       }
+      if (loadCount === 0 && currentTab === 'hot') {
+        const userMemes = await fetchUserMemes(2);
+        for (const meme of userMemes) {
+          if (!seenUrls.has(meme.url)) {
+            seenUrls.add(meme.url);
+            renderMeme(meme, loadCount);
+            loadCount++;
+          }
+        }
+      }
       let meme;
       if (currentTab === 'hotnow') {
         meme = await fetchHotMeme();
-      } else if (currentTab === 'rewind') {
-        meme = await fetchRewindMeme();
-      } else if (currentTab === 'cursed') {
-        loadConfessions();
-        isLoading = false;
-        return;
       } else {
         meme = await fetchMeme();
       }
@@ -1844,32 +1738,6 @@
         document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
       }
       isLoading = false;
-    };
-    const loadConfessions = async () => {
-      if (!db) return;
-      try {
-        const q = db.collection('confessions').orderBy('timestamp', 'desc').limit(20);
-        const snapshot = await q.get();
-        feed.innerHTML = '';
-        snapshot.docs.forEach(doc => {
-          const conf = doc.data();
-          const card = document.createElement('div');
-          card.className = 'meme-card';
-          card.innerHTML = `
-            <div class="meme-title">🎭 Anonymous Confession</div>
-            <div style="padding:20px; font-size:16px; line-height:1.5;">${escapeHtml(conf.text)}</div>
-            <div class="reactions">
-              <div class="reaction-item">
-                <div class="reaction-btn">💀</div>
-                <div class="reaction-count">0</div>
-              </div>
-            </div>
-          `;
-          feed.appendChild(card);
-        });
-      } catch (e) {
-        feed.innerHTML = '<div class="loading-spinner">No confessions yet...</div>';
-      }
     };
     const fetchUserMemes = async (limit = 3) => {
       if (!db) return [];
@@ -1918,6 +1786,7 @@
         return null;
       }
     };
+    // 🔥 HOT NOW FETCH — FIXED ERROR HANDLING
     const fetchHotMeme = async () => {
       if (!db) return await fetchMeme();
       try {
@@ -1964,9 +1833,7 @@
           isUserGenerated: true,
           createdBy: username,
           isAnonymous: isAnonymous,
-          collections: [],
-          remixes: [],
-          nft: false
+          collections: []
         };
         await db.collection('memes').doc(memeId).set(memeData);
         document.getElementById('memeGenerator').style.display = 'none';
@@ -1989,33 +1856,6 @@
         alert("Failed to create meme. Check image URL.");
         console.error(e);
       }
-    };
-    const generateAiMeme = async () => {
-      const prompt = document.getElementById('aiMemePrompt').value.trim();
-      if (!prompt) return;
-      const btn = document.getElementById('generateAiMeme');
-      btn.disabled = true;
-      btn.textContent = "🤖 Generating...";
-      try {
-        const results = document.getElementById('aiMemeResults');
-        results.style.display = 'grid';
-        results.innerHTML = '';
-        for (let i = 0; i < 4; i++) {
-          const option = document.createElement('div');
-          option.className = 'ai-meme-option';
-          option.innerHTML = `<img src="https://via.placeholder.com/300x300/161625/39FF14?text=AI+Meme+${i+1}" data-prompt="${escapeHtml(prompt)}">`;
-          option.onclick = () => {
-            const img = option.querySelector('img');
-            createMeme('', '', img.src, false);
-            document.getElementById('aiMemeModal').style.display = 'none';
-          };
-          results.appendChild(option);
-        }
-      } catch (e) {
-        alert("AI generation failed. Try again.");
-      }
-      btn.disabled = false;
-      btn.textContent = "Generate Meme";
     };
     const generateAICaption = async () => {
       const url = document.getElementById('imageUrl').value.trim();
@@ -2124,10 +1964,13 @@
       const input = document.getElementById('chatMessage');
       const text = input.value.trim();
       if (!text) return;
-      if (text === '/battle') {
-        startBattleRoyale();
-        input.value = '';
-        return;
+      if (text.startsWith('/duel @')) {
+        const target = text.split('@')[1];
+        if (target && target !== currentUser.username) {
+          startDuel(currentUser.username, target);
+          input.value = '';
+          return;
+        }
       }
       try {
         await db.collection('chat').add({
@@ -2144,19 +1987,29 @@
         console.error(e);
       }
     };
-    const postConfession = async () => {
-      const text = document.getElementById('confessionText').value.trim();
-      if (!text || !currentUser) return;
+    const startDuel = async (challenger, opponent) => {
       try {
-        await db.collection('confessions').add({
-          text: text,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        const duelId = `duel_${Date.now()}`;
+        await db.collection('duels').doc(duelId).set({
+          challenger: challenger,
+          opponent: opponent,
+          challengerMeme: null,
+          opponentMeme: null,
+          status: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        document.getElementById('confessionModal').style.display = 'none';
-        document.getElementById('confessionText').value = '';
-        switchTab('cursed');
+        const meme = await fetchMeme();
+        if (meme) {
+          await db.collection('duels').doc(duelId).update({
+            challengerMeme: meme.url,
+            opponentMeme: meme.url,
+            status: 'active'
+          });
+          alert(`Duel started! React first to win 10 CC!`);
+          loadChatMessages();
+        }
       } catch (e) {
-        alert("Failed to post confession.");
+        console.warn("Duel failed:", e);
       }
     };
     let isLoginMode = false;
@@ -2270,6 +2123,7 @@
         }
       });
     };
+    // 🔥 COLLECTIONS — FIXED LOCAL STORAGE + FIRESTORE SYNC
     const loadCollections = () => {
       return JSON.parse(localStorage.getItem('collections') || '["Savage", "Wholesome", "CringeCoin Grinders"]');
     };
@@ -2313,10 +2167,12 @@
           collections.push(name);
           localStorage.setItem('collections', JSON.stringify(collections));
           input.value = '';
+          // Reopen with new list
           showCollectionsModal(document.getElementById('collectionsModal').dataset.memeId || '');
         }
       }
     };
+    // 🔥 MEME EDITOR — FIXED DRAG + TEXT EDITING
     let editableTexts = [];
     const initMemeEditor = () => {
       const templates = {
@@ -2354,6 +2210,7 @@
         addEditableText('Your text', 200, 200);
       };
       document.getElementById('postMemeBtn').onclick = () => {
+        // For now, use placeholder image
         const imageUrl = 'https://via.placeholder.com/600x400/161625/39FF14?text=Custom+Meme';
         createMeme('', '', imageUrl, false);
         document.getElementById('memeEditor').style.display = 'none';
@@ -2371,6 +2228,7 @@
       el.style.top = y + 'px';
       document.querySelector('.editor-preview').appendChild(el);
       editableTexts.push(el);
+      // Make draggable with proper cleanup
       let isDragging = false;
       el.onmousedown = (e) => {
         isDragging = true;
@@ -2389,7 +2247,7 @@
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
       };
-      el.ondragstart = () => false;
+      el.ondragstart = () => false; // Disable default drag
     };
     const loadQuests = () => {
       const today = new Date().toDateString();
@@ -2641,10 +2499,7 @@
       document.getElementById('closeCollections').onclick = () => document.getElementById('collectionsModal').style.display = 'none';
       document.getElementById('changePasswordBtn').onclick = changePassword;
       document.getElementById('deleteAccountBtn').onclick = deleteAccount;
-      document.getElementById('closeConfession').onclick = () => document.getElementById('confessionModal').style.display = 'none';
-      document.getElementById('postConfession').onclick = postConfession;
-      document.getElementById('closeAiMeme').onclick = () => document.getElementById('aiMemeModal').style.display = 'none';
-      document.getElementById('generateAiMeme').onclick = generateAiMeme;
+      // TRACK QUEST PROGRESS
       const originalUpdateCringeCoin = updateCringeCoin;
       window.updateCringeCoin = async (amount) => {
         await originalUpdateCringeCoin(amount);
