@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
   <title>CringeScroll</title>
+  <!-- 🔥 PRECONNECT -->
   <link rel="preconnect" href="https://i.imgur.com">
   <link rel="preconnect" href="https://i.redd.it">
   <link rel="dns-prefetch" href="//i.imgur.com">
@@ -38,11 +39,12 @@
     :root {
       --bg: #0d0d1a;
       --card-bg: #161625;
-      --neon-purple: #D400FF;
-      --neon-green: #39FF14;
       --neon-pink: #FF2A6D;
+      --neon-cyan: #00FFFF;
+      --neon-purple: #D400FF;
+      --neon-blue: #0080FF;
       --text: #f5f5ff;
-      --border: rgba(212, 0, 255, 0.12);
+      --border: rgba(255, 42, 109, 0.12);
       --ad-bg: rgba(22, 22, 37, 0.4);
     }
     * {
@@ -77,7 +79,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 1px solid var(--neon-purple);
+      border-bottom: 1px solid var(--neon-pink);
       transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease;
       will-change: transform, opacity;
     }
@@ -99,12 +101,12 @@
     .cringe-logo {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-green));
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 15px rgba(212, 0, 255, 0.5);
+      box-shadow: 0 0 15px rgba(255, 42, 109, 0.5);
       position: relative;
       overflow: hidden;
     }
@@ -121,7 +123,7 @@
       font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -134,7 +136,7 @@
       left: 0;
       width: 0;
       height: 2px;
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       transition: width 0.3s ease;
     }
     .logo-container:hover .logo-title::after {
@@ -151,13 +153,13 @@
       transition: background 0.2s;
     }
     .hamburger-menu:hover {
-      background: rgba(57, 255, 20, 0.1);
+      background: rgba(0, 255, 255, 0.1);
     }
     .ui-bar {
       display: flex;
       flex-direction: column;
       background: rgba(13, 13, 26, 0.7);
-      border-bottom: 1px solid rgba(212, 0, 255, 0.3);
+      border-bottom: 1px solid rgba(255, 42, 109, 0.3);
       z-index: 99;
       transition: height 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease;
       overflow: hidden;
@@ -172,7 +174,7 @@
       display: flex;
       justify-content: center;
       padding: 12px 0;
-      border-bottom: 1px solid rgba(212, 0, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 42, 109, 0.1);
     }
     .tab-btn {
       background: transparent;
@@ -186,7 +188,7 @@
       transition: color 0.2s;
     }
     .tab-btn.active {
-      color: var(--neon-green);
+      color: var(--neon-cyan);
     }
     .tab-btn.active::after {
       content: "";
@@ -195,14 +197,14 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--neon-green);
+      background: var(--neon-cyan);
     }
     .control-bar {
       display: flex;
       justify-content: center;
       gap: 16px;
       padding: 12px 0;
-      border-top: 1px solid rgba(212, 0, 255, 0.1);
+      border-top: 1px solid rgba(255, 42, 109, 0.1);
     }
     .control-btn {
       background: transparent;
@@ -258,20 +260,20 @@
       z-index: 10;
     }
     .reaction-badge {
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       color: var(--bg);
       font-weight: bold;
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 14px;
-      box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     }
     .meme-title {
       padding: 18px 20px 14px;
       font-size: 20px;
       font-weight: 700;
       line-height: 1.4;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       word-break: break-word;
       padding-top: 36px;
     }
@@ -295,7 +297,7 @@
       gap: 16px;
       padding: 12px 0 10px;
       background: rgba(0,0,0,0.2);
-      border-top: 1px solid rgba(212, 0, 255, 0.1);
+      border-top: 1px solid rgba(255, 42, 109, 0.1);
     }
     .reaction-item {
       display: flex;
@@ -314,11 +316,11 @@
     }
     .reaction-count {
       font-size: 14px;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-weight: bold;
       min-width: 20px;
       text-align: center;
-      background: rgba(57, 255, 20, 0.1);
+      background: rgba(0, 255, 255, 0.1);
       padding: 2px 6px;
       border-radius: 10px;
       transition: all 0.2s;
@@ -359,7 +361,7 @@
       color: white;
     }
     .save-btn {
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       color: var(--bg);
     }
     .remix-btn {
@@ -368,7 +370,7 @@
     }
     .claimed-by {
       font-size: 12px;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       margin-top: 6px;
       display: block;
       text-align: center;
@@ -385,7 +387,7 @@
     }
     .ad-container::before {
       content: "Sponsored by Cringe Lords";
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-size: 12px;
       position: absolute;
       top: 8px;
@@ -397,7 +399,7 @@
     .loading-spinner {
       text-align: center;
       padding: 20px;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-size: 16px;
     }
     .skeleton-card {
@@ -421,11 +423,11 @@
       padding: 16px;
       text-align: center;
       z-index: 1000;
-      border-top: 1px solid var(--neon-purple);
+      border-top: 1px solid var(--neon-pink);
       display: none;
     }
     .prompt-btn {
-      background: var(--neon-purple);
+      background: var(--neon-pink);
       color: white;
       border: none;
       padding: 8px 16px;
@@ -445,7 +447,7 @@
       padding: 20px;
       z-index: 200;
       transition: right 0.3s ease;
-      border-left: 1px solid var(--neon-purple);
+      border-left: 1px solid var(--neon-pink);
       display: flex;
       flex-direction: column;
     }
@@ -457,24 +459,24 @@
       justify-content: space-between;
       align-items: center;
       padding-bottom: 10px;
-      border-bottom: 1px solid rgba(212, 0, 255, 0.3);
+      border-bottom: 1px solid rgba(255, 42, 109, 0.3);
       margin-bottom: 10px;
     }
     .panel-title {
       font-size: 20px;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
     }
     .close-panel {
       background: none;
       border: none;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-size: 24px;
       cursor: pointer;
     }
     .user-stats {
       display: flex;
       justify-content: space-between;
-      background: rgba(57, 255, 20, 0.1);
+      background: rgba(0, 255, 255, 0.1);
       padding: 10px;
       border-radius: 10px;
       margin-bottom: 15px;
@@ -485,7 +487,7 @@
     .stat-value {
       font-size: 20px;
       font-weight: bold;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
     }
     .stat-label {
       font-size: 12px;
@@ -536,7 +538,7 @@
       align-items: center;
       gap: 8px;
       font-size: 12px;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       margin-bottom: 10px;
     }
     .user-status .username {
@@ -554,7 +556,7 @@
       cursor: pointer;
     }
     .chat-message {
-      background: rgba(57, 255, 20, 0.1);
+      background: rgba(0, 255, 255, 0.1);
       border-radius: 10px;
       padding: 8px 12px;
       max-width: 80%;
@@ -562,7 +564,7 @@
     }
     .chat-message.self {
       align-self: flex-end;
-      background: rgba(212, 0, 255, 0.1);
+      background: rgba(255, 42, 109, 0.1);
     }
     .chat-message .username {
       font-weight: bold;
@@ -582,14 +584,14 @@
     #chatInput input {
       flex: 1;
       background: rgba(0,0,0,0.3);
-      border: 1px solid var(--neon-green);
+      border: 1px solid var(--neon-cyan);
       color: var(--text);
       padding: 8px;
       border-radius: 8px;
       font-size: 14px;
     }
     #chatInput button {
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       color: var(--bg);
       border: none;
       padding: 8px 16px;
@@ -615,7 +617,7 @@
       border-radius: 20px;
       width: 90%;
       max-width: 400px;
-      border: 2px solid var(--neon-purple);
+      border: 2px solid var(--neon-pink);
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -626,14 +628,14 @@
       align-items: center;
     }
     .auth-title {
-      color: var(--neon-purple);
+      color: var(--neon-pink);
       margin: 0;
       font-size: 20px;
     }
     .close-auth {
       background: none;
       border: none;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-size: 24px;
       cursor: pointer;
     }
@@ -644,14 +646,14 @@
     }
     .auth-input {
       background: rgba(0,0,0,0.3);
-      border: 1px solid var(--neon-green);
+      border: 1px solid var(--neon-cyan);
       color: var(--text);
       padding: 10px;
       border-radius: 8px;
       font-size: 14px;
     }
     .auth-btn {
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       color: var(--bg);
       border: none;
       padding: 10px;
@@ -666,7 +668,7 @@
       color: var(--text);
     }
     .auth-toggle a {
-      color: var(--neon-purple);
+      color: var(--neon-pink);
       text-decoration: none;
       font-weight: bold;
     }
@@ -688,10 +690,10 @@
       border-radius: 20px;
       width: 90%;
       max-width: 500px;
-      border: 2px solid var(--neon-purple);
+      border: 2px solid var(--neon-pink);
     }
     .generator-content h2 {
-      color: var(--neon-purple);
+      color: var(--neon-pink);
       margin-bottom: 15px;
     }
     .generator-inputs {
@@ -701,7 +703,7 @@
     }
     input[type="text"] {
       background: rgba(0,0,0,0.3);
-      border: 1px solid var(--neon-green);
+      border: 1px solid var(--neon-cyan);
       color: var(--text);
       padding: 10px;
       border-radius: 8px;
@@ -711,7 +713,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-size: 14px;
     }
     .anonymous-toggle input {
@@ -731,7 +733,7 @@
       cursor: pointer;
     }
     .generator-btn.create {
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       color: var(--bg);
     }
     .generator-btn.cancel {
@@ -739,7 +741,7 @@
       color: white;
     }
     .ai-caption-btn {
-      background: var(--neon-purple);
+      background: var(--neon-pink);
       color: white;
       border: none;
       padding: 6px;
@@ -749,7 +751,7 @@
       margin-top: 4px;
     }
     .ai-caption-result {
-      background: rgba(212, 0, 255, 0.2);
+      background: rgba(255, 42, 109, 0.2);
       padding: 8px;
       border-radius: 6px;
       margin-top: 8px;
@@ -757,7 +759,7 @@
     }
     .ai-caption-result span {
       cursor: pointer;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       text-decoration: underline;
     }
     .footer-notice {
@@ -775,14 +777,14 @@
       color: var(--text);
       text-decoration: none;
       font-size: 16px;
-      border-bottom: 1px solid rgba(212, 0, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 42, 109, 0.1);
       display: flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
     }
     .menu-item:hover {
-      color: var(--neon-purple);
+      color: var(--neon-pink);
     }
     .menu-item svg {
       width: 20px;
@@ -811,7 +813,7 @@
       border-radius: 20px;
       width: 90%;
       max-width: 400px;
-      border: 2px solid var(--neon-purple);
+      border: 2px solid var(--neon-pink);
     }
     .modal-header {
       display: flex;
@@ -820,20 +822,20 @@
       margin-bottom: 15px;
     }
     .modal-title {
-      color: var(--neon-purple);
+      color: var(--neon-pink);
       margin: 0;
       font-size: 20px;
     }
     .close-modal {
       background: none;
       border: none;
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-size: 24px;
       cursor: pointer;
     }
     .modal-input {
       background: rgba(0,0,0,0.3);
-      border: 1px solid var(--neon-green);
+      border: 1px solid var(--neon-cyan);
       color: var(--text);
       padding: 10px;
       border-radius: 8px;
@@ -842,7 +844,7 @@
       margin-bottom: 12px;
     }
     .modal-btn {
-      background: var(--neon-green);
+      background: var(--neon-cyan);
       color: var(--bg);
       border: none;
       padding: 10px;
@@ -852,7 +854,7 @@
       width: 100%;
     }
     .quest-item {
-      background: rgba(57, 255, 20, 0.1);
+      background: rgba(0, 255, 255, 0.1);
       padding: 10px;
       border-radius: 10px;
       margin: 8px 0;
@@ -861,25 +863,25 @@
       align-items: center;
     }
     .quest-complete {
-      color: var(--neon-green);
+      color: var(--neon-cyan);
       font-weight: bold;
     }
     .badge-item {
-      background: rgba(212, 0, 255, 0.2);
+      background: rgba(255, 42, 109, 0.2);
       padding: 8px;
       border-radius: 8px;
       margin: 6px 0;
       font-size: 14px;
     }
     .collection-item {
-      background: rgba(57, 255, 20, 0.1);
+      background: rgba(0, 255, 255, 0.1);
       padding: 10px;
       border-radius: 10px;
       margin: 8px 0;
       cursor: pointer;
     }
     .collection-item:hover {
-      background: rgba(57, 255, 20, 0.2);
+      background: rgba(0, 255, 255, 0.2);
     }
     #memeEditor {
       display: none;
@@ -898,14 +900,14 @@
       border-radius: 20px;
       width: 95%;
       max-width: 800px;
-      border: 2px solid var(--neon-purple);
+      border: 2px solid var(--neon-pink);
       margin: 20px auto;
     }
     .editor-preview {
       position: relative;
       width: 100%;
       margin: 20px 0;
-      border: 1px dashed var(--neon-green);
+      border: 1px dashed var(--neon-cyan);
       overflow: hidden;
     }
     .editor-image {
@@ -929,14 +931,14 @@
     }
     .template-btn, .tool-btn {
       padding: 8px 12px;
-      background: rgba(212, 0, 255, 0.2);
-      border: 1px solid var(--neon-purple);
+      background: rgba(255, 42, 109, 0.2);
+      border: 1px solid var(--neon-pink);
       color: white;
       border-radius: 6px;
       cursor: pointer;
     }
     .template-btn:hover, .tool-btn:hover {
-      background: rgba(212, 0, 255, 0.3);
+      background: rgba(255, 42, 109, 0.3);
     }
     .editor-btns {
       display: flex;
@@ -969,9 +971,9 @@
       </div>
       <div class="hamburger-menu" id="hamburgerBtn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 6H21" stroke="var(--neon-green)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M3 12H21" stroke="var(--neon-green)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M3 18H21" stroke="var(--neon-green)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 6H21" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 12H21" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 18H21" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </div>
     </header>
@@ -992,7 +994,7 @@
     </div>
     <div id="feed"></div>
   </div>
-  <!-- Panels remain -->
+    <!-- Panels remain -->
   <div id="leaderboardPanel">
     <div class="panel-header">
       <div class="panel-title">🏆 Cringe Lords</div>
@@ -1184,7 +1186,7 @@
       </div>
       <input type="text" id="editorImageUrl" class="modal-input" placeholder="Image URL (or use template)">
       <div class="editor-btns">
-        <button class="modal-btn" style="background:var(--neon-green);" id="postMemeBtn">Post Meme</button>
+        <button class="modal-btn" style="background:var(--neon-cyan);" id="postMemeBtn">Post Meme</button>
         <button class="modal-btn" id="cancelEditor">Cancel</button>
       </div>
     </div>
@@ -1197,8 +1199,8 @@
   <div class="footer-notice">
     <a href="/privacy.html">Privacy Policy</a>
   </div>
-    <script>
-    // ===== CORE ENGINE v5.0 — ALL FUNCTIONS FIXED + FULL EDITOR =====
+  <script>
+    // ===== CORE ENGINE v6.0 — NEON THEME + FIXED ECONOMY =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1238,7 +1240,7 @@
     const createPlaceholder = (width, height) => {
       const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#161625"/>
-        <text x="50%" y="50%" fill="#39FF14" font-size="10" text-anchor="middle" dominant-baseline="middle">Cringe...</text>
+        <text x="50%" y="50%" fill="#00FFFF" font-size="10" text-anchor="middle" dominant-baseline="middle">Cringe...</text>
       </svg>`;
       return `image/svg+xml;base64,${btoa(svg)}`;
     };
@@ -1467,14 +1469,14 @@
           transaction.set(docRef, data);
         });
         if (currentUser) {
-          updateCringeCoin(1);
+          updateCringeCoin(1); // ✅ FIXED: 1 CC per reaction
           updateStreak();
           if (emoji === '💀') {
             playSound('oof');
             const questKey = `quest_react_${new Date().toDateString()}`;
             if (!localStorage.getItem(questKey)) {
               localStorage.setItem(questKey, 'completed');
-              updateCringeCoin(5);
+              updateCringeCoin(5); // ✅ FIXED: 5 CC for daily quest
             }
           }
         }
@@ -1505,7 +1507,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: var(--neon-green);
+            color: var(--neon-cyan);
             font-weight: bold;
             font-size: 24px;
             pointer-events: none;
@@ -1625,7 +1627,6 @@
         showCollectionsModal(meme.id);
       };
       actionDiv.appendChild(saveBtn);
-      // 🔥 REMIX BUTTON
       const remixBtn = document.createElement('button');
       remixBtn.className = 'remix-btn';
       remixBtn.textContent = '🔄 Remix';
@@ -2130,7 +2131,6 @@
         }
       });
     };
-    // 🔥 COLLECTIONS
     const loadCollections = () => {
       return JSON.parse(localStorage.getItem('collections') || '["Savage", "Wholesome", "CringeCoin Grinders"]');
     };
@@ -2178,7 +2178,6 @@
         }
       }
     };
-    // 🔥 FULL MEME EDITOR WITH ERASER + REMIX
     let editableTexts = [];
     let isErasing = false;
     const initMemeEditor = (imageUrl = '', title = '') => {
@@ -2189,7 +2188,7 @@
         blank: ''
       };
       document.getElementById('editorImageUrl').value = imageUrl;
-      document.getElementById('editorImage').src = imageUrl || 'https://via.placeholder.com/600x400/161625/39FF14?text=Upload+Image';
+      document.getElementById('editorImage').src = imageUrl || 'https://via.placeholder.com/600x400/161625/00FFFF?text=Upload+Image';
       editableTexts = [];
       document.querySelectorAll('.editable-text').forEach(el => el.remove());
       if (title) {
@@ -2216,7 +2215,7 @@
         };
       });
       document.getElementById('editorImageUrl').onchange = function() {
-        document.getElementById('editorImage').src = this.value || 'https://via.placeholder.com/600x400/161625/39FF14?text=Upload+Image';
+        document.getElementById('editorImage').src = this.value || 'https://via.placeholder.com/600x400/161625/00FFFF?text=Upload+Image';
         editableTexts = [];
         document.querySelectorAll('.editable-text').forEach(el => el.remove());
       };
@@ -2225,13 +2224,13 @@
       };
       document.getElementById('eraseBtn').onclick = () => {
         isErasing = !isErasing;
-        document.getElementById('eraseBtn').style.background = isErasing ? 'var(--neon-pink)' : 'rgba(212, 0, 255, 0.2)';
+        document.getElementById('eraseBtn').style.background = isErasing ? 'var(--neon-pink)' : 'rgba(255, 42, 109, 0.2)';
         if (isErasing) {
           alert("Click any text to erase it!");
         }
       };
       document.getElementById('postMemeBtn').onclick = () => {
-        const imageUrl = document.getElementById('editorImageUrl').value || 'https://via.placeholder.com/600x400/161625/39FF14?text=Custom+Meme';
+        const imageUrl = document.getElementById('editorImageUrl').value || 'https://via.placeholder.com/600x400/161625/00FFFF?text=Custom+Meme';
         createMeme('', '', imageUrl, false);
         document.getElementById('memeEditor').style.display = 'none';
         isErasing = false;
@@ -2255,7 +2254,7 @@
           el.remove();
           editableTexts = editableTexts.filter(t => t !== el);
           isErasing = false;
-          document.getElementById('eraseBtn').style.background = 'rgba(212, 0, 255, 0.2)';
+          document.getElementById('eraseBtn').style.background = 'rgba(255, 42, 109, 0.2)';
           e.stopPropagation();
         }
       };
@@ -2360,7 +2359,7 @@
       if (unlocked.includes(30)) badges.push("🏆 30-Day Streak");
       const list = document.getElementById('inventoryList');
       if (badges.length === 0) {
-        list.innerHTML = "<div style='text-align:center;color:var(--neon-green);'>No badges yet. Keep scrolling!</div>";
+        list.innerHTML = "<div style='text-align:center;color:var(--neon-cyan);'>No badges yet. Keep scrolling!</div>";
       } else {
         list.innerHTML = badges.map(b => `<div class="badge-item">${b}</div>`).join('');
       }
@@ -2591,4 +2590,3 @@
   </script>
 </body>
 </html>
- 
