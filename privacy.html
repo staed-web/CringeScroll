@@ -3,92 +3,194 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy - CringeScroll</title>
+  <title>Privacy Policy — CringeScroll</title>
   <style>
+    :root {
+      --bg: #0d0d1a;
+      --text: #f5f5ff;
+      --neon-pink: #FF2A6D;
+      --neon-cyan: #00FFFF;
+    }
     body {
-      background: #0d0d1a;
-      color: #f5f5ff;
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Segoe UI', system-ui, sans-serif;
       line-height: 1.6;
       padding: 20px;
       max-width: 800px;
       margin: 0 auto;
     }
-    h1, h2 {
-      color: #D400FF;
+    h1, h2, h3 {
+      color: var(--neon-cyan);
       margin-top: 1.5em;
     }
-    p, ul {
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    p, ul, ol {
       margin-bottom: 1em;
     }
-    .highlight {
-      background: rgba(212, 0, 255, 0.1);
-      padding: 2px 6px;
-      border-radius: 4px;
+    a {
+      color: var(--neon-pink);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      background: #161625;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255, 42, 109, 0.2);
+    }
+    .updated {
+      color: var(--neon-pink);
+      font-size: 0.9em;
+      text-align: center;
+      margin-top: -12px;
     }
   </style>
 </head>
 <body>
-  <h1>Privacy Policy for CringeScroll</h1>
-  
-  <p>Last updated: October 16, 2025</p>
-  
-  <p>This Privacy Policy describes how CringeScroll ("we", "us", or "our") collects, uses, and discloses your information when you use our website (<span class="highlight">cringescroll-prod.web.app</span> or related domains).</p>
-  
-  <h2>1. Information We Collect</h2>
-  <p>We collect only the following personal information:</p>
-  <ul>
-    <li><span class="highlight">Username</span>: Chosen by you when joining chat. Used to display your identity in chat and leaderboard.</li>
-    <li><span class="highlight">CringeCoin balance</span>: Virtual points earned through app activity (reactions, posting memes, chat). Stored to power leaderboard rankings.</li>
-    <li><span class="highlight">Streak count</span>: Number of consecutive days you've used the app. Used for gamification.</li>
-    <li><span class="highlight">Chat messages</span>: Text you send in the public chat room.</li>
-    <li><span class="highlight">Meme interactions</span>: Reactions (💀, 😂, etc.) to memes.</li>
-  </ul>
-  
-  <p><strong>We do NOT collect:</strong></p>
-  <ul>
-    <li>Email addresses</li>
-    <li>Passwords</li>
-    <li>Device identifiers</li>
-    <li>Location data</li>
-    <li>IP addresses (beyond standard server logs)</li>
-  </ul>
-  
-  <h2>2. How We Use Your Information</h2>
-  <p>We use your information solely to:</p>
-  <ul>
-    <li>Display your username in chat and leaderboard</li>
-    <li>Track CringeCoin balance for leaderboard rankings</li>
-    <li>Show your streak badge for consecutive usage</li>
-    <li>Display your chat messages in the public chat room</li>
-    <li>Show your meme reactions to other users</li>
-  </ul>
-  
-  <h2>3. Advertising</h2>
-  <p>CringeScroll uses Google AdSense to display ads. Google AdSense may use cookies to serve ads based on your prior visits to this website or other websites.</p>
-  <p><strong>Important:</strong> We do NOT share your username, CringeCoin balance, streak count, chat messages, or meme interactions with Google or any advertising partner. Ad personalization is based solely on anonymous site usage patterns, not your personal data.</p>
-  
-  <h2>4. Data Storage & Security</h2>
-  <p>Your data is stored securely in Firebase Firestore (Google Cloud). We implement industry-standard security measures to protect your information. However, no method of transmission over the internet is 100% secure.</p>
-  
-  <h2>5. Your Rights</h2>
-  <p>You have the right to:</p>
-  <ul>
-    <li><strong>Access</strong>: View your username, CringeCoin balance, and streak</li>
-    <li><strong>Delete</strong>: Clear your data by logging out and clearing browser localStorage</li>
-  </ul>
-  <p>To delete your data permanently from our servers, email us at <span class="highlight">cringescroll.contact@gmail.com</span> with your username.</p>
-  
-  <h2>6. Children's Privacy</h2>
-  <p>CringeScroll is not intended for children under 13. We do not knowingly collect personal information from children under 13. If we become aware of such collection, we will delete the information promptly.</p>
-  
-  <h2>7. Changes to This Policy</h2>
-  <p>We may update this Privacy Policy periodically. The "Last updated" date at the top will reflect changes. Continued use after changes implies acceptance.</p>
-  
-  <h2>8. Contact Us</h2>
-  <p>For privacy-related questions or requests, contact us at:<br>
-  <span class="highlight">cringescroll.contact@gmail.com</span></p>
-  
-  <p>Thank you for using CringeScroll!</p>
+  <div class="container">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: November 3, 2025</p>
+
+    <p>
+      Welcome to <strong>CringeScroll</strong> ("we", "us", or "our"). We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and mobile web app (collectively, the "Service").
+    </p>
+
+    <h2>1. Information We Collect</h2>
+
+    <h3>a) Account Information</h3>
+    <p>
+      When you sign up, we collect:
+      <ul>
+        <li>Email address</li>
+        <li>Username (2–15 alphanumeric characters)</li>
+        <li>Password (securely hashed)</li>
+      </ul>
+    </p>
+
+    <h3>b) Usage & Interaction Data</h3>
+    <p>
+      We automatically collect:
+      <ul>
+        <li>Memes you post, react to, tip, or save</li>
+        <li>Chat messages you send in CringeChat</li>
+        <li>Duel activity and outcomes</li>
+        <li>Quest completions and inventory unlocks</li>
+        <li>Timestamps of activity (for streak tracking)</li>
+      </ul>
+    </p>
+
+    <h3>c) Device & Log Data</h3>
+    <p>
+      We collect standard technical information:
+      <ul>
+        <li>IP address (via Firebase)</li>
+        <li>Browser type and version</li>
+        <li>Operating system</li>
+        <li>Pages visited and time spent</li>
+        <li>Error logs</li>
+      </ul>
+    </p>
+
+    <h3>d) Content You Upload</h3>
+    <p>
+      When you create or remix memes:
+      <ul>
+        <li>Image URLs (external or data URLs from canvas exports)</li>
+        <li>Meme captions and text overlays</li>
+        <li>Collection names you create</li>
+      </ul>
+      <strong>Note:</strong> We do **not** store full image files unless you use Fabric.js export (then stored as data URL in Firestore).
+    </p>
+
+    <h2>2. How We Use Your Information</h2>
+    <ul>
+      <li>To provide and maintain the Service</li>
+      <li>To manage your account and CringeCoin balance</li>
+      <li>To display memes, leaderboards, and chat in real time</li>
+      <li>To detect and prevent abuse (e.g., spam, fake accounts)</li>
+      <li>To personalize your experience (e.g., streak rewards, daily quests)</li>
+      <li>To comply with legal obligations</li>
+    </ul>
+
+    <h2>3. Data Sharing & Disclosure</h2>
+    <p>
+      We **do not sell** your personal data.
+    </p>
+    <p>
+      We may share data only in these cases:
+    </p>
+    <ul>
+      <li><strong>With Firebase (Google):</strong> As our backend provider, Firebase processes data per <a href="https://policies.google.com/privacy" target="_blank">Google’s Privacy Policy</a>.</li>
+      <li><strong>With AdSense:</strong> Anonymous ad requests for monetization (no personal identifiers shared).</li>
+      <li><strong>Legal compliance:</strong> If required by law or to protect our rights.</li>
+    </ul>
+
+    <h2>4. Data Retention</h2>
+    <p>
+      We retain your data as long as your account is active. You may:
+    </p>
+    <ul>
+      <li>Delete your account anytime via <strong>Profile → Security → Delete Account</strong></li>
+      <li>Upon deletion, all personal data (username, email, memes, chat history) is permanently erased from Firestore within 30 days</li>
+    </ul>
+
+    <h2>5. Children’s Privacy</h2>
+    <p>
+      CringeScroll is **not intended for users under 13**. We do not knowingly collect data from children. If we become aware of such data, we will delete it promptly.
+    </p>
+
+    <h2>6. Your Rights</h2>
+    <p>
+      Depending on your location, you may have the right to:
+    </p>
+    <ul>
+      <li>Access, correct, or delete your personal data</li>
+      <li>Export your data</li>
+      <li>Opt out of non-essential data processing</li>
+    </ul>
+    <p>
+      To exercise these rights, contact us at: <strong>cringescroll.contact@gmail.com</strong>
+    </p>
+
+    <h2>7. Security</h2>
+    <p>
+      We use industry-standard measures:
+    </p>
+    <ul>
+      <li>Firebase Authentication (email/password)</li>
+      <li>Firestore Security Rules (role-based access)</li>
+      <li>HTTPS encryption in transit</li>
+      <li>No plain-text password storage</li>
+    </ul>
+    <p>
+      However, no internet transmission is 100% secure. Use at your own risk.
+    </p>
+
+    <h2>8. Changes to This Policy</h2>
+    <p>
+      We may update this policy. Continued use after changes implies acceptance.
+    </p>
+
+    <h2>9. Contact Us</h2>
+    <p>
+      Questions? Contact:  
+      <br><strong>Email:</strong> cringescroll.contact@gmail.com  
+      <br><strong>Website:</strong> <a href="https://cringescroll.com">cringescroll.com</a>
+    </p>
+
+    <p style="text-align:center; margin-top: 30px; color: #8a8aa0; font-size: 0.9em;">
+      Scroll responsibly. 💀
+    </p>
+  </div>
 </body>
 </html>
