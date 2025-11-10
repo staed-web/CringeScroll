@@ -1121,46 +1121,54 @@
     </main>
   </div>
   <script>
-  // Initialize Firebase after DOM load
+  // ===== CORE ENGINE v6.3 — CONTINUED =====
+  // Firebase initialization
+  let db, auth;
+  const firebaseConfig = {
+    apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
+    authDomain: "cringescroll-prod.firebaseapp.com",
+    projectId: "cringescroll-prod",
+    storageBucket: "cringescroll-prod.firebasestorage.app",
+    messagingSenderId: "802266413389",
+    appId: "1:802266413389:web:22a7274e4edc8a0529df04"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  auth = firebase.auth();
+
+  // Main app initialization
   document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      
-      // Initialize services
-      db = firebase.firestore();
-      auth = firebase.auth();
-      
-      // Initialize UI components
-      initThreeBackground();
-      setupEventListeners();
-      setupScrollHandling();
-      init3DEffects();
-      
-      // Load initial data
-      await Promise.all([
-        loadFeed('hot'),
-        loadLeaderboard(),
-        checkDailyCrown(),
-        checkStreak()
-      ]);
-      
-      // Show welcome notification
-      showNotification("Welcome to CringeScroll!", "Cringe or be cringed. The internet's most chaotic meme platform.");
-      
-      // Check for PWA installation prompt
-      setupPWA();
-      
-    } catch (error) {
-      console.error('Initialization error:', error);
-      showNotification("Error", "Failed to initialize app. Please refresh.", true);
-    }
+    // Set up DOM elements
+    feed = document.getElementById('feed');
+    
+    // Initialize UI components
+    initThreeBackground();
+    setupEventListeners();
+    setupScrollHandling();
+    init3DEffects();
+    
+    // Load initial data
+    await Promise.all([
+      loadFeed('hot'),
+      loadLeaderboard(),
+      checkDailyCrown(),
+      checkStreak()
+    ]);
+    
+    // Show welcome notification
+    showNotification("Welcome to CringeScroll!", "Cringe or be cringed. The internet's most chaotic meme platform.");
+    
+    // Set up PWA features
+    setupPWA();
   });
 
   // Three.js background initialization
   function initThreeBackground() {
-    const canvas = document.getElementById('background-canvas');
-    if (!canvas) return;
+    const canvas = document.createElement('canvas');
+    canvas.id = 'background-canvas';
+    document.body.insertBefore(canvas, document.body.firstChild);
     
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -1237,55 +1245,7 @@
     animate();
   }
 
-  // Initialize 3D effects for cards and UI elements
-  function init3DEffects() {
-    // Card hover effects
-    document.querySelectorAll('.meme-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-      });
-    });
-    
-    // 3D floating animations
-    gsap.utils.toArray('.floating').forEach(element => {
-      gsap.to(element, {
-        y: -15,
-        ease: "sine.inOut",
-        duration: 2,
-        repeat: -1,
-        yoyo: true
-      });
-    });
-    
-    // Parallax effect for background elements
-    document.addEventListener('mousemove', (e) => {
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
-      
-      document.querySelectorAll('.parallax').forEach(el => {
-        const speed = parseFloat(el.getAttribute('data-speed') || '0.05');
-        const xOffset = (x - 0.5) * speed * 100;
-        const yOffset = (y - 0.5) * speed * 100;
-        el.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
-      });
-    });
-  }
-
-  // Setup all event listeners
+  // Setup event listeners for all UI elements
   function setupEventListeners() {
     // Tab switching
     document.querySelectorAll('.tab-btn, .nav-item').forEach(tab => {
@@ -1330,27 +1290,22 @@
     
     // Create meme button
     document.getElementById('createBtn').addEventListener('click', () => {
-      document.getElementById('createMemeModal').classList.add('open');
-    });
-    
-    document.getElementById('closeCreateMemeModal').addEventListener('click', () => {
-      document.getElementById('createMemeModal').classList.remove('open');
-    });
-    
-    // Generate meme preview
-    document.getElementById('generateMemeBtn').addEventListener('click', () => {
-      generateMemePreview();
-    });
-    
-    // Post meme
-    document.getElementById('postMemeBtn').addEventListener('click', async () => {
-      await postMeme();
+      if (!currentUser) {
+        showAuthModal();
+        return;
+      }
+      document.getElementById('memeEditor').style.display = 'flex';
+      initFabricEditor();
     });
     
     // Profile button
     document.getElementById('profileBtn').addEventListener('click', () => {
+      if (!currentUser) {
+        showAuthModal();
+        return;
+      }
+      loadProfile();
       document.getElementById('profileModal').classList.add('open');
-      loadUserProfile();
     });
     
     document.getElementById('closeProfileModal').addEventListener('click', () => {
@@ -1377,8 +1332,12 @@
       document.getElementById('leaderboardPanel').classList.remove('open');
     });
     
-    // Collections panel
-    document.getElementById('collectionsBtn').addEventListener('click', () => {
+    // Saved memes panel
+    document.getElementById('savedMemesBtn').addEventListener('click', () => {
+      if (!currentUser) {
+        showAuthModal();
+        return;
+      }
       document.getElementById('collectionsPanel').classList.add('open');
       loadCollections();
     });
@@ -1387,14 +1346,13 @@
       document.getElementById('collectionsPanel').classList.remove('open');
     });
     
-    // Create collection button
-    document.getElementById('createCollectionBtn').addEventListener('click', () => {
-      createCollection();
+    // Settings button
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+      document.getElementById('settingsModal').classList.add('open');
     });
     
-    // Daily quests button
-    document.getElementById('dailyQuestsBtn').addEventListener('click', () => {
-      showDailyQuests();
+    document.getElementById('closeSettingsModal').addEventListener('click', () => {
+      document.getElementById('settingsModal').classList.remove('open');
     });
     
     // Theme toggle
@@ -1405,6 +1363,11 @@
     // Cringe roulette
     document.getElementById('rouletteBtn').addEventListener('click', () => {
       cringeRoulette();
+    });
+    
+    // Notifications button
+    document.getElementById('notificationsBtn').addEventListener('click', () => {
+      showNotifications();
     });
   }
 
@@ -1788,425 +1751,6 @@
     });
   }
 
-  // Insert ad containers between memes
-  function insertAds() {
-    const feed = document.getElementById('feed');
-    if (!feed) return;
-    
-    // Insert ad after every 3 memes
-    const memeCards = feed.querySelectorAll('.meme-card');
-    memeCards.forEach((card, index) => {
-      if ((index + 1) % 3 === 0) {
-        const adContainer = document.createElement('div');
-        adContainer.className = 'ad-container glow';
-        adContainer.innerHTML = `
-          <div class="ad-content">Support CringeScroll - Upgrade to Premium to remove ads</div>
-          <button class="action-button tip" style="margin-top: 16px;">Go Premium</button>
-        `;
-        feed.insertBefore(adContainer, card.nextSibling);
-      }
-    });
-  }
-
-  // Add reaction to meme
-  async function addReaction(memeId, emoji) {
-    if (!currentUser) {
-      showNotification("Login required", "Please log in to react to memes");
-      return;
-    }
-    
-    try {
-      const memeRef = db.collection('memes').doc(memeId);
-      const memeDoc = await memeRef.get();
-      
-      if (!memeDoc.exists) {
-        showNotification("Error", "Meme not found", true);
-        return;
-      }
-      
-      const memeData = memeDoc.data();
-      const reactions = memeData.reactions || {};
-      
-      // Update reactions count
-      reactions[emoji] = (reactions[emoji] || 0) + 1;
-      
-      // Update meme document
-      await memeRef.update({
-        reactions: reactions,
-        ups: (memeData.ups || 0) + 1
-      });
-      
-      // Update user coins
-      await updateCringeCoin(1);
-      
-      // Update UI
-      const reactionCount = document.querySelector(`.meme-card[data-id="${memeId}"] .reaction-item:nth-child(${getEmojiIndex(emoji)}) .reaction-count`);
-      if (reactionCount) {
-        reactionCount.textContent = reactions[emoji];
-        reactionCount.classList.add('animated');
-        setTimeout(() => {
-          reactionCount.classList.remove('animated');
-        }, 300);
-      }
-      
-      // Update hot score if needed
-      await updateHotScore(memeId);
-      
-      showNotification("Reaction added!", "+1 CringeCoin earned");
-      
-    } catch (error) {
-      console.error('Error adding reaction:', error);
-      showNotification("Error", "Failed to add reaction", true);
-    }
-  }
-
-  // Get emoji index for UI updates
-  function getEmojiIndex(emoji) {
-    const emojis = ['😂', '💀', '🔥', '❤️'];
-    return emojis.indexOf(emoji) + 1;
-  }
-
-  // Tip meme creator
-  async function tipMeme(memeId, amount) {
-    if (!currentUser) {
-      showNotification("Login required", "Please log in to tip creators");
-      return;
-    }
-    
-    if (cringeCoin < amount) {
-      showNotification("Insufficient funds", `You need at least ${amount} CringeCoins to tip`);
-      return;
-    }
-    
-    try {
-      const memeRef = db.collection('memes').doc(memeId);
-      const memeDoc = await memeRef.get();
-      
-      if (!memeDoc.exists) {
-        showNotification("Error", "Meme not found", true);
-        return;
-      }
-      
-      const memeData = memeDoc.data();
-      const creatorId = memeData.userId;
-      
-      if (!creatorId) {
-        showNotification("Error", "This meme doesn't have a creator to tip", true);
-        return;
-      }
-      
-      // Start transaction
-      await db.runTransaction(async (transaction) => {
-        const userRef = db.collection('users').doc(currentUser.uid);
-        const creatorRef = db.collection('users').doc(creatorId);
-        
-        const userDoc = await transaction.get(userRef);
-        const creatorDoc = await transaction.get(creatorRef);
-        
-        if (!userDoc.exists || !creatorDoc.exists) {
-          throw new Error("User not found");
-        }
-        
-        const userData = userDoc.data();
-        const creatorData = creatorDoc.data();
-        
-        if (userData.cringeCoin < amount) {
-          throw new Error("Insufficient coins");
-        }
-        
-        // Update balances
-        transaction.update(userRef, {
-          cringeCoin: userData.cringeCoin - amount
-        });
-        
-        transaction.update(creatorRef, {
-          cringeCoin: (creatorData.cringeCoin || 0) + amount
-        });
-        
-        // Record transaction
-        transaction.set(db.collection('transactions').doc(), {
-          from: currentUser.uid,
-          to: creatorId,
-          amount: amount,
-          memeId: memeId,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      });
-      
-      // Update local coin count
-      cringeCoin -= amount;
-      updateProfileUI();
-      
-      // Show notification
-      showNotification("Tip sent!", `You tipped ${amount} CringeCoins to the creator!`);
-      
-      // Visual feedback
-      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
-      if (card) {
-        const tipAnimation = document.createElement('div');
-        tipAnimation.style.cssText = `
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: rgba(166, 227, 161, 0.9);
-          color: #0f172a;
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-weight: 700;
-          font-size: 18px;
-          z-index: 10;
-          animation: tipAnimation 1.5s forwards;
-        `;
-        tipAnimation.innerHTML = `+${amount} CC!`;
-        card.appendChild(tipAnimation);
-        
-        setTimeout(() => {
-          tipAnimation.remove();
-        }, 1500);
-      }
-      
-    } catch (error) {
-      console.error('Error tipping meme:', error);
-      showNotification("Error", "Failed to send tip", true);
-    }
-  }
-
-  // Claim meme
-  async function claimMeme(memeId) {
-    if (!currentUser) {
-      showNotification("Login required", "Please log in to claim memes");
-      return;
-    }
-    
-    const claimBtn = document.querySelector(`.meme-card[data-id="${memeId}"] .claim-btn`);
-    if (claimBtn && claimBtn.disabled) {
-      showNotification("Already claimed", "This meme has already been claimed");
-      return;
-    }
-    
-    try {
-      const memeRef = db.collection('memes').doc(memeId);
-      const memeDoc = await memeRef.get();
-      
-      if (!memeDoc.exists) {
-        showNotification("Error", "Meme not found", true);
-        return;
-      }
-      
-      const memeData = memeDoc.data();
-      
-      if (memeData.claimedBy) {
-        showNotification("Already claimed", "This meme has already been claimed");
-        return;
-      }
-      
-      // Claim the meme
-      await memeRef.update({
-        claimedBy: currentUser.uid,
-        claimedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      
-      // Award coins
-      await updateCringeCoin(10);
-      
-      // Update UI
-      if (claimBtn) {
-        claimBtn.disabled = true;
-        claimBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-          </svg>
-          Claimed
-        `;
-      }
-      
-      // Add claimed by text
-      const claimedByText = document.createElement('div');
-      claimedByText.className = 'claimed-by';
-      claimedByText.innerHTML = `Claimed by <span style="color: var(--accent-blue);">@${currentUser.username}</span>`;
-      const cardFooter = document.querySelector(`.meme-card[data-id="${memeId}"] .card-footer`);
-      if (cardFooter) {
-        cardFooter.parentNode.insertBefore(claimedByText, cardFooter);
-      }
-      
-      showNotification("Meme claimed!", "+10 CringeCoins awarded");
-      
-    } catch (error) {
-      console.error('Error claiming meme:', error);
-      showNotification("Error", "Failed to claim meme", true);
-    }
-  }
-
-  // Save meme to collection
-  async function saveMeme(memeId) {
-    if (!currentUser) {
-      showNotification("Login required", "Please log in to save memes");
-      return;
-    }
-    
-    try {
-      // Show collections modal
-      const collectionsModal = document.getElementById('collectionsModal');
-      if (collectionsModal) {
-        collectionsModal.classList.add('open');
-        
-        // Load user collections
-        const collectionsList = document.getElementById('collectionsList');
-        if (collectionsList) {
-          collectionsList.innerHTML = '<div class="loading-spinner">Loading collections...</div>';
-          
-          const userRef = db.collection('users').doc(currentUser.uid);
-          const userDoc = await userRef.get();
-          
-          if (userDoc.exists) {
-            const userData = userDoc.data();
-            const collections = userData.collections || {};
-            const collectionNames = Object.keys(collections);
-            
-            if (collectionNames.length === 0) {
-              collectionsList.innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                  <p>You don't have any collections yet.</p>
-                  <button class="action-button save" id="createFirstCollection">Create your first collection</button>
-                </div>
-              `;
-              
-              document.getElementById('createFirstCollection').addEventListener('click', () => {
-                createCollection(memeId);
-              });
-            } else {
-              collectionsList.innerHTML = collectionNames.map(name => `
-                <div class="collection-item" data-collection="${escapeHTML(name)}">
-                  <div>${escapeHTML(name)}</div>
-                  <div class="collection-count">${collections[name].length} memes</div>
-                </div>
-              `).join('');
-              
-              // Add click handlers
-              document.querySelectorAll('.collection-item').forEach(item => {
-                item.addEventListener('click', async () => {
-                  const collectionName = item.dataset.collection;
-                  await addToCollection(memeId, collectionName);
-                  collectionsModal.classList.remove('open');
-                });
-              });
-            }
-          }
-        }
-      }
-      
-    } catch (error) {
-      console.error('Error saving meme:', error);
-      showNotification("Error", "Failed to save meme", true);
-    }
-  }
-
-  // Add meme to collection
-  async function addToCollection(memeId, collectionName) {
-    try {
-      const userRef = db.collection('users').doc(currentUser.uid);
-      
-      await db.runTransaction(async (transaction) => {
-        const userDoc = await transaction.get(userRef);
-        
-        if (!userDoc.exists) {
-          throw new Error("User not found");
-        }
-        
-        const userData = userDoc.data();
-        const collections = userData.collections || {};
-        
-        if (!collections[collectionName]) {
-          collections[collectionName] = [];
-        }
-        
-        if (!collections[collectionName].includes(memeId)) {
-          collections[collectionName].push(memeId);
-          transaction.update(userRef, { collections });
-        }
-      });
-      
-      showNotification("Saved!", `Added to "${collectionName}" collection`);
-      
-    } catch (error) {
-      console.error('Error adding to collection:', error);
-      showNotification("Error", "Failed to add to collection", true);
-    }
-  }
-
-  // Create new collection
-  async function createCollection(memeId = null) {
-    const collectionName = prompt("Enter collection name:");
-    if (!collectionName || collectionName.trim() === '') return;
-    
-    try {
-      const userRef = db.collection('users').doc(currentUser.uid);
-      
-      await db.runTransaction(async (transaction) => {
-        const userDoc = await transaction.get(userRef);
-        
-        if (!userDoc.exists) {
-          throw new Error("User not found");
-        }
-        
-        const userData = userDoc.data();
-        const collections = userData.collections || {};
-        
-        if (collections[collectionName]) {
-          throw new Error("Collection already exists");
-        }
-        
-        collections[collectionName] = memeId ? [memeId] : [];
-        transaction.update(userRef, { collections });
-      });
-      
-      if (memeId) {
-        showNotification("Created & Saved!", `New collection "${collectionName}" created and meme added`);
-      } else {
-        showNotification("Collection created!", `New collection "${collectionName}" created`);
-      }
-      
-      // Refresh collections panel if open
-      if (document.getElementById('collectionsPanel').classList.contains('open')) {
-        loadCollections();
-      }
-      
-    } catch (error) {
-      console.error('Error creating collection:', error);
-      showNotification("Error", error.message || "Failed to create collection", true);
-    }
-  }
-
-  // Remix meme
-  function remixMeme(memeId) {
-    if (!currentUser) {
-      showNotification("Login required", "Please log in to remix memes");
-      return;
-    }
-    
-    const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
-    if (card) {
-      const img = card.querySelector('.meme-image');
-      const title = card.querySelector('.meme-title').textContent;
-      
-      // Open meme editor with this meme
-      openMemeEditor(img.dataset.src, title);
-    }
-  }
-
-  // Open meme editor
-  function openMemeEditor(imageUrl = null, title = '') {
-    const editor = document.getElementById('memeEditor');
-    if (!editor) return;
-    
-    editor.style.display = 'flex';
-    
-    // Initialize Fabric.js canvas
-    initFabricEditor(imageUrl, title);
-  }
-
   // Initialize Fabric.js editor
   function initFabricEditor(imageUrl = null, title = '') {
     const canvasEl = document.getElementById('canvas');
@@ -2464,444 +2008,95 @@
     }
   }
 
-  // Load leaderboard
-  async function loadLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboardList');
-    if (!leaderboardList) return;
-    
-    leaderboardList.innerHTML = `
-      <div class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Loading cringe lords...</p>
-      </div>
-    `;
-    
-    try {
-      const usersRef = db.collection('users')
-        .orderBy('cringeCoin', 'desc')
-        .limit(10);
-      
-      const snapshot = await usersRef.get();
-      
-      if (snapshot.empty) {
-        leaderboardList.innerHTML = '<p>No users found</p>';
-        return;
-      }
-      
-      leaderboardList.innerHTML = '';
-      
-      snapshot.docs.forEach((doc, index) => {
-        const userData = doc.data();
-        const isCurrentUser = currentUser && doc.id === currentUser.uid;
-        
-        const leaderItem = document.createElement('div');
-        leaderItem.className = `leaderboard-item ${isCurrentUser ? 'current-user' : ''}`;
-        leaderItem.innerHTML = `
-          <div class="leaderboard-rank">#${index + 1}</div>
-          <div class="leaderboard-user">
-            <div class="user-avatar">${userData.username.charAt(0)}</div>
-            <div class="user-info">
-              <div class="username">${userData.username}</div>
-              <div class="user-stats">
-                <span class="cringe-coins">${userData.cringeCoin.toLocaleString()} CC</span>
-                <span class="streak">🔥 ${userData.streak || 0} day streak</span>
-              </div>
-            </div>
-          </div>
-          ${isCurrentUser ? '<div class="current-badge">YOU</div>' : ''}
-        `;
-        
-        leaderboardList.appendChild(leaderItem);
-      });
-      
-    } catch (error) {
-      console.error('Error loading leaderboard:', error);
-      leaderboardList.innerHTML = `
-        <div class="error-message">
-          <p>Failed to load leaderboard</p>
-          <button class="action-button save" onclick="loadLeaderboard()">Retry</button>
-        </div>
-      `;
-    }
-  }
-
-  // Load user collections
-  async function loadCollections() {
-    const collectionsGrid = document.getElementById('collectionsGrid');
-    if (!collectionsGrid) return;
-    
-    collectionsGrid.innerHTML = `
-      <div class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Loading your collections...</p>
-      </div>
-    `;
-    
-    if (!currentUser) {
-      collectionsGrid.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-          <p>Please log in to view your collections</p>
-          <button class="action-button save" onclick="showAuthModal()">Log In</button>
-        </div>
-      `;
-      return;
-    }
-    
-    try {
-      const userRef = db.collection('users').doc(currentUser.uid);
-      const userDoc = await userRef.get();
-      
-      if (!userDoc.exists) {
-        collectionsGrid.innerHTML = '<p>User not found</p>';
-        return;
-      }
-      
-      const userData = userDoc.data();
-      const collections = userData.collections || {};
-      const collectionNames = Object.keys(collections);
-      
-      if (collectionNames.length === 0) {
-        collectionsGrid.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-            <p>You don't have any collections yet</p>
-            <button class="action-button save" onclick="createCollection()">Create Collection</button>
-          </div>
-        `;
-        return;
-      }
-      
-      collectionsGrid.innerHTML = '';
-      
-      collectionNames.forEach(name => {
-        const collectionCard = document.createElement('div');
-        collectionCard.className = 'collection-card';
-        collectionCard.innerHTML = `
-          <div class="collection-title">${escapeHTML(name)}</div>
-          <div class="collection-count">${collections[name].length} memes</div>
-          <div class="collection-preview">
-            ${collections[name].slice(0, 3).map(id => `
-              <div class="preview-item" data-id="${id}"></div>
-            `).join('')}
-          </div>
-        `;
-        
-        // Add click handler
-        collectionCard.addEventListener('click', () => {
-          showCollectionDetail(name, collections[name]);
-        });
-        
-        collectionsGrid.appendChild(collectionCard);
-      });
-      
-      // Load preview images
-      loadCollectionPreviews();
-      
-    } catch (error) {
-      console.error('Error loading collections:', error);
-      collectionsGrid.innerHTML = `
-        <div class="error-message">
-          <p>Failed to load collections</p>
-          <button class="action-button save" onclick="loadCollections()">Retry</button>
-        </div>
-      `;
-    }
-  }
-
-  // Load collection previews
-  async function loadCollectionPreviews() {
-    const previewItems = document.querySelectorAll('.preview-item');
-    const memeIds = Array.from(previewItems).map(item => item.dataset.id);
-    
-    if (memeIds.length === 0) return;
-    
-    try {
-      const memesRef = db.collection('memes').where(firebase.firestore.FieldPath.documentId(), 'in', memeIds);
-      const snapshot = await memesRef.get();
-      
-      const memesMap = {};
-      snapshot.docs.forEach(doc => {
-        memesMap[doc.id] = doc.data();
-      });
-      
-      previewItems.forEach(item => {
-        const memeId = item.dataset.id;
-        const memeData = memesMap[memeId];
-        
-        if (memeData && memeData.url) {
-          item.style.backgroundImage = `url(${memeData.url})`;
-          item.style.backgroundSize = 'cover';
-          item.style.backgroundPosition = 'center';
-        } else {
-          item.style.backgroundColor = 'var(--card-bg)';
-          item.innerHTML = '<span>?</span>';
-        }
-      });
-      
-    } catch (error) {
-      console.error('Error loading collection previews:', error);
-    }
-  }
-
-  // Show collection detail
-  async function showCollectionDetail(collectionName, memeIds) {
-    const collectionDetailModal = document.getElementById('collectionDetailModal');
-    const collectionTitle = document.getElementById('collectionTitle');
-    const collectionMemesGrid = document.getElementById('collectionMemesGrid');
-    
-    if (!collectionDetailModal || !collectionTitle || !collectionMemesGrid) return;
-    
-    collectionTitle.textContent = collectionName;
-    collectionMemesGrid.innerHTML = `
-      <div class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Loading memes...</p>
-      </div>
-    `;
-    
-    collectionDetailModal.classList.add('open');
-    
-    try {
-      if (memeIds.length === 0) {
-        collectionMemesGrid.innerHTML = '<p>This collection is empty</p>';
-        return;
-      }
-      
-      // Get memes in batches of 10
-      const batches = [];
-      for (let i = 0; i < memeIds.length; i += 10) {
-        batches.push(memeIds.slice(i, i + 10));
-      }
-      
-      const memes = [];
-      
-      for (const batch of batches) {
-        const memesRef = db.collection('memes').where(firebase.firestore.FieldPath.documentId(), 'in', batch);
-        const snapshot = await memesRef.get();
-        
-        snapshot.docs.forEach(doc => {
-          memes.push({
-            id: doc.id,
-            ...doc.data()
-          });
-        });
-      }
-      
-      // Render memes
-      collectionMemesGrid.innerHTML = '';
-      
-      memes.forEach(meme => {
-        const memeItem = document.createElement('div');
-        memeItem.className = 'collection-meme-item';
-        memeItem.innerHTML = `
-          <div class="meme-preview" style="background-image: url('${meme.url}')"></div>
-          <div class="meme-title">${escapeHTML(meme.title)}</div>
-          <div class="meme-stats">
-            <span>${meme.ups || 0} upvotes</span>
-            <button class="action-button save small" onclick="removeFromCollection('${collectionName}', '${meme.id}')">Remove</button>
-          </div>
-        `;
-        
-        collectionMemesGrid.appendChild(memeItem);
-      });
-      
-    } catch (error) {
-      console.error('Error loading collection detail:', error);
-      collectionMemesGrid.innerHTML = `
-        <div class="error-message">
-          <p>Failed to load collection details</p>
-        </div>
-      `;
-    }
-  }
-
-  // Remove meme from collection
-  async function removeFromCollection(collectionName, memeId) {
-    if (!currentUser) {
-      showNotification("Login required", "Please log in to modify collections");
-      return;
-    }
-    
-    try {
-      const userRef = db.collection('users').doc(currentUser.uid);
-      
-      await db.runTransaction(async (transaction) => {
-        const userDoc = await transaction.get(userRef);
-        
-        if (!userDoc.exists) {
-          throw new Error("User not found");
-        }
-        
-        const userData = userDoc.data();
-        const collections = userData.collections || {};
-        
-        if (collections[collectionName]) {
-          collections[collectionName] = collections[collectionName].filter(id => id !== memeId);
-          transaction.update(userRef, { collections });
-        }
-      });
-      
-      showNotification("Removed", `Meme removed from "${collectionName}"`);
-      
-      // Refresh collection detail if open
-      if (document.getElementById('collectionDetailModal').classList.contains('open')) {
-        const collectionTitle = document.getElementById('collectionTitle').textContent;
-        showCollectionDetail(collectionTitle, document.querySelectorAll('.collection-meme-item').map(el => el.dataset.id));
-      }
-      
-    } catch (error) {
-      console.error('Error removing from collection:', error);
-      showNotification("Error", "Failed to remove from collection", true);
-    }
-  }
-
-  // Check daily crown
-  async function checkDailyCrown() {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const crownRef = db.collection('dailyCrowns').doc(today);
-      const crownDoc = await crownRef.get();
-      
-      if (crownDoc.exists) {
-        dailyCrown = crownDoc.data();
-      }
-      
-    } catch (error) {
-      console.error('Error checking daily crown:', error);
-    }
-  }
-
-  // Check user streak
-  async function checkStreak() {
+  // Load profile
+  async function loadProfile() {
     if (!currentUser) return;
     
     try {
       const userRef = db.collection('users').doc(currentUser.uid);
       const userDoc = await userRef.get();
       
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        streak = userData.streak || 0;
-        
-        // Update streak badge
-        const streakBadge = document.querySelector('.streak-badge');
-        if (streakBadge) {
-          streakBadge.innerHTML = `🔥 ${streak}d`;
-        }
+      if (!userDoc.exists) {
+        showNotification("User not found", "", true);
+        return;
       }
+      
+      const userData = userDoc.data();
+      currentUser = { ...currentUser, ...userData };
+      
+      // Update profile UI
+      document.getElementById('profileContent').innerHTML = `
+        <div class="profile-header">
+          <div class="avatar-large">U</div>
+          <div class="profile-details">
+            <h3>${escapeHTML(currentUser.username)}</h3>
+            <p>Member since ${formatDate(currentUser.createdAt)}</p>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <div class="stat-value">${currentUser.cringeCoin?.toLocaleString() || 0}</div>
+                <div>CringeCoins</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${currentUser.streak || 0}</div>
+                <div>Day Streak</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${currentUser.memeCount || 0}</div>
+                <div>Memes Posted</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="profile-section">
+          <h4>My Collections</h4>
+          <div class="collections-list" id="profileCollections">
+            <!-- Collections loaded here -->
+          </div>
+        </div>
+        <div class="profile-section">
+          <h4>Recent Activity</h4>
+          <div class="activity-list" id="userActivity">
+            <!-- Activity loaded here -->
+          </div>
+        </div>
+      `;
+      
+      // Load collections
+      loadProfileCollections();
+      
+      // Load activity
+      loadUserActivity();
       
     } catch (error) {
-      console.error('Error checking streak:', error);
+      console.error('Error loading profile:', error);
+      showNotification("Error", "Failed to load profile", true);
     }
   }
 
-  // Update user's CringeCoin balance
-  async function updateCringeCoin(amount) {
-    if (!currentUser || amount <= 0) return;
+  // Show notification
+  function showNotification(title, message, isError = false) {
+    const notification = document.getElementById('notification');
+    notification.querySelector('.notification-title').textContent = title;
+    notification.querySelector('.notification-message').textContent = message;
+    notification.style.backgroundColor = isError ? 'rgba(245, 189, 230, 0.9)' : 'rgba(26, 26, 42, 0.95)';
     
-    try {
-      const userRef = db.collection('users').doc(currentUser.uid);
-      
-      await db.runTransaction(async (transaction) => {
-        const userDoc = await transaction.get(userRef);
-        
-        if (!userDoc.exists) {
-          throw new Error("User not found");
-        }
-        
-        const userData = userDoc.data();
-        const newBalance = (userData.cringeCoin || 0) + amount;
-        
-        transaction.update(userRef, {
-          cringeCoin: newBalance
-        });
-      });
-      
-      // Update local balance
-      cringeCoin += amount;
-      
-      // Update UI
-      updateProfileUI();
-      
-      return true;
-      
-    } catch (error) {
-      console.error('Error updating CringeCoin:', error);
-      return false;
-    }
+    notification.classList.remove('show');
+    void notification.offsetWidth; // Trigger reflow
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 5000);
   }
 
-  // Update profile UI
-  function updateProfileUI() {
-    // Update coin balance in profile
-    const coinElements = document.querySelectorAll('.stat-value');
-    coinElements.forEach(el => {
-      if (el.textContent.includes(',')) {
-        el.textContent = cringeCoin.toLocaleString();
-      }
-    });
-    
-    // Update streak
-    const streakBadge = document.querySelector('.streak-badge');
-    if (streakBadge) {
-      streakBadge.innerHTML = `🔥 ${streak}d`;
-    }
-  }
-
-  // Setup PWA
-  function setupPWA() {
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-      const installPrompt = document.getElementById('installPrompt');
-      if (installPrompt && !localStorage.getItem('installPromptSeen')) {
-        setTimeout(() => {
-          installPrompt.style.display = 'block';
-          
-          document.getElementById('installBtn').addEventListener('click', () => {
-            installPrompt.style.display = 'none';
-            localStorage.setItem('installPromptSeen', 'true');
-            showNotification("Install instructions", "Tap the share button and select 'Add to Home Screen'");
-          });
-          
-          document.getElementById('dismissBtn').addEventListener('click', () => {
-            installPrompt.style.display = 'none';
-            localStorage.setItem('installPromptSeen', 'true');
-          });
-        }, 5000);
-      }
-    }
-  }
-
-  // Utility functions
-  function formatTimeAgo(timestamp) {
-    if (!timestamp) return 'just now';
-    
-    const now = new Date().getTime();
-    let time;
-    
-    if (timestamp.seconds) {
-      // Firebase timestamp
-      time = timestamp.seconds * 1000;
-    } else if (timestamp.toDate) {
-      // Firestore Timestamp object
-      time = timestamp.toDate().getTime();
-    } else if (typeof timestamp === 'string') {
-      // ISO string
-      time = new Date(timestamp).getTime();
-    } else {
-      // Assume milliseconds
-      time = timestamp;
-    }
-    
-    const diff = now - time;
-    
-    if (diff < 60000) return 'just now';
-    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
-    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
-    if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
-    
-    const date = new Date(time);
+  // Format date
+  function formatDate(timestamp) {
+    if (!timestamp) return 'Unknown';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleDateString();
   }
 
+  // Escape HTML
   function escapeHTML(str) {
     if (typeof str !== 'string') return '';
     return str.replace(/[&<>"']/g, m => ({
@@ -2913,6 +2108,7 @@
     }[m]));
   }
 
+  // Debounce function
   function debounce(func, wait) {
     let timeout;
     return function() {
@@ -2925,9 +2121,8 @@
     };
   }
 
-  // Initialize app
-  window.addEventListener('load', () => {
-    // Handle service worker registration
+  // Setup PWA
+  function setupPWA() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then(registration => {
@@ -2938,30 +2133,179 @@
         });
     }
     
-    // Setup manifest dynamically
-    const manifest = {
-      name: 'CringeScroll',
-      short_name: 'CringeScroll',
-      start_url: '/',
-      display: 'standalone',
-      background_color: '#0f0f1a',
-      theme_color: '#0f0f1a',
-      icons: [{
-        src: '/icon-192x192.png',
-        sizes: '192x192',
-        type: 'image/png'
-      }, {
-        src: '/icon-512x512.png',
-        sizes: '512x512',
-        type: 'image/png'
-      }]
-    };
+    // Install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      
+      if (!localStorage.getItem('installPromptSeen')) {
+        setTimeout(() => {
+          const installPrompt = document.getElementById('installPrompt');
+          if (installPrompt) {
+            installPrompt.style.display = 'block';
+          }
+        }, 5000);
+      }
+    });
+  }
+
+  // Add reaction to meme
+  async function addReaction(memeId, emoji) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to react to memes");
+      return;
+    }
     
-    const manifestElement = document.createElement('link');
-    manifestElement.rel = 'manifest';
-    manifestElement.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
-    document.head.appendChild(manifestElement);
-  });
+    try {
+      const memeRef = db.collection('memes').doc(memeId);
+      const memeDoc = await memeRef.get();
+      
+      if (!memeDoc.exists) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      const memeData = memeDoc.data();
+      const reactions = memeData.reactions || {};
+      
+      // Update reactions count
+      reactions[emoji] = (reactions[emoji] || 0) + 1;
+      
+      // Update meme document
+      await memeRef.update({
+        reactions: reactions,
+        ups: (memeData.ups || 0) + 1
+      });
+      
+      // Update user coins
+      await updateCringeCoin(1);
+      
+      // Update UI
+      const reactionCount = document.querySelector(`.meme-card[data-id="${memeId}"] .reaction-item:nth-child(${getEmojiIndex(emoji)}) .reaction-count`);
+      if (reactionCount) {
+        reactionCount.textContent = reactions[emoji];
+        reactionCount.classList.add('animated');
+        setTimeout(() => {
+          reactionCount.classList.remove('animated');
+        }, 300);
+      }
+      
+      // Update hot score if needed
+      await updateHotScore(memeId);
+      
+      showNotification("Reaction added!", "+1 CringeCoin earned");
+      
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+      showNotification("Error", "Failed to add reaction", true);
+    }
+  }
+
+  // Tip meme creator
+  async function tipMeme(memeId, amount) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to tip creators");
+      return;
+    }
+    
+    if (cringeCoin < amount) {
+      showNotification("Insufficient funds", `You need at least ${amount} CringeCoins to tip`);
+      return;
+    }
+    
+    try {
+      const memeRef = db.collection('memes').doc(memeId);
+      const memeDoc = await memeRef.get();
+      
+      if (!memeDoc.exists) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      const memeData = memeDoc.data();
+      const creatorId = memeData.userId;
+      
+      if (!creatorId) {
+        showNotification("Error", "This meme doesn't have a creator to tip", true);
+        return;
+      }
+      
+      // Start transaction
+      await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const creatorRef = db.collection('users').doc(creatorId);
+        
+        const userDoc = await transaction.get(userRef);
+        const creatorDoc = await transaction.get(creatorRef);
+        
+        if (!userDoc.exists || !creatorDoc.exists) {
+          throw new Error("User not found");
+        }
+        
+        const userData = userDoc.data();
+        const creatorData = creatorDoc.data();
+        
+        if (userData.cringeCoin < amount) {
+          throw new Error("Insufficient coins");
+        }
+        
+        // Update balances
+        transaction.update(userRef, {
+          cringeCoin: userData.cringeCoin - amount
+        });
+        
+        transaction.update(creatorRef, {
+          cringeCoin: (creatorData.cringeCoin || 0) + amount
+        });
+        
+        // Record transaction
+        transaction.set(db.collection('transactions').doc(), {
+          from: currentUser.uid,
+          to: creatorId,
+          amount: amount,
+          memeId: memeId,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+      
+      // Update local coin count
+      cringeCoin -= amount;
+      updateProfileUI();
+      
+      // Show notification
+      showNotification("Tip sent!", `You tipped ${amount} CringeCoins to the creator!`);
+      
+      // Visual feedback
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (card) {
+        const tipAnimation = document.createElement('div');
+        tipAnimation.style.cssText = `
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(166, 227, 161, 0.9);
+          color: #0f172a;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-weight: 700;
+          font-size: 18px;
+          z-index: 10;
+          animation: tipAnimation 1.5s forwards;
+        `;
+        tipAnimation.innerHTML = `+${amount} CC!`;
+        card.appendChild(tipAnimation);
+        
+        setTimeout(() => {
+          tipAnimation.remove();
+        }, 1500);
+      }
+      
+    } catch (error) {
+      console.error('Error tipping meme:', error);
+      showNotification("Error", "Failed to send tip", true);
+    }
+  }
 </script>
 </body>
 </html>
