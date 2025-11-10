@@ -15,10 +15,14 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/ScrollTrigger.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
   <style>
     :root {
-      /* Modern Dark Theme */
       --bg-primary: #0f0f1a;
+      --bg-secondary: #161625;
       --card-bg: #1a1a2a;
       --card-border: rgba(120, 100, 200, 0.15);
       --text-primary: #f0f0ff;
@@ -28,13 +32,13 @@
       --accent-pink: #f5bde6;
       --accent-green: #a6e3a1;
       --accent-yellow: #f9e2af;
+      --border-radius: 18px;
       --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.2);
       --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.3);
       --shadow-lg: 0 15px 50px rgba(0, 0, 0, 0.4);
       --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      --border-radius: 18px;
-      --sidebar-width: 280px;
       --header-height: 68px;
+      --sidebar-width: 280px;
     }
 
     * {
@@ -68,7 +72,7 @@
       position: relative;
     }
 
-    /* === SIDEBAR NAVIGATION === */
+    /* SIDEBAR NAVIGATION */
     .sidebar {
       width: var(--sidebar-width);
       background: rgba(20, 20, 35, 0.92);
@@ -82,7 +86,7 @@
       z-index: 1000;
       display: flex;
       flex-direction: column;
-      padding: 24px 0;
+      padding: 20px 0;
       transform: translateX(0);
       transition: var(--transition);
       box-shadow: var(--shadow-md);
@@ -93,9 +97,9 @@
     }
 
     .logo-container {
-      padding: 0 24px 24px;
+      padding: 0 24px 20px;
       border-bottom: 1px solid rgba(120, 100, 200, 0.15);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .logo {
@@ -116,19 +120,6 @@
       box-shadow: 0 0 15px rgba(137, 180, 250, 0.3);
       position: relative;
       overflow: hidden;
-      transform-style: preserve-3d;
-      transition: var(--transition);
-    }
-
-    .logo-icon:hover {
-      transform: rotateY(15deg) rotateX(5deg) scale(1.05);
-    }
-
-    .logo-icon::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
     }
 
     .logo-icon span {
@@ -137,7 +128,6 @@
       font-size: 18px;
       color: white;
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-      transform: translateZ(10px);
     }
 
     .logo-text {
@@ -148,12 +138,11 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      position: relative;
     }
 
     .nav-section {
       padding: 0 24px 16px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .nav-title {
@@ -166,12 +155,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .nav-title svg {
-      width: 16px;
-      height: 16px;
-      color: var(--accent-purple);
     }
 
     .nav-menu {
@@ -191,13 +174,11 @@
       font-weight: 500;
       transition: var(--transition);
       position: relative;
-      overflow: hidden;
     }
 
     .nav-item:hover, .nav-item.active {
       background: rgba(137, 180, 250, 0.1);
       color: var(--accent-blue);
-      transform: translateX(4px);
     }
 
     .nav-item::before {
@@ -221,92 +202,9 @@
       width: 22px;
       height: 22px;
       flex-shrink: 0;
-      transition: var(--transition);
     }
 
-    .nav-item:hover svg {
-      transform: scale(1.15);
-    }
-
-    .user-profile {
-      padding: 0 24px;
-      margin-top: auto;
-      border-top: 1px solid rgba(120, 100, 200, 0.15);
-      padding-top: 20px;
-    }
-
-    .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px;
-      background: rgba(30, 30, 50, 0.7);
-      border-radius: 16px;
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    .profile-card:hover {
-      background: rgba(137, 180, 250, 0.15);
-      transform: translateX(4px);
-    }
-
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 20px;
-      color: white;
-      flex-shrink: 0;
-      box-shadow: 0 0 15px rgba(137, 180, 250, 0.3);
-    }
-
-    .profile-info {
-      flex: 1;
-    }
-
-    .profile-name {
-      font-weight: 600;
-      margin-bottom: 2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .streak-badge {
-      background: rgba(166, 227, 161, 0.2);
-      color: var(--accent-green);
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .profile-stats {
-      display: flex;
-      gap: 16px;
-      margin-top: 8px;
-    }
-
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      font-size: 13px;
-    }
-
-    .stat-value {
-      font-weight: 700;
-      color: var(--accent-purple);
-      font-size: 16px;
-      margin-top: 2px;
-    }
-
-    /* === MAIN CONTENT AREA === */
+    /* MAIN CONTENT AREA */
     .main-content {
       flex: 1;
       margin-left: var(--sidebar-width);
@@ -326,16 +224,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
+      padding: 0 16px;
       position: sticky;
       top: 0;
       z-index: 999;
-      transition: var(--transition);
     }
 
-    .mobile-nav {
-      display: none;
-      gap: 20px;
+    .mobile-nav-btns {
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
 
     .hamburger-btn {
@@ -350,8 +248,6 @@
       color: var(--accent-blue);
       cursor: pointer;
       transition: var(--transition);
-      position: relative;
-      z-index: 1001;
     }
 
     .hamburger-btn:hover {
@@ -362,7 +258,7 @@
       flex: 1;
       max-width: 500px;
       position: relative;
-      margin: 0 24px;
+      margin: 0 16px;
     }
 
     .search-input {
@@ -377,12 +273,6 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.2);
-    }
-
     .search-icon {
       position: absolute;
       left: 18px;
@@ -394,14 +284,14 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .action-btn {
       background: rgba(30, 30, 50, 0.7);
       border: 1px solid rgba(120, 100, 200, 0.2);
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 14px;
       display: flex;
       align-items: center;
@@ -410,7 +300,6 @@
       cursor: pointer;
       transition: var(--transition);
       position: relative;
-      overflow: hidden;
     }
 
     .action-btn:hover {
@@ -419,23 +308,10 @@
       transform: translateY(-2px);
     }
 
-    .action-btn::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .action-btn:hover::after {
-      opacity: 1;
-    }
-
     .notification-badge {
       position: absolute;
-      top: -4px;
-      right: -4px;
+      top: -3px;
+      right: -3px;
       background: var(--accent-pink);
       color: white;
       font-size: 10px;
@@ -446,7 +322,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      box-shadow: 0 0 8px rgba(245, 189, 230, 0.7);
+      box-shadow: 0 0 0 2px var(--bg-primary);
     }
 
     .create-btn {
@@ -454,13 +330,13 @@
       color: white;
       border: none;
       padding: 0 20px;
-      height: 42px;
+      height: 44px;
       border-radius: 14px;
       font-weight: 600;
       font-size: 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 4px 20px rgba(137, 180, 250, 0.4);
       transition: var(--transition);
     }
@@ -470,13 +346,9 @@
       box-shadow: 0 6px 25px rgba(137, 180, 250, 0.6);
     }
 
-    .create-btn:active {
-      transform: translateY(1px) scale(0.98);
-    }
-
-    /* === CONTENT PANELS === */
+    /* CONTENT AREA */
     .content-area {
-      padding: 24px;
+      padding: 20px;
       overflow-y: auto;
       height: calc(100dvh - var(--header-height));
     }
@@ -485,13 +357,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
       gap: 16px;
     }
 
     .panel-title {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 700;
       background: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
       -webkit-background-clip: text;
@@ -507,21 +379,16 @@
       bottom: -4px;
       left: 0;
       width: 100%;
-      height: 4px;
+      height: 3px;
       background: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
       border-radius: 2px;
       opacity: 0.7;
     }
 
-    .panel-actions {
-      display: flex;
-      gap: 12px;
-    }
-
     .tab-container {
       display: flex;
-      gap: 12px;
-      margin-bottom: 28px;
+      gap: 10px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
     }
 
@@ -529,30 +396,15 @@
       background: rgba(30, 30, 50, 0.5);
       border: 1px solid rgba(120, 100, 200, 0.2);
       color: var(--text-secondary);
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 16px;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 15px;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       align-items: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .tab-btn::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(137, 180, 250, 0.1), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .tab-btn:hover::before {
-      opacity: 1;
+      gap: 8px;
     }
 
     .tab-btn:hover {
@@ -567,21 +419,16 @@
       box-shadow: 0 4px 15px rgba(137, 180, 250, 0.2);
     }
 
-    .tab-btn.active::before {
-      opacity: 1;
-    }
-
     .tab-btn svg {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
     }
 
-    /* === MEME CARDS === */
+    /* MEME CARDS */
     .feed-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 28px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
       padding-bottom: 40px;
     }
 
@@ -592,8 +439,6 @@
       box-shadow: var(--shadow-md);
       transition: var(--transition);
       position: relative;
-      transform-style: preserve-3d;
-      will-change: transform;
       border: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
@@ -601,13 +446,13 @@
     }
 
     .meme-card:hover {
-      transform: translateY(-8px) rotateX(2deg) rotateY(1deg) scale(1.02);
+      transform: translateY(-6px) scale(1.01);
       box-shadow: var(--shadow-lg);
       z-index: 10;
     }
 
     .card-header {
-      padding: 16px;
+      padding: 14px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -619,12 +464,11 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 8px;
     }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
       display: flex;
@@ -638,12 +482,12 @@
 
     .username {
       font-weight: 600;
-      font-size: 16px;
+      font-size: 15px;
       color: var(--accent-blue);
     }
 
     .post-time {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-secondary);
       margin-top: 2px;
     }
@@ -654,8 +498,8 @@
     }
 
     .card-btn {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 10px;
       background: rgba(30, 30, 50, 0.7);
       border: 1px solid var(--card-border);
@@ -670,17 +514,15 @@
     .card-btn:hover {
       background: rgba(137, 180, 250, 0.2);
       color: var(--accent-blue);
-      transform: scale(1.1);
     }
 
     .meme-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       line-height: 1.4;
-      margin: 0 16px 12px;
+      margin: 0 14px 12px;
       color: var(--text-primary);
       word-break: break-word;
-      hyphens: auto;
     }
 
     .meme-image-container {
@@ -691,36 +533,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transform-style: preserve-3d;
       transition: var(--transition);
     }
 
     .meme-card:hover .meme-image-container {
-      transform: scale(1.03) rotateX(1deg) rotateY(1deg);
+      transform: scale(1.02);
     }
 
     .meme-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: var(--transition);
-      display: block;
       opacity: 0;
-      transform: scale(1.02);
     }
 
     .meme-image.loaded {
       opacity: 1;
-      transform: scale(1);
     }
 
     .badge-container {
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 10px;
+      right: 10px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       z-index: 3;
     }
 
@@ -728,18 +566,18 @@
       background: rgba(166, 227, 161, 0.9);
       color: #0f172a;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 20px;
-      font-size: 14px;
+      font-size: 13px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       backdrop-filter: blur(5px);
-      box-shadow: 0 4px 15px rgba(166, 227, 161, 0.3);
+      box-shadow: 0 2px 8px rgba(166, 227, 161, 0.3);
     }
 
     .card-footer {
-      padding: 16px;
+      padding: 14px;
       border-top: 1px solid var(--card-border);
       margin-top: auto;
     }
@@ -747,7 +585,7 @@
     .reactions {
       display: flex;
       justify-content: space-around;
-      padding: 12px 0;
+      padding: 10px 0;
     }
 
     .reaction-item {
@@ -758,10 +596,10 @@
     }
 
     .reaction-btn {
-      font-size: 24px;
-      margin-bottom: 6px;
+      font-size: 22px;
+      margin-bottom: 4px;
       transition: var(--transition);
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
     }
 
     .reaction-btn:hover {
@@ -770,7 +608,7 @@
     }
 
     .reaction-count {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--accent-green);
     }
@@ -778,20 +616,20 @@
     .action-buttons {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
-      margin-top: 16px;
+      gap: 8px;
+      margin-top: 14px;
     }
 
     .action-button {
       flex: 1;
-      padding: 10px;
-      border-radius: 14px;
+      padding: 8px;
+      border-radius: 12px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
       transition: var(--transition);
       border: none;
@@ -819,55 +657,59 @@
       filter: brightness(1.1);
     }
 
-    .action-button:active {
-      transform: translateY(1px);
+    /* PANELS */
+    .panel {
+      position: fixed;
+      top: 0;
+      right: -380px;
+      width: 360px;
+      height: 100dvh;
+      background: rgba(26, 26, 42, 0.95);
+      backdrop-filter: blur(15px);
+      border-left: 1px solid var(--card-border);
+      z-index: 1500;
+      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.4);
     }
 
-    .action-button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
+    .panel.open {
+      right: 0;
     }
 
-    /* === AD CONTAINER === */
-    .ad-container {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
+    .panel-header {
       padding: 20px;
-      text-align: center;
-      border: 1px solid var(--card-border);
-      box-shadow: var(--shadow-md);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-content {
+      padding: 20px;
+      overflow-y: auto;
+      height: calc(100% - 70px);
+    }
+
+    .close-panel {
+      background: none;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
       transition: var(--transition);
-      position: relative;
-      overflow: hidden;
     }
 
-    .ad-container:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .ad-container::before {
-      content: "Sponsored";
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(137, 180, 250, 0.2);
-      color: var(--accent-blue);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 2px 10px;
-      border-radius: 12px;
-    }
-
-    .ad-content {
-      margin-top: 24px;
-      font-size: 18px;
-      font-weight: 600;
+    .close-panel:hover {
+      background: rgba(137, 180, 250, 0.1);
       color: var(--accent-blue);
     }
 
-    /* === MODALS AND PANELS === */
+    /* MODALS */
     .modal {
       display: none;
       position: fixed;
@@ -901,8 +743,6 @@
       transform: translateY(20px);
       opacity: 0;
       transition: transform 0.4s ease, opacity 0.4s ease;
-      position: relative;
-      overflow: hidden;
     }
 
     .modal.open .modal-content {
@@ -910,64 +750,7 @@
       opacity: 1;
     }
 
-    .panel {
-      position: fixed;
-      top: 0;
-      right: -380px;
-      width: 360px;
-      height: 100dvh;
-      background: rgba(26, 26, 42, 0.95);
-      backdrop-filter: blur(15px);
-      border-left: 1px solid var(--card-border);
-      z-index: 1500;
-      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.4);
-    }
-
-    .panel.open {
-      right: 0;
-    }
-
-    .panel-header {
-      padding: 24px;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .panel-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--accent-blue);
-    }
-
-    .close-panel {
-      background: none;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .close-panel:hover {
-      background: rgba(137, 180, 250, 0.1);
-      color: var(--accent-blue);
-    }
-
-    .panel-content {
-      padding: 24px;
-      overflow-y: auto;
-      height: calc(100% - 70px);
-    }
-
-    /* === NOTIFICATIONS === */
+    /* NOTIFICATIONS */
     .notification {
       position: fixed;
       bottom: 24px;
@@ -980,7 +763,7 @@
       border: 1px solid var(--card-border);
       box-shadow: var(--shadow-lg);
       transform: translateX(400px);
-      transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.2s;
+      transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
       z-index: 3000;
       max-width: 350px;
       display: flex;
@@ -1020,50 +803,44 @@
       line-height: 1.4;
     }
 
-    /* === 3D EFFECTS AND ANIMATIONS === */
-    .floating {
-      animation: floating 6s ease-in-out infinite;
-    }
-
-    @keyframes floating {
-      0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
-      50% { transform: translateY(-10px) rotateX(2deg) rotateY(1deg); }
-    }
-
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(137, 180, 250, 0.4); }
-      70% { box-shadow: 0 0 0 12px rgba(137, 180, 250, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(137, 180, 250, 0); }
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .glow {
+    /* LOADING STATES */
+    .skeleton-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      height: 480px;
       position: relative;
       overflow: hidden;
     }
 
-    .glow::after {
+    .skeleton-card::before {
       content: "";
       position: absolute;
-      inset: -2px;
-      background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue), var(--accent-pink), var(--accent-green));
-      background-size: 400% 400%;
-      z-index: -1;
-      border-radius: var(--border-radius);
-      opacity: 0.3;
-      animation: gradientBG 15s ease infinite;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: loading 1.5s infinite;
     }
 
-    /* === RESPONSIVE DESIGN === */
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* UTILITIES */
+    .hidden {
+      display: none !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-20 {
+      margin-top: 20px;
+    }
+
+    /* RESPONSIVE DESIGN */
     @media (max-width: 1024px) {
       :root {
         --sidebar-width: 80px;
@@ -1074,16 +851,12 @@
         overflow: hidden;
       }
       
-      .logo-text, .nav-title, .profile-info {
+      .logo-text, .nav-title, .nav-item span, .profile-info {
         display: none;
       }
       
       .logo-icon {
         margin: 0 auto;
-      }
-      
-      .nav-item span {
-        display: none;
       }
       
       .nav-item {
@@ -1093,10 +866,6 @@
       
       .nav-item svg {
         margin: 0 auto;
-      }
-      
-      .user-profile {
-        display: none;
       }
     }
 
@@ -1117,7 +886,7 @@
         margin-left: 0;
       }
       
-      .mobile-nav {
+      .mobile-nav-btns {
         display: flex;
       }
       
@@ -1133,70 +902,34 @@
         width: 100%;
         max-width: 400px;
       }
+      
+      .action-buttons {
+        flex-wrap: wrap;
+      }
+      
+      .action-button {
+        flex: 1 0 45%;
+      }
     }
 
-    /* === LOADING STATES === */
-    .skeleton-card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-      height: 500px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .skeleton-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      animation: loading 1.5s infinite;
-    }
-
-    @keyframes loading {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .loading-spinner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: var(--accent-blue);
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(137, 180, 250, 0.3);
-      border-radius: 50%;
-      border-top-color: var(--accent-blue);
-      animation: spin 1s linear infinite;
-      margin-bottom: 16px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* === CANVAS EFFECTS === */
-    #background-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      opacity: 0.3;
+    @media (max-width: 480px) {
+      .action-button {
+        flex: 1 0 100%;
+        margin-bottom: 8px;
+      }
+      
+      .reactions {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .reaction-item {
+        flex: 1 0 20%;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="background-canvas"></div>
-  
   <div id="app">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
@@ -1231,7 +964,7 @@
           </a>
           <a href="#" class="nav-item" data-tab="crowned">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6z"></path>
+              <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6l2-6z"></path>
             </svg>
             <span>Crowned</span>
           </a>
@@ -1264,12 +997,6 @@
             </svg>
             <span>Leaderboard</span>
           </a>
-          <a href="#" class="nav-item" id="dailyQuestsBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <span>Daily Quests</span>
-          </a>
         </div>
       </nav>
       
@@ -1281,13 +1008,6 @@
           Collections
         </div>
         <div class="nav-menu">
-          <a href="#" class="nav-item" id="collectionsBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6l2-6z"></path>
-            </svg>
-            <span>My Collections</span>
-          </a>
           <a href="#" class="nav-item" id="savedMemesBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path>
@@ -1297,26 +1017,21 @@
         </div>
       </nav>
       
-      <div class="user-profile">
-        <div class="profile-card" id="profileBtn">
-          <div class="avatar">U</div>
-          <div class="profile-info">
-            <div class="profile-name">
-              <span>User3781</span>
-              <div class="streak-badge">🔥 5d</div>
-            </div>
-            <div class="profile-stats">
-              <div class="stat-item">
-                <span>Coin Balance</span>
-                <div class="stat-value">2,450</div>
-              </div>
-              <div class="stat-item">
-                <span>Rank</span>
-                <div class="stat-value">#137</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="nav-section" style="margin-top: auto; border-top: 1px solid rgba(120, 100, 200, 0.15); padding-top: 15px;">
+        <a href="#" class="nav-item" id="profileBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>My Profile</span>
+        </a>
+        <a href="#" class="nav-item" id="settingsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
       </div>
     </aside>
     
@@ -1329,13 +1044,17 @@
           </svg>
         </button>
         
-        <div class="mobile-nav">
-          <button class="action-btn" id="searchBtn">
+        <div class="search-bar">
+          <div class="search-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-          </button>
-          <button class="action-btn" id="notificationsBtn">
+          </div>
+          <input type="text" class="search-input" placeholder="Search memes, users...">
+        </div>
+        
+        <div class="header-actions">
+          <button class="action-btn" id="notificationsBtn" title="Notifications">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               <path d="M15 8h.01"></path>
@@ -1343,36 +1062,11 @@
             </svg>
             <span class="notification-badge">3</span>
           </button>
-        </div>
-        
-        <div class="search-bar" id="searchBar">
-          <div class="search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </div>
-          <input type="text" class="search-input" placeholder="Search memes, users, collections...">
-        </div>
-        
-        <div class="header-actions">
           <button class="action-btn" id="rouletteBtn" title="Cringe Roulette">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 21a9 9 0 100-18a9 9 0 000 18z"></path>
               <path d="M12 16v-4"></path>
               <path d="M12 8h.01"></path>
-            </svg>
-          </button>
-          <button class="action-btn" id="glowBtn" title="Toggle Theme">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="M4.93 4.93l1.41 1.41"></path>
-              <path d="M17.66 17.66l1.41 1.41"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-              <path d="M4.93 19.07l1.41-1.41"></path>
-              <path d="M17.66 6.34l1.41-1.41"></path>
-              <circle cx="12" cy="12" r="4"></circle>
             </svg>
           </button>
           <button class="create-btn" id="createBtn">
@@ -1410,7 +1104,8 @@
           </button>
           <button class="tab-btn" data-tab="mymemes">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7a2 2 0 002-2h14a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"></path>
             </svg>
             My Memes
           </button>
@@ -1418,465 +1113,13 @@
         
         <div class="feed-grid" id="feed">
           <!-- Content loaded dynamically -->
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
         </div>
       </div>
     </main>
   </div>
-  
-  <!-- Panels -->
-  <div class="panel" id="chatPanel">
-    <div class="panel-header">
-      <h2 class="panel-title">💬 Cringe Chat</h2>
-      <button class="close-panel" id="closeChatPanel">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    <div class="panel-content">
-      <div id="chatMessages">
-        <!-- Chat messages loaded here -->
-      </div>
-      <div class="chat-input">
-        <input type="text" id="chatMessageInput" placeholder="Type a message...">
-        <button id="sendMessageBtn">Send</button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="panel" id="leaderboardPanel">
-    <div class="panel-header">
-      <h2 class="panel-title">🏆 Cringe Lords</h2>
-      <button class="close-panel" id="closeLeaderboardPanel">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    <div class="panel-content">
-      <div class="leaderboard-list" id="leaderboardList">
-        <!-- Leaderboard loaded here -->
-      </div>
-    </div>
-  </div>
-  
-  <div class="panel" id="collectionsPanel">
-    <div class="panel-header">
-      <h2 class="panel-title">📁 My Collections</h2>
-      <button class="close-panel" id="closeCollectionsPanel">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    <div class="panel-content">
-      <div class="collections-grid" id="collectionsGrid">
-        <!-- Collections loaded here -->
-      </div>
-      <button class="action-button save" id="createCollectionBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14m7-7H5"></path>
-        </svg>
-        Create New Collection
-      </button>
-    </div>
-  </div>
-  
-  <!-- Modals -->
-  <div class="modal" id="authModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Welcome to CringeScroll</h2>
-        <button class="close-panel" id="closeAuthModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p style="margin-bottom: 24px; color: var(--text-secondary);">Sign in to unlock all features</p>
-        <button class="action-button save" style="margin-bottom: 16px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-          </svg>
-          Continue with Google
-        </button>
-        <button class="action-button tip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
-          </svg>
-          Continue with Facebook
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal" id="createMemeModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Create New Meme</h2>
-        <button class="close-panel" id="closeCreateMemeModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Top Text</label>
-          <input type="text" class="form-control" id="topText" maxlength="50">
-        </div>
-        <div class="form-group">
-          <label>Bottom Text</label>
-          <input type="text" class="form-control" id="bottomText" maxlength="50">
-        </div>
-        <div class="form-group">
-          <label>Image URL</label>
-          <input type="url" class="form-control" id="imageUrl" required>
-        </div>
-        <div class="form-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="anonymousMode">
-            <span>Post Anonymously</span>
-          </label>
-        </div>
-        <button class="action-button save" id="generateMemeBtn">Generate Preview</button>
-        <div class="preview-container" id="memePreview">
-          <!-- Preview loaded here -->
-        </div>
-        <button class="action-button save" id="postMemeBtn">Post Meme</button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="modal" id="profileModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">My Profile</h2>
-        <button class="close-panel" id="closeProfileModal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="profile-header">
-          <div class="avatar-large">U</div>
-          <div class="profile-details">
-            <h3>User3781</h3>
-            <p>Member since Jan 2024</p>
-            <div class="profile-stats">
-              <div class="stat-item">
-                <div class="stat-value">2,450</div>
-                <div>CringeCoins</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">5</div>
-                <div>Day Streak</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">42</div>
-                <div>Memes Posted</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="profile-section">
-          <h4>My Collections</h4>
-          <div class="collections-list" id="profileCollections">
-            <!-- Collections loaded here -->
-          </div>
-        </div>
-        <div class="profile-section">
-          <h4>Recent Activity</h4>
-          <div class="activity-list" id="userActivity">
-            <!-- Activity loaded here -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="notification" id="notification">
-    <div class="notification-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-      </svg>
-    </div>
-    <div class="notification-content">
-      <div class="notification-title">Welcome to CringeScroll!</div>
-      <div class="notification-message">The most chaotic meme platform on the internet. Get ready to scroll!</div>
-    </div>
-  </div>
-  
-  <script>
-    // Initialize 3D background
-    document.addEventListener('DOMContentLoaded', () => {
-      const canvas = document.createElement('canvas');
-      canvas.id = 'background-canvas';
-      document.body.insertBefore(canvas, document.body.firstChild);
-      
-      // Initialize Three.js scene
-      let scene, camera, renderer, particles;
-      
-      function init() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-        camera.position.z = 300;
-        
-        renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('background-canvas'), alpha: true });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        
-        // Create particles
-        const particleCount = 2000;
-        const positions = new Float32Array(particleCount * 3);
-        const sizes = new Float32Array(particleCount);
-        
-        for (let i = 0; i < particleCount * 3; i += 3) {
-          positions[i] = (Math.random() - 0.5) * 2000;
-          positions[i + 1] = (Math.random() - 0.5) * 2000;
-          positions[i + 2] = (Math.random() - 0.5) * 2000;
-          
-          sizes[i / 3] = Math.random() * 10 + 5;
-        }
-        
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-        
-        const material = new THREE.PointsMaterial({ 
-          color: 0x89b4fa,
-          sizeAttenuation: true,
-          transparent: true,
-          opacity: 0.8
-        });
-        
-        particles = new THREE.Points(geometry, material);
-        scene.add(particles);
-        
-        // Animation
-        function animate() {
-          requestAnimationFrame(animate);
-          
-          particles.rotation.x += 0.0001;
-          particles.rotation.y += 0.0002;
-          
-          const positions = particles.geometry.attributes.position.array;
-          for (let i = 0; i < positions.length; i += 3) {
-            positions[i + 2] += 0.2;
-            if (positions[i + 2] > 1000) {
-              positions[i + 2] = -1000;
-            }
-          }
-          particles.geometry.attributes.position.needsUpdate = true;
-          
-          renderer.render(scene, camera);
-        }
-        
-        animate();
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-      }
-      
-      init();
-      
-      // Sidebar toggle
-      const toggleSidebar = document.getElementById('toggleSidebar');
-      const sidebar = document.querySelector('.sidebar');
-      
-      toggleSidebar.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-      });
-      
-      // Tab switching
-      document.querySelectorAll('.tab-btn, .nav-item').forEach(tab => {
-        tab.addEventListener('click', (e) => {
-          e.preventDefault();
-          const tabName = tab.dataset.tab;
-          
-          // Update active tab
-          document.querySelectorAll('.tab-btn, .nav-item').forEach(t => {
-            t.classList.remove('active');
-          });
-          tab.classList.add('active');
-          
-          // Load content for tab
-          loadFeedContent(tabName);
-        });
-      });
-      
-      // Initial load
-      loadFeedContent('hot');
-      
-      // Show welcome notification
-      setTimeout(() => {
-        document.getElementById('notification').classList.add('show');
-      }, 1000);
-      
-      setTimeout(() => {
-        document.getElementById('notification').classList.remove('show');
-      }, 5000);
-    });
-    
-    function loadFeedContent(tab) {
-      const feed = document.getElementById('feed');
-      feed.innerHTML = `
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-      `;
-      
-      // Simulate loading delay
-      setTimeout(() => {
-        feed.innerHTML = '';
-        
-        // Generate sample memes based on tab
-        const memeCount = tab === 'mymemes' ? 3 : 6;
-        
-        for (let i = 0; i < memeCount; i++) {
-          const meme = createMemeCard(i, tab);
-          feed.appendChild(meme);
-        }
-        
-        // Insert ad after every 2 memes
-        if (tab !== 'mymemes') {
-          const adElement = document.createElement('div');
-          adElement.className = 'ad-container glow';
-          adElement.innerHTML = `
-            <div class="ad-content">Discover the ultimate meme creation tool</div>
-            <button class="action-button tip" style="margin-top: 16px;">Try Premium</button>
-          `;
-          feed.insertBefore(adElement, feed.children[2]);
-        }
-      }, 800);
-    }
-    
-    function createMemeCard(index, tab) {
-      const card = document.createElement('div');
-      card.className = 'meme-card floating';
-      
-      // Random data for demo
-      const usernames = ['MemeLord666', 'CringeQueen', 'DankMaster', 'LOLWizard', 'SavageScroller'];
-      const titles = [
-        "When your code finally works but you don't know why",
-        "Me trying to explain memes to my parents",
-        "How I feel after scrolling CringeScroll for 3 hours",
-        "My boss when I ask for a raise",
-        "That one friend who always sends cringe memes",
-        "When someone says they don't like memes"
-      ];
-      const reactions = [
-        { emoji: '💀', count: Math.floor(Math.random() * 5000) + 1000 },
-        { emoji: '😂', count: Math.floor(Math.random() * 3000) + 500 },
-        { emoji: '🤡', count: Math.floor(Math.random() * 2000) + 300 },
-        { emoji: '🔥', count: Math.floor(Math.random() * 1500) + 200 }
-      ];
-      
-      const username = usernames[Math.floor(Math.random() * usernames.length)];
-      const title = titles[Math.floor(Math.random() * titles.length)];
-      const reactionData = reactions[Math.floor(Math.random() * reactions.length)];
-      const isUserGenerated = tab === 'mymemes' || Math.random() > 0.7;
-      
-      card.innerHTML = `
-        <div class="card-header">
-          <div class="user-info">
-            <div class="user-avatar">${username.charAt(0)}</div>
-            <div>
-              <div class="username">${username}</div>
-              <div class="post-time">2 hours ago</div>
-            </div>
-          </div>
-          <div class="card-actions">
-            <button class="card-btn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <h3 class="meme-title">${title}</h3>
-        <div class="meme-image-container">
-          <div class="badge-container">
-            <div class="reaction-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-              ${reactionData.count.toLocaleString()}
-            </div>
-            ${isUserGenerated ? `<div class="reaction-badge" style="background: rgba(245, 189, 230, 0.9);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
-                <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
-              User Generated
-            </div>` : ''}
-          </div>
-          <img class="meme-image loaded" src="https://picsum.photos/seed/${index}/300/300?random=${Math.random()}" alt="Cringe meme">
-        </div>
-        <div class="card-footer">
-          <div class="reactions">
-            ${reactions.map(r => `
-              <div class="reaction-item">
-                <div class="reaction-btn">${r.emoji}</div>
-                <div class="reaction-count">${Math.floor(r.count * (0.5 + Math.random() * 0.5)).toLocaleString()}</div>
-              </div>
-            `).join('')}
-          </div>
-          <div class="action-buttons">
-            <button class="action-button tip">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Tip 5 CC
-            </button>
-            <button class="action-button claim">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-              </svg>
-              Claim
-            </button>
-            <button class="action-button save">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path>
-              </svg>
-              Save
-            </button>
-            <button class="action-button remix">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 002-2v-4M17 9l-5 5-5-5M12 12.8V2.5"></path>
-              </svg>
-              Remix
-            </button>
-          </div>
-        </div>
-      `;
-      
-      return card;
-    }
-    
-    function showNotification(title, message) {
-      const notification = document.getElementById('notification');
-      notification.querySelector('.notification-title').textContent = title;
-      notification.querySelector('.notification-message').textContent = message;
-      
-      notification.classList.remove('show');
-      void notification.offsetWidth; // Trigger reflow
-      notification.classList.add('show');
-      
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 5000);
-    }
-  </script>
   <script>
   // Initialize Firebase after DOM load
   document.addEventListener('DOMContentLoaded', async () => {
@@ -2530,7 +1773,7 @@
             img.classList.add('loaded');
           };
           img.onerror = () => {
-            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM2NjYiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcnJvciBMb2FkaW5nIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+            img.src = 'image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM2NjYiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcnJvciBMb2FkaW5nIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
           };
           imageObserver.unobserve(img);
         }
