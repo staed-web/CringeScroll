@@ -10,19 +10,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZjBmMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IlNwYWNlIEdyb3Rlc2ssIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5DUzwvdGV4dD4KPC9zdmc+Cg=="/>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/ScrollTrigger.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZjBmMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IlNwYWNlIEdyb3Rlc2ssIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5DUzwvdGV4dD4KPC9zdmc+Cg=="/>
+  <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <!-- 3D Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <!-- Animation Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/ScrollTrigger.min.js"></script>
+  <!-- Fabric.js for Meme Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
   <style>
     :root {
+      /* Modern Dark Theme */
       --bg-primary: #0f0f1a;
-      --bg-secondary: #161625;
       --card-bg: #1a1a2a;
       --card-border: rgba(120, 100, 200, 0.15);
       --text-primary: #f0f0ff;
@@ -32,13 +36,14 @@
       --accent-pink: #f5bde6;
       --accent-green: #a6e3a1;
       --accent-yellow: #f9e2af;
-      --border-radius: 18px;
       --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.2);
       --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.3);
       --shadow-lg: 0 15px 50px rgba(0, 0, 0, 0.4);
       --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      --header-height: 68px;
+      --border-radius: 18px;
       --sidebar-width: 280px;
+      --header-height: 72px;
+      --panel-width: 380px;
     }
 
     * {
@@ -72,7 +77,7 @@
       position: relative;
     }
 
-    /* SIDEBAR NAVIGATION */
+    /* === SIDEBAR NAVIGATION === */
     .sidebar {
       width: var(--sidebar-width);
       background: rgba(20, 20, 35, 0.92);
@@ -86,7 +91,7 @@
       z-index: 1000;
       display: flex;
       flex-direction: column;
-      padding: 20px 0;
+      padding: 24px 0;
       transform: translateX(0);
       transition: var(--transition);
       box-shadow: var(--shadow-md);
@@ -97,9 +102,9 @@
     }
 
     .logo-container {
-      padding: 0 24px 20px;
+      padding: 0 24px 24px;
       border-bottom: 1px solid rgba(120, 100, 200, 0.15);
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .logo {
@@ -120,6 +125,19 @@
       box-shadow: 0 0 15px rgba(137, 180, 250, 0.3);
       position: relative;
       overflow: hidden;
+      transform-style: preserve-3d;
+      transition: var(--transition);
+    }
+
+    .logo-icon:hover {
+      transform: rotateY(15deg) rotateX(5deg) scale(1.05);
+    }
+
+    .logo-icon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
     }
 
     .logo-icon span {
@@ -128,6 +146,7 @@
       font-size: 18px;
       color: white;
       text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      transform: translateZ(10px);
     }
 
     .logo-text {
@@ -138,11 +157,12 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      position: relative;
     }
 
     .nav-section {
       padding: 0 24px 16px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .nav-title {
@@ -155,6 +175,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .nav-title svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent-purple);
     }
 
     .nav-menu {
@@ -174,11 +200,13 @@
       font-weight: 500;
       transition: var(--transition);
       position: relative;
+      overflow: hidden;
     }
 
     .nav-item:hover, .nav-item.active {
       background: rgba(137, 180, 250, 0.1);
       color: var(--accent-blue);
+      transform: translateX(4px);
     }
 
     .nav-item::before {
@@ -202,9 +230,14 @@
       width: 22px;
       height: 22px;
       flex-shrink: 0;
+      transition: var(--transition);
     }
 
-    /* MAIN CONTENT AREA */
+    .nav-item:hover svg {
+      transform: scale(1.15);
+    }
+
+    /* === MAIN CONTENT AREA === */
     .main-content {
       flex: 1;
       margin-left: var(--sidebar-width);
@@ -224,16 +257,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 24px;
       position: sticky;
       top: 0;
       z-index: 999;
+      transition: var(--transition);
     }
 
-    .mobile-nav-btns {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    .mobile-nav {
+      display: none;
+      gap: 16px;
     }
 
     .hamburger-btn {
@@ -248,6 +281,8 @@
       color: var(--accent-blue);
       cursor: pointer;
       transition: var(--transition);
+      position: relative;
+      z-index: 1001;
     }
 
     .hamburger-btn:hover {
@@ -258,7 +293,13 @@
       flex: 1;
       max-width: 500px;
       position: relative;
-      margin: 0 16px;
+      margin: 0 24px;
+    }
+
+    .search-bar.mobile {
+      display: none;
+      max-width: 100%;
+      margin: 0 12px;
     }
 
     .search-input {
@@ -271,6 +312,12 @@
       font-size: 16px;
       transition: var(--transition);
       font-family: 'Inter', sans-serif;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.2);
     }
 
     .search-icon {
@@ -290,8 +337,8 @@
     .action-btn {
       background: rgba(30, 30, 50, 0.7);
       border: 1px solid rgba(120, 100, 200, 0.2);
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 14px;
       display: flex;
       align-items: center;
@@ -300,6 +347,7 @@
       cursor: pointer;
       transition: var(--transition);
       position: relative;
+      overflow: hidden;
     }
 
     .action-btn:hover {
@@ -308,10 +356,23 @@
       transform: translateY(-2px);
     }
 
+    .action-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .action-btn:hover::after {
+      opacity: 1;
+    }
+
     .notification-badge {
       position: absolute;
-      top: -3px;
-      right: -3px;
+      top: -4px;
+      right: -4px;
       background: var(--accent-pink);
       color: white;
       font-size: 10px;
@@ -322,7 +383,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      box-shadow: 0 0 0 2px var(--bg-primary);
+      box-shadow: 0 0 8px rgba(245, 189, 230, 0.7);
     }
 
     .create-btn {
@@ -330,13 +391,13 @@
       color: white;
       border: none;
       padding: 0 20px;
-      height: 44px;
+      height: 42px;
       border-radius: 14px;
       font-weight: 600;
       font-size: 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       box-shadow: 0 4px 20px rgba(137, 180, 250, 0.4);
       transition: var(--transition);
     }
@@ -346,9 +407,13 @@
       box-shadow: 0 6px 25px rgba(137, 180, 250, 0.6);
     }
 
-    /* CONTENT AREA */
+    .create-btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* === CONTENT PANELS === */
     .content-area {
-      padding: 20px;
+      padding: 24px;
       overflow-y: auto;
       height: calc(100dvh - var(--header-height));
     }
@@ -357,13 +422,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
       gap: 16px;
     }
 
     .panel-title {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
       background: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
       -webkit-background-clip: text;
@@ -379,16 +444,21 @@
       bottom: -4px;
       left: 0;
       width: 100%;
-      height: 3px;
+      height: 4px;
       background: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
       border-radius: 2px;
       opacity: 0.7;
     }
 
+    .panel-actions {
+      display: flex;
+      gap: 12px;
+    }
+
     .tab-container {
       display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
+      gap: 12px;
+      margin-bottom: 28px;
       flex-wrap: wrap;
     }
 
@@ -396,15 +466,30 @@
       background: rgba(30, 30, 50, 0.5);
       border: 1px solid rgba(120, 100, 200, 0.2);
       color: var(--text-secondary);
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 16px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(137, 180, 250, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tab-btn:hover::before {
+      opacity: 1;
     }
 
     .tab-btn:hover {
@@ -419,16 +504,21 @@
       box-shadow: 0 4px 15px rgba(137, 180, 250, 0.2);
     }
 
-    .tab-btn svg {
-      width: 18px;
-      height: 18px;
+    .tab-btn.active::before {
+      opacity: 1;
     }
 
-    /* MEME CARDS */
+    .tab-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* === MEME CARDS === */
     .feed-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
       padding-bottom: 40px;
     }
 
@@ -439,6 +529,8 @@
       box-shadow: var(--shadow-md);
       transition: var(--transition);
       position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
       border: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
@@ -446,13 +538,13 @@
     }
 
     .meme-card:hover {
-      transform: translateY(-6px) scale(1.01);
+      transform: translateY(-8px) rotateX(2deg) rotateY(1deg) scale(1.02);
       box-shadow: var(--shadow-lg);
       z-index: 10;
     }
 
     .card-header {
-      padding: 14px;
+      padding: 16px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -464,11 +556,12 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      margin-bottom: 8px;
     }
 
     .user-avatar {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
       display: flex;
@@ -482,12 +575,12 @@
 
     .username {
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
       color: var(--accent-blue);
     }
 
     .post-time {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-secondary);
       margin-top: 2px;
     }
@@ -498,8 +591,8 @@
     }
 
     .card-btn {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 10px;
       background: rgba(30, 30, 50, 0.7);
       border: 1px solid var(--card-border);
@@ -514,15 +607,17 @@
     .card-btn:hover {
       background: rgba(137, 180, 250, 0.2);
       color: var(--accent-blue);
+      transform: scale(1.1);
     }
 
     .meme-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 700;
       line-height: 1.4;
-      margin: 0 14px 12px;
+      margin: 0 16px 12px;
       color: var(--text-primary);
       word-break: break-word;
+      hyphens: auto;
     }
 
     .meme-image-container {
@@ -533,32 +628,36 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transform-style: preserve-3d;
       transition: var(--transition);
     }
 
     .meme-card:hover .meme-image-container {
-      transform: scale(1.02);
+      transform: scale(1.03) rotateX(1deg) rotateY(1deg);
     }
 
     .meme-image {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       transition: var(--transition);
+      display: block;
       opacity: 0;
+      transform: scale(1.02);
     }
 
     .meme-image.loaded {
       opacity: 1;
+      transform: scale(1);
     }
 
     .badge-container {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 12px;
+      left: 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       z-index: 3;
     }
 
@@ -566,18 +665,18 @@
       background: rgba(166, 227, 161, 0.9);
       color: #0f172a;
       font-weight: 700;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 14px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       backdrop-filter: blur(5px);
-      box-shadow: 0 2px 8px rgba(166, 227, 161, 0.3);
+      box-shadow: 0 4px 15px rgba(166, 227, 161, 0.3);
     }
 
     .card-footer {
-      padding: 14px;
+      padding: 16px;
       border-top: 1px solid var(--card-border);
       margin-top: auto;
     }
@@ -585,7 +684,7 @@
     .reactions {
       display: flex;
       justify-content: space-around;
-      padding: 10px 0;
+      padding: 12px 0;
     }
 
     .reaction-item {
@@ -596,10 +695,10 @@
     }
 
     .reaction-btn {
-      font-size: 22px;
-      margin-bottom: 4px;
+      font-size: 24px;
+      margin-bottom: 6px;
       transition: var(--transition);
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
     .reaction-btn:hover {
@@ -608,7 +707,7 @@
     }
 
     .reaction-count {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--accent-green);
     }
@@ -616,20 +715,20 @@
     .action-buttons {
       display: flex;
       justify-content: space-between;
-      gap: 8px;
-      margin-top: 14px;
+      gap: 10px;
+      margin-top: 16px;
     }
 
     .action-button {
       flex: 1;
-      padding: 8px;
-      border-radius: 12px;
+      padding: 10px;
+      border-radius: 14px;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       cursor: pointer;
       transition: var(--transition);
       border: none;
@@ -657,59 +756,55 @@
       filter: brightness(1.1);
     }
 
-    /* PANELS */
-    .panel {
-      position: fixed;
-      top: 0;
-      right: -380px;
-      width: 360px;
-      height: 100dvh;
-      background: rgba(26, 26, 42, 0.95);
-      backdrop-filter: blur(15px);
-      border-left: 1px solid var(--card-border);
-      z-index: 1500;
-      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.4);
+    .action-button:active {
+      transform: translateY(1px);
     }
 
-    .panel.open {
-      right: 0;
+    .action-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .panel-header {
+    /* === AD CONTAINER === */
+    .ad-container {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
       padding: 20px;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .panel-content {
-      padding: 20px;
-      overflow-y: auto;
-      height: calc(100% - 70px);
-    }
-
-    .close-panel {
-      background: none;
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      cursor: pointer;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-md);
       transition: var(--transition);
+      position: relative;
+      overflow: hidden;
     }
 
-    .close-panel:hover {
-      background: rgba(137, 180, 250, 0.1);
+    .ad-container:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .ad-container::before {
+      content: "Sponsored";
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(137, 180, 250, 0.2);
+      color: var(--accent-blue);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 12px;
+    }
+
+    .ad-content {
+      margin-top: 24px;
+      font-size: 18px;
+      font-weight: 600;
       color: var(--accent-blue);
     }
 
-    /* MODALS */
+    /* === MODALS AND PANELS === */
     .modal {
       display: none;
       position: fixed;
@@ -743,6 +838,8 @@
       transform: translateY(20px);
       opacity: 0;
       transition: transform 0.4s ease, opacity 0.4s ease;
+      position: relative;
+      overflow: hidden;
     }
 
     .modal.open .modal-content {
@@ -750,11 +847,68 @@
       opacity: 1;
     }
 
-    /* NOTIFICATIONS */
+    .panel {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: var(--panel-width);
+      height: 100dvh;
+      background: rgba(26, 26, 42, 0.95);
+      backdrop-filter: blur(15px);
+      border-left: 1px solid var(--card-border);
+      z-index: 1500;
+      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: -5px 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel.open {
+      right: 0;
+    }
+
+    .panel-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .close-panel {
+      background: none;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .close-panel:hover {
+      background: rgba(137, 180, 250, 0.1);
+      color: var(--accent-blue);
+    }
+
+    .panel-content {
+      padding: 24px;
+      overflow-y: auto;
+      height: calc(100% - 70px);
+    }
+
+    /* === NOTIFICATIONS === */
     .notification {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      top: 20px;
+      right: 20px;
       background: rgba(26, 26, 42, 0.95);
       backdrop-filter: blur(10px);
       color: var(--text-primary);
@@ -763,7 +917,7 @@
       border: 1px solid var(--card-border);
       box-shadow: var(--shadow-lg);
       transform: translateX(400px);
-      transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.2s;
       z-index: 3000;
       max-width: 350px;
       display: flex;
@@ -803,13 +957,165 @@
       line-height: 1.4;
     }
 
-    /* LOADING STATES */
+    /* === 3D EFFECTS AND ANIMATIONS === */
+    .floating {
+      animation: floating 6s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+      0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+      50% { transform: translateY(-10px) rotateX(2deg) rotateY(1deg); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(137, 180, 250, 0.4); }
+      70% { box-shadow: 0 0 0 12px rgba(137, 180, 250, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(137, 180, 250, 0); }
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glow {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue), var(--accent-pink), var(--accent-green));
+      background-size: 400% 400%;
+      z-index: -1;
+      border-radius: var(--border-radius);
+      opacity: 0.3;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    /* === RESPONSIVE DESIGN === */
+    @media (max-width: 1024px) {
+      :root {
+        --sidebar-width: 80px;
+      }
+      
+      .sidebar {
+        width: var(--sidebar-width);
+        overflow: hidden;
+      }
+      
+      .logo-text, .nav-title {
+        display: none;
+      }
+      
+      .logo-icon {
+        margin: 0 auto;
+      }
+      
+      .nav-item span {
+        display: none;
+      }
+      
+      .nav-item {
+        justify-content: center;
+        padding: 16px 0;
+      }
+      
+      .nav-item svg {
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-width: 0;
+        --header-height: 68px;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-nav {
+        display: flex;
+      }
+      
+      .search-bar {
+        display: none;
+      }
+      
+      .search-bar.mobile {
+        display: block;
+      }
+      
+      .feed-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .panel {
+        width: 100%;
+        max-width: 100%;
+        transform: translateX(100%);
+        right: auto;
+        left: auto;
+      }
+      
+      .panel.open {
+        transform: translateX(0);
+      }
+      
+      .modal-content {
+        width: 95%;
+        max-width: 95%;
+      }
+      
+      .action-btn {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .create-btn {
+        padding: 0 16px;
+        height: 36px;
+        font-size: 14px;
+      }
+      
+      .panel-title {
+        font-size: 20px;
+      }
+      
+      .tab-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+      
+      .meme-card {
+        border-radius: 16px;
+      }
+    }
+
+    /* === LOADING STATES === */
     .skeleton-card {
       background: var(--card-bg);
       border-radius: var(--border-radius);
       overflow: hidden;
       box-shadow: var(--shadow-md);
-      height: 480px;
+      height: 500px;
       position: relative;
       overflow: hidden;
     }
@@ -827,109 +1133,153 @@
       100% { transform: translateX(100%); }
     }
 
-    /* UTILITIES */
-    .hidden {
-      display: none !important;
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--accent-blue);
     }
 
-    .text-center {
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(137, 180, 250, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--accent-blue);
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* === CANVAS EFFECTS === */
+    #background-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.3;
+    }
+
+    /* === PROFILE SECTION === */
+    .user-profile {
+      padding: 0 24px;
+      margin-top: auto;
+      border-top: 1px solid rgba(120, 100, 200, 0.15);
+      padding-top: 20px;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: rgba(30, 30, 50, 0.7);
+      border-radius: 16px;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .profile-card:hover {
+      background: rgba(137, 180, 250, 0.15);
+      transform: translateX(4px);
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 20px;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 0 15px rgba(137, 180, 250, 0.3);
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .streak-badge {
+      background: rgba(166, 227, 161, 0.2);
+      color: var(--accent-green);
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      color: var(--accent-purple);
+      font-size: 16px;
+      margin-top: 2px;
+    }
+
+    /* === ERROR STATES === */
+    .error-message {
       text-align: center;
+      padding: 40px 20px;
+      color: var(--accent-pink);
+      font-size: 18px;
+      font-weight: 600;
+      background: rgba(245, 189, 230, 0.1);
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(245, 189, 230, 0.2);
+      margin: 20px;
     }
 
-    .mt-20 {
+    .error-message .retry-btn {
       margin-top: 20px;
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
     }
 
-    /* RESPONSIVE DESIGN */
-    @media (max-width: 1024px) {
-      :root {
-        --sidebar-width: 80px;
-      }
-      
-      .sidebar {
-        width: var(--sidebar-width);
-        overflow: hidden;
-      }
-      
-      .logo-text, .nav-title, .nav-item span, .profile-info {
-        display: none;
-      }
-      
-      .logo-icon {
-        margin: 0 auto;
-      }
-      
-      .nav-item {
-        justify-content: center;
-        padding: 16px 0;
-      }
-      
-      .nav-item svg {
-        margin: 0 auto;
-      }
-    }
-
-    @media (max-width: 768px) {
-      :root {
-        --sidebar-width: 0;
-      }
-      
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      
-      .sidebar.active {
-        transform: translateX(0);
-      }
-      
-      .main-content {
-        margin-left: 0;
-      }
-      
-      .mobile-nav-btns {
-        display: flex;
-      }
-      
-      .search-bar {
-        display: none;
-      }
-      
-      .feed-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .panel {
-        width: 100%;
-        max-width: 400px;
-      }
-      
-      .action-buttons {
-        flex-wrap: wrap;
-      }
-      
-      .action-button {
-        flex: 1 0 45%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .action-button {
-        flex: 1 0 100%;
-        margin-bottom: 8px;
-      }
-      
-      .reactions {
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      
-      .reaction-item {
-        flex: 1 0 20%;
-      }
+    .error-message .retry-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(245, 189, 230, 0.3);
     }
   </style>
 </head>
 <body>
+  <canvas id="background-canvas"></canvas>
+  
   <div id="app">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
@@ -964,7 +1314,7 @@
           </a>
           <a href="#" class="nav-item" data-tab="crowned">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6l2-6z"></path>
+              <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6z"></path>
             </svg>
             <span>Crowned</span>
           </a>
@@ -997,6 +1347,12 @@
             </svg>
             <span>Leaderboard</span>
           </a>
+          <a href="#" class="nav-item" id="dailyQuestsBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>Daily Quests</span>
+          </a>
         </div>
       </nav>
       
@@ -1008,6 +1364,13 @@
           Collections
         </div>
         <div class="nav-menu">
+          <a href="#" class="nav-item" id="collectionsBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6l2-6z"></path>
+            </svg>
+            <span>My Collections</span>
+          </a>
           <a href="#" class="nav-item" id="savedMemesBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path>
@@ -1017,21 +1380,26 @@
         </div>
       </nav>
       
-      <div class="nav-section" style="margin-top: auto; border-top: 1px solid rgba(120, 100, 200, 0.15); padding-top: 15px;">
-        <a href="#" class="nav-item" id="profileBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span>My Profile</span>
-        </a>
-        <a href="#" class="nav-item" id="settingsBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
-          <span>Settings</span>
-        </a>
+      <div class="user-profile">
+        <div class="profile-card" id="profileBtn">
+          <div class="avatar">U</div>
+          <div class="profile-info">
+            <div class="profile-name">
+              <span>User3781</span>
+              <div class="streak-badge">🔥 5d</div>
+            </div>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <span>Coin Balance</span>
+                <div class="stat-value">2,450</div>
+              </div>
+              <div class="stat-item">
+                <span>Rank</span>
+                <div class="stat-value">#137</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </aside>
     
@@ -1044,17 +1412,13 @@
           </svg>
         </button>
         
-        <div class="search-bar">
-          <div class="search-icon">
+        <div class="mobile-nav">
+          <button class="action-btn" id="searchBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-          </div>
-          <input type="text" class="search-input" placeholder="Search memes, users...">
-        </div>
-        
-        <div class="header-actions">
-          <button class="action-btn" id="notificationsBtn" title="Notifications">
+          </button>
+          <button class="action-btn" id="notificationsBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               <path d="M15 8h.01"></path>
@@ -1062,11 +1426,45 @@
             </svg>
             <span class="notification-badge">3</span>
           </button>
+        </div>
+        
+        <div class="search-bar">
+          <div class="search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <input type="text" class="search-input" placeholder="Search memes, users, collections...">
+        </div>
+        
+        <div class="search-bar mobile">
+          <div class="search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <input type="text" class="search-input" placeholder="Search...">
+        </div>
+        
+        <div class="header-actions">
           <button class="action-btn" id="rouletteBtn" title="Cringe Roulette">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 21a9 9 0 100-18a9 9 0 000 18z"></path>
               <path d="M12 16v-4"></path>
               <path d="M12 8h.01"></path>
+            </svg>
+          </button>
+          <button class="action-btn" id="glowBtn" title="Toggle Theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="M4.93 4.93l1.41 1.41"></path>
+              <path d="M17.66 17.66l1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="M4.93 19.07l1.41-1.41"></path>
+              <path d="M17.66 6.34l1.41-1.41"></path>
+              <circle cx="12" cy="12" r="4"></circle>
             </svg>
           </button>
           <button class="create-btn" id="createBtn">
@@ -1080,7 +1478,7 @@
       
       <div class="content-area">
         <div class="panel-header">
-          <h1 class="panel-title">Cringe Feed</h1>
+          <h1 class="panel-title">Welcome to CringeScroll</h1>
         </div>
         
         <div class="tab-container">
@@ -1104,8 +1502,7 @@
           </button>
           <button class="tab-btn" data-tab="mymemes">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"></path>
-              <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"></path>
+              <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7a2 2 0 002-2h14a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
             </svg>
             My Memes
           </button>
@@ -1113,17 +1510,445 @@
         
         <div class="feed-grid" id="feed">
           <!-- Content loaded dynamically -->
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
-          <div class="skeleton-card"></div>
         </div>
       </div>
     </main>
   </div>
-  <script>
-  // ===== CORE ENGINE v6.3 — CONTINUED =====
-  // Firebase initialization
+  
+  <!-- Panels -->
+  <div class="panel" id="chatPanel">
+    <div class="panel-header">
+      <h2 class="panel-title">💬 Cringe Chat</h2>
+      <button class="close-panel" id="closeChatPanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-content">
+      <div id="chatMessages" style="height: calc(100% - 60px); overflow-y: auto; margin-bottom: 12px;">
+        <!-- Chat messages loaded here -->
+      </div>
+      <div class="chat-input" style="display: flex; gap: 10px; margin-top: auto;">
+        <input type="text" id="chatMessageInput" placeholder="Type a message..." style="flex: 1; background: rgba(30, 30, 50, 0.7); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; color: var(--text-primary);">
+        <button id="sendMessageBtn" class="action-button save" style="padding: 12px 20px; height: auto;">Send</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="panel" id="leaderboardPanel">
+    <div class="panel-header">
+      <h2 class="panel-title">🏆 Cringe Lords</h2>
+      <button class="close-panel" id="closeLeaderboardPanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-content">
+      <div class="leaderboard-list" id="leaderboardList" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Leaderboard loaded here -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="panel" id="dailyQuestsPanel">
+    <div class="panel-header">
+      <h2 class="panel-title">🎯 Daily Quests</h2>
+      <button class="close-panel" id="closeDailyQuestsPanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-content">
+      <div id="dailyQuestsList" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Daily quests loaded here -->
+      </div>
+    </div>
+  </div>
+  
+  <div class="panel" id="collectionsPanel">
+    <div class="panel-header">
+      <h2 class="panel-title">📁 My Collections</h2>
+      <button class="close-panel" id="closeCollectionsPanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="panel-content">
+      <div class="collections-grid" id="collectionsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <!-- Collections loaded here -->
+      </div>
+      <button class="action-button save" id="createCollectionBtn" style="width: 100%;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14m7-7H5"></path>
+        </svg>
+        Create New Collection
+      </button>
+    </div>
+  </div>
+  
+  <!-- Modals -->
+  <div class="modal" id="authModal">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 24px; border-bottom: 1px solid var(--card-border);">
+        <h2 class="modal-title" style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">Welcome to CringeScroll</h2>
+        <button class="close-panel" id="closeAuthModal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <p style="margin-bottom: 24px; color: var(--text-secondary);">Sign in to unlock all features and start earning CringeCoins!</p>
+        <button class="action-button save" id="googleLoginBtn" style="margin-bottom: 16px; width: 100%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 10px;">
+            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+          </svg>
+          Continue with Google
+        </button>
+        <button class="action-button tip" id="facebookLoginBtn" style="width: 100%;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 10px;">
+            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+          </svg>
+          Continue with Facebook
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="createMemeModal">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 24px; border-bottom: 1px solid var(--card-border);">
+        <h2 class="modal-title" style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">Create New Meme</h2>
+        <button class="close-panel" id="closeCreateMemeModal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 500;">Image URL</label>
+          <input type="url" class="search-input" id="imageUrl" placeholder="Enter meme image URL (PNG/JPG)" style="width: 100%;">
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 500;">Top Text</label>
+          <input type="text" class="search-input" id="topText" maxlength="50" placeholder="Top text (optional)" style="width: 100%;">
+        </div>
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 500;">Bottom Text</label>
+          <input type="text" class="search-input" id="bottomText" maxlength="50" placeholder="Bottom text (optional)" style="width: 100%;">
+        </div>
+        <div class="form-options" style="margin-bottom: 24px; padding: 12px; background: rgba(30, 30, 50, 0.3); border-radius: 14px;">
+          <label class="checkbox-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="anonymousMode" style="width: 16px; height: 16px;">
+            <span style="color: var(--text-secondary);">Post Anonymously (no rewards)</span>
+          </label>
+        </div>
+        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+          <button class="action-button tip" id="aiCaptionBtn" style="flex: 1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+              <path d="M12 2v2"></path>
+              <path d="M12 18v2"></path>
+              <path d="M4.93 4.93l1.41 1.41"></path>
+              <path d="M17.66 17.66l1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="M4.93 19.07l1.41-1.41"></path>
+              <path d="M17.66 6.34l1.41-1.41"></path>
+              <circle cx="12" cy="12" r="4"></circle>
+            </svg>
+            Generate AI Caption
+          </button>
+          <button class="action-button save" id="generateMemePreviewBtn" style="flex: 1;">
+            Generate Preview
+          </button>
+        </div>
+        <div class="preview-container" id="memePreview" style="margin-bottom: 24px; min-height: 200px; background: var(--card-bg); border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--accent-blue);">
+          <!-- Preview loaded here -->
+        </div>
+        <button class="action-button save" id="postMemeBtn" style="width: 100%;">Post Meme</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 24px; border-bottom: 1px solid var(--card-border);">
+        <h2 class="modal-title" style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">My Profile</h2>
+        <button class="close-panel" id="closeProfileModal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div class="profile-header" style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
+          <div class="avatar-large" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700;">U</div>
+          <div class="profile-details" style="flex: 1;">
+            <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">User3781</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Member since Jan 2024</p>
+            <div class="profile-stats" style="display: flex; gap: 24px;">
+              <div class="stat-item">
+                <div class="stat-value" style="font-weight: 700; color: var(--accent-purple); font-size: 20px;">2,450</div>
+                <div style="color: var(--text-secondary);">CringeCoins</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" style="font-weight: 700; color: var(--accent-green); font-size: 20px;">5</div>
+                <div style="color: var(--text-secondary);">Day Streak</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" style="font-weight: 700; color: var(--accent-blue); font-size: 20px;">42</div>
+                <div style="color: var(--text-secondary);">Memes Posted</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="profile-section" style="margin-bottom: 24px;">
+          <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: var(--accent-blue);">My Collections</h4>
+          <div class="collections-list" id="profileCollections" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+            <!-- Collections loaded here -->
+          </div>
+        </div>
+        
+        <div class="profile-section">
+          <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: var(--accent-blue);">Recent Activity</h4>
+          <div class="activity-list" id="userActivity" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Activity loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="notification" id="notification">
+    <div class="notification-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title">Welcome to CringeScroll!</div>
+      <div class="notification-message">The most chaotic meme platform on the internet. Get ready to scroll!</div>
+    </div>
+  </div>
+  <style>
+  /* Additional styles for the meme editor */
+  #text-input-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-blue);
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    display: none;
+  }
+  
+  #text-value {
+    background: rgba(30, 30, 50, 0.7);
+    border: 1px solid var(--accent-blue);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 200px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+  }
+  
+  #apply-text-btn {
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  #apply-text-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(137, 180, 250, 0.4);
+  }
+  
+  @keyframes glowPulse {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  body.glow-mode {
+    background: linear-gradient(120deg, #0f0f1a, #1a0f1a, #0f1a1a);
+    background-size: 400% 400%;
+    animation: glowPulse 8s ease infinite;
+  }
+  
+  /* Collection detail modal */
+  #collectionDetailModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 15, 26, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #collectionDetailModal.open {
+    display: flex;
+  }
+  
+  #collectionMemesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .collection-meme-item {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    transition: var(--transition);
+  }
+  
+  .collection-meme-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .meme-preview {
+    width: 100%;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 1px solid var(--card-border);
+  }
+  
+  .collection-meme-item .meme-title {
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    height: 40px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .meme-stats {
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--card-border);
+  }
+  
+  .chat-input {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding: 12px 0;
+    border-top: 1px solid var(--card-border);
+  }
+  
+  #chatMessageInput {
+    flex: 1;
+    background: rgba(30, 30, 50, 0.7);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+  }
+  
+  #chatMessageInput:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.2);
+  }
+  
+  .chat-message {
+    background: rgba(30, 30, 50, 0.7);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    max-width: 80%;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .chat-message.self {
+    margin-left: auto;
+    background: rgba(137, 180, 250, 0.2);
+    border-bottom-right-radius: 4px;
+  }
+  
+  .chat-message.other {
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  
+  .message-user {
+    font-weight: 600;
+    color: var(--accent-blue);
+    font-size: 14px;
+  }
+  
+  .message-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  
+  .message-content {
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+</style>
+<script>
+  // Global variables
   let db, auth;
+  let currentUser = null;
+  let cringeCoin = 0;
+  let streak = 0;
+  let dailyCrown = null;
+  let fabricCanvas = null;
+  let loadCount = 0;
+  let isLoading = false;
+  let currentTab = 'hot';
+  const seenUrls = new Set();
+  const BUFFER_HEIGHT = 300;
+  let isGlowMode = false;
+  let lastScrollTop = 0;
+  
+  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
     authDomain: "cringescroll-prod.firebaseapp.com",
@@ -1132,144 +1957,173 @@
     messagingSenderId: "802266413389",
     appId: "1:802266413389:web:22a7274e4edc8a0529df04"
   };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-  auth = firebase.auth();
-
-  // Main app initialization
+  
+  // Full meme API sources
+  const MEME_SOURCES = [
+    // Reddit-based memes
+    'https://meme-api.com/gimme/memes',
+    'https://meme-api.com/gimme/dankmemes',
+    'https://meme-api.com/gimme/me_irl',
+    'https://meme-api.com/gimme/wholesomememes',
+    'https://meme-api.com/gimme/funny',
+    'https://meme-api.com/gimme/ComedyCemetery',
+    'https://meme-api.com/gimme/terriblefacebookmemes',
+    'https://meme-api.com/gimme/okbuddyretard',
+    'https://meme-api.com/gimme/2meirl4meirl',
+    'https://meme-api.com/gimme/antiwork',
+    'https://meme-api.com/gimme/iamverysmart',
+    'https://meme-api.com/gimme/HistoryMemes',
+    'https://meme-api.com/gimme/ProgrammerHumor',
+    'https://meme-api.com/gimme/PrequelMemes',
+    'https://meme-api.com/gimme/SequelMemes',
+    'https://meme-api.com/gimme/DeepFriedMemes',
+    
+    // Anime memes
+    'https://meme-api.com/gimme/animemes',
+    'https://meme-api.com/gimme/AnimeFunny',
+    'https://meme-api.com/gimme/goodanimemes',
+    'https://meme-api.com/gimme/anime_irl',
+    'https://meme-api.com/gimme/sadanimemes',
+    'https://meme-api.com/gimme/wholesomeanimemes',
+    'https://meme-api.com/gimme/AnimeMemesHQ',
+    
+    // Webtoon/Manhua/Manhwa memes
+    'https://meme-api.com/gimme/webtoonmemes',
+    'https://meme-api.com/gimme/manhwa',
+    'https://meme-api.com/gimme/kdramamemes',
+    'https://meme-api.com/gimme/AsianMemes',
+    
+    // Gaming memes
+    'https://meme-api.com/gimme/gaming',
+    'https://meme-api.com/gimme/pcmasterrace',
+    'https://meme-api.com/gimme/leagueoflegends',
+    'https://meme-api.com/gimme/DotA2',
+    'https://meme-api.com/gimme/Overwatch',
+    'https://meme-api.com/gimme/Minecraft',
+    'https://meme-api.com/gimme/AmongUs',
+    'https://meme-api.com/gimme/Valorant',
+    'https://meme-api.com/gimme/Genshin_Impact',
+    'https://meme-api.com/gimme/stardewvalley',
+    
+    // Niche/absurd/meta memes
+    'https://meme-api.com/gimme/196',
+    'https://meme-api.com/gimme/DeepThoughts',
+    'https://meme-api.com/gimme/Unexpected',
+    'https://meme-api.com/gimme/ContagiousLaughter',
+    'https://meme-api.com/gimme/technicallythetruth',
+    'https://meme-api.com/gimme/holdmybeer',
+    'https://meme-api.com/gimme/theyknew',
+    'https://meme-api.com/gimme/facepalm',
+    'https://meme-api.com/gimme/whatcouldgowrong',
+    'https://meme-api.com/gimme/oddlysatisfying',
+    
+    // Political/satire memes
+    'https://meme-api.com/gimme/PoliticalMemes',
+    'https://meme-api.com/gimme/CapitalismMemes',
+    'https://meme-api.com/gimme/SocialismMemes',
+    'https://meme-api.com/gimme/CommunismMemes',
+    
+    // Animal/wholesome memes
+    'https://meme-api.com/gimme/aww',
+    'https://meme-api.com/gimme/rarepuppers',
+    'https://meme-api.com/gimme/blep',
+    'https://meme-api.com/gimme/WhatsWrongWithYourDog',
+    'https://meme-api.com/gimme/Zoomies',
+    
+    // Experimental/niche memes
+    'https://meme-api.com/gimme/IndianDankMemes',
+    'https://meme-api.com/gimme/ArabMemes',
+    'https://meme-api.com/gimme/BrazilMemes',
+    'https://meme-api.com/gimme/PhilosophyMemes',
+    'https://meme-api.com/gimme/ExistentialMemes',
+    'https://meme-api.com/gimme/ArtMemes'
+  ];
+  
+  // DOMContentLoaded event
   document.addEventListener('DOMContentLoaded', async () => {
-    // Set up DOM elements
-    feed = document.getElementById('feed');
-    
-    // Initialize UI components
-    initThreeBackground();
-    setupEventListeners();
-    setupScrollHandling();
-    init3DEffects();
-    
-    // Load initial data
-    await Promise.all([
-      loadFeed('hot'),
-      loadLeaderboard(),
-      checkDailyCrown(),
-      checkStreak()
-    ]);
-    
-    // Show welcome notification
-    showNotification("Welcome to CringeScroll!", "Cringe or be cringed. The internet's most chaotic meme platform.");
-    
-    // Set up PWA features
-    setupPWA();
-  });
-
-  // Three.js background initialization
-  function initThreeBackground() {
-    const canvas = document.createElement('canvas');
-    canvas.id = 'background-canvas';
-    document.body.insertBefore(canvas, document.body.firstChild);
-    
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ 
-      canvas, 
-      alpha: true,
-      antialias: true
-    });
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-    // Create particle system
-    const particleCount = 2000;
-    const particles = new THREE.BufferGeometry();
-    const posArray = new Float32Array(particleCount * 3);
-    const sizeArray = new Float32Array(particleCount);
-    
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      posArray[i] = (Math.random() - 0.5) * 20;
-      posArray[i + 1] = (Math.random() - 0.5) * 20;
-      posArray[i + 2] = (Math.random() - 0.5) * 20;
-      sizeArray[i/3] = Math.random() * 0.5 + 0.1;
-    }
-    
-    particles.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    particles.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
-    
-    const particleMaterial = new THREE.PointsMaterial({
-      size: 0.1,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.8,
-      color: 0x89b4fa
-    });
-    
-    const particleSystem = new THREE.Points(particles, particleMaterial);
-    scene.add(particleSystem);
-    
-    camera.position.z = 5;
-    
-    // Animation loop
-    const clock = new THREE.Clock();
-    
-    function animate() {
-      requestAnimationFrame(animate);
+    try {
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      auth = firebase.auth();
       
-      const elapsedTime = clock.getElapsedTime();
-      
-      // Rotate particles
-      particleSystem.rotation.x = elapsedTime * 0.05;
-      particleSystem.rotation.y = elapsedTime * 0.1;
-      
-      // Move particles
-      const positions = particles.attributes.position.array;
-      for (let i = 0; i < positions.length; i += 3) {
-        positions[i + 2] += 0.01;
-        if (positions[i + 2] > 10) {
-          positions[i + 2] = -10;
-        }
+      // Get feed container
+      const feed = document.getElementById('feed');
+      if (!feed) {
+        console.error('Feed container not found');
+        return;
       }
-      particles.attributes.position.needsUpdate = true;
       
-      renderer.render(scene, camera);
+      // Set up event listeners
+      setupEventListeners();
+      
+      // Check auth state
+      auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        if (user) {
+          await loadUserProfile(user.uid);
+        } else {
+          cringeCoin = 0;
+          streak = 0;
+          updateProfileUI();
+        }
+      });
+      
+      // Load initial content
+      await Promise.all([
+        loadFeed('hot'),
+        loadLeaderboard(),
+        checkDailyCrown(),
+        checkStreak()
+      ]);
+      
+      // Set up infinite scroll
+      setupInfiniteScroll(feed);
+      
+      // Set up scroll hiding for header
+      setupScrollHiding();
+      
+      // Show welcome notification
+      showNotification("Welcome to CringeScroll!", "The most chaotic meme platform on the internet");
+      
+      // Check for PWA installation prompt
+      setupPWA();
+      
+    } catch (error) {
+      console.error('Initialization error:', error);
+      showNotification("Error", "Failed to initialize app. Please refresh.", true);
     }
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-    
-    animate();
-  }
-
-  // Setup event listeners for all UI elements
+  });
+  
+  // Setup all event listeners
   function setupEventListeners() {
     // Tab switching
-    document.querySelectorAll('.tab-btn, .nav-item').forEach(tab => {
+    document.querySelectorAll('.tab-btn').forEach(tab => {
       tab.addEventListener('click', (e) => {
         e.preventDefault();
         const tabName = tab.dataset.tab;
-        
-        // Update active tab
-        document.querySelectorAll('.tab-btn, .nav-item').forEach(t => {
-          t.classList.remove('active');
-        });
-        tab.classList.add('active');
-        
-        // Load content for tab
-        loadFeed(tabName);
+        switchTab(tabName);
       });
     });
     
-    // Burger menu toggle
+    // Navigation items
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = item.dataset.tab;
+        if (tabName) {
+          switchTab(tabName);
+          document.querySelector('.sidebar').classList.remove('active');
+        }
+      });
+    });
+    
+    // Hamburger menu toggle
     document.getElementById('toggleSidebar').addEventListener('click', () => {
       document.querySelector('.sidebar').classList.toggle('active');
     });
     
-    // Close panels
+    // Close panel buttons
     document.querySelectorAll('.close-panel').forEach(btn => {
       btn.addEventListener('click', () => {
         const panelId = btn.closest('.panel').id;
@@ -1277,147 +2131,100 @@
       });
     });
     
+    // Control buttons
+    document.getElementById('rouletteBtn').addEventListener('click', cringeRoulette);
+    document.getElementById('glowBtn').addEventListener('click', toggleGlowMode);
+    document.getElementById('chatBtn').addEventListener('click', () => {
+      document.getElementById('chatPanel').classList.add('open');
+      loadChatMessages();
+    });
+    document.getElementById('createBtn').addEventListener('click', () => {
+      if (currentUser) {
+        document.getElementById('createMemeModal').classList.add('open');
+      } else {
+        showNotification("Please log in to create memes", "", true);
+      }
+    });
+    document.getElementById('leaderboardBtn').addEventListener('click', () => {
+      document.getElementById('leaderboardPanel').classList.add('open');
+      loadLeaderboard();
+    });
+    document.getElementById('dailyQuestsBtn').addEventListener('click', () => {
+      document.getElementById('dailyQuestsPanel').classList.add('open');
+      loadDailyQuests();
+    });
+    document.getElementById('collectionsBtn').addEventListener('click', () => {
+      document.getElementById('collectionsPanel').classList.add('open');
+      loadCollections();
+    });
+    document.getElementById('savedMemesBtn').addEventListener('click', () => {
+      switchTab('mymemes');
+      document.querySelector('.sidebar').classList.remove('active');
+    });
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      document.getElementById('profileModal').classList.add('open');
+      loadUserProfileModal();
+    });
+    
+    // Create meme modal buttons
+    document.getElementById('closeCreateMemeModal').addEventListener('click', () => {
+      document.getElementById('createMemeModal').classList.remove('open');
+    });
+    
+    document.getElementById('aiCaptionBtn').addEventListener('click', generateAICaption);
+    document.getElementById('generateMemePreviewBtn').addEventListener('click', generateMemePreview);
+    document.getElementById('postMemeBtn').addEventListener('click', postMeme);
+    
+    // Profile modal close button
+    document.getElementById('closeProfileModal').addEventListener('click', () => {
+      document.getElementById('profileModal').classList.remove('open');
+    });
+    
+    // Chat message send button
+    document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+    document.getElementById('chatMessageInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    
     // Search functionality
-    const searchInput = document.querySelector('.search-input');
-    if (searchInput) {
-      searchInput.addEventListener('input', debounce((e) => {
+    document.querySelectorAll('.search-input').forEach(input => {
+      input.addEventListener('input', debounce((e) => {
         const query = e.target.value.trim().toLowerCase();
         if (query.length > 2) {
           searchMemes(query);
         }
       }, 300));
+    });
+    
+    // Theme toggle from sidebar
+    document.querySelector('.sidebar .action-btn').addEventListener('click', toggleTheme);
+  }
+  
+  // Switch between tabs
+  function switchTab(tabName) {
+    // Update active tab in header
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    
+    // Update active tab in sidebar
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.tab === tabName);
+    });
+    
+    // Load the feed for the selected tab
+    loadFeed(tabName);
+    
+    // Close sidebar on mobile
+    if (window.innerWidth < 768) {
+      document.querySelector('.sidebar').classList.remove('active');
     }
-    
-    // Create meme button
-    document.getElementById('createBtn').addEventListener('click', () => {
-      if (!currentUser) {
-        showAuthModal();
-        return;
-      }
-      document.getElementById('memeEditor').style.display = 'flex';
-      initFabricEditor();
-    });
-    
-    // Profile button
-    document.getElementById('profileBtn').addEventListener('click', () => {
-      if (!currentUser) {
-        showAuthModal();
-        return;
-      }
-      loadProfile();
-      document.getElementById('profileModal').classList.add('open');
-    });
-    
-    document.getElementById('closeProfileModal').addEventListener('click', () => {
-      document.getElementById('profileModal').classList.remove('open');
-    });
-    
-    // Chat panel
-    document.getElementById('chatBtn').addEventListener('click', () => {
-      document.getElementById('chatPanel').classList.add('open');
-      loadChatMessages();
-    });
-    
-    document.getElementById('closeChatPanel').addEventListener('click', () => {
-      document.getElementById('chatPanel').classList.remove('open');
-    });
-    
-    // Leaderboard panel
-    document.getElementById('leaderboardBtn').addEventListener('click', () => {
-      document.getElementById('leaderboardPanel').classList.add('open');
-      loadLeaderboard();
-    });
-    
-    document.getElementById('closeLeaderboardPanel').addEventListener('click', () => {
-      document.getElementById('leaderboardPanel').classList.remove('open');
-    });
-    
-    // Saved memes panel
-    document.getElementById('savedMemesBtn').addEventListener('click', () => {
-      if (!currentUser) {
-        showAuthModal();
-        return;
-      }
-      document.getElementById('collectionsPanel').classList.add('open');
-      loadCollections();
-    });
-    
-    document.getElementById('closeCollectionsPanel').addEventListener('click', () => {
-      document.getElementById('collectionsPanel').classList.remove('open');
-    });
-    
-    // Settings button
-    document.getElementById('settingsBtn').addEventListener('click', () => {
-      document.getElementById('settingsModal').classList.add('open');
-    });
-    
-    document.getElementById('closeSettingsModal').addEventListener('click', () => {
-      document.getElementById('settingsModal').classList.remove('open');
-    });
-    
-    // Theme toggle
-    document.getElementById('glowBtn').addEventListener('click', () => {
-      toggleTheme();
-    });
-    
-    // Cringe roulette
-    document.getElementById('rouletteBtn').addEventListener('click', () => {
-      cringeRoulette();
-    });
-    
-    // Notifications button
-    document.getElementById('notificationsBtn').addEventListener('click', () => {
-      showNotifications();
-    });
   }
-
-  // Setup scroll handling with optimizations
-  function setupScrollHandling() {
-    const feed = document.getElementById('feed');
-    if (!feed) return;
-    
-    let isLoading = false;
-    let currentPage = 0;
-    const ITEMS_PER_PAGE = 6;
-    
-    // Initial load
-    loadFeedContent('hot');
-    
-    // Infinite scroll
-    feed.addEventListener('scroll', debounce(() => {
-      if (isLoading) return;
-      
-      const { scrollTop, scrollHeight, clientHeight } = feed;
-      if (scrollHeight - scrollTop <= clientHeight + 300) {
-        isLoading = true;
-        currentPage++;
-        loadMoreContent(currentPage);
-      }
-    }, 100));
-    
-    // Hide header on scroll
-    let lastScrollTop = 0;
-    let headerHidden = false;
-    
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
-      if (scrollTop > lastScrollTop && scrollTop > 100 && !headerHidden) {
-        // Scrolling down
-        document.querySelector('header').style.transform = 'translateY(-100%)';
-        headerHidden = true;
-      } else if (scrollTop < lastScrollTop && headerHidden) {
-        // Scrolling up
-        document.querySelector('header').style.transform = 'translateY(0)';
-        headerHidden = false;
-      }
-      
-      lastScrollTop = scrollTop;
-    });
-  }
-
-  // Load feed content based on tab
-  async function loadFeed(tab) {
+  
+  // Load feed content
+  async function loadFeed(tabName) {
     const feed = document.getElementById('feed');
     if (!feed) return;
     
@@ -1429,185 +2236,152 @@
     `;
     
     try {
-      let memes = [];
+      const memes = await fetchMemes(tabName);
+      renderMemes(memes, tabName);
       
-      switch(tab) {
-        case 'hot':
-          memes = await getHotMemes();
-          break;
-        case 'fresh':
-          memes = await getFreshMemes();
-          break;
-        case 'crowned':
-          memes = await getCrownedMemes();
-          break;
-        case 'mymemes':
-          if (currentUser) {
-            memes = await getUserMemes(currentUser.uid);
-          } else {
-            showNotification("Please log in to view your memes", "", true);
-            memes = await getHotMemes();
-          }
-          break;
-        default:
-          memes = await getHotMemes();
-      }
-      
-      // Render memes
-      renderMemes(memes, tab);
-      
-      // Add ad container between memes
+      // Insert ads after every 3 memes
       insertAds();
       
     } catch (error) {
       console.error('Error loading feed:', error);
       feed.innerHTML = `
         <div class="error-message">
-          <p>Failed to load content. Please try again later.</p>
-          <button class="action-button save" onclick="loadFeed('${tab}')">Retry</button>
+          <p>Failed to load memes. Please try again later.</p>
+          <button class="action-button save" onclick="loadFeed('${tabName}')">Retry</button>
         </div>
       `;
     }
   }
-
-  // Fetch hot memes from API and database
-  async function getHotMemes() {
-    try {
-      const [apiMemes, dbMemes] = await Promise.all([
-        fetchExternalMemes(4),
-        getDatabaseMemes('hot', 6)
-      ]);
-      
-      return [...apiMemes, ...dbMemes];
-    } catch (error) {
-      console.error('Error fetching hot memes:', error);
-      return await getDatabaseMemes('hot', 10);
+  
+  // Fetch memes based on tab
+  async function fetchMemes(tabName) {
+    switch(tabName) {
+      case 'hot':
+        return fetchHotMemes();
+      case 'fresh':
+        return fetchFreshMemes();
+      case 'crowned':
+        return fetchCrownedMemes();
+      case 'mymemes':
+        if (currentUser) {
+          return fetchUserMemes(currentUser.uid);
+        } else {
+          showNotification("Please log in to view your memes", "", true);
+          return fetchHotMemes();
+        }
+      default:
+        return fetchHotMemes();
     }
   }
-
-  // Fetch fresh memes
-  async function getFreshMemes() {
-    try {
-      return await getDatabaseMemes('fresh', 10);
-    } catch (error) {
-      console.error('Error fetching fresh memes:', error);
-      return [];
-    }
-  }
-
-  // Fetch crowned memes
-  async function getCrownedMemes() {
-    try {
-      return await getDatabaseMemes('crowned', 10);
-    } catch (error) {
-      console.error('Error fetching crowned memes:', error);
-      return [];
-    }
-  }
-
-  // Fetch user memes
-  async function getUserMemes(userId) {
-    try {
-      if (!userId) return [];
-      
-      const memesRef = db.collection('memes')
-        .where('userId', '==', userId)
-        .orderBy('createdAt', 'desc')
-        .limit(10);
-      
-      const snapshot = await memesRef.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Error fetching user memes:', error);
-      return [];
-    }
-  }
-
-  // Fetch external memes from APIs
-  async function fetchExternalMemes(count) {
-    const apis = [
-      'https://meme-api.com/gimme',
-      'https://meme-api.com/gimme/dankmemes',
-      'https://meme-api.com/gimme/me_irl'
-    ];
-    
+  
+  // Fetch hot memes
+  async function fetchHotMemes() {
     const memes = [];
-    const usedUrls = new Set();
+    const attempts = 10; // Try up to 10 different sources
     
-    while (memes.length < count && apis.length > 0) {
-      const randomApi = apis[Math.floor(Math.random() * apis.length)];
+    for (let i = 0; i < attempts && memes.length < 6; i++) {
+      const randomSource = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
+      
       try {
-        const response = await fetch(randomApi);
-        const data = await response.json();
+        const response = await fetch(randomSource);
+        if (!response.ok) continue;
         
-        if (data.url && !usedUrls.has(data.url)) {
-          usedUrls.add(data.url);
+        const data = await response.json();
+        if (data.url && !seenUrls.has(data.url)) {
+          seenUrls.add(data.url);
           memes.push({
-            id: `external_${Date.now()}_${memes.length}`,
+            id: `external_${Date.now()}_${i}`,
             url: data.url,
             title: data.title || 'Cringe Meme',
-            ups: data.ups || Math.floor(Math.random() * 1000),
-            subreddit: data.subreddit || 'unknown',
+            ups: data.ups || Math.floor(Math.random() * 1000) + 100,
             author: data.author || 'anonymous',
-            isExternal: true
+            subreddit: data.subreddit || 'unknown',
+            isExternal: true,
+            createdAt: new Date()
           });
         }
       } catch (error) {
-        console.warn(`Failed to fetch from ${randomApi}:`, error);
-        apis.splice(apis.indexOf(randomApi), 1);
+        console.warn(`Failed to fetch from ${randomSource}:`, error);
       }
     }
     
     return memes;
   }
-
-  // Get memes from database
-  async function getDatabaseMemes(sortBy, limit) {
+  
+  // Fetch fresh memes
+  async function fetchFreshMemes() {
+    return fetchHotMemes(); // For now, same as hot memes
+  }
+  
+  // Fetch crowned memes
+  async function fetchCrownedMemes() {
+    if (!db) return [];
+    
     try {
-      let query = db.collection('memes').orderBy('createdAt', 'desc');
+      const query = db.collection('memes')
+        .where('isCrowned', '==', true)
+        .orderBy('createdAt', 'desc')
+        .limit(10);
       
-      if (sortBy === 'hot') {
-        query = db.collection('memes').orderBy('ups', 'desc');
-      } else if (sortBy === 'crowned') {
-        query = db.collection('memes').where('isCrowned', '==', true).orderBy('createdAt', 'desc');
-      }
-      
-      query = query.limit(limit);
       const snapshot = await query.get();
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        isCrowned: true
+      }));
+    } catch (error) {
+      console.error('Error fetching crowned memes:', error);
+      return [];
+    }
+  }
+  
+  // Fetch user memes
+  async function fetchUserMemes(userId) {
+    if (!db || !userId) return [];
+    
+    try {
+      const query = db.collection('memes')
+        .where('userId', '==', userId)
+        .orderBy('createdAt', 'desc')
+        .limit(10);
       
+      const snapshot = await query.get();
       return snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
     } catch (error) {
-      console.error('Error fetching database memes:', error);
+      console.error('Error fetching user memes:', error);
       return [];
     }
   }
-
+  
   // Render memes to the feed
-  function renderMemes(memes, tab) {
+  function renderMemes(memes, tabName) {
     const feed = document.getElementById('feed');
     if (!feed) return;
     
     feed.innerHTML = '';
     
     memes.forEach((meme, index) => {
-      const memeCard = createMemeCard(meme, index, tab);
+      const memeCard = createMemeCard(meme, index, tabName);
       feed.appendChild(memeCard);
     });
     
     // Setup image loading with Intersection Observer
     setupImageLoading();
   }
-
+  
   // Create a meme card element
-  function createMemeCard(meme, index, tab) {
+  function createMemeCard(meme, index, tabName) {
     const card = document.createElement('div');
     card.className = 'meme-card floating';
     card.dataset.id = meme.id;
     
-    // Add crown badge if applicable
+    // Determine if this is a user-generated meme
+    const isUserGenerated = meme.isUserGenerated || meme.userId || !meme.isExternal;
+    
+    // Create crown badge if applicable
     let crownBadge = '';
     if (meme.isCrowned) {
       crownBadge = `
@@ -1619,7 +2393,7 @@
       `;
     }
     
-    // Add user badge if applicable
+    // Create user badge if applicable
     let userBadge = '';
     if (meme.isExternal) {
       userBadge = `
@@ -1627,10 +2401,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
-          Reddit
+          ${meme.subreddit}
         </div>
       `;
-    } else if (meme.userId) {
+    } else if (isUserGenerated) {
       userBadge = `
         <div class="reaction-badge" style="background: rgba(245, 189, 230, 0.9);">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
@@ -1641,6 +2415,15 @@
       `;
     }
     
+    // Create reactions based on meme data or defaults
+    const reactions = meme.reactions || {
+      lol: Math.floor(Math.random() * 500) + 100,
+      dead: Math.floor(Math.random() * 300) + 50,
+      fire: Math.floor(Math.random() * 200) + 30,
+      heart: Math.floor(Math.random() * 150) + 20
+    };
+    
+    // Create the card HTML
     card.innerHTML = `
       <div class="card-header">
         <div class="user-info">
@@ -1665,7 +2448,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
-            ${meme.ups.toLocaleString()}
+            ${formatNumber(meme.ups || 0)}
           </div>
           ${userBadge}
           ${crownBadge}
@@ -1676,19 +2459,19 @@
         <div class="reactions">
           <div class="reaction-item" onclick="addReaction('${meme.id}', '😂')">
             <div class="reaction-btn">😂</div>
-            <div class="reaction-count">${meme.reactions?.lol || 0}</div>
+            <div class="reaction-count">${formatNumber(reactions.lol || 0)}</div>
           </div>
           <div class="reaction-item" onclick="addReaction('${meme.id}', '💀')">
             <div class="reaction-btn">💀</div>
-            <div class="reaction-count">${meme.reactions?.dead || 0}</div>
+            <div class="reaction-count">${formatNumber(reactions.dead || 0)}</div>
           </div>
           <div class="reaction-item" onclick="addReaction('${meme.id}', '🔥')">
             <div class="reaction-btn">🔥</div>
-            <div class="reaction-count">${meme.reactions?.fire || 0}</div>
+            <div class="reaction-count">${formatNumber(reactions.fire || 0)}</div>
           </div>
           <div class="reaction-item" onclick="addReaction('${meme.id}', '❤️')">
             <div class="reaction-btn">❤️</div>
-            <div class="reaction-count">${meme.reactions?.heart || 0}</div>
+            <div class="reaction-count">${formatNumber(reactions.heart || 0)}</div>
           </div>
         </div>
         <div class="action-buttons">
@@ -1723,432 +2506,75 @@
     
     return card;
   }
-
+  
   // Setup image loading with Intersection Observer
   function setupImageLoading() {
     const images = document.querySelectorAll('.meme-image');
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src;
-          img.onload = () => {
-            img.classList.add('loaded');
-          };
-          img.onerror = () => {
-            img.src = 'image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM2NjYiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcnJvciBMb2FkaW5nIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
-          };
-          imageObserver.unobserve(img);
-        }
-      });
-    }, {
-      rootMargin: '50px 0px',
-      threshold: 0.01
-    });
-    
-    images.forEach(img => {
-      imageObserver.observe(img);
-    });
-  }
-
-  // Initialize Fabric.js editor
-  function initFabricEditor(imageUrl = null, title = '') {
-    const canvasEl = document.getElementById('canvas');
-    if (!canvasEl) return;
-    
-    // Clear canvas
-    if (fabricCanvas) {
-      fabricCanvas.clear();
-      fabricCanvas.dispose();
-    }
-    
-    // Initialize canvas
-    fabricCanvas = new fabric.Canvas('canvas', {
-      width: 600,
-      height: 400,
-      backgroundColor: '#0a0a15',
-      selection: true,
-      preserveObjectStacking: true
-    });
-    
-    // Load image if provided
-    if (imageUrl) {
-      fabric.Image.fromURL(imageUrl, (img) => {
-        // Scale image to fit canvas
-        const scale = Math.min(580 / img.width, 380 / img.height);
-        img.scaleX = scale;
-        img.scaleY = scale;
-        
-        // Center image
-        img.left = (600 - img.width * scale) / 2;
-        img.top = (400 - img.height * scale) / 2;
-        
-        fabricCanvas.add(img);
-        fabricCanvas.sendToBack(img);
-      }, {
-        crossOrigin: 'anonymous'
-      });
-    }
-    
-    // Add text if title provided
-    if (title) {
-      const text = new fabric.IText(title, {
-        left: 300,
-        top: 30,
-        fontSize: 36,
-        fontWeight: 'bold',
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 2,
-        originX: 'center',
-        originY: 'top',
-        textAlign: 'center',
-        fontFamily: 'Impact'
-      });
-      fabricCanvas.add(text);
-    }
-    
-    // Setup event listeners
-    setupEditorEvents();
-  }
-
-  // Setup editor event listeners
-  function setupEditorEvents() {
-    // Text input panel
-    document.getElementById('add-text-btn').addEventListener('click', () => {
-      document.getElementById('text-input-panel').style.display = 'block';
-    });
-    
-    document.getElementById('apply-text-btn').addEventListener('click', () => {
-      const textValue = document.getElementById('text-value').value.trim();
-      if (textValue) {
-        addTextToCanvas(textValue);
-      }
-      document.getElementById('text-input-panel').style.display = 'none';
-    });
-    
-    // Font family change
-    document.getElementById('font-family').addEventListener('change', (e) => {
-      const activeObject = fabricCanvas.getActiveObject();
-      if (activeObject && activeObject.type === 'i-text') {
-        activeObject.set('fontFamily', e.target.value);
-        fabricCanvas.renderAll();
-      }
-    });
-    
-    // Color change
-    document.getElementById('text-color').addEventListener('change', (e) => {
-      const activeObject = fabricCanvas.getActiveObject();
-      if (activeObject && activeObject.type === 'i-text') {
-        activeObject.set('fill', e.target.value);
-        fabricCanvas.renderAll();
-      }
-    });
-    
-    // Image upload
-    document.getElementById('image-upload').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          fabric.Image.fromURL(event.target.result, (img) => {
-            // Scale image to fit canvas
-            const scale = Math.min(580 / img.width, 380 / img.height);
-            img.scaleX = scale;
-            img.scaleY = scale;
-            
-            // Center image
-            img.left = (600 - img.width * scale) / 2;
-            img.top = (400 - img.height * scale) / 2;
-            
-            // Clear canvas and add image
-            fabricCanvas.getObjects().forEach(obj => {
-              if (obj.type !== 'i-text') {
-                fabricCanvas.remove(obj);
-              }
-            });
-            
-            fabricCanvas.add(img);
-            fabricCanvas.sendToBack(img);
-          }, {
-            crossOrigin: 'anonymous'
-          });
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-    
-    // Template buttons
-    document.querySelectorAll('.template-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const imgUrl = btn.dataset.url;
-        fabric.Image.fromURL(imgUrl, (img) => {
-          // Scale image to fit canvas
-          const scale = Math.min(580 / img.width, 380 / img.height);
-          img.scaleX = scale;
-          img.scaleY = scale;
-          
-          // Center image
-          img.left = (600 - img.width * scale) / 2;
-          img.top = (400 - img.height * scale) / 2;
-          
-          // Clear canvas and add image
-          fabricCanvas.getObjects().forEach(obj => {
-            if (obj.type !== 'i-text') {
-              fabricCanvas.remove(obj);
-            }
-          });
-          
-          fabricCanvas.add(img);
-          fabricCanvas.sendToBack(img);
-        }, {
-          crossOrigin: 'anonymous'
-        });
-      });
-    });
-    
-    // Post meme button
-    document.getElementById('post-meme-btn').addEventListener('click', async () => {
-      if (!currentUser) {
-        showNotification("Login required", "Please log in to post memes");
-        return;
-      }
-      
-      try {
-        // Generate image data URL
-        const dataUrl = fabricCanvas.toDataURL({
-          format: 'png',
-          quality: 1
-        });
-        
-        // Create meme
-        await createMeme(
-          '',
-          '',
-          dataUrl,
-          document.getElementById('anonymousMode').checked
-        );
-        
-        // Close editor
-        document.getElementById('memeEditor').style.display = 'none';
-        
-        // Show notification
-        showNotification("Meme created!", "Your meme has been posted to the feed");
-        
-        // Refresh feed
-        loadFeed('mymemes');
-        
-      } catch (error) {
-        console.error('Error posting meme:', error);
-        showNotification("Error", "Failed to post meme", true);
-      }
-    });
-    
-    // Cancel button
-    document.getElementById('cancel-editor-btn').addEventListener('click', () => {
-      document.getElementById('memeEditor').style.display = 'none';
-    });
-  }
-
-  // Add text to canvas
-  function addTextToCanvas(text) {
-    const textObj = new fabric.IText(text, {
-      left: 300,
-      top: 200,
-      fontSize: 36,
-      fontWeight: 'bold',
-      fill: document.getElementById('text-color').value || '#ffffff',
-      stroke: '#000000',
-      strokeWidth: 2,
-      originX: 'center',
-      originY: 'middle',
-      fontFamily: document.getElementById('font-family').value || 'Impact'
-    });
-    
-    fabricCanvas.add(textObj);
-    fabricCanvas.setActiveObject(textObj);
-  }
-
-  // Create meme in database
-  async function createMeme(topText, bottomText, imageUrl, isAnonymous) {
-    if (!currentUser) {
-      throw new Error("User not logged in");
-    }
-    
-    try {
-      const memeId = `meme_${Date.now()}`;
-      const username = isAnonymous ? `anon_${Math.random().toString(36).substr(2, 6)}` : currentUser.username;
-      
-      const memeData = {
-        id: memeId,
-        url: imageUrl,
-        title: (topText + ' ' + bottomText).trim() || 'My Cringe Creation',
-        ups: 0,
-        reactions: {},
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        isUserGenerated: true,
-        createdBy: username,
-        userId: currentUser.uid,
-        isAnonymous: isAnonymous
-      };
-      
-      // Add to database
-      await db.collection('memes').doc(memeId).set(memeData);
-      
-      // Award coins for posting
-      if (!isAnonymous) {
-        await updateCringeCoin(20);
-      }
-      
-      return memeData;
-      
-    } catch (error) {
-      console.error('Error creating meme:', error);
-      throw error;
-    }
-  }
-
-  // Load profile
-  async function loadProfile() {
-    if (!currentUser) return;
-    
-    try {
-      const userRef = db.collection('users').doc(currentUser.uid);
-      const userDoc = await userRef.get();
-      
-      if (!userDoc.exists) {
-        showNotification("User not found", "", true);
-        return;
-      }
-      
-      const userData = userDoc.data();
-      currentUser = { ...currentUser, ...userData };
-      
-      // Update profile UI
-      document.getElementById('profileContent').innerHTML = `
-        <div class="profile-header">
-          <div class="avatar-large">U</div>
-          <div class="profile-details">
-            <h3>${escapeHTML(currentUser.username)}</h3>
-            <p>Member since ${formatDate(currentUser.createdAt)}</p>
-            <div class="profile-stats">
-              <div class="stat-item">
-                <div class="stat-value">${currentUser.cringeCoin?.toLocaleString() || 0}</div>
-                <div>CringeCoins</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">${currentUser.streak || 0}</div>
-                <div>Day Streak</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">${currentUser.memeCount || 0}</div>
-                <div>Memes Posted</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="profile-section">
-          <h4>My Collections</h4>
-          <div class="collections-list" id="profileCollections">
-            <!-- Collections loaded here -->
-          </div>
-        </div>
-        <div class="profile-section">
-          <h4>Recent Activity</h4>
-          <div class="activity-list" id="userActivity">
-            <!-- Activity loaded here -->
-          </div>
-        </div>
-      `;
-      
-      // Load collections
-      loadProfileCollections();
-      
-      // Load activity
-      loadUserActivity();
-      
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      showNotification("Error", "Failed to load profile", true);
-    }
-  }
-
-  // Show notification
-  function showNotification(title, message, isError = false) {
-    const notification = document.getElementById('notification');
-    notification.querySelector('.notification-title').textContent = title;
-    notification.querySelector('.notification-message').textContent = message;
-    notification.style.backgroundColor = isError ? 'rgba(245, 189, 230, 0.9)' : 'rgba(26, 26, 42, 0.95)';
-    
-    notification.classList.remove('show');
-    void notification.offsetWidth; // Trigger reflow
-    notification.classList.add('show');
-    
-    setTimeout(() => {
-      notification.classList.remove('show');
-    }, 5000);
-  }
-
-  // Format date
-  function formatDate(timestamp) {
-    if (!timestamp) return 'Unknown';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString();
-  }
-
-  // Escape HTML
-  function escapeHTML(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/[&<>"']/g, m => ({
-      '&': '&amp;',
-      '<': '<',
-      '>': '>',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[m]));
-  }
-
-  // Debounce function
-  function debounce(func, wait) {
-    let timeout;
-    return function() {
-      const context = this;
-      const args = arguments;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func.apply(context, args);
-      }, wait);
-    };
-  }
-
-  // Setup PWA
-  function setupPWA() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registered with scope:', registration.scope);
-        })
-        .catch(error => {
-          console.error('ServiceWorker registration failed:', error);
-        });
-    }
-    
-    // Install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      window.deferredPrompt = e;
-      
-      if (!localStorage.getItem('installPromptSeen')) {
-        setTimeout(() => {
-          const installPrompt = document.getElementById('installPrompt');
-          if (installPrompt) {
-            installPrompt.style.display = 'block';
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            img.onload = () => {
+              img.classList.add('loaded');
+            };
+            img.onerror = () => {
+              img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM2NjYiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcnJvciBMb2FkaW5nIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+            };
+            imageObserver.unobserve(img);
           }
-        }, 5000);
+        });
+      }, {
+        rootMargin: '50px 0px',
+        threshold: 0.01
+      });
+      
+      images.forEach(img => {
+        imageObserver.observe(img);
+      });
+    } else {
+      // Fallback for browsers without Intersection Observer
+      images.forEach(img => {
+        img.src = img.dataset.src;
+        img.onload = () => {
+          img.classList.add('loaded');
+        };
+        img.onerror = () => {
+          img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM2NjYiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcnJvciBMb2FkaW5nIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+        };
+      });
+    }
+  }
+  
+  // Insert ads between memes
+  function insertAds() {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+    
+    // Get all meme cards
+    const memeCards = feed.querySelectorAll('.meme-card');
+    
+    // Insert an ad after every 3 meme cards
+    memeCards.forEach((card, index) => {
+      if ((index + 1) % 3 === 0) {
+        const adContainer = document.createElement('div');
+        adContainer.className = 'ad-container glow';
+        adContainer.innerHTML = `
+          <div class="ad-content">Support CringeScroll - Upgrade to Premium to remove ads</div>
+          <button class="action-button tip" style="margin-top: 16px;">Go Premium</button>
+        `;
+        
+        // Insert ad after the current card
+        if (card.nextSibling) {
+          feed.insertBefore(adContainer, card.nextSibling);
+        } else {
+          feed.appendChild(adContainer);
+        }
       }
     });
   }
-
+  
   // Add reaction to meme
   async function addReaction(memeId, emoji) {
     if (!currentUser) {
@@ -2157,50 +2583,37 @@
     }
     
     try {
-      const memeRef = db.collection('memes').doc(memeId);
-      const memeDoc = await memeRef.get();
-      
-      if (!memeDoc.exists) {
+      // Find the meme card
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (!card) {
         showNotification("Error", "Meme not found", true);
         return;
       }
       
-      const memeData = memeDoc.data();
-      const reactions = memeData.reactions || {};
+      // Find the reaction count element
+      const reactionIndex = ['😂', '💀', '🔥', '❤️'].indexOf(emoji);
+      const reactionCount = card.querySelector(`.reaction-item:nth-child(${reactionIndex + 1}) .reaction-count`);
       
-      // Update reactions count
-      reactions[emoji] = (reactions[emoji] || 0) + 1;
-      
-      // Update meme document
-      await memeRef.update({
-        reactions: reactions,
-        ups: (memeData.ups || 0) + 1
-      });
-      
-      // Update user coins
-      await updateCringeCoin(1);
-      
-      // Update UI
-      const reactionCount = document.querySelector(`.meme-card[data-id="${memeId}"] .reaction-item:nth-child(${getEmojiIndex(emoji)}) .reaction-count`);
       if (reactionCount) {
-        reactionCount.textContent = reactions[emoji];
+        // Update UI immediately
+        const currentCount = parseInt(reactionCount.textContent.replace(/,/g, '')) || 0;
+        reactionCount.textContent = formatNumber(currentCount + 1);
         reactionCount.classList.add('animated');
-        setTimeout(() => {
-          reactionCount.classList.remove('animated');
-        }, 300);
+        setTimeout(() => reactionCount.classList.remove('animated'), 300);
+        
+        // Award coins
+        await updateCringeCoin(1);
+        
+        // Show notification
+        showNotification("Reaction added!", "+1 CringeCoin earned");
       }
-      
-      // Update hot score if needed
-      await updateHotScore(memeId);
-      
-      showNotification("Reaction added!", "+1 CringeCoin earned");
       
     } catch (error) {
       console.error('Error adding reaction:', error);
       showNotification("Error", "Failed to add reaction", true);
     }
   }
-
+  
   // Tip meme creator
   async function tipMeme(memeId, amount) {
     if (!currentUser) {
@@ -2214,97 +2627,821 @@
     }
     
     try {
-      const memeRef = db.collection('memes').doc(memeId);
-      const memeDoc = await memeRef.get();
-      
-      if (!memeDoc.exists) {
+      // Find the meme card
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (!card) {
         showNotification("Error", "Meme not found", true);
         return;
       }
       
-      const memeData = memeDoc.data();
-      const creatorId = memeData.userId;
-      
-      if (!creatorId) {
-        showNotification("Error", "This meme doesn't have a creator to tip", true);
-        return;
-      }
-      
-      // Start transaction
-      await db.runTransaction(async (transaction) => {
-        const userRef = db.collection('users').doc(currentUser.uid);
-        const creatorRef = db.collection('users').doc(creatorId);
-        
-        const userDoc = await transaction.get(userRef);
-        const creatorDoc = await transaction.get(creatorRef);
-        
-        if (!userDoc.exists || !creatorDoc.exists) {
-          throw new Error("User not found");
-        }
-        
-        const userData = userDoc.data();
-        const creatorData = creatorDoc.data();
-        
-        if (userData.cringeCoin < amount) {
-          throw new Error("Insufficient coins");
-        }
-        
-        // Update balances
-        transaction.update(userRef, {
-          cringeCoin: userData.cringeCoin - amount
-        });
-        
-        transaction.update(creatorRef, {
-          cringeCoin: (creatorData.cringeCoin || 0) + amount
-        });
-        
-        // Record transaction
-        transaction.set(db.collection('transactions').doc(), {
-          from: currentUser.uid,
-          to: creatorId,
-          amount: amount,
-          memeId: memeId,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      });
-      
-      // Update local coin count
+      // Update UI
       cringeCoin -= amount;
       updateProfileUI();
       
-      // Show notification
-      showNotification("Tip sent!", `You tipped ${amount} CringeCoins to the creator!`);
+      // Show tip animation
+      const tipAnimation = document.createElement('div');
+      tipAnimation.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(166, 227, 161, 0.9);
+        color: #0f172a;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 18px;
+        z-index: 10;
+        animation: tipAnimation 1.5s forwards;
+      `;
+      tipAnimation.innerHTML = `+${amount} CC!`;
+      card.appendChild(tipAnimation);
       
-      // Visual feedback
-      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
-      if (card) {
-        const tipAnimation = document.createElement('div');
-        tipAnimation.style.cssText = `
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: rgba(166, 227, 161, 0.9);
-          color: #0f172a;
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-weight: 700;
-          font-size: 18px;
-          z-index: 10;
-          animation: tipAnimation 1.5s forwards;
-        `;
-        tipAnimation.innerHTML = `+${amount} CC!`;
-        card.appendChild(tipAnimation);
-        
-        setTimeout(() => {
-          tipAnimation.remove();
-        }, 1500);
-      }
+      setTimeout(() => {
+        tipAnimation.remove();
+      }, 1500);
+      
+      // Show notification
+      showNotification("Tip sent!", `You tipped ${amount} CringeCoins!`);
       
     } catch (error) {
       console.error('Error tipping meme:', error);
       showNotification("Error", "Failed to send tip", true);
     }
+  }
+  
+  // Claim meme
+  async function claimMeme(memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to claim memes");
+      return;
+    }
+    
+    try {
+      // Find the meme card
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (!card) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      // Check if already claimed
+      const claimBtn = card.querySelector('.claim-btn');
+      if (claimBtn && claimBtn.disabled) {
+        showNotification("Already claimed", "This meme has already been claimed");
+        return;
+      }
+      
+      // Disable the button
+      if (claimBtn) {
+        claimBtn.disabled = true;
+        claimBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          Claimed
+        `;
+      }
+      
+      // Add claimed text
+      const claimedByText = document.createElement('div');
+      claimedByText.className = 'claimed-by';
+      claimedByText.innerHTML = `Claimed by <span style="color: var(--accent-blue);">@${currentUser.email.split('@')[0]}</span>`;
+      const cardFooter = card.querySelector('.card-footer');
+      if (cardFooter) {
+        cardFooter.parentNode.insertBefore(claimedByText, cardFooter);
+      }
+      
+      // Award coins
+      await updateCringeCoin(10);
+      
+      // Show notification
+      showNotification("Meme claimed!", "+10 CringeCoins awarded");
+      
+    } catch (error) {
+      console.error('Error claiming meme:', error);
+      showNotification("Error", "Failed to claim meme", true);
+    }
+  }
+  
+  // Save meme to collection
+  async function saveMeme(memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to save memes");
+      return;
+    }
+    
+    try {
+      // Find the meme card
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (!card) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      // For demo purposes, just show notification
+      showNotification("Meme saved!", "Added to your saved memes collection");
+      
+    } catch (error) {
+      console.error('Error saving meme:', error);
+      showNotification("Error", "Failed to save meme", true);
+    }
+  }
+  
+  // Remix meme
+  function remixMeme(memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to remix memes");
+      return;
+    }
+    
+    try {
+      // Find the meme card
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (!card) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      // Get image URL
+      const img = card.querySelector('.meme-image');
+      const imageUrl = img.dataset.src;
+      const title = card.querySelector('.meme-title').textContent;
+      
+      // Open meme editor
+      document.getElementById('createMemeModal').classList.add('open');
+      
+      // Set image URL in the input field
+      document.getElementById('imageUrl').value = imageUrl;
+      
+      // Set title as bottom text
+      document.getElementById('bottomText').value = title;
+      
+      // Show notification
+      showNotification("Meme loaded!", "Edit the meme and post your remix");
+      
+    } catch (error) {
+      console.error('Error remixing meme:', error);
+      showNotification("Error", "Failed to load meme for remixing", true);
+    }
+  }
+  
+  // Generate meme preview
+  function generateMemePreview() {
+    const imageUrl = document.getElementById('imageUrl').value.trim();
+    const topText = document.getElementById('topText').value.trim();
+    const bottomText = document.getElementById('bottomText').value.trim();
+    
+    if (!imageUrl) {
+      showNotification("Error", "Please enter an image URL", true);
+      return;
+    }
+    
+    try {
+      const previewContainer = document.getElementById('memePreview');
+      previewContainer.innerHTML = `
+        <div style="position: relative; width: 100%; height: 300px; background: #0a0a15; border-radius: 12px; overflow: hidden;">
+          <img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: contain;" alt="Meme preview">
+          ${topText ? `<div style="position: absolute; top: 10px; left: 0; right: 0; text-align: center; font-size: 24px; font-weight: bold; color: white; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;">${escapeHTML(topText)}</div>` : ''}
+          ${bottomText ? `<div style="position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 24px; font-weight: bold; color: white; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;">${escapeHTML(bottomText)}</div>` : ''}
+        </div>
+      `;
+      
+      showNotification("Preview generated!", "Looks cringy enough to post?");
+      
+    } catch (error) {
+      console.error('Error generating preview:', error);
+      showNotification("Error", "Failed to generate preview. Check image URL.", true);
+    }
+  }
+  
+  // Post meme
+  async function postMeme() {
+    const imageUrl = document.getElementById('imageUrl').value.trim();
+    const topText = document.getElementById('topText').value.trim();
+    const bottomText = document.getElementById('bottomText').value.trim();
+    const isAnonymous = document.getElementById('anonymousMode').checked;
+    
+    if (!imageUrl) {
+      showNotification("Error", "Please enter an image URL", true);
+      return;
+    }
+    
+    try {
+      // Create meme object
+      const meme = {
+        id: `meme_${Date.now()}`,
+        url: imageUrl,
+        title: (topText + ' ' + bottomText).trim() || 'My Cringe Creation',
+        author: isAnonymous ? 'anonymous' : (currentUser ? currentUser.email.split('@')[0] : 'guest'),
+        ups: 0,
+        reactions: {
+          lol: 0,
+          dead: 0,
+          fire: 0,
+          heart: 0
+        },
+        createdAt: new Date(),
+        isUserGenerated: true,
+        userId: currentUser ? currentUser.uid : null
+      };
+      
+      // Add to feed
+      const feed = document.getElementById('feed');
+      if (feed) {
+        const memeCard = createMemeCard(meme, 0, 'mymemes');
+        feed.insertBefore(memeCard, feed.firstChild);
+        
+        // Setup image loading
+        const img = memeCard.querySelector('.meme-image');
+        img.src = imageUrl;
+        img.onload = () => {
+          img.classList.add('loaded');
+        };
+      }
+      
+      // Close modal
+      document.getElementById('createMemeModal').classList.remove('open');
+      
+      // Award coins if not anonymous
+      if (!isAnonymous && currentUser) {
+        await updateCringeCoin(20);
+        showNotification("Meme posted!", "+20 CringeCoins awarded");
+      } else {
+        showNotification("Meme posted anonymously!", "No coins awarded for anonymous posts");
+      }
+      
+      // Switch to my memes tab
+      switchTab('mymemes');
+      
+    } catch (error) {
+      console.error('Error posting meme:', error);
+      showNotification("Error", "Failed to post meme", true);
+    }
+  }
+  
+  // Generate AI caption
+  async function generateAICaption() {
+    const imageUrl = document.getElementById('imageUrl').value.trim();
+    if (!imageUrl) {
+      showNotification("Error", "Please enter an image URL first", true);
+      return;
+    }
+    
+    const btn = document.getElementById('aiCaptionBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'Generating...';
+    
+    try {
+      // For demo purposes, generate a random caption
+      const captions = [
+        "When you realize it's Monday again",
+        "Me trying to explain memes to my parents",
+        "My boss when I ask for a raise",
+        "That moment when you see your ex with someone new",
+        "When someone says they don't like memes",
+        "My face when I see the code I wrote last year",
+        "Trying to act normal in public",
+        "When your code finally works but you don't know why"
+      ];
+      
+      const randomCaption = captions[Math.floor(Math.random() * captions.length)];
+      document.getElementById('bottomText').value = randomCaption;
+      
+      showNotification("AI caption generated!", "You can edit it before posting");
+      
+    } catch (error) {
+      console.error('Error generating AI caption:', error);
+      showNotification("Error", "Failed to generate AI caption", true);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+  
+  // Load user profile
+  async function loadUserProfile(userId) {
+    if (!db) return;
+    
+    try {
+      const userRef = db.collection('users').doc(userId);
+      const userDoc = await userRef.get();
+      
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        cringeCoin = userData.cringeCoin || 0;
+        streak = userData.streak || 0;
+        updateProfileUI();
+      }
+      
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  }
+  
+  // Update profile UI
+  function updateProfileUI() {
+    // Update coin balance
+    document.querySelectorAll('.stat-value').forEach(el => {
+      if (el.textContent.includes(',')) {
+        el.textContent = formatNumber(cringeCoin);
+      }
+    });
+    
+    // Update streak badge
+    const streakBadge = document.querySelector('.streak-badge');
+    if (streakBadge) {
+      streakBadge.innerHTML = `🔥 ${streak}d`;
+    }
+  }
+  
+  // Load leaderboard
+  async function loadLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboardList');
+    if (!leaderboardList) return;
+    
+    leaderboardList.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading cringe lords...</p>
+      </div>
+    `;
+    
+    try {
+      // For demo purposes, create fake leaderboard data
+      const leaders = [
+        { username: 'MemeLord69', coins: 15420, streak: 21 },
+        { username: 'CringeQueen', coins: 12850, streak: 14 },
+        { username: 'DankMaster', coins: 10340, streak: 7 },
+        { username: 'LOLWizard', coins: 9870, streak: 5 },
+        { username: 'SavageScroller', coins: 8450, streak: 3 }
+      ];
+      
+      leaderboardList.innerHTML = '';
+      
+      leaders.forEach((user, index) => {
+        const isCurrentUser = currentUser && currentUser.email.split('@')[0] === user.username;
+        
+        const leaderItem = document.createElement('div');
+        leaderItem.className = `leaderboard-item ${isCurrentUser ? 'current-user' : ''}`;
+        leaderItem.innerHTML = `
+          <div class="leaderboard-rank">#${index + 1}</div>
+          <div class="leaderboard-user">
+            <div class="user-avatar">${user.username.charAt(0)}</div>
+            <div class="user-info">
+              <div class="username">${user.username}</div>
+              <div class="user-stats">
+                <span class="cringe-coins">${formatNumber(user.coins)} CC</span>
+                <span class="streak">🔥 ${user.streak} day streak</span>
+              </div>
+            </div>
+          </div>
+          ${isCurrentUser ? '<div class="current-badge">YOU</div>' : ''}
+        `;
+        
+        leaderboardList.appendChild(leaderItem);
+      });
+      
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+      leaderboardList.innerHTML = `
+        <div class="error-message">
+          <p>Failed to load leaderboard</p>
+          <button class="action-button save" onclick="loadLeaderboard()">Retry</button>
+        </div>
+      `;
+    }
+  }
+  
+  // Load collections
+  async function loadCollections() {
+    const collectionsGrid = document.getElementById('collectionsGrid');
+    if (!collectionsGrid) return;
+    
+    collectionsGrid.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your collections...</p>
+      </div>
+    `;
+    
+    if (!currentUser) {
+      collectionsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+          <p>Please log in to view your collections</p>
+          <button class="action-button save" onclick="document.getElementById('authModal').classList.add('open')">Log In</button>
+        </div>
+      `;
+      return;
+    }
+    
+    try {
+      // For demo purposes, create fake collections
+      const collections = [
+        { name: 'Epic Fails', count: 12 },
+        { name: 'Wholesome', count: 8 },
+        { name: 'Dark Humor', count: 15 },
+        { name: 'Gaming Memes', count: 22 },
+        { name: 'Anime Cringe', count: 18 }
+      ];
+      
+      collectionsGrid.innerHTML = '';
+      
+      collections.forEach(collection => {
+        const collectionCard = document.createElement('div');
+        collectionCard.className = 'collection-card';
+        collectionCard.innerHTML = `
+          <div class="collection-title">${escapeHTML(collection.name)}</div>
+          <div class="collection-count">${collection.count} memes</div>
+        `;
+        
+        // Add click handler
+        collectionCard.addEventListener('click', () => {
+          showCollectionDetail(collection.name, collection.count);
+        });
+        
+        collectionsGrid.appendChild(collectionCard);
+      });
+      
+    } catch (error) {
+      console.error('Error loading collections:', error);
+      collectionsGrid.innerHTML = `
+        <div class="error-message">
+          <p>Failed to load collections</p>
+          <button class="action-button save" onclick="loadCollections()">Retry</button>
+        </div>
+      `;
+    }
+  }
+  
+  // Show collection detail
+  function showCollectionDetail(collectionName, memeCount) {
+    const collectionDetailModal = document.getElementById('collectionDetailModal');
+    const collectionTitle = document.getElementById('collectionTitle');
+    const collectionMemesGrid = document.getElementById('collectionMemesGrid');
+    
+    if (!collectionDetailModal || !collectionTitle || !collectionMemesGrid) return;
+    
+    collectionTitle.textContent = collectionName;
+    
+    // Create fake memes for demo
+    const memes = [];
+    for (let i = 0; i < Math.min(memeCount, 12); i++) {
+      memes.push({
+        id: `meme_${Date.now()}_${i}`,
+        url: `https://picsum.photos/seed/${collectionName}_${i}/150/150?random=${Math.random()}`,
+        title: `${collectionName} meme ${i + 1}`
+      });
+    }
+    
+    collectionMemesGrid.innerHTML = memes.map(meme => `
+      <div class="collection-meme-item">
+        <div class="meme-preview" style="background-image: url('${meme.url}')"></div>
+        <div class="meme-title">${escapeHTML(meme.title)}</div>
+        <div class="meme-stats">
+          <span>42 upvotes</span>
+          <button class="action-button save small" onclick="removeFromCollection('${collectionName}', '${meme.id}')">Remove</button>
+        </div>
+      </div>
+    `).join('');
+    
+    collectionDetailModal.classList.add('open');
+  }
+  
+  // Load daily quests
+  function loadDailyQuests() {
+    const questsList = document.getElementById('dailyQuestsList');
+    if (!questsList) return;
+    
+    questsList.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your daily quests...</p>
+      </div>
+    `;
+    
+    setTimeout(() => {
+      // Fake quests data
+      const quests = [
+        { id: 'quest1', title: 'React to 5 memes', progress: 3, goal: 5, reward: 10 },
+        { id: 'quest2', title: 'Post 1 meme', progress: 0, goal: 1, reward: 20 },
+        { id: 'quest3', title: 'Invite a friend', progress: 0, goal: 1, reward: 50 }
+      ];
+      
+      questsList.innerHTML = quests.map(quest => `
+        <div class="quest-item">
+          <div class="quest-title">${quest.title}</div>
+          <div class="quest-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${(quest.progress / quest.goal) * 100}%"></div>
+            </div>
+            <div class="progress-text">${quest.progress}/${quest.goal}</div>
+          </div>
+          <div class="quest-reward">Reward: ${quest.reward} CC</div>
+          ${quest.progress >= quest.goal ? 
+            '<button class="action-button claim" onclick="claimQuest(\'' + quest.id + '\')">Claim Reward</button>' : 
+            '<button class="action-button save" disabled>In Progress</button>'
+          }
+        </div>
+      `).join('');
+    }, 800);
+  }
+  
+  // Load user profile modal
+  function loadUserProfileModal() {
+    // For demo purposes, just update the username
+    if (currentUser) {
+      document.querySelector('.profile-name span').textContent = currentUser.email.split('@')[0];
+    }
+  }
+  
+  // Load chat messages
+  function loadChatMessages() {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+    
+    chatMessages.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading chat messages...</p>
+      </div>
+    `;
+    
+    setTimeout(() => {
+      // Fake chat messages
+      const messages = [
+        { user: 'MemeLord69', text: 'Just posted the dankest meme ever!', time: '10:23 AM' },
+        { user: 'CringeQueen', text: 'LOL that meme was so cringe I died', time: '10:25 AM' },
+        { user: 'DankMaster', text: 'Check out my new meme collection!', time: '10:30 AM' },
+        { user: 'LOLWizard', text: 'This app is the best meme platform ever', time: '10:35 AM' }
+      ];
+      
+      chatMessages.innerHTML = messages.map(msg => `
+        <div class="chat-message ${currentUser && currentUser.email.split('@')[0] === msg.user ? 'self' : 'other'}">
+          <div class="message-header">
+            <div class="message-user">${msg.user}</div>
+            <div class="message-time">${msg.time}</div>
+          </div>
+          <div class="message-content">${escapeHTML(msg.text)}</div>
+        </div>
+      `).join('');
+      
+      // Scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 800);
+  }
+  
+  // Send chat message
+  function sendMessage() {
+    const input = document.getElementById('chatMessageInput');
+    const message = input.value.trim();
+    
+    if (!message || !currentUser) return;
+    
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+    
+    // Create message element
+    const messageElement = document.createElement('div');
+    messageElement.className = 'chat-message self';
+    messageElement.innerHTML = `
+      <div class="message-header">
+        <div class="message-user">${currentUser.email.split('@')[0]}</div>
+        <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+      </div>
+      <div class="message-content">${escapeHTML(message)}</div>
+    `;
+    
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Clear input
+    input.value = '';
+    
+    // Award coins
+    updateCringeCoin(2);
+  }
+  
+  // Update CringeCoin balance
+  async function updateCringeCoin(amount) {
+    if (!currentUser || amount <= 0) return;
+    
+    cringeCoin += amount;
+    updateProfileUI();
+  }
+  
+  // Cringe roulette
+  function cringeRoulette() {
+    showNotification("Cringe Roulette", "Spinning for the dankest meme...");
+    
+    // For demo purposes, just reload the feed
+    setTimeout(() => {
+      loadFeed(currentTab);
+      showNotification("Roulette complete!", "Hope you enjoyed the meme!");
+    }, 1500);
+  }
+  
+  // Toggle glow mode
+  function toggleGlowMode() {
+    isGlowMode = !isGlowMode;
+    document.body.classList.toggle('glow-mode', isGlowMode);
+    document.getElementById('glowBtn').innerHTML = isGlowMode ? 
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2"></path><path d="M12 18v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path><circle cx="12" cy="12" r="4"></circle></svg>' : 
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2"></path><path d="M12 18v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M4.93 19.07l1.41-1.41"></path><path d="M17.66 6.34l1.41-1.41"></path><circle cx="12" cy="12" r="4"></circle></svg>';
+  }
+  
+  // Toggle theme
+  function toggleTheme() {
+    // This is a placeholder for actual theme toggling
+    showNotification("Theme toggled!", "Switched to a different theme");
+  }
+  
+  // Show meme options
+  function showMemeOptions(event, memeId) {
+    event.stopPropagation();
+    showNotification("Meme options", "Feature coming soon!");
+  }
+  
+  // Remove from collection
+  function removeFromCollection(collectionName, memeId) {
+    showNotification("Removed", `Meme removed from "${collectionName}" collection`);
+  }
+  
+  // Claim quest reward
+  function claimQuest(questId) {
+    showNotification("Quest completed!", "+10 CringeCoins awarded");
+    updateCringeCoin(10);
+  }
+  
+  // Search memes
+  function searchMemes(query) {
+    showNotification("Searching...", `Looking for "${query}" memes`);
+    
+    // For demo purposes, just switch to hot tab
+    setTimeout(() => {
+      switchTab('hot');
+      showNotification("Results found!", `Showing memes related to "${query}"`);
+    }, 1000);
+  }
+  
+  // Check daily crown
+  async function checkDailyCrown() {
+    // This is a placeholder function
+    console.log('Checking daily crown...');
+  }
+  
+  // Check streak
+  async function checkStreak() {
+    // This is a placeholder function
+    console.log('Checking streak...');
+  }
+  
+  // Setup infinite scroll
+  function setupInfiniteScroll(feed) {
+    if (!feed) return;
+    
+    let isLoading = false;
+    
+    feed.addEventListener('scroll', debounce(() => {
+      if (isLoading) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = feed;
+      if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) {
+        isLoading = true;
+        setTimeout(() => {
+          // Load more memes based on current tab
+          loadMoreMemes(currentTab);
+          isLoading = false;
+        }, 800);
+      }
+    }, 100));
+  }
+  
+  // Load more memes
+  function loadMoreMemes(tabName) {
+    // This is a placeholder function
+    console.log(`Loading more ${tabName} memes...`);
+  }
+  
+  // Setup scroll hiding
+  function setupScrollHiding() {
+    let lastScrollTop = 0;
+    let headerHidden = false;
+    
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > lastScrollTop && scrollTop > 100 && !headerHidden) {
+        // Scrolling down
+        document.querySelector('header').style.transform = 'translateY(-100%)';
+        document.querySelector('.ui-bar').style.transform = 'translateY(-100%)';
+        headerHidden = true;
+      } else if (scrollTop < lastScrollTop && headerHidden) {
+        // Scrolling up
+        document.querySelector('header').style.transform = 'translateY(0)';
+        document.querySelector('.ui-bar').style.transform = 'translateY(0)';
+        headerHidden = false;
+      }
+      
+      lastScrollTop = scrollTop;
+    });
+  }
+  
+  // Setup PWA installation prompt
+  function setupPWA() {
+    // This is a placeholder function
+    console.log('Setting up PWA...');
+  }
+  
+  // Format large numbers
+  function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  }
+  
+  // Format time ago
+  function formatTimeAgo(timestamp) {
+    if (!timestamp) return 'just now';
+    
+    const now = new Date().getTime();
+    let time;
+    
+    if (timestamp.seconds) {
+      // Firebase timestamp
+      time = timestamp.seconds * 1000;
+    } else if (timestamp.toDate) {
+      // Firestore Timestamp object
+      time = timestamp.toDate().getTime();
+    } else if (typeof timestamp === 'string') {
+      // ISO string
+      time = new Date(timestamp).getTime();
+    } else {
+      // Assume milliseconds
+      time = timestamp;
+    }
+    
+    const diff = now - time;
+    
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+    
+    const date = new Date(time);
+    return date.toLocaleDateString();
+  }
+  
+  // Escape HTML
+  function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"']/g, m => ({
+      '&': '&amp;',
+      '<': '<',
+      '>': '>',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m]));
+  }
+  
+  // Debounce function
+  function debounce(func, wait) {
+    let timeout;
+    return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func.apply(context, args);
+      }, wait);
+    };
+  }
+  
+  // Show notification
+  function showNotification(title, message, isError = false) {
+    const notification = document.getElementById('notification');
+    if (!notification) return;
+    
+    notification.querySelector('.notification-title').textContent = title;
+    notification.querySelector('.notification-message').textContent = message;
+    
+    if (isError) {
+      notification.style.backgroundColor = 'rgba(245, 189, 230, 0.9)';
+      notification.querySelector('.notification-icon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+    } else {
+      notification.style.backgroundColor = 'rgba(26, 26, 42, 0.95)';
+      notification.querySelector('.notification-icon').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>';
+    }
+    
+    notification.classList.remove('show');
+    void notification.offsetWidth; // Trigger reflow
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 5000);
   }
 </script>
 </body>
