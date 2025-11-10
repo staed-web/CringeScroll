@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZjBmMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IlNwYWNlIEdyb3Rlc2ssIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5DUzwvdGV4dD4KPC9zdmc+Cg=="/>
+  <link rel="icon" type="image/svg+xml" href="image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwZjBmMWEiIHJ4PSI4IiByeT0iOCIvPgogIDx0ZXh0IHg9IjE2IiB5PSIxNiIgZm9udC1mYW1pbHk9IlNwYWNlIEdyb3Rlc2ssIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5DUzwvdGV4dD4KPC9zdmc+Cg=="/>
   <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.3/dist/gsap.min.js"></script>
@@ -1878,344 +1878,612 @@
     }
   </script>
   <script>
-  // ===== CORE APP INITIALIZATION =====
-  let db;
-  let auth;
-  let currentUser = null;
-  let currentTab = 'hot';
-  const seenUrls = new Set();
-  let isLoading = false;
-  let loadCount = 0;
-  let cringeCoin = 0;
-  let streak = 0;
-  const MEME_SOURCES = [
-    'https://meme-api.com/gimme/memes',
-    'https://meme-api.com/gimme/dankmemes',
-    'https://meme-api.com/gimme/me_irl',
-    'https://meme-api.com/gimme/wholesomememes',
-    'https://meme-api.com/gimme/funny',
-    'https://meme-api.com/gimme/ComedyCemetery',
-    'https://meme-api.com/gimme/terriblefacebookmemes'
-  ];
-
-  // Initialize Firebase - using the config from the uploaded file
-  const firebaseConfig = {
-    apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
-    authDomain: "cringescroll-prod.firebaseapp.com",
-    projectId: "cringescroll-prod",
-    storageBucket: "cringescroll-prod.firebasestorage.app",
-    messagingSenderId: "802266413389",
-    appId: "1:802266413389:web:22a7274e4edc8a0529df04"
-  };
-
-  // Initialize app when DOM is fully loaded
+  // Initialize Firebase after DOM load
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
+      
+      // Initialize services
       db = firebase.firestore();
       auth = firebase.auth();
       
-      // Set up Firebase authentication state listener
-      auth.onAuthStateChanged(user => {
-        currentUser = user;
-        if (user) {
-          loadUserProfile(user.uid);
-          document.querySelectorAll('.requires-auth').forEach(el => {
-            el.style.display = 'flex';
-          });
-        } else {
-          document.querySelectorAll('.requires-auth').forEach(el => {
-            el.style.display = 'none';
-          });
-        }
-        updateNavItems();
-      });
-      
       // Initialize UI components
+      initThreeBackground();
       setupEventListeners();
-      setupInfiniteScroll();
+      setupScrollHandling();
+      init3DEffects();
       
-      // Load initial feed content
-      await loadFeedContent('hot');
-      
-      // Initialize 3D background (already started in Part 1)
-      initBackgroundParticles();
+      // Load initial data
+      await Promise.all([
+        loadFeed('hot'),
+        loadLeaderboard(),
+        checkDailyCrown(),
+        checkStreak()
+      ]);
       
       // Show welcome notification
-      showNotification("Welcome to the new CringeScroll!", "Get ready for the ultimate meme experience");
+      showNotification("Welcome to CringeScroll!", "Cringe or be cringed. The internet's most chaotic meme platform.");
+      
+      // Check for PWA installation prompt
+      setupPWA();
       
     } catch (error) {
-      console.error('App initialization failed:', error);
-      showNotification("App Error", "Failed to initialize application. Please refresh the page.");
+      console.error('Initialization error:', error);
+      showNotification("Error", "Failed to initialize app. Please refresh.", true);
     }
   });
 
-  // ===== USER PROFILE AND AUTHENTICATION =====
-  async function loadUserProfile(uid) {
-    try {
-      const userDoc = await db.collection('users').doc(uid).get();
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        cringeCoin = userData.cringeCoin || 0;
-        streak = userData.streak || 0;
-        updateProfileDisplay();
-      } else {
-        // Create new user document if it doesn't exist
-        await db.collection('users').doc(uid).set({
-          cringeCoin: 100, // Starting coins
-          streak: 1,
-          lastActive: new Date(),
-          collections: {},
-          createdAt: new Date()
-        });
-        cringeCoin = 100;
-        streak = 1;
-        updateProfileDisplay();
-      }
-    } catch (error) {
-      console.error("Error loading user profile:", error);
-      showNotification("Profile Error", "Failed to load profile data");
-    }
-  }
-
-  function updateProfileDisplay() {
-    document.querySelector('.profile-name span').textContent = currentUser.email.split('@')[0];
-    document.querySelector('.stat-value:first-child').textContent = cringeCoin.toLocaleString();
-    document.querySelector('.stat-value:last-child').textContent = `#${Math.floor(Math.random() * 1000) + 1}`;
+  // Three.js background initialization
+  function initThreeBackground() {
+    const canvas = document.getElementById('background-canvas');
+    if (!canvas) return;
     
-    if (streak > 1) {
-      document.querySelector('.streak-badge').textContent = `🔥 ${streak}d`;
-      document.querySelector('.streak-badge').style.display = 'inline-flex';
-    }
-  }
-
-  async function signInAnonymously() {
-    try {
-      await auth.signInAnonymously();
-      showNotification("Signed In", "You're now signed in anonymously!");
-    } catch (error) {
-      console.error("Anonymous sign-in failed:", error);
-      showNotification("Auth Error", "Failed to sign in anonymously");
-    }
-  }
-
-  async function signOut() {
-    try {
-      await auth.signOut();
-      showNotification("Signed Out", "You've been signed out successfully");
-      window.location.reload();
-    } catch (error) {
-      console.error("Sign out failed:", error);
-      showNotification("Auth Error", "Failed to sign out");
-    }
-  }
-
-  // ===== FEED AND CONTENT MANAGEMENT =====
-  async function loadFeedContent(tab) {
-    if (isLoading) return;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ 
+      canvas, 
+      alpha: true,
+      antialias: true
+    });
     
-    isLoading = true;
-    currentTab = tab;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
-    // Show loading state
-    const feed = document.getElementById('feed');
-    if (loadCount === 0) {
-      feed.innerHTML = `
-        <div class="loading-spinner">
-          <div class="spinner"></div>
-          <div>Loading memes...</div>
-        </div>
-      `;
+    // Create particle system
+    const particleCount = 2000;
+    const particles = new THREE.BufferGeometry();
+    const posArray = new Float32Array(particleCount * 3);
+    const sizeArray = new Float32Array(particleCount);
+    
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      posArray[i] = (Math.random() - 0.5) * 20;
+      posArray[i + 1] = (Math.random() - 0.5) * 20;
+      posArray[i + 2] = (Math.random() - 0.5) * 20;
+      sizeArray[i/3] = Math.random() * 0.5 + 0.1;
     }
     
-    try {
-      // Update active tab styling
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    particles.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    particles.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.1,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.8,
+      color: 0x89b4fa
+    });
+    
+    const particleSystem = new THREE.Points(particles, particleMaterial);
+    scene.add(particleSystem);
+    
+    camera.position.z = 5;
+    
+    // Animation loop
+    const clock = new THREE.Clock();
+    
+    function animate() {
+      requestAnimationFrame(animate);
       
-      // Update nav items
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+      const elapsedTime = clock.getElapsedTime();
       
-      // Fetch memes based on tab type
-      let memes = [];
+      // Rotate particles
+      particleSystem.rotation.x = elapsedTime * 0.05;
+      particleSystem.rotation.y = elapsedTime * 0.1;
       
-      if (tab === 'mymemes' && currentUser) {
-        // Load user's own memes
-        memes = await fetchUserMemes();
-      } else {
-        // Load general memes
-        memes = await Promise.all(
-          Array.from({length: 6}, (_, i) => fetchRandomMeme(i, tab))
-        );
-      }
-      
-      // Clear loading state
-      feed.innerHTML = '';
-      
-      // Render memes
-      memes.forEach(meme => {
-        if (meme) {
-          const memeCard = createMemeCard(meme);
-          feed.appendChild(memeCard);
+      // Move particles
+      const positions = particles.attributes.position.array;
+      for (let i = 0; i < positions.length; i += 3) {
+        positions[i + 2] += 0.01;
+        if (positions[i + 2] > 10) {
+          positions[i + 2] = -10;
         }
+      }
+      particles.attributes.position.needsUpdate = true;
+      
+      renderer.render(scene, camera);
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    animate();
+  }
+
+  // Initialize 3D effects for cards and UI elements
+  function init3DEffects() {
+    // Card hover effects
+    document.querySelectorAll('.meme-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
       });
       
-      // Add an ad container after every 2 memes
-      if (tab !== 'mymemes') {
-        Array.from(feed.children).forEach((child, index) => {
-          if ((index + 1) % 2 === 0) {
-            const adContainer = document.createElement('div');
-            adContainer.className = 'ad-container glow';
-            adContainer.innerHTML = `
-              <div class="ad-content">Discover the ultimate meme creation tool</div>
-              <button class="action-button tip" style="margin-top: 16px;">Try Premium</button>
-            `;
-            feed.insertBefore(adContainer, child.nextSibling);
-          }
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      });
+    });
+    
+    // 3D floating animations
+    gsap.utils.toArray('.floating').forEach(element => {
+      gsap.to(element, {
+        y: -15,
+        ease: "sine.inOut",
+        duration: 2,
+        repeat: -1,
+        yoyo: true
+      });
+    });
+    
+    // Parallax effect for background elements
+    document.addEventListener('mousemove', (e) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      document.querySelectorAll('.parallax').forEach(el => {
+        const speed = parseFloat(el.getAttribute('data-speed') || '0.05');
+        const xOffset = (x - 0.5) * speed * 100;
+        const yOffset = (y - 0.5) * speed * 100;
+        el.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+      });
+    });
+  }
+
+  // Setup all event listeners
+  function setupEventListeners() {
+    // Tab switching
+    document.querySelectorAll('.tab-btn, .nav-item').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = tab.dataset.tab;
+        
+        // Update active tab
+        document.querySelectorAll('.tab-btn, .nav-item').forEach(t => {
+          t.classList.remove('active');
         });
+        tab.classList.add('active');
+        
+        // Load content for tab
+        loadFeed(tabName);
+      });
+    });
+    
+    // Burger menu toggle
+    document.getElementById('toggleSidebar').addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.toggle('active');
+    });
+    
+    // Close panels
+    document.querySelectorAll('.close-panel').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panelId = btn.closest('.panel').id;
+        document.getElementById(panelId).classList.remove('open');
+      });
+    });
+    
+    // Search functionality
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', debounce((e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (query.length > 2) {
+          searchMemes(query);
+        }
+      }, 300));
+    }
+    
+    // Create meme button
+    document.getElementById('createBtn').addEventListener('click', () => {
+      document.getElementById('createMemeModal').classList.add('open');
+    });
+    
+    document.getElementById('closeCreateMemeModal').addEventListener('click', () => {
+      document.getElementById('createMemeModal').classList.remove('open');
+    });
+    
+    // Generate meme preview
+    document.getElementById('generateMemeBtn').addEventListener('click', () => {
+      generateMemePreview();
+    });
+    
+    // Post meme
+    document.getElementById('postMemeBtn').addEventListener('click', async () => {
+      await postMeme();
+    });
+    
+    // Profile button
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      document.getElementById('profileModal').classList.add('open');
+      loadUserProfile();
+    });
+    
+    document.getElementById('closeProfileModal').addEventListener('click', () => {
+      document.getElementById('profileModal').classList.remove('open');
+    });
+    
+    // Chat panel
+    document.getElementById('chatBtn').addEventListener('click', () => {
+      document.getElementById('chatPanel').classList.add('open');
+      loadChatMessages();
+    });
+    
+    document.getElementById('closeChatPanel').addEventListener('click', () => {
+      document.getElementById('chatPanel').classList.remove('open');
+    });
+    
+    // Leaderboard panel
+    document.getElementById('leaderboardBtn').addEventListener('click', () => {
+      document.getElementById('leaderboardPanel').classList.add('open');
+      loadLeaderboard();
+    });
+    
+    document.getElementById('closeLeaderboardPanel').addEventListener('click', () => {
+      document.getElementById('leaderboardPanel').classList.remove('open');
+    });
+    
+    // Collections panel
+    document.getElementById('collectionsBtn').addEventListener('click', () => {
+      document.getElementById('collectionsPanel').classList.add('open');
+      loadCollections();
+    });
+    
+    document.getElementById('closeCollectionsPanel').addEventListener('click', () => {
+      document.getElementById('collectionsPanel').classList.remove('open');
+    });
+    
+    // Create collection button
+    document.getElementById('createCollectionBtn').addEventListener('click', () => {
+      createCollection();
+    });
+    
+    // Daily quests button
+    document.getElementById('dailyQuestsBtn').addEventListener('click', () => {
+      showDailyQuests();
+    });
+    
+    // Theme toggle
+    document.getElementById('glowBtn').addEventListener('click', () => {
+      toggleTheme();
+    });
+    
+    // Cringe roulette
+    document.getElementById('rouletteBtn').addEventListener('click', () => {
+      cringeRoulette();
+    });
+  }
+
+  // Setup scroll handling with optimizations
+  function setupScrollHandling() {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+    
+    let isLoading = false;
+    let currentPage = 0;
+    const ITEMS_PER_PAGE = 6;
+    
+    // Initial load
+    loadFeedContent('hot');
+    
+    // Infinite scroll
+    feed.addEventListener('scroll', debounce(() => {
+      if (isLoading) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = feed;
+      if (scrollHeight - scrollTop <= clientHeight + 300) {
+        isLoading = true;
+        currentPage++;
+        loadMoreContent(currentPage);
+      }
+    }, 100));
+    
+    // Hide header on scroll
+    let lastScrollTop = 0;
+    let headerHidden = false;
+    
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > lastScrollTop && scrollTop > 100 && !headerHidden) {
+        // Scrolling down
+        document.querySelector('header').style.transform = 'translateY(-100%)';
+        headerHidden = true;
+      } else if (scrollTop < lastScrollTop && headerHidden) {
+        // Scrolling up
+        document.querySelector('header').style.transform = 'translateY(0)';
+        headerHidden = false;
       }
       
-      loadCount++;
+      lastScrollTop = scrollTop;
+    });
+  }
+
+  // Load feed content based on tab
+  async function loadFeed(tab) {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+    
+    // Show loading skeleton
+    feed.innerHTML = `
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    `;
+    
+    try {
+      let memes = [];
+      
+      switch(tab) {
+        case 'hot':
+          memes = await getHotMemes();
+          break;
+        case 'fresh':
+          memes = await getFreshMemes();
+          break;
+        case 'crowned':
+          memes = await getCrownedMemes();
+          break;
+        case 'mymemes':
+          if (currentUser) {
+            memes = await getUserMemes(currentUser.uid);
+          } else {
+            showNotification("Please log in to view your memes", "", true);
+            memes = await getHotMemes();
+          }
+          break;
+        default:
+          memes = await getHotMemes();
+      }
+      
+      // Render memes
+      renderMemes(memes, tab);
+      
+      // Add ad container between memes
+      insertAds();
       
     } catch (error) {
       console.error('Error loading feed:', error);
       feed.innerHTML = `
         <div class="error-message">
-          <div>❌ Failed to load memes</div>
-          <button class="action-button save" style="margin-top: 16px;" onclick="loadFeedContent('${tab}')">
-            Try Again
-          </button>
+          <p>Failed to load content. Please try again later.</p>
+          <button class="action-button save" onclick="loadFeed('${tab}')">Retry</button>
         </div>
       `;
-    } finally {
-      isLoading = false;
     }
   }
 
-  async function fetchRandomMeme(index, tab) {
+  // Fetch hot memes from API and database
+  async function getHotMemes() {
     try {
-      // For demo purposes, we'll use placeholder data
-      // In production, this would connect to Firebase or meme APIs
-      const memeId = `meme-${Date.now()}-${index}`;
-      const titleOptions = [
-        "When your code finally works but you don't know why",
-        "Me explaining memes to my parents",
-        "My reaction to Monday morning meetings",
-        "How I feel after scrolling CringeScroll for 3 hours",
-        "When someone says they don't like memes",
-        "My boss when I ask for a raise",
-        "That one friend who always sends cringe memes"
-      ];
+      const [apiMemes, dbMemes] = await Promise.all([
+        fetchExternalMemes(4),
+        getDatabaseMemes('hot', 6)
+      ]);
       
-      const reactionCounts = {
-        '💀': Math.floor(Math.random() * 5000) + 1000,
-        '😂': Math.floor(Math.random() * 3000) + 500,
-        '🤡': Math.floor(Math.random() * 2000) + 300,
-        '🔥': Math.floor(Math.random() * 1500) + 200
-      };
-      
-      return {
-        id: memeId,
-        title: titleOptions[Math.floor(Math.random() * titleOptions.length)],
-        url: `https://picsum.photos/seed/${memeId}/300/300?random=${Math.random()}`,
-        username: ['MemeLord666', 'CringeQueen', 'DankMaster', 'LOLWizard', 'SavageScroller'][Math.floor(Math.random() * 5)],
-        timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-        reactions: reactionCounts,
-        isUserGenerated: tab === 'mymemes' || Math.random() > 0.7,
-        claimedBy: null,
-        isSaved: Math.random() > 0.5
-      };
+      return [...apiMemes, ...dbMemes];
     } catch (error) {
-      console.error('Error fetching meme:', error);
-      return null;
+      console.error('Error fetching hot memes:', error);
+      return await getDatabaseMemes('hot', 10);
     }
   }
 
-  async function fetchUserMemes() {
-    if (!currentUser) return [];
-    
+  // Fetch fresh memes
+  async function getFreshMemes() {
     try {
-      // For demo purposes - would connect to Firebase in production
-      return Array.from({length: 3}, (_, i) => ({
-        id: `user-meme-${i}-${Date.now()}`,
-        title: `My awesome meme #${i + 1}`,
-        url: `https://picsum.photos/seed/user${i}/300/300?random=${Math.random()}`,
-        username: currentUser.email.split('@')[0],
-        timestamp: new Date(Date.now() - i * 60 * 60 * 1000).toISOString(),
-        reactions: {
-          '💀': Math.floor(Math.random() * 100) + 10,
-          '😂': Math.floor(Math.random() * 80) + 5,
-          '🤡': Math.floor(Math.random() * 50) + 3,
-          '🔥': Math.floor(Math.random() * 30) + 1
-        },
-        isUserGenerated: true,
-        claimedBy: null,
-        isSaved: true
-      }));
+      return await getDatabaseMemes('fresh', 10);
+    } catch (error) {
+      console.error('Error fetching fresh memes:', error);
+      return [];
+    }
+  }
+
+  // Fetch crowned memes
+  async function getCrownedMemes() {
+    try {
+      return await getDatabaseMemes('crowned', 10);
+    } catch (error) {
+      console.error('Error fetching crowned memes:', error);
+      return [];
+    }
+  }
+
+  // Fetch user memes
+  async function getUserMemes(userId) {
+    try {
+      if (!userId) return [];
+      
+      const memesRef = db.collection('memes')
+        .where('userId', '==', userId)
+        .orderBy('createdAt', 'desc')
+        .limit(10);
+      
+      const snapshot = await memesRef.get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       console.error('Error fetching user memes:', error);
       return [];
     }
   }
 
-  function createMemeCard(meme) {
+  // Fetch external memes from APIs
+  async function fetchExternalMemes(count) {
+    const apis = [
+      'https://meme-api.com/gimme',
+      'https://meme-api.com/gimme/dankmemes',
+      'https://meme-api.com/gimme/me_irl'
+    ];
+    
+    const memes = [];
+    const usedUrls = new Set();
+    
+    while (memes.length < count && apis.length > 0) {
+      const randomApi = apis[Math.floor(Math.random() * apis.length)];
+      try {
+        const response = await fetch(randomApi);
+        const data = await response.json();
+        
+        if (data.url && !usedUrls.has(data.url)) {
+          usedUrls.add(data.url);
+          memes.push({
+            id: `external_${Date.now()}_${memes.length}`,
+            url: data.url,
+            title: data.title || 'Cringe Meme',
+            ups: data.ups || Math.floor(Math.random() * 1000),
+            subreddit: data.subreddit || 'unknown',
+            author: data.author || 'anonymous',
+            isExternal: true
+          });
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch from ${randomApi}:`, error);
+        apis.splice(apis.indexOf(randomApi), 1);
+      }
+    }
+    
+    return memes;
+  }
+
+  // Get memes from database
+  async function getDatabaseMemes(sortBy, limit) {
+    try {
+      let query = db.collection('memes').orderBy('createdAt', 'desc');
+      
+      if (sortBy === 'hot') {
+        query = db.collection('memes').orderBy('ups', 'desc');
+      } else if (sortBy === 'crowned') {
+        query = db.collection('memes').where('isCrowned', '==', true).orderBy('createdAt', 'desc');
+      }
+      
+      query = query.limit(limit);
+      const snapshot = await query.get();
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('Error fetching database memes:', error);
+      return [];
+    }
+  }
+
+  // Render memes to the feed
+  function renderMemes(memes, tab) {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+    
+    feed.innerHTML = '';
+    
+    memes.forEach((meme, index) => {
+      const memeCard = createMemeCard(meme, index, tab);
+      feed.appendChild(memeCard);
+    });
+    
+    // Setup image loading with Intersection Observer
+    setupImageLoading();
+  }
+
+  // Create a meme card element
+  function createMemeCard(meme, index, tab) {
     const card = document.createElement('div');
     card.className = 'meme-card floating';
     card.dataset.id = meme.id;
     
-    // Randomize the reaction badge content for demo
-    const reactionTypes = ['🔥', '💎', '🚀', '💯'];
-    const reactionType = reactionTypes[Math.floor(Math.random() * reactionTypes.length)];
-    const totalReactions = Object.values(meme.reactions).reduce((a, b) => a + b, 0);
+    // Add crown badge if applicable
+    let crownBadge = '';
+    if (meme.isCrowned) {
+      crownBadge = `
+        <div class="crown-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3 6h6l-5 4l2 6l-4-3l-4 3l2-6l-5-4h6l2-6z"></path>
+          </svg>
+        </div>
+      `;
+    }
     
-    // Get time since post
-    const timeSince = getTimeSince(new Date(meme.timestamp));
+    // Add user badge if applicable
+    let userBadge = '';
+    if (meme.isExternal) {
+      userBadge = `
+        <div class="reaction-badge" style="background: rgba(137, 180, 250, 0.9);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Reddit
+        </div>
+      `;
+    } else if (meme.userId) {
+      userBadge = `
+        <div class="reaction-badge" style="background: rgba(245, 189, 230, 0.9);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          User Generated
+        </div>
+      `;
+    }
     
     card.innerHTML = `
       <div class="card-header">
         <div class="user-info">
-          <div class="user-avatar">${meme.username.charAt(0)}</div>
+          <div class="user-avatar">${meme.author ? meme.author.charAt(0).toUpperCase() : 'U'}</div>
           <div>
-            <div class="username">${meme.username}</div>
-            <div class="post-time">${timeSince}</div>
+            <div class="username">${meme.author || 'anonymous'}</div>
+            <div class="post-time">${formatTimeAgo(meme.createdAt)}</div>
           </div>
         </div>
         <div class="card-actions">
-          <button class="card-btn">
+          <button class="card-btn" onclick="showMemeOptions(event, '${meme.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
             </svg>
           </button>
         </div>
       </div>
-      <h3 class="meme-title">${meme.title}</h3>
+      <h3 class="meme-title">${escapeHTML(meme.title)}</h3>
       <div class="meme-image-container">
         <div class="badge-container">
           <div class="reaction-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
-            ${totalReactions.toLocaleString()}
+            ${meme.ups.toLocaleString()}
           </div>
-          ${meme.isUserGenerated ? `<div class="reaction-badge" style="background: rgba(245, 189, 230, 0.9);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
-              <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-            User Generated
-          </div>` : ''}
+          ${userBadge}
+          ${crownBadge}
         </div>
-        <img class="meme-image" src="${meme.url}" alt="Cringe meme">
+        <img class="meme-image" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiMxYTFhMmEiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjYTZhNmMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Mb2FkaW5nLi4uPC90ZXh0Pjwvc3ZnPg==" data-src="${meme.url}" alt="Cringe meme">
       </div>
       <div class="card-footer">
         <div class="reactions">
-          ${Object.entries(meme.reactions).map(([emoji, count]) => `
-            <div class="reaction-item">
-              <div class="reaction-btn">${emoji}</div>
-              <div class="reaction-count">${count.toLocaleString()}</div>
-            </div>
-          `).join('')}
+          <div class="reaction-item" onclick="addReaction('${meme.id}', '😂')">
+            <div class="reaction-btn">😂</div>
+            <div class="reaction-count">${meme.reactions?.lol || 0}</div>
+          </div>
+          <div class="reaction-item" onclick="addReaction('${meme.id}', '💀')">
+            <div class="reaction-btn">💀</div>
+            <div class="reaction-count">${meme.reactions?.dead || 0}</div>
+          </div>
+          <div class="reaction-item" onclick="addReaction('${meme.id}', '🔥')">
+            <div class="reaction-btn">🔥</div>
+            <div class="reaction-count">${meme.reactions?.fire || 0}</div>
+          </div>
+          <div class="reaction-item" onclick="addReaction('${meme.id}', '❤️')">
+            <div class="reaction-btn">❤️</div>
+            <div class="reaction-count">${meme.reactions?.heart || 0}</div>
+          </div>
         </div>
         <div class="action-buttons">
           <button class="action-button tip" onclick="tipMeme('${meme.id}', 5)">
@@ -2224,25 +2492,20 @@
             </svg>
             Tip 5 CC
           </button>
-          ${!meme.claimedBy ? `<button class="action-button claim" onclick="claimMeme('${meme.id}')">
+          <button class="action-button claim" onclick="claimMeme('${meme.id}')" ${meme.claimedBy ? 'disabled' : ''}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
               <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
             </svg>
-            Claim
-          </button>` : `<button class="action-button claim" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 13l4 4L19 7"></path>
-            </svg>
-            Claimed
-          </button>`}
-          <button class="action-button ${meme.isSaved ? 'save' : ''}" onclick="toggleSaveMeme('${meme.id}', this)">
+            ${meme.claimedBy ? 'Claimed' : 'Claim'}
+          </button>
+          <button class="action-button save" onclick="saveMeme('${meme.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path>
             </svg>
-            ${meme.isSaved ? 'Saved' : 'Save'}
+            Save
           </button>
-          <button class="action-button remix" onclick="openRemixModal('${meme.id}')">
+          <button class="action-button remix" onclick="remixMeme('${meme.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 002-2v-4M17 9l-5 5-5-5M12 12.8V2.5"></path>
             </svg>
@@ -2252,616 +2515,1210 @@
       </div>
     `;
     
-    // Lazy load images
-    const img = card.querySelector('.meme-image');
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          img.classList.add('loaded');
-          observer.disconnect();
-        }
-      }, { threshold: 0.1 });
-      observer.observe(img);
-    } else {
-      img.classList.add('loaded');
-    }
-    
     return card;
   }
 
-  function getTimeSince(date) {
-    const seconds = Math.floor((new Date() - date) / 1000);
-    let interval = seconds / 31536000;
+  // Setup image loading with Intersection Observer
+  function setupImageLoading() {
+    const images = document.querySelectorAll('.meme-image');
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.onload = () => {
+            img.classList.add('loaded');
+          };
+          img.onerror = () => {
+            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM2NjYiLz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FcnJvciBMb2FkaW5nIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+          };
+          imageObserver.unobserve(img);
+        }
+      });
+    }, {
+      rootMargin: '50px 0px',
+      threshold: 0.01
+    });
     
-    if (interval > 1) return Math.floor(interval) + "y ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + "mo ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + "d ago";
-    interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + "h ago";
-    interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + "m ago";
-    return Math.floor(seconds) + "s ago";
+    images.forEach(img => {
+      imageObserver.observe(img);
+    });
   }
 
-  // ===== USER INTERACTIONS =====
-  function tipMeme(memeId, amount) {
+  // Insert ad containers between memes
+  function insertAds() {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+    
+    // Insert ad after every 3 memes
+    const memeCards = feed.querySelectorAll('.meme-card');
+    memeCards.forEach((card, index) => {
+      if ((index + 1) % 3 === 0) {
+        const adContainer = document.createElement('div');
+        adContainer.className = 'ad-container glow';
+        adContainer.innerHTML = `
+          <div class="ad-content">Support CringeScroll - Upgrade to Premium to remove ads</div>
+          <button class="action-button tip" style="margin-top: 16px;">Go Premium</button>
+        `;
+        feed.insertBefore(adContainer, card.nextSibling);
+      }
+    });
+  }
+
+  // Add reaction to meme
+  async function addReaction(memeId, emoji) {
     if (!currentUser) {
-      showAuthPrompt();
+      showNotification("Login required", "Please log in to react to memes");
+      return;
+    }
+    
+    try {
+      const memeRef = db.collection('memes').doc(memeId);
+      const memeDoc = await memeRef.get();
+      
+      if (!memeDoc.exists) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      const memeData = memeDoc.data();
+      const reactions = memeData.reactions || {};
+      
+      // Update reactions count
+      reactions[emoji] = (reactions[emoji] || 0) + 1;
+      
+      // Update meme document
+      await memeRef.update({
+        reactions: reactions,
+        ups: (memeData.ups || 0) + 1
+      });
+      
+      // Update user coins
+      await updateCringeCoin(1);
+      
+      // Update UI
+      const reactionCount = document.querySelector(`.meme-card[data-id="${memeId}"] .reaction-item:nth-child(${getEmojiIndex(emoji)}) .reaction-count`);
+      if (reactionCount) {
+        reactionCount.textContent = reactions[emoji];
+        reactionCount.classList.add('animated');
+        setTimeout(() => {
+          reactionCount.classList.remove('animated');
+        }, 300);
+      }
+      
+      // Update hot score if needed
+      await updateHotScore(memeId);
+      
+      showNotification("Reaction added!", "+1 CringeCoin earned");
+      
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+      showNotification("Error", "Failed to add reaction", true);
+    }
+  }
+
+  // Get emoji index for UI updates
+  function getEmojiIndex(emoji) {
+    const emojis = ['😂', '💀', '🔥', '❤️'];
+    return emojis.indexOf(emoji) + 1;
+  }
+
+  // Tip meme creator
+  async function tipMeme(memeId, amount) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to tip creators");
       return;
     }
     
     if (cringeCoin < amount) {
-      showNotification("Insufficient Funds", `You need at least ${amount} CringeCoins to tip`);
+      showNotification("Insufficient funds", `You need at least ${amount} CringeCoins to tip`);
       return;
     }
     
-    // For demo: update coin balance
-    cringeCoin -= amount;
-    updateProfileDisplay();
-    
-    // Visual feedback
-    const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
-    if (card) {
-      const reactionCount = card.querySelector('.reaction-count');
-      if (reactionCount) {
-        const currentValue = parseInt(reactionCount.textContent.replace(/,/g, ''));
-        reactionCount.textContent = (currentValue + 1).toLocaleString();
-        reactionCount.classList.add('pulse');
-        setTimeout(() => reactionCount.classList.remove('pulse'), 500);
-      }
+    try {
+      const memeRef = db.collection('memes').doc(memeId);
+      const memeDoc = await memeRef.get();
       
-      // Floating coin animation
-      const floatCoin = document.createElement('div');
-      floatCoin.innerHTML = `-${amount} 💰`;
-      floatCoin.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(1.5);
-        color: var(--accent-pink);
-        font-weight: 700;
-        font-size: 24px;
-        text-shadow: 0 0 10px rgba(245, 189, 230, 0.7);
-        pointer-events: none;
-        z-index: 10;
-        animation: floatUp 1s forwards;
-      `;
-      card.appendChild(floatCoin);
-      
-      setTimeout(() => {
-        if (floatCoin.parentNode) floatCoin.parentNode.removeChild(floatCoin);
-      }, 1000);
-    }
-    
-    showNotification("Tipped Successfully", `You tipped ${amount} CringeCoins!`);
-  }
-
-  function claimMeme(memeId) {
-    if (!currentUser) {
-      showAuthPrompt();
-      return;
-    }
-    
-    const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
-    if (!card) return;
-    
-    // Update UI immediately
-    const claimBtn = card.querySelector('.claim');
-    if (claimBtn) {
-      claimBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 13l4 4L19 7"></path>
-        </svg>
-        Claimed
-      `;
-      claimBtn.disabled = true;
-    }
-    
-    // Add claimed by text
-    const claimedText = document.createElement('div');
-    claimedText.className = 'claimed-by';
-    claimedText.textContent = `Spotted by @${currentUser.email.split('@')[0]}`;
-    card.querySelector('.card-footer').before(claimedText);
-    
-    // Add coins for claiming
-    cringeCoin += 10;
-    updateProfileDisplay();
-    
-    showNotification("Meme Claimed", "You earned 10 CringeCoins for spotting this meme!");
-  }
-
-  function toggleSaveMeme(memeId, button) {
-    if (!currentUser) {
-      showAuthPrompt();
-      return;
-    }
-    
-    const isSaved = button.classList.contains('save');
-    button.classList.toggle('save');
-    button.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path>
-      </svg>
-      ${isSaved ? 'Save' : 'Saved'}
-    `;
-    
-    showNotification(isSaved ? "Removed from Saved" : "Saved to Collection", 
-      isSaved ? "Meme removed from your saved collection" : "Meme added to your saved collection!");
-  }
-
-  function openRemixModal(memeId) {
-    if (!currentUser) {
-      showAuthPrompt();
-      return;
-    }
-    
-    const modal = document.getElementById('createMemeModal');
-    modal.classList.add('open');
-    
-    // For demo purposes, we'd load the meme data into the editor
-    document.getElementById('topText').value = "Your custom text here";
-    document.getElementById('bottomText').value = "Make it cringe-worthy";
-  }
-
-  // ===== MODALS AND PANELS =====
-  function setupEventListeners() {
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tab = btn.dataset.tab;
-        loadFeedContent(tab);
-      });
-    });
-    
-    // Navigation items
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tab = item.dataset.tab;
-        if (tab) {
-          loadFeedContent(tab);
-        } else if (item.id === 'chatBtn') {
-          openPanel('chatPanel');
-        } else if (item.id === 'leaderboardBtn') {
-          openPanel('leaderboardPanel');
-          loadLeaderboard();
-        } else if (item.id === 'dailyQuestsBtn') {
-          // Placeholder for quests
-          showNotification("Daily Quests", "Quests feature coming soon!");
-        } else if (item.id === 'collectionsBtn' || item.id === 'savedMemesBtn') {
-          openPanel('collectionsPanel');
-          loadCollections();
-        } else if (item.id === 'profileBtn') {
-          openProfile();
-        }
-      });
-    });
-    
-    // Header actions
-    document.getElementById('rouletteBtn').addEventListener('click', () => {
-      showNotification("Cringe Roulette", "Spinning the wheel of cringe...");
-      // In a real app, this would load a random meme
-      setTimeout(() => {
-        loadFeedContent('hot');
-        showNotification("roulette complete", "You've been blessed with ultimate cringe!");
-      }, 1000);
-    });
-    
-    document.getElementById('glowBtn').addEventListener('click', toggleGlowMode);
-    document.getElementById('createBtn').addEventListener('click', () => {
-      if (!currentUser) {
-        showAuthPrompt();
+      if (!memeDoc.exists) {
+        showNotification("Error", "Meme not found", true);
         return;
       }
-      document.getElementById('createMemeModal').classList.add('open');
-    });
-    
-    document.getElementById('searchBtn').addEventListener('click', () => {
-      document.getElementById('searchBar').style.display = 
-        document.getElementById('searchBar').style.display === 'none' ? 'block' : 'none';
-    });
-    
-    document.getElementById('notificationsBtn').addEventListener('click', () => {
-      showNotification("notifications", "You have 3 new notifications!");
-    });
-    
-    document.getElementById('toggleSidebar').addEventListener('click', () => {
-      document.querySelector('.sidebar').classList.toggle('active');
-    });
-    
-    // Modal close buttons
-    document.querySelectorAll('.close-panel').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const modal = btn.closest('.modal, .panel');
-        if (modal) modal.classList.remove('open');
-      });
-    });
-    
-    // Close modals when clicking outside
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          modal.classList.remove('open');
+      
+      const memeData = memeDoc.data();
+      const creatorId = memeData.userId;
+      
+      if (!creatorId) {
+        showNotification("Error", "This meme doesn't have a creator to tip", true);
+        return;
+      }
+      
+      // Start transaction
+      await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const creatorRef = db.collection('users').doc(creatorId);
+        
+        const userDoc = await transaction.get(userRef);
+        const creatorDoc = await transaction.get(creatorRef);
+        
+        if (!userDoc.exists || !creatorDoc.exists) {
+          throw new Error("User not found");
         }
+        
+        const userData = userDoc.data();
+        const creatorData = creatorDoc.data();
+        
+        if (userData.cringeCoin < amount) {
+          throw new Error("Insufficient coins");
+        }
+        
+        // Update balances
+        transaction.update(userRef, {
+          cringeCoin: userData.cringeCoin - amount
+        });
+        
+        transaction.update(creatorRef, {
+          cringeCoin: (creatorData.cringeCoin || 0) + amount
+        });
+        
+        // Record transaction
+        transaction.set(db.collection('transactions').doc(), {
+          from: currentUser.uid,
+          to: creatorId,
+          amount: amount,
+          memeId: memeId,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
       });
-    });
-    
-    // Create meme form
-    document.getElementById('generateMemeBtn').addEventListener('click', previewMeme);
-    document.getElementById('postMemeBtn').addEventListener('click', postMeme);
-    
-    // Auth modal
-    document.querySelectorAll('[id$="AuthModal"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.getElementById('authModal').classList.add('open');
-      });
-    });
+      
+      // Update local coin count
+      cringeCoin -= amount;
+      updateProfileUI();
+      
+      // Show notification
+      showNotification("Tip sent!", `You tipped ${amount} CringeCoins to the creator!`);
+      
+      // Visual feedback
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      if (card) {
+        const tipAnimation = document.createElement('div');
+        tipAnimation.style.cssText = `
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(166, 227, 161, 0.9);
+          color: #0f172a;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-weight: 700;
+          font-size: 18px;
+          z-index: 10;
+          animation: tipAnimation 1.5s forwards;
+        `;
+        tipAnimation.innerHTML = `+${amount} CC!`;
+        card.appendChild(tipAnimation);
+        
+        setTimeout(() => {
+          tipAnimation.remove();
+        }, 1500);
+      }
+      
+    } catch (error) {
+      console.error('Error tipping meme:', error);
+      showNotification("Error", "Failed to send tip", true);
+    }
   }
 
-  function openPanel(panelId) {
-    document.querySelectorAll('.panel').forEach(panel => {
-      panel.classList.remove('open');
-    });
-    document.getElementById(panelId).classList.add('open');
-  }
-
-  function closeAllPanels() {
-    document.querySelectorAll('.panel').forEach(panel => {
-      panel.classList.remove('open');
-    });
-  }
-
-  function openProfile() {
-    const modal = document.getElementById('profileModal');
-    modal.classList.add('open');
-    
-    // Load profile data
-    const profileContent = document.querySelector('#profileModal .modal-body');
-    profileContent.innerHTML = `
-      <div class="profile-header">
-        <div class="avatar-large">U</div>
-        <div class="profile-details">
-          <h3>${currentUser.email.split('@')[0]}</h3>
-          <p>Member since ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
-          <div class="profile-stats">
-            <div class="stat-item">
-              <div class="stat-value">${cringeCoin.toLocaleString()}</div>
-              <div>CringeCoins</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">${streak}</div>
-              <div>Day Streak</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">42</div>
-              <div>Memes Posted</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="profile-section">
-        <h4>My Collections</h4>
-        <div class="collections-list" id="profileCollections">
-          <div class="collection-card">
-            <div style="font-weight: 600; margin-bottom: 4px;">Saved Memes</div>
-            <div>128 memes</div>
-          </div>
-          <div class="collection-card">
-            <div style="font-weight: 600; margin-bottom: 4px;">My Creations</div>
-            <div>42 memes</div>
-          </div>
-        </div>
-      </div>
-      <div class="profile-section">
-        <h4>Recent Activity</h4>
-        <div class="activity-list" id="userActivity">
-          <div style="padding: 12px 0; border-bottom: 1px solid var(--card-border);">
-            <div>Posted a new meme</div>
-            <div style="color: var(--text-secondary); font-size: 14px;">2 hours ago</div>
-          </div>
-          <div style="padding: 12px 0; border-bottom: 1px solid var(--card-border);">
-            <div>Claimed a meme</div>
-            <div style="color: var(--text-secondary); font-size: 14px;">5 hours ago</div>
-          </div>
-          <div style="padding: 12px 0;">
-            <div>Tipped a user 5 CC</div>
-            <div style="color: var(--text-secondary); font-size: 14px;">Yesterday</div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function previewMeme() {
-    const topText = document.getElementById('topText').value;
-    const bottomText = document.getElementById('bottomText').value;
-    const imageUrl = document.getElementById('imageUrl').value || 'https://picsum.photos/400/400?random=' + Math.random();
-    
-    const preview = document.getElementById('memePreview');
-    preview.innerHTML = `
-      <div style="position: relative; width: 100%; aspect-ratio: 1/1; background: #0a0a15; border-radius: 16px; overflow: hidden; margin: 20px 0;">
-        <img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Meme preview">
-        <div style="position: absolute; top: 16px; left: 0; right: 0; text-align: center; font-weight: 700; font-size: 24px; color: white; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;">
-          ${topText || ''}
-        </div>
-        <div style="position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-weight: 700; font-size: 24px; color: white; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;">
-          ${bottomText || ''}
-        </div>
-      </div>
-    `;
-  }
-
-  function postMeme() {
-    const topText = document.getElementById('topText').value;
-    const bottomText = document.getElementById('bottomText').value;
-    const imageUrl = document.getElementById('imageUrl').value;
-    const isAnonymous = document.getElementById('anonymousMode').checked;
-    
-    if (!imageUrl) {
-      showNotification("Missing Image", "Please enter a valid image URL");
+  // Claim meme
+  async function claimMeme(memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to claim memes");
       return;
     }
     
-    // For demo: add to feed immediately
-    const meme = {
-      id: `new-meme-${Date.now()}`,
-      title: `${topText} ${bottomText}`.trim() || 'Check out this epic meme!',
-      url: imageUrl,
-      username: isAnonymous ? 'Anonymous' : currentUser.email.split('@')[0],
-      timestamp: new Date().toISOString(),
-      reactions: {
-        '💀': 0,
-        '😂': 0,
-        '🤡': 0,
-        '🔥': 0
-      },
-      isUserGenerated: true,
-      claimedBy: null,
-      isSaved: true
+    const claimBtn = document.querySelector(`.meme-card[data-id="${memeId}"] .claim-btn`);
+    if (claimBtn && claimBtn.disabled) {
+      showNotification("Already claimed", "This meme has already been claimed");
+      return;
+    }
+    
+    try {
+      const memeRef = db.collection('memes').doc(memeId);
+      const memeDoc = await memeRef.get();
+      
+      if (!memeDoc.exists) {
+        showNotification("Error", "Meme not found", true);
+        return;
+      }
+      
+      const memeData = memeDoc.data();
+      
+      if (memeData.claimedBy) {
+        showNotification("Already claimed", "This meme has already been claimed");
+        return;
+      }
+      
+      // Claim the meme
+      await memeRef.update({
+        claimedBy: currentUser.uid,
+        claimedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Award coins
+      await updateCringeCoin(10);
+      
+      // Update UI
+      if (claimBtn) {
+        claimBtn.disabled = true;
+        claimBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          Claimed
+        `;
+      }
+      
+      // Add claimed by text
+      const claimedByText = document.createElement('div');
+      claimedByText.className = 'claimed-by';
+      claimedByText.innerHTML = `Claimed by <span style="color: var(--accent-blue);">@${currentUser.username}</span>`;
+      const cardFooter = document.querySelector(`.meme-card[data-id="${memeId}"] .card-footer`);
+      if (cardFooter) {
+        cardFooter.parentNode.insertBefore(claimedByText, cardFooter);
+      }
+      
+      showNotification("Meme claimed!", "+10 CringeCoins awarded");
+      
+    } catch (error) {
+      console.error('Error claiming meme:', error);
+      showNotification("Error", "Failed to claim meme", true);
+    }
+  }
+
+  // Save meme to collection
+  async function saveMeme(memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to save memes");
+      return;
+    }
+    
+    try {
+      // Show collections modal
+      const collectionsModal = document.getElementById('collectionsModal');
+      if (collectionsModal) {
+        collectionsModal.classList.add('open');
+        
+        // Load user collections
+        const collectionsList = document.getElementById('collectionsList');
+        if (collectionsList) {
+          collectionsList.innerHTML = '<div class="loading-spinner">Loading collections...</div>';
+          
+          const userRef = db.collection('users').doc(currentUser.uid);
+          const userDoc = await userRef.get();
+          
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            const collections = userData.collections || {};
+            const collectionNames = Object.keys(collections);
+            
+            if (collectionNames.length === 0) {
+              collectionsList.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                  <p>You don't have any collections yet.</p>
+                  <button class="action-button save" id="createFirstCollection">Create your first collection</button>
+                </div>
+              `;
+              
+              document.getElementById('createFirstCollection').addEventListener('click', () => {
+                createCollection(memeId);
+              });
+            } else {
+              collectionsList.innerHTML = collectionNames.map(name => `
+                <div class="collection-item" data-collection="${escapeHTML(name)}">
+                  <div>${escapeHTML(name)}</div>
+                  <div class="collection-count">${collections[name].length} memes</div>
+                </div>
+              `).join('');
+              
+              // Add click handlers
+              document.querySelectorAll('.collection-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                  const collectionName = item.dataset.collection;
+                  await addToCollection(memeId, collectionName);
+                  collectionsModal.classList.remove('open');
+                });
+              });
+            }
+          }
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error saving meme:', error);
+      showNotification("Error", "Failed to save meme", true);
+    }
+  }
+
+  // Add meme to collection
+  async function addToCollection(memeId, collectionName) {
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      
+      await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        
+        if (!userDoc.exists) {
+          throw new Error("User not found");
+        }
+        
+        const userData = userDoc.data();
+        const collections = userData.collections || {};
+        
+        if (!collections[collectionName]) {
+          collections[collectionName] = [];
+        }
+        
+        if (!collections[collectionName].includes(memeId)) {
+          collections[collectionName].push(memeId);
+          transaction.update(userRef, { collections });
+        }
+      });
+      
+      showNotification("Saved!", `Added to "${collectionName}" collection`);
+      
+    } catch (error) {
+      console.error('Error adding to collection:', error);
+      showNotification("Error", "Failed to add to collection", true);
+    }
+  }
+
+  // Create new collection
+  async function createCollection(memeId = null) {
+    const collectionName = prompt("Enter collection name:");
+    if (!collectionName || collectionName.trim() === '') return;
+    
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      
+      await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        
+        if (!userDoc.exists) {
+          throw new Error("User not found");
+        }
+        
+        const userData = userDoc.data();
+        const collections = userData.collections || {};
+        
+        if (collections[collectionName]) {
+          throw new Error("Collection already exists");
+        }
+        
+        collections[collectionName] = memeId ? [memeId] : [];
+        transaction.update(userRef, { collections });
+      });
+      
+      if (memeId) {
+        showNotification("Created & Saved!", `New collection "${collectionName}" created and meme added`);
+      } else {
+        showNotification("Collection created!", `New collection "${collectionName}" created`);
+      }
+      
+      // Refresh collections panel if open
+      if (document.getElementById('collectionsPanel').classList.contains('open')) {
+        loadCollections();
+      }
+      
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      showNotification("Error", error.message || "Failed to create collection", true);
+    }
+  }
+
+  // Remix meme
+  function remixMeme(memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to remix memes");
+      return;
+    }
+    
+    const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+    if (card) {
+      const img = card.querySelector('.meme-image');
+      const title = card.querySelector('.meme-title').textContent;
+      
+      // Open meme editor with this meme
+      openMemeEditor(img.dataset.src, title);
+    }
+  }
+
+  // Open meme editor
+  function openMemeEditor(imageUrl = null, title = '') {
+    const editor = document.getElementById('memeEditor');
+    if (!editor) return;
+    
+    editor.style.display = 'flex';
+    
+    // Initialize Fabric.js canvas
+    initFabricEditor(imageUrl, title);
+  }
+
+  // Initialize Fabric.js editor
+  function initFabricEditor(imageUrl = null, title = '') {
+    const canvasEl = document.getElementById('canvas');
+    if (!canvasEl) return;
+    
+    // Clear canvas
+    if (fabricCanvas) {
+      fabricCanvas.clear();
+      fabricCanvas.dispose();
+    }
+    
+    // Initialize canvas
+    fabricCanvas = new fabric.Canvas('canvas', {
+      width: 600,
+      height: 400,
+      backgroundColor: '#0a0a15',
+      selection: true,
+      preserveObjectStacking: true
+    });
+    
+    // Load image if provided
+    if (imageUrl) {
+      fabric.Image.fromURL(imageUrl, (img) => {
+        // Scale image to fit canvas
+        const scale = Math.min(580 / img.width, 380 / img.height);
+        img.scaleX = scale;
+        img.scaleY = scale;
+        
+        // Center image
+        img.left = (600 - img.width * scale) / 2;
+        img.top = (400 - img.height * scale) / 2;
+        
+        fabricCanvas.add(img);
+        fabricCanvas.sendToBack(img);
+      }, {
+        crossOrigin: 'anonymous'
+      });
+    }
+    
+    // Add text if title provided
+    if (title) {
+      const text = new fabric.IText(title, {
+        left: 300,
+        top: 30,
+        fontSize: 36,
+        fontWeight: 'bold',
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeWidth: 2,
+        originX: 'center',
+        originY: 'top',
+        textAlign: 'center',
+        fontFamily: 'Impact'
+      });
+      fabricCanvas.add(text);
+    }
+    
+    // Setup event listeners
+    setupEditorEvents();
+  }
+
+  // Setup editor event listeners
+  function setupEditorEvents() {
+    // Text input panel
+    document.getElementById('add-text-btn').addEventListener('click', () => {
+      document.getElementById('text-input-panel').style.display = 'block';
+    });
+    
+    document.getElementById('apply-text-btn').addEventListener('click', () => {
+      const textValue = document.getElementById('text-value').value.trim();
+      if (textValue) {
+        addTextToCanvas(textValue);
+      }
+      document.getElementById('text-input-panel').style.display = 'none';
+    });
+    
+    // Font family change
+    document.getElementById('font-family').addEventListener('change', (e) => {
+      const activeObject = fabricCanvas.getActiveObject();
+      if (activeObject && activeObject.type === 'i-text') {
+        activeObject.set('fontFamily', e.target.value);
+        fabricCanvas.renderAll();
+      }
+    });
+    
+    // Color change
+    document.getElementById('text-color').addEventListener('change', (e) => {
+      const activeObject = fabricCanvas.getActiveObject();
+      if (activeObject && activeObject.type === 'i-text') {
+        activeObject.set('fill', e.target.value);
+        fabricCanvas.renderAll();
+      }
+    });
+    
+    // Image upload
+    document.getElementById('image-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          fabric.Image.fromURL(event.target.result, (img) => {
+            // Scale image to fit canvas
+            const scale = Math.min(580 / img.width, 380 / img.height);
+            img.scaleX = scale;
+            img.scaleY = scale;
+            
+            // Center image
+            img.left = (600 - img.width * scale) / 2;
+            img.top = (400 - img.height * scale) / 2;
+            
+            // Clear canvas and add image
+            fabricCanvas.getObjects().forEach(obj => {
+              if (obj.type !== 'i-text') {
+                fabricCanvas.remove(obj);
+              }
+            });
+            
+            fabricCanvas.add(img);
+            fabricCanvas.sendToBack(img);
+          }, {
+            crossOrigin: 'anonymous'
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Template buttons
+    document.querySelectorAll('.template-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const imgUrl = btn.dataset.url;
+        fabric.Image.fromURL(imgUrl, (img) => {
+          // Scale image to fit canvas
+          const scale = Math.min(580 / img.width, 380 / img.height);
+          img.scaleX = scale;
+          img.scaleY = scale;
+          
+          // Center image
+          img.left = (600 - img.width * scale) / 2;
+          img.top = (400 - img.height * scale) / 2;
+          
+          // Clear canvas and add image
+          fabricCanvas.getObjects().forEach(obj => {
+            if (obj.type !== 'i-text') {
+              fabricCanvas.remove(obj);
+            }
+          });
+          
+          fabricCanvas.add(img);
+          fabricCanvas.sendToBack(img);
+        }, {
+          crossOrigin: 'anonymous'
+        });
+      });
+    });
+    
+    // Post meme button
+    document.getElementById('post-meme-btn').addEventListener('click', async () => {
+      if (!currentUser) {
+        showNotification("Login required", "Please log in to post memes");
+        return;
+      }
+      
+      try {
+        // Generate image data URL
+        const dataUrl = fabricCanvas.toDataURL({
+          format: 'png',
+          quality: 1
+        });
+        
+        // Create meme
+        await createMeme(
+          '',
+          '',
+          dataUrl,
+          document.getElementById('anonymousMode').checked
+        );
+        
+        // Close editor
+        document.getElementById('memeEditor').style.display = 'none';
+        
+        // Show notification
+        showNotification("Meme created!", "Your meme has been posted to the feed");
+        
+        // Refresh feed
+        loadFeed('mymemes');
+        
+      } catch (error) {
+        console.error('Error posting meme:', error);
+        showNotification("Error", "Failed to post meme", true);
+      }
+    });
+    
+    // Cancel button
+    document.getElementById('cancel-editor-btn').addEventListener('click', () => {
+      document.getElementById('memeEditor').style.display = 'none';
+    });
+  }
+
+  // Add text to canvas
+  function addTextToCanvas(text) {
+    const textObj = new fabric.IText(text, {
+      left: 300,
+      top: 200,
+      fontSize: 36,
+      fontWeight: 'bold',
+      fill: document.getElementById('text-color').value || '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 2,
+      originX: 'center',
+      originY: 'middle',
+      fontFamily: document.getElementById('font-family').value || 'Impact'
+    });
+    
+    fabricCanvas.add(textObj);
+    fabricCanvas.setActiveObject(textObj);
+  }
+
+  // Create meme in database
+  async function createMeme(topText, bottomText, imageUrl, isAnonymous) {
+    if (!currentUser) {
+      throw new Error("User not logged in");
+    }
+    
+    try {
+      const memeId = `meme_${Date.now()}`;
+      const username = isAnonymous ? `anon_${Math.random().toString(36).substr(2, 6)}` : currentUser.username;
+      
+      const memeData = {
+        id: memeId,
+        url: imageUrl,
+        title: (topText + ' ' + bottomText).trim() || 'My Cringe Creation',
+        ups: 0,
+        reactions: {},
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        isUserGenerated: true,
+        createdBy: username,
+        userId: currentUser.uid,
+        isAnonymous: isAnonymous
+      };
+      
+      // Add to database
+      await db.collection('memes').doc(memeId).set(memeData);
+      
+      // Award coins for posting
+      if (!isAnonymous) {
+        await updateCringeCoin(20);
+      }
+      
+      return memeData;
+      
+    } catch (error) {
+      console.error('Error creating meme:', error);
+      throw error;
+    }
+  }
+
+  // Load leaderboard
+  async function loadLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboardList');
+    if (!leaderboardList) return;
+    
+    leaderboardList.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading cringe lords...</p>
+      </div>
+    `;
+    
+    try {
+      const usersRef = db.collection('users')
+        .orderBy('cringeCoin', 'desc')
+        .limit(10);
+      
+      const snapshot = await usersRef.get();
+      
+      if (snapshot.empty) {
+        leaderboardList.innerHTML = '<p>No users found</p>';
+        return;
+      }
+      
+      leaderboardList.innerHTML = '';
+      
+      snapshot.docs.forEach((doc, index) => {
+        const userData = doc.data();
+        const isCurrentUser = currentUser && doc.id === currentUser.uid;
+        
+        const leaderItem = document.createElement('div');
+        leaderItem.className = `leaderboard-item ${isCurrentUser ? 'current-user' : ''}`;
+        leaderItem.innerHTML = `
+          <div class="leaderboard-rank">#${index + 1}</div>
+          <div class="leaderboard-user">
+            <div class="user-avatar">${userData.username.charAt(0)}</div>
+            <div class="user-info">
+              <div class="username">${userData.username}</div>
+              <div class="user-stats">
+                <span class="cringe-coins">${userData.cringeCoin.toLocaleString()} CC</span>
+                <span class="streak">🔥 ${userData.streak || 0} day streak</span>
+              </div>
+            </div>
+          </div>
+          ${isCurrentUser ? '<div class="current-badge">YOU</div>' : ''}
+        `;
+        
+        leaderboardList.appendChild(leaderItem);
+      });
+      
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+      leaderboardList.innerHTML = `
+        <div class="error-message">
+          <p>Failed to load leaderboard</p>
+          <button class="action-button save" onclick="loadLeaderboard()">Retry</button>
+        </div>
+      `;
+    }
+  }
+
+  // Load user collections
+  async function loadCollections() {
+    const collectionsGrid = document.getElementById('collectionsGrid');
+    if (!collectionsGrid) return;
+    
+    collectionsGrid.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your collections...</p>
+      </div>
+    `;
+    
+    if (!currentUser) {
+      collectionsGrid.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+          <p>Please log in to view your collections</p>
+          <button class="action-button save" onclick="showAuthModal()">Log In</button>
+        </div>
+      `;
+      return;
+    }
+    
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      const userDoc = await userRef.get();
+      
+      if (!userDoc.exists) {
+        collectionsGrid.innerHTML = '<p>User not found</p>';
+        return;
+      }
+      
+      const userData = userDoc.data();
+      const collections = userData.collections || {};
+      const collectionNames = Object.keys(collections);
+      
+      if (collectionNames.length === 0) {
+        collectionsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <p>You don't have any collections yet</p>
+            <button class="action-button save" onclick="createCollection()">Create Collection</button>
+          </div>
+        `;
+        return;
+      }
+      
+      collectionsGrid.innerHTML = '';
+      
+      collectionNames.forEach(name => {
+        const collectionCard = document.createElement('div');
+        collectionCard.className = 'collection-card';
+        collectionCard.innerHTML = `
+          <div class="collection-title">${escapeHTML(name)}</div>
+          <div class="collection-count">${collections[name].length} memes</div>
+          <div class="collection-preview">
+            ${collections[name].slice(0, 3).map(id => `
+              <div class="preview-item" data-id="${id}"></div>
+            `).join('')}
+          </div>
+        `;
+        
+        // Add click handler
+        collectionCard.addEventListener('click', () => {
+          showCollectionDetail(name, collections[name]);
+        });
+        
+        collectionsGrid.appendChild(collectionCard);
+      });
+      
+      // Load preview images
+      loadCollectionPreviews();
+      
+    } catch (error) {
+      console.error('Error loading collections:', error);
+      collectionsGrid.innerHTML = `
+        <div class="error-message">
+          <p>Failed to load collections</p>
+          <button class="action-button save" onclick="loadCollections()">Retry</button>
+        </div>
+      `;
+    }
+  }
+
+  // Load collection previews
+  async function loadCollectionPreviews() {
+    const previewItems = document.querySelectorAll('.preview-item');
+    const memeIds = Array.from(previewItems).map(item => item.dataset.id);
+    
+    if (memeIds.length === 0) return;
+    
+    try {
+      const memesRef = db.collection('memes').where(firebase.firestore.FieldPath.documentId(), 'in', memeIds);
+      const snapshot = await memesRef.get();
+      
+      const memesMap = {};
+      snapshot.docs.forEach(doc => {
+        memesMap[doc.id] = doc.data();
+      });
+      
+      previewItems.forEach(item => {
+        const memeId = item.dataset.id;
+        const memeData = memesMap[memeId];
+        
+        if (memeData && memeData.url) {
+          item.style.backgroundImage = `url(${memeData.url})`;
+          item.style.backgroundSize = 'cover';
+          item.style.backgroundPosition = 'center';
+        } else {
+          item.style.backgroundColor = 'var(--card-bg)';
+          item.innerHTML = '<span>?</span>';
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error loading collection previews:', error);
+    }
+  }
+
+  // Show collection detail
+  async function showCollectionDetail(collectionName, memeIds) {
+    const collectionDetailModal = document.getElementById('collectionDetailModal');
+    const collectionTitle = document.getElementById('collectionTitle');
+    const collectionMemesGrid = document.getElementById('collectionMemesGrid');
+    
+    if (!collectionDetailModal || !collectionTitle || !collectionMemesGrid) return;
+    
+    collectionTitle.textContent = collectionName;
+    collectionMemesGrid.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading memes...</p>
+      </div>
+    `;
+    
+    collectionDetailModal.classList.add('open');
+    
+    try {
+      if (memeIds.length === 0) {
+        collectionMemesGrid.innerHTML = '<p>This collection is empty</p>';
+        return;
+      }
+      
+      // Get memes in batches of 10
+      const batches = [];
+      for (let i = 0; i < memeIds.length; i += 10) {
+        batches.push(memeIds.slice(i, i + 10));
+      }
+      
+      const memes = [];
+      
+      for (const batch of batches) {
+        const memesRef = db.collection('memes').where(firebase.firestore.FieldPath.documentId(), 'in', batch);
+        const snapshot = await memesRef.get();
+        
+        snapshot.docs.forEach(doc => {
+          memes.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+      }
+      
+      // Render memes
+      collectionMemesGrid.innerHTML = '';
+      
+      memes.forEach(meme => {
+        const memeItem = document.createElement('div');
+        memeItem.className = 'collection-meme-item';
+        memeItem.innerHTML = `
+          <div class="meme-preview" style="background-image: url('${meme.url}')"></div>
+          <div class="meme-title">${escapeHTML(meme.title)}</div>
+          <div class="meme-stats">
+            <span>${meme.ups || 0} upvotes</span>
+            <button class="action-button save small" onclick="removeFromCollection('${collectionName}', '${meme.id}')">Remove</button>
+          </div>
+        `;
+        
+        collectionMemesGrid.appendChild(memeItem);
+      });
+      
+    } catch (error) {
+      console.error('Error loading collection detail:', error);
+      collectionMemesGrid.innerHTML = `
+        <div class="error-message">
+          <p>Failed to load collection details</p>
+        </div>
+      `;
+    }
+  }
+
+  // Remove meme from collection
+  async function removeFromCollection(collectionName, memeId) {
+    if (!currentUser) {
+      showNotification("Login required", "Please log in to modify collections");
+      return;
+    }
+    
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      
+      await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        
+        if (!userDoc.exists) {
+          throw new Error("User not found");
+        }
+        
+        const userData = userDoc.data();
+        const collections = userData.collections || {};
+        
+        if (collections[collectionName]) {
+          collections[collectionName] = collections[collectionName].filter(id => id !== memeId);
+          transaction.update(userRef, { collections });
+        }
+      });
+      
+      showNotification("Removed", `Meme removed from "${collectionName}"`);
+      
+      // Refresh collection detail if open
+      if (document.getElementById('collectionDetailModal').classList.contains('open')) {
+        const collectionTitle = document.getElementById('collectionTitle').textContent;
+        showCollectionDetail(collectionTitle, document.querySelectorAll('.collection-meme-item').map(el => el.dataset.id));
+      }
+      
+    } catch (error) {
+      console.error('Error removing from collection:', error);
+      showNotification("Error", "Failed to remove from collection", true);
+    }
+  }
+
+  // Check daily crown
+  async function checkDailyCrown() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const crownRef = db.collection('dailyCrowns').doc(today);
+      const crownDoc = await crownRef.get();
+      
+      if (crownDoc.exists) {
+        dailyCrown = crownDoc.data();
+      }
+      
+    } catch (error) {
+      console.error('Error checking daily crown:', error);
+    }
+  }
+
+  // Check user streak
+  async function checkStreak() {
+    if (!currentUser) return;
+    
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      const userDoc = await userRef.get();
+      
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        streak = userData.streak || 0;
+        
+        // Update streak badge
+        const streakBadge = document.querySelector('.streak-badge');
+        if (streakBadge) {
+          streakBadge.innerHTML = `🔥 ${streak}d`;
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error checking streak:', error);
+    }
+  }
+
+  // Update user's CringeCoin balance
+  async function updateCringeCoin(amount) {
+    if (!currentUser || amount <= 0) return;
+    
+    try {
+      const userRef = db.collection('users').doc(currentUser.uid);
+      
+      await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        
+        if (!userDoc.exists) {
+          throw new Error("User not found");
+        }
+        
+        const userData = userDoc.data();
+        const newBalance = (userData.cringeCoin || 0) + amount;
+        
+        transaction.update(userRef, {
+          cringeCoin: newBalance
+        });
+      });
+      
+      // Update local balance
+      cringeCoin += amount;
+      
+      // Update UI
+      updateProfileUI();
+      
+      return true;
+      
+    } catch (error) {
+      console.error('Error updating CringeCoin:', error);
+      return false;
+    }
+  }
+
+  // Update profile UI
+  function updateProfileUI() {
+    // Update coin balance in profile
+    const coinElements = document.querySelectorAll('.stat-value');
+    coinElements.forEach(el => {
+      if (el.textContent.includes(',')) {
+        el.textContent = cringeCoin.toLocaleString();
+      }
+    });
+    
+    // Update streak
+    const streakBadge = document.querySelector('.streak-badge');
+    if (streakBadge) {
+      streakBadge.innerHTML = `🔥 ${streak}d`;
+    }
+  }
+
+  // Setup PWA
+  function setupPWA() {
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+      const installPrompt = document.getElementById('installPrompt');
+      if (installPrompt && !localStorage.getItem('installPromptSeen')) {
+        setTimeout(() => {
+          installPrompt.style.display = 'block';
+          
+          document.getElementById('installBtn').addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+            localStorage.setItem('installPromptSeen', 'true');
+            showNotification("Install instructions", "Tap the share button and select 'Add to Home Screen'");
+          });
+          
+          document.getElementById('dismissBtn').addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+            localStorage.setItem('installPromptSeen', 'true');
+          });
+        }, 5000);
+      }
+    }
+  }
+
+  // Utility functions
+  function formatTimeAgo(timestamp) {
+    if (!timestamp) return 'just now';
+    
+    const now = new Date().getTime();
+    let time;
+    
+    if (timestamp.seconds) {
+      // Firebase timestamp
+      time = timestamp.seconds * 1000;
+    } else if (timestamp.toDate) {
+      // Firestore Timestamp object
+      time = timestamp.toDate().getTime();
+    } else if (typeof timestamp === 'string') {
+      // ISO string
+      time = new Date(timestamp).getTime();
+    } else {
+      // Assume milliseconds
+      time = timestamp;
+    }
+    
+    const diff = now - time;
+    
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+    
+    const date = new Date(time);
+    return date.toLocaleDateString();
+  }
+
+  function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"']/g, m => ({
+      '&': '&amp;',
+      '<': '<',
+      '>': '>',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m]));
+  }
+
+  function debounce(func, wait) {
+    let timeout;
+    return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func.apply(context, args);
+      }, wait);
+    };
+  }
+
+  // Initialize app
+  window.addEventListener('load', () => {
+    // Handle service worker registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('ServiceWorker registered with scope:', registration.scope);
+        })
+        .catch(error => {
+          console.error('ServiceWorker registration failed:', error);
+        });
+    }
+    
+    // Setup manifest dynamically
+    const manifest = {
+      name: 'CringeScroll',
+      short_name: 'CringeScroll',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#0f0f1a',
+      theme_color: '#0f0f1a',
+      icons: [{
+        src: '/icon-192x192.png',
+        sizes: '192x192',
+        type: 'image/png'
+      }, {
+        src: '/icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png'
+      }]
     };
     
-    // Add to top of feed
-    const feed = document.getElementById('feed');
-    const newCard = createMemeCard(meme);
-    feed.insertBefore(newCard, feed.firstChild);
-    
-    // Update coins
-    cringeCoin += 10;
-    updateProfileDisplay();
-    
-    // Close modal
-    document.getElementById('createMemeModal').classList.remove('open');
-    
-    showNotification("Meme Posted!", "Your meme has been shared with the cringe community! +10 CringeCoins");
-  }
-
-  function loadLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboardList');
-    leaderboardList.innerHTML = `
-      <div class="leaderboard-item">
-        <div style="font-weight: 600; color: gold;">#1</div>
-        <div>xX_CringeLord_Xx</div>
-        <div style="color: var(--accent-purple); font-weight: 600;">24,500 CC</div>
-      </div>
-      <div class="leaderboard-item">
-        <div style="font-weight: 600; color: silver;">#2</div>
-        <div>MemeQueen99</div>
-        <div style="color: var(--accent-purple); font-weight: 600;">18,750 CC</div>
-      </div>
-      <div class="leaderboard-item">
-        <div style="font-weight: 600; color: #cd7f32;">#3</div>
-        <div>DankMaster420</div>
-        <div style="color: var(--accent-purple); font-weight: 600;">15,300 CC</div>
-      </div>
-      <div class="leaderboard-item">
-        <div style="font-weight: 600;">#4</div>
-        <div>CringeScrollAddict</div>
-        <div style="color: var(--accent-purple); font-weight: 600;">12,100 CC</div>
-      </div>
-      <div class="leaderboard-item">
-        <div style="font-weight: 600;">#5</div>
-        <div>MemeInvestor</div>
-        <div style="color: var(--accent-purple); font-weight: 600;">9,800 CC</div>
-      </div>
-      <div class="leaderboard-item">
-        <div style="font-weight: 600;">#6</div>
-        <div>${currentUser?.email.split('@')[0] || 'User3781'}</div>
-        <div style="color: var(--accent-purple); font-weight: 600;">${cringeCoin.toLocaleString()} CC</div>
-      </div>
-    `;
-  }
-
-  function loadCollections() {
-    const collectionsGrid = document.getElementById('collectionsGrid');
-    collectionsGrid.innerHTML = `
-      <div class="collection-card">
-        <div style="font-weight: 600; margin-bottom: 8px;">🔥 Hot Takes</div>
-        <div>42 memes</div>
-      </div>
-      <div class="collection-card">
-        <div style="font-weight: 600; margin-bottom: 8px;">😂 Funny Moments</div>
-        <div>28 memes</div>
-      </div>
-      <div class="collection-card">
-        <div style="font-weight: 600; margin-bottom: 8px;">💀 Dark Humor</div>
-        <div>17 memes</div>
-      </div>
-      <div class="collection-card">
-        <div style="font-weight: 600; margin-bottom: 8px;">🌈 Wholesome</div>
-        <div>31 memes</div>
-      </div>
-    `;
-  }
-
-  function showAuthPrompt() {
-    document.getElementById('authModal').classList.add('open');
-  }
-
-  function toggleGlowMode() {
-    document.body.classList.toggle('glow-mode');
-    const isGlowing = document.body.classList.contains('glow-mode');
-    
-    if (isGlowing) {
-      showNotification("Glow Mode Activated", "Experience CringeScroll with enhanced visual effects!");
-    } else {
-      showNotification("Glow Mode Deactivated", "Visual effects reduced for better performance");
-    }
-  }
-
-  // ===== NOTIFICATIONS AND UTILITIES =====
-  function showNotification(title, message) {
-    const notification = document.getElementById('notification');
-    notification.querySelector('.notification-title').textContent = title;
-    notification.querySelector('.notification-message').textContent = message;
-    
-    // Remove existing show class to restart animation
-    notification.classList.remove('show');
-    void notification.offsetWidth; // Trigger reflow
-    notification.classList.add('show');
-    
-    // Auto hide after 5 seconds
-    setTimeout(() => {
-      notification.classList.remove('show');
-    }, 5000);
-  }
-
-  function setupInfiniteScroll() {
-    const feed = document.getElementById('feed');
-    let scrollTimer;
-    
-    feed.addEventListener('scroll', () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 500) {
-          if (!isLoading && loadCount < 10) { // Limit for demo
-            loadMoreContent();
-          }
-        }
-      }, 100);
-    });
-  }
-
-  function loadMoreContent() {
-    // In a real app, this would load more memes
-    showNotification("Loading more...", "Fetching additional memes for your viewing pleasure");
-    
-    setTimeout(() => {
-      const currentTab = document.querySelector('.tab-btn.active').dataset.tab;
-      loadFeedContent(currentTab);
-    }, 800);
-  }
-
-  function updateNavItems() {
-    if (currentUser) {
-      document.querySelectorAll('.requires-auth').forEach(el => {
-        el.style.display = 'flex';
-      });
-      document.getElementById('profileBtn').style.display = 'flex';
-    } else {
-      document.querySelectorAll('.requires-auth').forEach(el => {
-        el.style.display = 'none';
-      });
-      document.getElementById('profileBtn').style.display = 'none';
-    }
-  }
-
-  // ===== 3D BACKGROUND EFFECTS =====
-  function initBackgroundParticles() {
-    const canvas = document.getElementById('background-canvas');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    let particles = [];
-    const particleCount = 80;
-    
-    class Particle {
-      constructor() {
-        this.reset();
-      }
-      
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 5 + 1;
-        this.speedX = Math.random() * 3 - 1.5;
-        this.speedY = Math.random() * 3 - 1.5;
-        this.color = `hsl(${Math.random() * 60 + 180}, 70%, 60%)`;
-        this.opacity = Math.random() * 0.5 + 0.1;
-      }
-      
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-      }
-      
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-    }
-    
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
-    
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw connections between nearby particles
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance < 100) {
-            ctx.strokeStyle = `hsla(${Math.random() * 60 + 180}, 70%, 60%, ${0.2 - distance/1000})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-      
-      // Update and draw particles
-      particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-      });
-      
-      requestAnimationFrame(animate);
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      
-      // Reset particles on resize
-      particles = [];
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-      }
-    });
-    
-    // Start animation
-    animate();
-  }
+    const manifestElement = document.createElement('link');
+    manifestElement.rel = 'manifest';
+    manifestElement.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' }));
+    document.head.appendChild(manifestElement);
+  });
 </script>
 </body>
 </html>
