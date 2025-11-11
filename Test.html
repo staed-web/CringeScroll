@@ -1016,25 +1016,22 @@
         gap: 16px;
       }
       
-      .search-container {
-        margin: 0 10px;
-      }
-      
       .logo-text {
         font-size: 22px;
       }
       
-      .nav-container {
-        padding: 6px 0;
+      .search-container {
+        display: none;
       }
       
-      .nav-item {
-        font-size: 10px;
-        padding: 4px 8px;
+      .header-actions {
+        gap: 8px;
       }
       
-      .nav-item i {
-        font-size: 18px;
+      .action-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
       }
       
       .chat-window {
@@ -1062,14 +1059,6 @@
       
       .logo-text {
         font-size: 20px;
-      }
-      
-      .search-container {
-        display: none;
-      }
-      
-      .header-actions {
-        gap: 8px;
       }
       
       .action-btn {
@@ -2686,7 +2675,7 @@
               </div>
             </div>
             
-            <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(106, 13, 173, 0.2);">
+            <div style="text-align: center; padding: 15px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; margin-top: 25px;">
               <div style="font-weight: bold; color: var(--accent-3); margin-bottom: 5px;">Your Rank: #42</div>
               <div style="color: var(--text-secondary);">3,245 CringeCoin</div>
               <button class="btn btn-primary" style="margin-top: 15px; width: 100%;">
@@ -3369,362 +3358,369 @@
       
       // Add text on click
       fabricCanvas.on('mouse:down', (opt) => {
-        if (activeTool === 'text') {
-          const mouseX = opt.e.offsetX;
-          const mouseY = opt.e.offsetY;
-          
-          const text = new fabric.IText('Your text here', {
-            left: mouseX,
-            top: mouseY,
-            fontFamily: document.getElementById('fontFamilySelect').value,
-            fontSize: 36,
-            fill: currentColor,
-            stroke: '#000000',
-            strokeWidth: 2,
-            originX: 'left',
-            originY: 'top',
-            hasRotatingPoint: true,
-            cornerColor: '#6a0dad',
-            transparentCorners: false
-          });
-          
-          fabricCanvas.add(text);
-          fabricCanvas.setActiveObject(text);
-          text.enterEditing();
-          text.selectAll();
-        }
-      });
-      
-      // Add image button
-      document.querySelector('.editor-tool[data-tool="image"]').addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-              fabric.Image.fromURL(event.target.result, (img) => {
-                img.scaleToWidth(300);
-                img.top = 150;
-                img.left = 150;
-                fabricCanvas.add(img);
-                saveCanvasState();
-              }, { crossOrigin: 'anonymous' });
-            };
-            reader.readAsDataURL(file);
-          }
-        };
-        input.click();
-      });
-    };
+  if (activeTool === 'text') {
+    const mouseX = opt.e.offsetX;
+    const mouseY = opt.e.offsetY;
     
-    // Save canvas state for undo/redo
-    const saveCanvasState = () => {
-      canUndo.push(fabricCanvas.toJSON());
-      canRedo = []; // Clear redo stack when new action is taken
-    };
-    
-    // Undo canvas action
-    const undoCanvasAction = () => {
-      if (canUndo.length > 1) {
-        canRedo.push(canUndo.pop());
-        fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], fabricCanvas.renderAll.bind(fabricCanvas));
-      }
-    };
-    
-    // Redo canvas action
-    const redoCanvasAction = () => {
-      if (canRedo.length > 0) {
-        canUndo.push(canRedo.pop());
-        fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], fabricCanvas.renderAll.bind(fabricCanvas));
-      }
-    };
-    
-    // Clear canvas
-    const clearCanvas = () => {
-      if (confirm('Are you sure you want to clear the canvas? All your work will be lost.')) {
-        fabricCanvas.clear();
-        fabricCanvas.setBackgroundColor('#0d0d29', fabricCanvas.renderAll.bind(fabricCanvas));
-        canUndo = [fabricCanvas.toJSON()];
-        canRedo = [];
-      }
-    };
-    
-    // Save meme draft
-    const saveMemeDraft = () => {
-      if (!currentUser) {
-        showAuthModal();
-        return;
-      }
-      
-      // In a real app, this would save to user's drafts in Firebase
-      showNotification('Draft Saved!', 'Your meme draft has been saved to your profile.', 'success');
-    };
-    
-    // Post meme from editor
-    const postMemeFromEditor = async () => {
-      if (!currentUser) {
-        showAuthModal();
-        return;
-      }
-      
-      try {
-        // Convert canvas to data URL
-        const dataURL = fabricCanvas.toDataURL({
-          format: 'png',
-          quality: 1.0,
-          multiplier: 2 // Higher quality for better image
+    const text = new fabric.IText('Your text here', {
+      left: mouseX,
+      top: mouseY,
+      fontFamily: document.getElementById('fontFamilySelect').value,
+                fontSize: 36,
+          fill: currentColor,
+          stroke: '#000000',
+          strokeWidth: 2,
+          originX: 'left',
+          originY: 'top',
+          hasRotatingPoint: true,
+          cornerColor: '#6a0dad',
+          transparentCorners: false
         });
         
-        // Create meme document in Firestore
-        const memeId = 'meme_' + Date.now();
-        const username = currentUser.username;
-        
-        // In a real app, this would save to Firebase
-        /* await db.collection('memes').doc(memeId).set({
-          id: memeId,
-          url: dataURL,
-          title: 'User-Generated Meme',
-          ups: 0,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          isUserGenerated: true,
-          createdBy: username,
-          userId: currentUser.uid,
-          reactions: {}
-        }); */
-        
-        // Award CringeCoin for posting
-        cringeCoin += 10;
-        
-        // Close editor and refresh feed
-        document.getElementById('memeEditorModal').classList.remove('active');
-        loadFeed(true);
-        
-        showNotification('Meme Posted!', 'Your meme has been shared successfully! +10 CringeCoin', 'success');
-      } catch (error) {
-        console.error('Meme post error:', error);
-        showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
+        fabricCanvas.add(text);
+        fabricCanvas.setActiveObject(text);
+        saveCanvasState();
+        text.enterEditing();
+        text.selectAll();
       }
-    };
-    
-    // ===== CHAT MESSAGE SENDING =====
-    document.getElementById('sendChatMessage').addEventListener('click', sendMessage);
-    document.getElementById('chatInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
     });
     
-    // ===== MODAL CLOSING =====
-    document.querySelectorAll('.close-modal').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const modal = e.target.closest('.modal-overlay');
-        if (modal) modal.classList.remove('active');
-      });
-    });
+    // Save state after each action
+    fabricCanvas.on('object:modified', saveCanvasState);
+    fabricCanvas.on('object:added', saveCanvasState);
+    fabricCanvas.on('object:removed', saveCanvasState);
     
-    // ===== SIDEBAR TOGGLING =====
-    document.getElementById('menuToggleBtn').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.add('active');
-    });
-    
-    document.getElementById('closeSidebar').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.remove('active');
-    });
-    
-    // ===== INFINITE SCROLLING =====
-    let scrollTimeout;
-    feed.addEventListener('scroll', () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const { scrollTop, scrollHeight, clientHeight } = feed;
-        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT && !isLoading) {
-          loadFeed();
+    // Add image button
+    document.querySelector('.editor-tool[data-tool="image"]').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            fabric.Image.fromURL(event.target.result, (img) => {
+              img.scaleToWidth(300);
+              img.top = 150;
+              img.left = 150;
+              fabricCanvas.add(img);
+              saveCanvasState();
+            }, { crossOrigin: 'anonymous' });
+          };
+          reader.readAsDataURL(file);
         }
-      }, 100);
+      };
+      input.click();
     });
+  };
+  
+  // Save canvas state for undo/redo
+  const saveCanvasState = () => {
+    canUndo.push(fabricCanvas.toJSON());
+    canRedo = []; // Clear redo stack when new action is taken
+  };
+  
+  // Undo canvas action
+  const undoCanvasAction = () => {
+    if (canUndo.length > 1) {
+      canRedo.push(canUndo.pop());
+      fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], fabricCanvas.renderAll.bind(fabricCanvas));
+    }
+  };
+  
+  // Redo canvas action
+  const redoCanvasAction = () => {
+    if (canRedo.length > 0) {
+      canUndo.push(canRedo.pop());
+      fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], fabricCanvas.renderAll.bind(fabricCanvas));
+    }
+  };
+  
+  // Clear canvas
+  const clearCanvas = () => {
+    if (confirm('Are you sure you want to clear the canvas? All your work will be lost.')) {
+      fabricCanvas.clear();
+      fabricCanvas.setBackgroundColor('#0d0d29', fabricCanvas.renderAll.bind(fabricCanvas));
+      canUndo = [fabricCanvas.toJSON()];
+      canRedo = [];
+    }
+  };
+  
+  // Save meme draft
+  const saveMemeDraft = () => {
+    if (!currentUser) {
+      showAuthModal();
+      return;
+    }
     
-    // ===== INITIALIZE APP =====
-    document.addEventListener('DOMContentLoaded', initApp);
+    // In a real app, this would save to user's drafts in Firebase
+    showNotification('Draft Saved!', 'Your meme draft has been saved to your profile.', 'success');
+  };
+  
+  // Post meme from editor
+  const postMemeFromEditor = async () => {
+    if (!currentUser) {
+      showAuthModal();
+      return;
+    }
     
-    // ===== FINAL INITIALIZATION =====
-    console.log('CringeScroll v10.0 — Fully Loaded and Optimized');
-    console.log('✓ Firebase Initialized');
-    console.log('✓ Dynamic Card Sizing Active');
-    console.log('✓ Hamburger Menu Scrollable');
-    console.log('✓ All Functions Working');
-    console.log('✓ Chat Window Functional');
-    console.log('✓ Meme Editor Glitch-Free');
-    console.log('✓ Offline Support Enabled');
-    
-    // Add final touches after everything loads
-    window.addEventListener('load', () => {
-      // Preload common images
-      const preloadUrls = [
-        'https://i.imgur.com/DrakeMemeTemplate.jpg',
-        'https://i.imgur.com/DistractedBoyfriend.jpg',
-        'https://i.imgur.com/ChangeMyMind.jpg',
-        'https://i.imgur.com/WomanYellingAtCat.jpg'
-      ];
-      
-      preloadUrls.forEach(url => {
-        const img = new Image();
-        img.src = url;
+    try {
+      // Convert canvas to data URL
+      const dataURL = fabricCanvas.toDataURL({
+        format: 'png',
+        quality: 1.0,
+        multiplier: 2 // Higher quality for better image
       });
       
-      // Final performance check
+      // Create meme document in Firestore
+      const memeId = 'meme_' + Date.now();
+      const username = currentUser.username;
+      
+      // In a real app, this would save to Firebase
+      /* await db.collection('memes').doc(memeId).set({
+        id: memeId,
+        url: dataURL,
+        title: 'User-Generated Meme',
+        ups: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        isUserGenerated: true,
+        createdBy: username,
+        userId: currentUser.uid,
+        reactions: {}
+      }); */
+      
+      // Award CringeCoin for posting
+      cringeCoin += 10;
+      
+      // Close editor and refresh feed
+      document.getElementById('memeEditorModal').classList.remove('active');
+      loadFeed(true);
+      
+      showNotification('Meme Posted!', 'Your meme has been shared successfully! +10 CringeCoin', 'success');
+    } catch (error) {
+      console.error('Meme post error:', error);
+      showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
+    }
+  };
+  
+  // ===== CHAT MESSAGE SENDING =====
+  document.getElementById('sendChatMessage').addEventListener('click', sendMessage);
+  document.getElementById('chatInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+  
+  // ===== MODAL CLOSING =====
+  document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const modal = e.target.closest('.modal-overlay');
+      if (modal) modal.classList.remove('active');
+    });
+  });
+  
+  // ===== SIDEBAR TOGGLING =====
+  document.getElementById('menuToggleBtn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.add('active');
+  });
+  
+  document.getElementById('closeSidebar').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('active');
+  });
+  
+  // ===== INFINITE SCROLLING =====
+  let scrollTimeout;
+  feed.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const { scrollTop, scrollHeight, clientHeight } = feed;
+      if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT && !isLoading) {
+        loadFeed();
+      }
+    }, 100);
+  });
+  
+  // ===== INITIALIZE APP =====
+  document.addEventListener('DOMContentLoaded', initApp);
+  
+  // ===== FINAL INITIALIZATION =====
+  console.log('CringeScroll v10.0 — Fully Loaded and Optimized');
+  console.log('✓ Firebase Initialized');
+  console.log('✓ Dynamic Card Sizing Active');
+  console.log('✓ Hamburger Menu Scrollable');
+  console.log('✓ All Functions Working');
+  console.log('✓ Chat Window Functional');
+  console.log('✓ Meme Editor Glitch-Free');
+  console.log('✓ Offline Support Enabled');
+  
+  // Add final touches after everything loads
+  window.addEventListener('load', () => {
+    // Preload common images
+    const preloadUrls = [
+      'https://i.imgur.com/DrakeMemeTemplate.jpg',
+      'https://i.imgur.com/DistractedBoyfriend.jpg',
+      'https://i.imgur.com/ChangeMyMind.jpg',
+      'https://i.imgur.com/WomanYellingAtCat.jpg'
+    ];
+    
+    preloadUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+    
+    // Final performance check
+    setTimeout(() => {
+      const loadTime = performance.now();
+      console.log(`Page fully loaded in ${loadTime.toFixed(2)}ms`);
+      
+      if (loadTime > 3000) {
+        console.warn('Load time exceeds 3 seconds - consider further optimizations');
+      }
+    }, 1000);
+    
+    // Trigger welcome animation
+    if (!localStorage.getItem('hasSeenWelcome')) {
       setTimeout(() => {
-        const loadTime = performance.now();
-        console.log(`Page fully loaded in ${loadTime.toFixed(2)}ms`);
-        
-        if (loadTime > 3000) {
-          console.warn('Load time exceeds 3 seconds - consider further optimizations');
-        }
+        showNotification('Welcome to CringeScroll v10.0!', 'Experience the ultimate meme sharing platform with dynamic cards, real-time chat, and a glitch-free editor.', 'info');
       }, 1000);
       
-      // Trigger welcome animation
-      if (!localStorage.getItem('hasSeenWelcome')) {
-        setTimeout(() => {
-          showNotification('Welcome to CringeScroll v10.0!', 'Experience the ultimate meme sharing platform with dynamic cards, real-time chat, and a glitch-free editor.', 'info');
-        }, 1000);
-        
-        localStorage.setItem('hasSeenWelcome', 'true');
-      }
-    });
-  </script>
+      localStorage.setItem('hasSeenWelcome', 'true');
+    }
+  });
+</script>
 
-  <!-- ===== FINAL POLISH ===== -->
-  <style>
-    /* Additional polish and final touches */
-    
-    /* Smooth page transitions */
-    .page-transition {
-      opacity: 0;
-      transform: translateY(10px);
-      transition: var(--transition);
+<!-- ===== FINAL POLISH ===== -->
+<style>
+  /* Additional polish and final touches */
+  
+  /* Smooth page transitions */
+  .page-transition {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: var(--transition);
+  }
+  
+  .page-transition.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Enhanced form controls */
+  .form-control:focus {
+    border-color: var(--accent-3);
+    box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
+  }
+  
+  /* Better button states */
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .btn:active {
+    transform: translateY(0);
+  }
+  
+  /* Enhanced modal animations */
+  .modal-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+  }
+  
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .modal-content {
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+  
+  .modal-overlay.active .modal-content {
+    transform: translateY(0);
+  }
+  
+  /* Enhanced notifications */
+  .notification {
+    transform: translateX(300px);
+    opacity: 0;
+    transition: var(--transition);
+  }
+  
+  .notification.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .notification.persistent {
+    z-index: 2000;
+  }
+  
+  /* Loading animations */
+  @keyframes skeleton-pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.4; }
+  }
+  
+  .skeleton-card {
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+  }
+  
+  /* Enhanced scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(106, 13, 173, 0.5);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 13, 173, 0.7);
+  }
+  
+  /* Print styles */
+  @media print {
+    .sidebar, .header, .action-btns, .modal-overlay {
+      display: none !important;
     }
     
-    .page-transition.active {
-      opacity: 1;
-      transform: translateY(0);
+    .main-content {
+      width: 100% !important;
+      margin: 0 !important;
     }
     
-    /* Enhanced form controls */
-    .form-control:focus {
-      border-color: var(--accent-3);
-      box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
+    .meme-card {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  }
+  
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
     }
     
-    /* Better button states */
-    .btn:hover {
-      transform: translateY(-2px);
+    .meme-card:hover {
+      transform: translateY(-2px) !important;
     }
-    
-    .btn:active {
-      transform: translateY(0);
-    }
-    
-    /* Enhanced modal animations */
-    .modal-overlay {
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--transition);
-    }
-    
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-    
-    .modal-content {
-      transform: translateY(20px);
-      transition: transform 0.3s ease;
-    }
-    
-    .modal-overlay.active .modal-content {
-      transform: translateY(0);
-    }
-    
-    /* Enhanced notifications */
-    .notification {
-      transform: translateX(300px);
-      opacity: 0;
-      transition: var(--transition);
-    }
-    
-    .notification.show {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    
-    .notification.persistent {
-      z-index: 2000;
-    }
-    
-    /* Loading animations */
-    @keyframes skeleton-pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 0.8; }
-      100% { opacity: 0.4; }
-    }
-    
-    .skeleton-card {
-      animation: skeleton-pulse 1.5s infinite ease-in-out;
-    }
-    
-    /* Enhanced scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: rgba(106, 13, 173, 0.5);
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(106, 13, 173, 0.7);
-    }
-    
-    /* Print styles */
-    @media print {
-      .sidebar, .header, .action-btns, .modal-overlay {
-        display: none !important;
-      }
-      
-      .main-content {
-        width: 100% !important;
-        margin: 0 !important;
-      }
-      
-      .meme-card {
-        break-inside: avoid;
-        page-break-inside: avoid;
-      }
-    }
-    
-    /* Reduced motion preferences */
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        transition: none !important;
-        animation: none !important;
-      }
-      
-      .meme-card:hover {
-        transform: translateY(-2px) !important;
-      }
-    }
-  </style>
+  }
+</style>
 
-  <noscript>
-    <div style="position: fixed; top: 0; left: 0; width: 100%; background: #ff4d4d; color: white; padding: 15px; text-align: center; z-index: 10000;">
-      JavaScript is required to run CringeScroll. Please enable JavaScript in your browser.
-    </div>
-  </noscript>
+<noscript>
+  <div style="position: fixed; top: 0; left: 0; width: 100%; background: #ff4d4d; color: white; padding: 15px; text-align: center; z-index: 10000;">
+    JavaScript is required to run CringeScroll. Please enable JavaScript in your browser.
+  </div>
+</noscript>
+
 </body>
 </html>
