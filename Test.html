@@ -280,7 +280,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 2px;
     }
 
     /* ===== NAVIGATION ===== */
@@ -306,6 +305,7 @@
       font-size: 12px;
       font-weight: 500;
       padding: 6px 16px;
+      margin-bottom: 8px;
       border-radius: 12px;
       transition: var(--transition);
       cursor: pointer;
@@ -517,19 +517,19 @@
     /* ===== SIDEBAR & MODALS ===== */
     .sidebar {
       position: fixed;
-      top: 0,
-      right: -320px,
-      width: 300px,
-      height: 100dvh,
-      background: var(--bg-secondary),
-      backdrop-filter: blur(10px),
-      -webkit-backdrop-filter: blur(10px),
-      border-left: 1px solid rgba(106, 13, 173, 0.3),
-      z-index: 1000,
-      transition: right 0.3s ease,
-      display: flex,
-      flex-direction: column,
-      overflow-y: auto,
+      top: 0;
+      right: -320px;
+      width: 300px;
+      height: 100dvh;
+      background: var(--bg-secondary);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-left: 1px solid rgba(106, 13, 173, 0.3);
+      z-index: 1000;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
       padding: 20px 16px;
     }
 
@@ -790,13 +790,6 @@
       transform: translateY(100px);
       opacity: 0;
       transition: var(--transition);
-      cursor: move;
-      user-select: none;
-    }
-
-    .chat-window.dragging {
-      cursor: grabbing;
-      transition: none;
     }
 
     .chat-window.active {
@@ -1348,7 +1341,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v10.2 — ULTIMATE REBIRTH =====
+    // ===== CORE ENGINE v7.0 — ULTIMATE REBIRTH =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1676,7 +1669,7 @@
         }
       }, 1000);
       
-      console.log('CringeScroll v10.2 initialized successfully!');
+      console.log('CringeScroll v7.0 initialized successfully!');
     };
     
     // Render a meme card with dynamic sizing
@@ -2887,15 +2880,15 @@
                 </div>
                 <div class="theme-option" data-theme="blue" style="background: linear-gradient(135deg, #0d1b2a, #1b263b); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
                   <div style="font-weight: bold; margin-bottom: 8px; color: #e0e1dd;">Ocean</div>
-                  <div style="font-size: 24px; color: #3b82f6;">🌊</div>
+                  <div style="font-size: 24px; color: #e0e1dd;">🌊</div>
                 </div>
                 <div class="theme-option" data-theme="red" style="background: linear-gradient(135deg, #2c090a, #4a0d0e); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
                   <div style="font-weight: bold; margin-bottom: 8px; color: #ffe6e6;">Volcano</div>
-                  <div style="font-size: 24px; color: #ef4444;">🌋</div>
+                  <div style="font-size: 24px; color: #ffe6e6;">🌋</div>
                 </div>
                 <div class="theme-option" data-theme="purple" style="background: linear-gradient(135deg, #1a092d, #2d1544); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
                   <div style="font-weight: bold; margin-bottom: 8px; color: #e6d9ff;">Royal</div>
-                  <div style="font-size: 24px; color: #a78bfa;">👑</div>
+                  <div style="font-size: 24px; color: #e6d9ff;">👑</div>
                 </div>
               </div>
             </div>
@@ -3518,77 +3511,6 @@
       }
     };
     
-    // Chat window draggable functionality
-    const makeChatWindowDraggable = () => {
-      const chatWindow = document.getElementById('chatWindow');
-      if (!chatWindow) return;
-      
-      let isDragging = false;
-      let currentX = 0;
-      let currentY = 0;
-      let initialX = 0;
-      let initialY = 0;
-      
-      const header = chatWindow.querySelector('.chat-header');
-      
-      // Load saved position
-      const savedPosition = localStorage.getItem('chatWindowPosition');
-      if (savedPosition) {
-        try {
-          const position = JSON.parse(savedPosition);
-          chatWindow.style.transform = `translate(${position.x}px, ${position.y}px)`;
-        } catch (e) {
-          console.error('Error loading chat window position:', e);
-        }
-      }
-      
-      const dragStart = (e) => {
-        // Only drag if clicking on the header, not on buttons
-        if (e.target.closest('.close-chat')) return;
-        
-        isDragging = true;
-        initialX = e.clientX - currentX;
-        initialY = e.clientY - currentY;
-        
-        chatWindow.classList.add('dragging');
-        document.addEventListener('mousemove', dragMove);
-        document.addEventListener('mouseup', dragEnd);
-      };
-      
-      const dragMove = (e) => {
-        if (!isDragging) return;
-        
-        e.preventDefault();
-        
-        currentX = e.clientX - initialX;
-        currentY = e.clientY - initialY;
-        
-        // Keep chat window within bounds
-        const maxX = window.innerWidth - chatWindow.offsetWidth;
-        const maxY = window.innerHeight - chatWindow.offsetHeight;
-        
-        currentX = Math.max(0, Math.min(currentX, maxX));
-        currentY = Math.max(0, Math.min(currentY, maxY));
-        
-        chatWindow.style.transform = `translate(${currentX}px, ${currentY + 90}px)`;
-      };
-      
-      const dragEnd = () => {
-        isDragging = false;
-        chatWindow.classList.remove('dragging');
-        document.removeEventListener('mousemove', dragMove);
-        document.removeEventListener('mouseup', dragEnd);
-        
-        // Save current position
-        localStorage.setItem('chatWindowPosition', JSON.stringify({
-          x: currentX,
-          y: currentY
-        }));
-      };
-      
-      header.addEventListener('mousedown', dragStart);
-    };
-    
     // ===== CHAT MESSAGE SENDING =====
     document.getElementById('sendChatMessage').addEventListener('click', sendMessage);
     document.getElementById('chatInput').addEventListener('keypress', (e) => {
@@ -3612,6 +3534,47 @@
       document.getElementById('sidebar').classList.remove('active');
     });
     
+    // ===== DRAGGABLE CHAT WINDOW =====
+    let isDragging = false;
+    let chatOffsetX = 0;
+    let chatOffsetY = 0;
+    
+    const chatHeader = document.querySelector('.chat-header');
+    if (chatHeader) {
+      chatHeader.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const chatWindow = document.getElementById('chatWindow');
+        const rect = chatWindow.getBoundingClientRect();
+        chatOffsetX = e.clientX - rect.left;
+        chatOffsetY = e.clientY - rect.top;
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const chatWindow = document.getElementById('chatWindow');
+        const rect = chatWindow.getBoundingClientRect();
+        
+        let newX = e.clientX - chatOffsetX;
+        let newY = e.clientY - chatOffsetY;
+        
+        // Keep within viewport bounds
+        newX = Math.max(0, Math.min(newX, window.innerWidth - rect.width));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - rect.height));
+        
+        chatWindow.style.left = `${newX}px`;
+        chatWindow.style.top = `${newY}px`;
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+      
+      document.addEventListener('mouseleave', () => {
+        isDragging = false;
+      });
+    }
+    
     // ===== INFINITE SCROLLING =====
     let scrollTimeout;
     feed.addEventListener('scroll', () => {
@@ -3627,21 +3590,14 @@
     // ===== INITIALIZE APP =====
     document.addEventListener('DOMContentLoaded', initApp);
     
-    // Initialize chat window when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      makeChatWindowDraggable();
-    });
-    
     // ===== FINAL INITIALIZATION =====
-    console.log('CringeScroll v10.2 — Fully Loaded and Optimized');
+    console.log('CringeScroll v7.0 — Fully Loaded and Optimized');
     console.log('✓ Firebase Initialized');
     console.log('✓ Dynamic Card Sizing Active');
     console.log('✓ Hamburger Menu Scrollable');
     console.log('✓ All Functions Working');
-    console.log('✓ Chat Window Functional & Draggable');
+    console.log('✓ Chat Window Functional');
     console.log('✓ Meme Editor Glitch-Free');
-    console.log('✓ Customization UI Fixed');
-    console.log('✓ Settings Menu Functional');
     console.log('✓ Offline Support Enabled');
     
     // Add final touches after everything loads
@@ -3672,110 +3628,12 @@
       // Trigger welcome animation
       if (!localStorage.getItem('hasSeenWelcome')) {
         setTimeout(() => {
-          showNotification('Welcome to CringeScroll v10.2!', 'Experience the ultimate meme sharing platform with glitch-free scrolling, working editor, and real-time chat.', 'info');
+          showNotification('Welcome to CringeScroll v7.0!', 'Experience the next evolution of meme sharing with dynamic cards, scrollable menu, and full functionality.', 'info');
         }, 1000);
         
         localStorage.setItem('hasSeenWelcome', 'true');
       }
     });
-  </script>
-
-  <!-- ===== FIREBASE RULES ===== -->
-  <script>
-    // Firebase rules for CringeScroll v10.2
-    const firebaseRules = `
-      rules_version = '2';
-      service cloud.firestore {
-        match /databases/{database}/documents {
-          function isUser() {
-            return request.auth != null;
-          }
-          
-          function isOwner(userId) {
-            return isUser() && request.auth.uid == userId;
-          }
-          
-          function isValidUsername(username) {
-            return username.matches('^[a-zA-Z0-9_]{2,15}$');
-          }
-          
-          function isNonNegative(value) {
-            return value is number && value >= 0;
-          }
-          
-          // Users collection
-          match /users/{userId} {
-            allow read: if true;
-            allow create: if 
-              isOwner(userId) &&
-              request.resource.data.keys().hasOnly(['email', 'username', 'cringeCoin', 'streak', 'lastActive', 'createdAt', 'avatar', 'collections', 'quests', 'inventory', 'preferences']) &&
-              isValidUsername(request.resource.data.username) &&
-              request.resource.data.email is string &&
-              isNonNegative(request.resource.data.cringeCoin) &&
-              isNonNegative(request.resource.data.streak);
-              
-            allow update: if
-              isOwner(userId) &&
-              request.resource.data.keys().hasOnly(['cringeCoin', 'streak', 'lastActive', 'avatar', 'collections', 'quests', 'inventory', 'preferences']) &&
-              (request.resource.data.cringeCoin >= 0 && request.resource.data.streak >= 0);
-          }
-          
-          // Memes collection
-          match /memes/{memeId} {
-            allow read: if true;
-            allow create: if
-              isUser() &&
-              request.resource.data.keys().hasOnly(['url', 'title', 'ups', 'createdAt', 'isUserGenerated', 'createdBy', 'userId', 'reactions']) &&
-              request.resource.data.url is string &&
-              request.resource.data.title is string &&
-              request.resource.data.ups is number &&
-              request.resource.data.userId == request.auth.uid;
-              
-            allow update: if
-              request.resource.data.keys().hasOnly(['ups', 'reactions']) &&
-              request.resource.data.ups > 0;
-          }
-          
-          // Chat collection
-          match /chat/{messageId} {
-            allow read: if true;
-            allow create: if
-              isUser() &&
-              request.resource.data.keys().hasOnly(['username', 'text', 'timestamp']) &&
-              request.resource.data.username is string &&
-              request.resource.data.text is string &&
-              request.resource.data.text.size() <= 200;
-          }
-          
-          // Tips collection
-          match /tips/{tipId} {
-            allow create: if
-              isUser() &&
-              request.resource.data.from == request.auth.uid &&
-              request.resource.data.keys().hasOnly(['from', 'to', 'memeId', 'amount', 'timestamp']) &&
-              isNonNegative(request.resource.data.amount);
-              
-            allow read: if isUser();
-          }
-        }
-      }
-      
-      Required indexes:
-      1. Collection: users
-         Fields: cringeCoin (desc)
-         Query scope: Collection
-         
-      2. Collection: memes
-         Fields: userId (asc), createdAt (desc)
-         Query scope: Collection
-         
-      3. Collection: memes
-         Fields: createdAt (desc)
-         Query scope: Collection
-    `;
-    
-    console.log('Firebase Rules Ready for Deployment:');
-    console.log(firebaseRules);
   </script>
 
   <!-- ===== FINAL POLISH ===== -->
