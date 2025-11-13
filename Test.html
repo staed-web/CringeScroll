@@ -28,6 +28,7 @@
       --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
       --card-padding: 16px;
       --header-height: 72px;
+      --meme-max-height: 600px;
     }
     
     /* Dark theme */
@@ -298,16 +299,16 @@
 
     .nav-item {
       display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 4px;
       color: var(--text-secondary);
       text-decoration: none;
       font-size: 12px;
       font-weight: 500;
-      padding: 6px 12px;
+      padding: 6px 16px;
       border-radius: 12px;
       transition: var(--transition);
+      cursor: pointer;
     }
 
     .nav-item.active, .nav-item:hover {
@@ -409,7 +410,6 @@
       position: relative;
       background: rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      min-height: 200px;
     }
 
     .meme-image {
@@ -419,7 +419,6 @@
       transition: var(--transition);
       opacity: 0;
       transform: scale(1.02);
-      object-fit: contain;
     }
 
     .meme-image.loaded {
@@ -446,23 +445,23 @@
     .reaction-bar {
       display: flex;
       justify-content: space-around;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .reaction-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
       background: none;
       border: none;
       color: var(--text-secondary);
-      font-size: 16px;
+      font-size: 18px;
       cursor: pointer;
       transition: var(--transition);
-      padding: 6px;
-      border-radius: 8px;
+      padding: 8px;
+      border-radius: 10px;
     }
 
     .reaction-btn:hover {
@@ -475,7 +474,7 @@
     }
 
     .reaction-count {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-primary);
     }
@@ -483,27 +482,27 @@
     .action-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 10px;
     }
 
     .card-btn {
-      padding: 8px 0;
-      border-radius: 8px;
+      padding: 10px 0;
+      border-radius: 10px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(106, 13, 173, 0.3);
       color: var(--text-primary);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
     }
 
     .card-btn i {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     .card-btn:hover {
@@ -518,19 +517,19 @@
     /* ===== SIDEBAR & MODALS ===== */
     .sidebar {
       position: fixed;
-      top: 0;
-      right: -320px;
-      width: 300px;
-      height: 100dvh;
-      background: var(--bg-secondary);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-left: 1px solid rgba(106, 13, 173, 0.3);
-      z-index: 1000;
-      transition: right 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
+      top: 0,
+      right: -320px,
+      width: 300px,
+      height: 100dvh,
+      background: var(--bg-secondary),
+      backdrop-filter: blur(10px),
+      -webkit-backdrop-filter: blur(10px),
+      border-left: 1px solid rgba(106, 13, 173, 0.3),
+      z-index: 1000,
+      transition: right 0.3s ease,
+      display: flex,
+      flex-direction: column,
+      overflow-y: auto,
       padding: 20px 16px;
     }
 
@@ -573,15 +572,15 @@
     }
 
     .menu-section {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     .menu-section-title {
       font-size: 16px;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 10px;
-      padding-bottom: 4px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
       border-bottom: 1px solid rgba(106, 13, 173, 0.2);
     }
 
@@ -589,9 +588,9 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 16px;
-      margin-bottom: 6px;
-      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-radius: 12px;
       color: var(--text-secondary);
       text-decoration: none;
       transition: var(--transition);
@@ -705,7 +704,7 @@
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .form-label {
@@ -718,7 +717,7 @@
 
     .form-control {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       border: 1px solid rgba(106, 13, 173, 0.3);
       background: rgba(0, 0, 0, 0.1);
@@ -734,7 +733,7 @@
     }
 
     .btn {
-      padding: 12px 20px;
+      padding: 14px 24px;
       border-radius: 12px;
       border: none;
       font-weight: 600;
@@ -776,10 +775,10 @@
     /* ===== CHAT WINDOW ===== */
     .chat-window {
       position: fixed;
-      bottom: 20px;
+      bottom: 90px;
       right: 20px;
-      width: 320px;
-      height: 450px;
+      width: 350px;
+      height: 500px;
       background: var(--bg-secondary);
       border-radius: 20px;
       box-shadow: var(--shadow-lg);
@@ -791,6 +790,13 @@
       transform: translateY(100px);
       opacity: 0;
       transition: var(--transition);
+      cursor: move;
+      user-select: none;
+    }
+
+    .chat-window.dragging {
+      cursor: grabbing;
+      transition: none;
     }
 
     .chat-window.active {
@@ -800,12 +806,11 @@
     }
 
     .chat-header {
-      padding: 12px 16px;
+      padding: 16px;
       border-bottom: 1px solid rgba(106, 13, 173, 0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: move;
     }
 
     .chat-title {
@@ -814,37 +819,23 @@
       color: var(--accent-3);
     }
 
-    .chat-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-action-btn {
+    .close-chat {
       background: none;
       border: none;
       color: var(--text-primary);
-      font-size: 16px;
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
+      font-size: 18px;
       cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: var(--transition);
     }
 
-    .chat-action-btn:hover {
+    .close-chat:hover {
       background: rgba(255, 255, 255, 0.1);
-    }
-
-    .resize-handle {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 20px;
-      height: 20px;
-      background: rgba(106, 13, 173, 0.3);
-      border-radius: 0 0 20px 0;
-      cursor: se-resize;
-      z-index: 10;
     }
 
     .chat-messages {
@@ -853,13 +844,13 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
     .message {
       max-width: 80%;
-      padding: 10px 15px;
-      border-radius: 14px;
+      padding: 12px 16px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.1);
       color: var(--text-primary);
       font-size: 14px;
@@ -879,24 +870,22 @@
     }
 
     .message-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-secondary);
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
     .chat-input-container {
-      padding: 12px 16px;
+      padding: 16px;
       border-top: 1px solid rgba(106, 13, 173, 0.3);
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
 
     .chat-input {
       flex: 1;
-      padding: 10px 15px;
-      border-radius: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
       border: 1px solid rgba(106, 13, 173, 0.3);
       background: rgba(0, 0, 0, 0.1);
       color: var(--text-primary);
@@ -909,8 +898,8 @@
     }
 
     .send-btn {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
       background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
       border: none;
@@ -954,14 +943,14 @@
     }
 
     .notification-icon {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 12px;
       background: rgba(106, 13, 173, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 20px;
       color: var(--accent-3);
     }
 
@@ -972,12 +961,11 @@
     .notification-title {
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 2px;
-      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     .notification-message {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.4;
     }
@@ -986,7 +974,7 @@
       background: none;
       border: none;
       color: var(--text-secondary);
-      font-size: 14px;
+      font-size: 16px;
       cursor: pointer;
       width: 24px;
       height: 24px;
@@ -1018,10 +1006,10 @@
     }
 
     .loading-spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(106, 13, 173, 0.2);
-      border-top: 3px solid var(--accent-3);
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(106, 13, 173, 0.2);
+      border-top: 4px solid var(--accent-3);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto;
@@ -1064,7 +1052,7 @@
       .chat-window {
         width: calc(100% - 40px);
         height: 450px;
-        bottom: 20px;
+        bottom: 80px;
         right: 20px;
       }
     }
@@ -1112,16 +1100,17 @@
       }
       
       .card-btn {
-        padding: 6px 0;
-        font-size: 12px;
+        padding: 8px 0;
+        font-size: 13px;
       }
       
       .card-btn i {
-        font-size: 13px;
+        font-size: 14px;
       }
       
       .chat-window {
         height: 400px;
+        bottom: 70px;
       }
     }
   </style>
@@ -1266,14 +1255,9 @@
   <div class="chat-window" id="chatWindow">
     <div class="chat-header">
       <h3 class="chat-title">CringeChat</h3>
-      <div class="chat-actions">
-        <button class="chat-action-btn" id="minimizeChat">
-          <i class="fas fa-minus"></i>
-        </button>
-        <button class="chat-action-btn" id="closeChatWindow">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+      <button class="close-chat" id="closeChatWindow">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
     <div class="chat-messages" id="chatMessages">
       <!-- Messages will be populated here -->
@@ -1284,7 +1268,6 @@
         <i class="fas fa-paper-plane"></i>
       </button>
     </div>
-    <div class="resize-handle" id="resizeHandle"></div>
   </div>
 
   <!-- ===== AUTH MODAL ===== -->
@@ -1365,7 +1348,7 @@
   </div>
 
   <script>
-    // ===== CORE ENGINE v11.0 =====
+    // ===== CORE ENGINE v10.2 — ULTIMATE REBIRTH =====
     let feed;
     const seenUrls = new Set();
     let isLoading = false;
@@ -1378,10 +1361,6 @@
     let cringeCoin = 0;
     let streak = 0;
     let dailyCrown = null;
-    let chatWindowPosition = { x: 20, y: 20, width: 320, height: 450 };
-    let isDragging = false;
-    let isResizing = false;
-    let dragStartX, dragStartY, resizeStartWidth, resizeStartHeight;
     
     // User preferences
     let userPreferences = {
@@ -1405,7 +1384,7 @@
       appId: "1:802266413389:web:22a7274e4edc8a0529df04"
     };
     
-    // Comprehensive Meme API sources
+    // Meme API sources
     const MEME_SOURCES = [
       'https://meme-api.com/gimme/memes',
       'https://meme-api.com/gimme/dankmemes',
@@ -1419,55 +1398,7 @@
       'https://meme-api.com/gimme/okbuddyretard',
       'https://meme-api.com/gimme/2meirl4meirl',
       'https://meme-api.com/gimme/antiwork',
-      'https://meme-api.com/gimme/iamverysmart',
-      'https://meme-api.com/gimme/PrequelMemes',
-      'https://meme-api.com/gimme/DeepFriedMemes',
-      'https://meme-api.com/gimme/animemes',
-      'https://meme-api.com/gimme/AnimeFunny',
-      'https://meme-api.com/gimme/goodanimemes',
-      'https://meme-api.com/gimme/anime_irl',
-      'https://meme-api.com/gimme/sadanimemes',
-      'https://meme-api.com/gimme/wholesomeanimemes',
-      'https://meme-api.com/gimme/AnimeMemesHQ',
-      'https://meme-api.com/gimme/webtoonmemes',
-      'https://meme-api.com/gimme/manhwa',
-      'https://meme-api.com/gimme/kdramamemes',
-      'https://meme-api.com/gimme/AsianMemes',
-      'https://meme-api.com/gimme/gaming',
-      'https://meme-api.com/gimme/pcmasterrace',
-      'https://meme-api.com/gimme/leagueoflegends',
-      'https://meme-api.com/gimme/DotA2',
-      'https://meme-api.com/gimme/Overwatch',
-      'https://meme-api.com/gimme/Minecraft',
-      'https://meme-api.com/gimme/AmongUs',
-      'https://meme-api.com/gimme/Valorant',
-      'https://meme-api.com/gimme/Genshin_Impact',
-      'https://meme-api.com/gimme/stardewvalley',
-      'https://meme-api.com/gimme/196',
-      'https://meme-api.com/gimme/DeepThoughts',
-      'https://meme-api.com/gimme/Unexpected',
-      'https://meme-api.com/gimme/ContagiousLaughter',
-      'https://meme-api.com/gimme/technicallythetruth',
-      'https://meme-api.com/gimme/holdmybeer',
-      'https://meme-api.com/gimme/theyknew',
-      'https://meme-api.com/gimme/facepalm',
-      'https://meme-api.com/gimme/whatcouldgowrong',
-      'https://meme-api.com/gimme/oddlysatisfying',
-      'https://meme-api.com/gimme/PoliticalMemes',
-      'https://meme-api.com/gimme/CapitalismMemes',
-      'https://meme-api.com/gimme/SocialismMemes',
-      'https://meme-api.com/gimme/CommunismMemes',
-      'https://meme-api.com/gimme/aww',
-      'https://meme-api.com/gimme/rarepuppers',
-      'https://meme-api.com/gimme/blep',
-      'https://meme-api.com/gimme/WhatsWrongWithYourDog',
-      'https://meme-api.com/gimme/Zoomies',
-      'https://meme-api.com/gimme/IndianDankMemes',
-      'https://meme-api.com/gimme/ArabMemes',
-      'https://meme-api.com/gimme/BrazilMemes',
-      'https://meme-api.com/gimme/PhilosophyMemes',
-      'https://meme-api.com/gimme/ExistentialMemes',
-      'https://meme-api.com/gimme/ArtMemes'
+      'https://meme-api.com/gimme/iamverysmart'
     ];
 
     // Chat messages
@@ -1548,7 +1479,7 @@
           await new Promise((resolve) => {
             const script = document.createElement('script');
             script.src = src;
-            script.async = false;
+            script.async = false; // Critical for proper initialization order
             script.onload = resolve;
             script.onerror = () => {
               console.error(`Failed to load script: ${src}`);
@@ -1700,13 +1631,6 @@
       document.documentElement.style.fontSize = 
         userPreferences.fontSize === 'small' ? '14px' : 
         userPreferences.fontSize === 'large' ? '18px' : '16px';
-        
-      // Apply chat window position
-      const chatWindow = document.getElementById('chatWindow');
-      if (chatWindow) {
-        chatWindow.style.width = `${chatWindowPosition.width}px`;
-        chatWindow.style.height = `${chatWindowPosition.height}px`;
-      }
     };
     
     // Update UI after login
@@ -1752,7 +1676,7 @@
         }
       }, 1000);
       
-      console.log('CringeScroll v11.0 initialized successfully!');
+      console.log('CringeScroll v10.2 initialized successfully!');
     };
     
     // Render a meme card with dynamic sizing
@@ -1763,9 +1687,7 @@
       
       // Calculate dynamic height based on image aspect ratio
       const aspectRatio = meme.width && meme.height ? meme.width / meme.height : 1.5;
-      const baseHeight = 300;
-      const maxHeight = 600;
-      const calculatedHeight = Math.min(maxHeight, Math.max(baseHeight, 500 / aspectRatio));
+      const height = Math.min(600, Math.max(300, 400 / aspectRatio));
       
       // Create card content
       card.innerHTML = `
@@ -1781,7 +1703,7 @@
             </div>
           </div>
         </div>
-        <div class="meme-image-container" style="min-height: ${calculatedHeight}px;">
+        <div class="meme-image-container" style="height: ${height}px;">
           <img 
             class="meme-image" 
             src="${createPlaceholder(300, 300)}" 
@@ -1809,19 +1731,19 @@
           <div class="action-buttons">
             <button class="card-btn save-btn" title="Save to collection">
               <i class="fas fa-bookmark"></i>
-              <span>Save</span>
+              Save
             </button>
             <button class="card-btn tip-btn" title="Tip creator">
               <i class="fas fa-coins"></i>
-              <span>Tip</span>
+              Tip
             </button>
             <button class="card-btn remix-btn" title="Remix this meme">
               <i class="fas fa-sync-alt"></i>
-              <span>Remix</span>
+              Remix
             </button>
             <button class="card-btn share-btn" title="Share meme">
               <i class="fas fa-share-alt"></i>
-              <span>Share</span>
+              Share
             </button>
           </div>
         </div>
@@ -1911,7 +1833,7 @@
             transform: translate(-50%, -50%);
             color: gold;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 20px;
             text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
             pointer-events: none;
             z-index: 100;
@@ -1938,7 +1860,8 @@
         return;
       }
       
-      document.getElementById('memeEditorModal').classList.add('active');
+      showNotification('Remix Mode', 'Meme editor will open soon. For now, create a new meme!', 'info');
+      // This would open the meme editor with the selected meme as base
     };
     
     // Share meme
@@ -1989,10 +1912,10 @@
             countEl.textContent = currentCount + 1;
             
             // Animation effect
-            btn.style.transform = 'scale(1.15)';
+            btn.style.transform = 'scale(1.2)';
             setTimeout(() => {
               btn.style.transform = 'scale(1)';
-            }, 200);
+            }, 300);
           }
         }
       }
@@ -2092,14 +2015,13 @@
         for (let i = 0; i < skeletonCount; i++) {
           const skeleton = document.createElement('div');
           skeleton.className = 'skeleton-card';
-          const height = Math.random() * 200 + 350;
-          skeleton.style.height = `${height}px`;
+          skeleton.style.height = `${Math.random() * 200 + 350}px`;
           skeleton.style.animationDelay = `${i * 0.1}s`;
           
           skeleton.innerHTML = `
             <div class="card-header" style="height: 80px; background: rgba(255, 255, 255, 0.1);"></div>
             <div class="meme-image-container" style="height: ${Math.random() * 200 + 250}px; background: rgba(255, 255, 255, 0.05);"></div>
-            <div class="card-footer" style="height: 80px; background: rgba(255, 255, 255, 0.1);"></div>
+            <div class="card-footer" style="height: 100px; background: rgba(255, 255, 255, 0.1);"></div>
           `;
           
           feed.appendChild(skeleton);
@@ -2167,13 +2089,17 @@
         document.getElementById('sidebar').classList.remove('active');
       });
       
-      document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        toggleTheme();
+      });
       
       document.getElementById('notificationsBtn').addEventListener('click', () => {
         showNotification('Notifications', 'You have 3 new notifications!', 'info');
       });
       
-      document.getElementById('chatToggleBtn').addEventListener('click', toggleChatWindow);
+      document.getElementById('chatToggleBtn').addEventListener('click', () => {
+        toggleChatWindow();
+      });
       
       document.getElementById('logoLink').addEventListener('click', () => {
         // Refresh feed
@@ -2189,33 +2115,15 @@
         }
       });
       
-      // Chat window drag functionality
-      document.querySelector('.chat-header').addEventListener('mousedown', (e) => {
-        isDragging = true;
-        dragStartX = e.clientX - chatWindowPosition.x;
-        dragStartY = e.clientY - chatWindowPosition.y;
-        document.getElementById('chatWindow').style.cursor = 'grabbing';
+      // Chat window
+      document.getElementById('closeChatWindow').addEventListener('click', () => {
+        toggleChatWindow();
       });
       
-      // Chat window resize functionality
-      document.getElementById('resizeHandle').addEventListener('mousedown', (e) => {
-        isResizing = true;
-        resizeStartWidth = chatWindowPosition.width;
-        resizeStartHeight = chatWindowPosition.height;
-        document.body.style.cursor = 'se-resize';
+      document.getElementById('sendChatMessage').addEventListener('click', () => {
+        sendMessage();
       });
       
-      // Chat window minimize
-      document.getElementById('minimizeChat').addEventListener('click', () => {
-        const chatWindow = document.getElementById('chatWindow');
-        chatWindow.classList.remove('active');
-      });
-      
-      // Close chat window
-      document.getElementById('closeChatWindow').addEventListener('click', toggleChatWindow);
-      
-      // Send chat message
-      document.getElementById('sendChatMessage').addEventListener('click', sendMessage);
       document.getElementById('chatInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
       });
@@ -2262,42 +2170,6 @@
       document.getElementById('menuCustomize').addEventListener('click', showCustomization);
       document.getElementById('menuSettings').addEventListener('click', showSettings);
       document.getElementById('menuLogout').addEventListener('click', logout);
-      
-      // Mouse move for dragging and resizing
-      document.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-          chatWindowPosition.x = e.clientX - dragStartX;
-          chatWindowPosition.y = e.clientY - dragStartY;
-          
-          // Ensure chat window stays within viewport bounds
-          chatWindowPosition.x = Math.max(0, Math.min(chatWindowPosition.x, window.innerWidth - chatWindowPosition.width));
-          chatWindowPosition.y = Math.max(0, Math.min(chatWindowPosition.y, window.innerHeight - chatWindowPosition.height));
-          
-          document.getElementById('chatWindow').style.transform = `translate(${chatWindowPosition.x}px, ${chatWindowPosition.y}px)`;
-        }
-        
-        if (isResizing) {
-          const newWidth = Math.max(250, resizeStartWidth + (e.clientX - (chatWindowPosition.x + resizeStartWidth)));
-          const newHeight = Math.max(300, resizeStartHeight + (e.clientY - (chatWindowPosition.y + resizeStartHeight)));
-          
-          chatWindowPosition.width = newWidth;
-          chatWindowPosition.height = newHeight;
-          
-          document.getElementById('chatWindow').style.width = `${newWidth}px`;
-          document.getElementById('chatWindow').style.height = `${newHeight}px`;
-        }
-      });
-      
-      // Mouse up to stop dragging and resizing
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        isResizing = false;
-        document.getElementById('chatWindow').style.cursor = 'default';
-        document.body.style.cursor = 'default';
-        
-        // Save chat window position to localStorage
-        localStorage.setItem('chatWindowPosition', JSON.stringify(chatWindowPosition));
-      });
       
       // Infinite scroll
       feed.addEventListener('scroll', () => {
@@ -2349,15 +2221,6 @@
           const messagesContainer = document.getElementById('chatMessages');
           messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 100);
-        
-        // Set initial position
-        const savedPosition = localStorage.getItem('chatWindowPosition');
-        if (savedPosition) {
-          chatWindowPosition = JSON.parse(savedPosition);
-          chatWindow.style.width = `${chatWindowPosition.width}px`;
-          chatWindow.style.height = `${chatWindowPosition.height}px`;
-          chatWindow.style.transform = `translate(${chatWindowPosition.x}px, ${chatWindowPosition.y}px)`;
-        }
       }
     };
     
@@ -2410,9 +2273,6 @@
       
       // Clear input
       input.value = '';
-      
-      // Earn cringe coin for chatting
-      cringeCoin += 2;
       
       // Scroll to bottom
       setTimeout(() => {
@@ -2523,6 +2383,743 @@
       updateUIAfterLogin();
     };
     
+    // Show profile
+    const showProfile = () => {
+      if (!currentUser) {
+        showAuthModal();
+        return;
+      }
+      
+      const profileModal = document.createElement('div');
+      profileModal.className = 'modal-overlay active';
+      profileModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-user-circle"></i> My Profile
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+              <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: white;">
+                ${currentUser.username.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h3 style="color: var(--text-primary); margin: 0; font-size: 24px;">${currentUser.username}</h3>
+                <p style="color: var(--text-secondary); margin: 5px 0 0 0;">${currentUser.email}</p>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: gold;">${cringeCoin}</div>
+                <div style="color: var(--text-secondary); margin-top: 5px;">CringeCoin</div>
+              </div>
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: var(--accent-3);">${streak}</div>
+                <div style="color: var(--text-secondary); margin-top: 5px;">Day Streak</div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 10px;">Badges</h4>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="background: rgba(106, 13, 173, 0.2); padding: 8px 15px; border-radius: 20px; font-weight: bold; color: var(--accent-3);">
+                  <i class="fas fa-fire"></i> Hot Poster
+                </div>
+                <div style="background: rgba(106, 13, 173, 0.2); padding: 8px 15px; border-radius: 20px; font-weight: bold; color: var(--accent-3);">
+                  <i class="fas fa-trophy"></i> Quest Master
+                </div>
+              </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').remove(); showSettings();">
+              <i class="fas fa-cog"></i> Account Settings
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(profileModal);
+      profileModal.querySelector('.close-modal').addEventListener('click', () => {
+        profileModal.remove();
+      });
+    };
+    
+    // Show collections
+    const showCollections = () => {
+      const collectionsModal = document.createElement('div');
+      collectionsModal.className = 'modal-overlay active';
+      collectionsModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-bookmark"></i> My Collections
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="New collection name">
+              <button class="btn btn-primary" style="margin-top: 10px;">
+                <i class="fas fa-plus"></i> Create Collection
+              </button>
+            </div>
+            
+            <div style="margin-top: 30px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Your Collections</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: var(--transition);">
+                  <i class="fas fa-star" style="font-size: 24px; color: gold; margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold; margin-bottom: 5px;">Favorites</div>
+                  <div style="color: var(--text-secondary);">12 memes</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: var(--transition);">
+                  <i class="fas fa-laugh" style="font-size: 24px; color: var(--accent-3); margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold; margin-bottom: 5px;">Funny Ones</div>
+                  <div style="color: var(--text-secondary);">8 memes</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: var(--transition);">
+                  <i class="fas fa-heart" style="font-size: 24px; color: #ff4d4d; margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold; margin-bottom: 5px;">Wholesome</div>
+                  <div style="color: var(--text-secondary);">5 memes</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: var(--transition);">
+                  <i class="fas fa-fire" style="font-size: 24px; color: #ff9900; margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold; margin-bottom: 5px;">Hot Now</div>
+                  <div style="color: var(--text-secondary);">3 memes</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(collectionsModal);
+      collectionsModal.querySelector('.close-modal').addEventListener('click', () => {
+        collectionsModal.remove();
+      });
+    };
+    
+    // Show inventory
+    const showInventory = () => {
+      const inventoryModal = document.createElement('div');
+      inventoryModal.className = 'modal-overlay active';
+      inventoryModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-box"></i> My Inventory
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="margin-bottom: 25px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Badges</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <div style="background: rgba(255, 215, 0, 0.15); padding: 10px 15px; border-radius: 12px; color: gold; font-weight: bold;">
+                  <i class="fas fa-fire"></i> 3-Day Streak
+                </div>
+                <div style="background: rgba(255, 215, 0, 0.15); padding: 10px 15px; border-radius: 12px; color: gold; font-weight: bold;">
+                  <i class="fas fa-crown"></i> Meme Lord
+                </div>
+                <div style="background: rgba(255, 215, 0, 0.15); padding: 10px 15px; border-radius: 12px; color: gold; font-weight: bold;">
+                  <i class="fas fa-trophy"></i> Quest Master
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Items</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px;">
+                <div style="background: rgba(106, 13, 173, 0.1); border-radius: 12px; padding: 15px; text-align: center;">
+                  <i class="fas fa-brush" style="font-size: 24px; color: var(--accent-3); margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold;">Editor Pro</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">1 item</div>
+                </div>
+                <div style="background: rgba(106, 13, 173, 0.1); border-radius: 12px; padding: 15px; text-align: center;">
+                  <i class="fas fa-palette" style="font-size: 24px; color: var(--accent-3); margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold;">Theme Pack</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">3 items</div>
+                </div>
+                <div style="background: rgba(106, 13, 173, 0.1); border-radius: 12px; padding: 15px; text-align: center;">
+                  <i class="fas fa-volume-up" style="font-size: 24px; color: var(--accent-3); margin-bottom: 10px;"></i>
+                  <div style="font-weight: bold;">Sound FX</div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">2 items</div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Boosters</h4>
+              <div style="background: rgba(255, 215, 0, 0.1); border-radius: 12px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                  <span>Double Coins</span>
+                  <span style="color: gold; font-weight: bold;">1x</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+                  <div style="width: 25%; height: 100%; background: gold; border-radius: 4px;"></div>
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">Expires in 2 days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(inventoryModal);
+      inventoryModal.querySelector('.close-modal').addEventListener('click', () => {
+        inventoryModal.remove();
+      });
+    };
+    
+    // Show leaderboard
+    const showLeaderboard = () => {
+      const leaderboardModal = document.createElement('div');
+      leaderboardModal.className = 'modal-overlay active';
+      leaderboardModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-chart-line"></i> Leaderboard
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="text-align: center; margin-bottom: 25px;">
+              <div style="font-size: 48px; color: gold; margin-bottom: 10px;">🏆</div>
+              <h3 style="color: var(--text-primary); margin-bottom: 5px;">Top Cringe Lords</h3>
+              <p style="color: var(--text-secondary);">This Week's Rankings</p>
+            </div>
+            
+            <div style="display: grid; gap: 12px;">
+              <!-- Top 3 with special styling -->
+              <div style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05)); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: gold; display: flex; align-items: center; justify-content: center; color: var(--bg-primary); font-weight: bold; font-size: 18px;">1</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold; color: gold; font-size: 18px;">MemeKing99</div>
+                  <div style="color: var(--text-secondary);">52,341 CringeCoin</div>
+                </div>
+                <div style="background: gold; color: var(--bg-primary); font-weight: bold; padding: 3px 10px; border-radius: 20px; font-size: 14px;">+12%</div>
+              </div>
+              
+              <div style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05)); border: 1px solid rgba(192, 192, 192, 0.3); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: silver; display: flex; align-items: center; justify-content: center; color: var(--bg-primary); font-weight: bold; font-size: 18px;">2</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold; color: silver; font-size: 18px;">DankMaster</div>
+                  <div style="color: var(--text-secondary);">48,921 CringeCoin</div>
+                </div>
+                <div style="background: silver; color: var(--bg-primary); font-weight: bold; padding: 3px 10px; border-radius: 20px; font-size: 14px;">+8%</div>
+              </div>
+              
+              <div style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(205, 127, 50, 0.3); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #cd7f32; display: flex; align-items: center; justify-content: center; color: var(--bg-primary); font-weight: bold; font-size: 18px;">3</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold; color: #cd7f32; font-size: 18px;">CringeQueen</div>
+                  <div style="color: var(--text-secondary);">42,785 CringeCoin</div>
+                </div>
+                <div style="background: #cd7f32; color: var(--bg-primary); font-weight: bold; padding: 3px 10px; border-radius: 20px; font-size: 14px;">+5%</div>
+              </div>
+              
+              <!-- Rest of the leaderboard -->
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">4</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">MemeLord42</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">38,456 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">+3%</div>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">5</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">LaughFactory</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">35,218 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">+2%</div>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">6</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">CringeMaster</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">31,942 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">+1%</div>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">7</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">DankDude</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">28,754 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">-1%</div>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">8</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">CringeLord</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">24,318 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">-2%</div>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">9</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">MemeGod</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">21,876 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">-3%</div>
+              </div>
+              
+              <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(106, 13, 173, 0.2); display: flex; align-items: center; justify-content: center; color: var(--accent-3); font-weight: bold;">10</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: bold;">LOLGuy</div>
+                  <div style="color: var(--text-secondary); font-size: 14px;">19,543 CringeCoin</div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 14px;">-4%</div>
+              </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(106, 13, 173, 0.2);">
+              <div style="font-weight: bold; color: var(--accent-3); margin-bottom: 5px;">Your Rank: #42</div>
+              <div style="color: var(--text-secondary);">3,245 CringeCoin</div>
+              <button class="btn btn-primary" style="margin-top: 15px; width: 100%;">
+                <i class="fas fa-trophy"></i> View My Stats
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(leaderboardModal);
+      leaderboardModal.querySelector('.close-modal').addEventListener('click', () => {
+        leaderboardModal.remove();
+      });
+    };
+    
+    // Show quests
+    const showQuests = () => {
+      const questsModal = document.createElement('div');
+      questsModal.className = 'modal-overlay active';
+      questsModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-trophy"></i> Daily Quests
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="text-align: center; margin-bottom: 25px;">
+              <div style="font-size: 36px; color: var(--accent-3); margin-bottom: 10px;">🎯</div>
+              <h3 style="color: var(--text-primary); margin-bottom: 5px;">Daily Challenges</h3>
+              <p style="color: var(--text-secondary);">Complete quests to earn CringeCoin</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
+              <!-- Quest 1 -->
+              <div style="background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 15px; border: 1px solid rgba(106, 13, 173, 0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                  <div>
+                    <h4 style="color: var(--text-primary); margin: 0 0 5px 0;">React to 5 memes</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin: 0;">React with 💀 to earn 5 CringeCoin</p>
+                  </div>
+                  <div style="background: rgba(255, 215, 0, 0.15); color: gold; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px;">+5 CC</div>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                  <div style="width: 60%; height: 100%; background: var(--accent-3); border-radius: 4px;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-secondary);">
+                  <span>3/5 completed</span>
+                  <span>2 left</span>
+                </div>
+              </div>
+              
+              <!-- Quest 2 -->
+              <div style="background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 15px; border: 1px solid rgba(106, 13, 173, 0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                  <div>
+                    <h4 style="color: var(--text-primary); margin: 0 0 5px 0;">Post 1 meme</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin: 0;">Create and post a meme to earn 10 CringeCoin</p>
+                  </div>
+                  <div style="background: rgba(255, 215, 0, 0.15); color: gold; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px;">+10 CC</div>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                  <div style="width: 0%; height: 100%; background: var(--accent-3); border-radius: 4px;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-secondary);">
+                  <span>0/1 completed</span>
+                  <span>1 left</span>
+                </div>
+              </div>
+              
+              <!-- Quest 3 - Completed -->
+              <div style="background: rgba(0, 210, 106, 0.1); border-radius: 16px; padding: 15px; border: 1px solid rgba(0, 210, 106, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; opacity: 0.7;">
+                  <div>
+                    <h4 style="color: #00d26a; margin: 0 0 5px 0; text-decoration: line-through;">Tip 1 meme</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin: 0; text-decoration: line-through;">Tip 5 CringeCoin to someone to earn 3 CringeCoin</p>
+                  </div>
+                  <div style="background: rgba(0, 210, 106, 0.2); color: #00d26a; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px;">+3 CC</div>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(0, 210, 106, 0.2); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                  <div style="width: 100%; height: 100%; background: #00d26a; border-radius: 4px;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #00d26a; font-weight: bold;">
+                  <span>COMPLETED</span>
+                  <span>5 CC earned</span>
+                </div>
+              </div>
+            </div>
+            
+            <div style="text-align: center; padding: 15px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; margin-bottom: 20px;">
+              <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(106, 13, 173, 0.2); padding: 8px 15px; border-radius: 20px; margin-bottom: 10px;">
+                <i class="fas fa-coins" style="color: gold;"></i>
+                <span style="color: gold; font-weight: bold; font-size: 18px;">18 CC</span>
+              </div>
+              <p style="color: var(--text-secondary); margin: 0;">Total rewards available today</p>
+            </div>
+            
+            <button class="btn btn-primary">
+              <i class="fas fa-sync-alt"></i> Refresh Quests
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(questsModal);
+      questsModal.querySelector('.close-modal').addEventListener('click', () => {
+        questsModal.remove();
+      });
+    };
+    
+    // Create meme (placeholder)
+    const createMeme = () => {
+      if (!currentUser) {
+        showAuthModal();
+        return;
+      }
+      
+      showNotification('Meme Editor', 'Advanced meme editor coming soon!', 'info');
+      
+      // In a real app, this would open the meme editor
+    };
+    
+    // Start meme roulette
+    const startMemeRoulette = () => {
+      if (isLoading) return;
+      
+      if (!currentUser) {
+        showAuthModal();
+        return;
+      }
+      
+      showNotification('Meme Roulette', 'Spinning for a random meme...', 'info');
+      
+      // Clear feed and show roulette animation
+      feed.innerHTML = '';
+      loadCount = 0;
+      
+      // Simulate loading a random meme
+      setTimeout(() => {
+        fetchMeme().then(meme => {
+          if (meme) {
+            renderMeme(meme, 0);
+            showNotification('Roulette Winner!', `You landed on: "${meme.title}"`, 'success');
+            
+            // Award bonus CringeCoin for playing roulette
+            cringeCoin += 3;
+            showNotification('Bonus!', '+3 CringeCoin for playing roulette!', 'success');
+          } else {
+            showNotification('Roulette Error', 'No memes available for roulette. Try again later.', 'error');
+            loadFeed();
+          }
+        }).catch(error => {
+          console.error('Roulette error:', error);
+          showNotification('Roulette Error', 'Failed to load meme. Try again later.', 'error');
+          loadFeed();
+        });
+      }, 1000);
+    };
+    
+    // Show customization options
+    const showCustomization = () => {
+      const customizationModal = document.createElement('div');
+      customizationModal.className = 'modal-overlay active';
+      customizationModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-palette"></i> Customize UI
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="margin-bottom: 25px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Theme</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;">
+                <div class="theme-option active" data-theme="dark" style="background: linear-gradient(135deg, #0f0c29, #302b63); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; border: 2px solid var(--accent-3);">
+                  <div style="font-weight: bold; margin-bottom: 8px;">Midnight</div>
+                  <div style="font-size: 24px;">🌙</div>
+                </div>
+                <div class="theme-option" data-theme="light" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
+                  <div style="font-weight: bold; margin-bottom: 8px; color: #212529;">Daylight</div>
+                  <div style="font-size: 24px; color: #212529;">☀️</div>
+                </div>
+                <div class="theme-option" data-theme="blue" style="background: linear-gradient(135deg, #0d1b2a, #1b263b); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
+                  <div style="font-weight: bold; margin-bottom: 8px; color: #e0e1dd;">Ocean</div>
+                  <div style="font-size: 24px; color: #3b82f6;">🌊</div>
+                </div>
+                <div class="theme-option" data-theme="red" style="background: linear-gradient(135deg, #2c090a, #4a0d0e); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
+                  <div style="font-weight: bold; margin-bottom: 8px; color: #ffe6e6;">Volcano</div>
+                  <div style="font-size: 24px; color: #ef4444;">🌋</div>
+                </div>
+                <div class="theme-option" data-theme="purple" style="background: linear-gradient(135deg, #1a092d, #2d1544); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
+                  <div style="font-weight: bold; margin-bottom: 8px; color: #e6d9ff;">Royal</div>
+                  <div style="font-size: 24px; color: #a78bfa;">👑</div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Card Appearance</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 200px;">
+                  <label class="form-label">Background Color</label>
+                  <input type="color" id="cardBgColor" value="#242152" class="form-control" style="height: 45px; padding: 5px;">
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                  <label class="form-label">Transparency</label>
+                  <input type="range" id="cardTransparency" min="0.7" max="1" step="0.1" value="0.9" class="form-control" style="height: 8px;">
+                  <div style="display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
+                    <span>More transparent</span>
+                    <span>Opaque</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Font Size</h4>
+              <div style="display: flex; justify-content: space-between; gap: 10px;">
+                <button class="btn btn-secondary" style="flex: 1; background: ${userPreferences.fontSize === 'small' ? 'rgba(106, 13, 173, 0.2)' : 'rgba(255, 255, 255, 0.05)'};" data-size="small">
+                  <i class="fas fa-font"></i> Small
+                </button>
+                <button class="btn btn-secondary" style="flex: 1; background: ${userPreferences.fontSize === 'medium' ? 'rgba(106, 13, 173, 0.2)' : 'rgba(255, 255, 255, 0.05)'};" data-size="medium">
+                  <i class="fas fa-font"></i> Medium
+                </button>
+                <button class="btn btn-secondary" style="flex: 1; background: ${userPreferences.fontSize === 'large' ? 'rgba(106, 13, 173, 0.2)' : 'rgba(255, 255, 255, 0.05)'};" data-size="large">
+                  <i class="fas fa-font"></i> Large
+                </button>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Header Buttons</h4>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" ${userPreferences.headerButtons.includes('notifications') ? 'checked' : ''} data-button="notifications">
+                  <i class="fas fa-bell"></i> Notifications
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" ${userPreferences.headerButtons.includes('theme') ? 'checked' : ''} data-button="theme">
+                  <i class="fas fa-moon"></i> Theme
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" ${userPreferences.headerButtons.includes('chat') ? 'checked' : ''} data-button="chat">
+                  <i class="fas fa-comments"></i> Chat
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                  <input type="checkbox" ${userPreferences.headerButtons.includes('menu') ? 'checked' : ''} data-button="menu">
+                  <i class="fas fa-bars"></i> Menu
+                </label>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+              <button class="btn btn-secondary" style="flex: 1;">
+                <i class="fas fa-redo"></i> Reset
+              </button>
+              <button class="btn btn-primary" style="flex: 1;" id="saveCustomization">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(customizationModal);
+      
+      // Theme selection
+      customizationModal.querySelectorAll('.theme-option').forEach(option => {
+        option.addEventListener('click', () => {
+          customizationModal.querySelectorAll('.theme-option').forEach(opt => {
+            opt.classList.remove('active');
+          });
+          option.classList.add('active');
+          userPreferences.theme = option.dataset.theme;
+        });
+      });
+      
+      // Font size selection
+      customizationModal.querySelectorAll('[data-size]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          customizationModal.querySelectorAll('[data-size]').forEach(b => {
+            b.style.background = 'rgba(255, 255, 255, 0.05)';
+          });
+          btn.style.background = 'rgba(106, 13, 173, 0.2)';
+          userPreferences.fontSize = btn.dataset.size;
+        });
+      });
+      
+      // Header buttons
+      customizationModal.querySelectorAll('[data-button]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          const button = checkbox.dataset.button;
+          if (checkbox.checked) {
+            if (!userPreferences.headerButtons.includes(button)) {
+              userPreferences.headerButtons.push(button);
+            }
+          } else {
+            userPreferences.headerButtons = userPreferences.headerButtons.filter(b => b !== button);
+          }
+        });
+      });
+      
+      // Save customization
+      customizationModal.querySelector('#saveCustomization').addEventListener('click', () => {
+        // Get card background color
+        const cardBgColor = customizationModal.querySelector('#cardBgColor').value;
+        userPreferences.cardBackground = cardBgColor;
+        
+        // Get transparency
+        const transparency = customizationModal.querySelector('#cardTransparency').value;
+        userPreferences.cardTransparency = transparency;
+        
+        // Save preferences
+        localStorage.setItem('cringePreferences', JSON.stringify(userPreferences));
+        
+        // Apply changes
+        applyUserPreferences();
+        
+        // Close modal
+        customizationModal.remove();
+        
+        showNotification('Customization Saved!', 'Your UI preferences have been updated.', 'success');
+      });
+      
+      customizationModal.querySelector('.close-modal').addEventListener('click', () => {
+        customizationModal.remove();
+      });
+    };
+    
+    // Show settings
+    const showSettings = () => {
+      const settingsModal = document.createElement('div');
+      settingsModal.className = 'modal-overlay active';
+      settingsModal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">
+              <i class="fas fa-cog"></i> Settings
+            </h2>
+            <button class="close-modal">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="menu-section">
+              <h3 class="menu-section-title">Account</h3>
+              <div class="menu-item" id="settingsProfile">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile Settings</span>
+              </div>
+              <div class="menu-item" id="settingsSecurity">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+              </div>
+              <div class="menu-item" id="settingsNotifications">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+              </div>
+            </div>
+            
+            <div class="menu-section">
+              <h3 class="menu-section-title">App</h3>
+              <div class="menu-item" id="settingsCustomization">
+                <i class="fas fa-palette"></i>
+                <span>UI Customization</span>
+              </div>
+              <div class="menu-item" id="settingsSound">
+                <i class="fas fa-volume-up"></i>
+                <span>Sound Effects</span>
+              </div>
+              <div class="menu-item" id="settingsData">
+                <i class="fas fa-database"></i>
+                <span>Data & Storage</span>
+              </div>
+            </div>
+            
+            <div class="menu-section">
+              <h3 class="menu-section-title">Advanced</h3>
+              <div class="menu-item" id="settingsDeveloper">
+                <i class="fas fa-code"></i>
+                <span>Developer Options</span>
+              </div>
+              <div class="menu-item" id="settingsHelp">
+                <i class="fas fa-question-circle"></i>
+                <span>Help & Feedback</span>
+              </div>
+              <div class="menu-item" id="settingsAbout">
+                <i class="fas fa-info-circle"></i>
+                <span>About CringeScroll</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(settingsModal);
+      settingsModal.querySelector('.close-modal').addEventListener('click', () => {
+        settingsModal.remove();
+      });
+      
+      // Menu items
+      settingsModal.querySelector('#settingsCustomization').addEventListener('click', () => {
+        settingsModal.remove();
+        showCustomization();
+      });
+    };
+    
+    // Logout user
+    const logout = () => {
+      if (confirm('Are you sure you want to log out?')) {
+        // In a real app, this would sign out from Firebase
+        currentUser = null;
+        document.getElementById('menuLogout').style.display = 'none';
+        showNotification('Logged Out', 'You have been logged out successfully.', 'info');
+      }
+    };
+    
     // Start the app when DOM is ready
     document.addEventListener('DOMContentLoaded', initApp);
   </script>
@@ -2546,9 +3143,9 @@
               <div style="flex: 1; min-width: 300px;">
                 <div style="background: var(--bg-secondary); border-radius: 16px; padding: 15px; height: 100%;">
                   <h4 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-image"></i> Preview
+                    <i class="fas fa-image"></i> Canvas
                   </h4>
-                  <div id="editorContainer" style="width: 100%; min-height: 400px; background: rgba(0, 0, 0, 0.1); border-radius: 12px; position: relative; overflow: hidden;">
+                  <div id="editorContainer" style="width: 100%; height: calc(100% - 40px); background: rgba(0, 0, 0, 0.2); border-radius: 12px; position: relative; overflow: hidden;">
                     <canvas id="canvas" width="800" height="600" style="width: 100%; height: 100%;"></canvas>
                   </div>
                 </div>
@@ -2557,12 +3154,9 @@
                 <div style="background: var(--bg-secondary); border-radius: 16px; padding: 15px; height: 100%; display: flex; flex-direction: column; gap: 15px;">
                   <div>
                     <h4 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                      <i class="fas fa-toolbox"></i> Tools
+                      <i class="fas fa-sliders-h"></i> Tools
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                      <button class="btn btn-secondary editor-tool active" data-tool="select">
-                        <i class="fas fa-mouse-pointer"></i> Select
-                      </button>
                       <button class="btn btn-secondary editor-tool" data-tool="text">
                         <i class="fas fa-font"></i> Text
                       </button>
@@ -2572,14 +3166,17 @@
                       <button class="btn btn-secondary editor-tool" data-tool="draw">
                         <i class="fas fa-pencil-alt"></i> Draw
                       </button>
+                      <button class="btn btn-secondary editor-tool" data-tool="eraser">
+                        <i class="fas fa-eraser"></i> Eraser
+                      </button>
                     </div>
                   </div>
                   
                   <div style="flex: 1;">
                     <h4 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                      <i class="fas fa-sliders-h"></i> Properties
+                      <i class="fas fa-palette"></i> Settings
                     </h4>
-                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
                       <div>
                         <label class="form-label">Text Color</label>
                         <input type="color" id="textColorPicker" value="#FFFFFF" style="width: 100%; height: 40px; border-radius: 12px; border: 1px solid rgba(106, 13, 173, 0.3);">
@@ -2597,21 +3194,13 @@
                       </div>
                       
                       <div>
-                        <label class="form-label">Font Size</label>
-                        <input type="range" id="fontSizeSlider" min="12" max="72" value="36" class="form-control" style="height: 8px;">
-                        <div style="display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
-                          <span>Small</span>
-                          <span>Large</span>
-                        </div>
+                        <label class="form-label">Brush Size</label>
+                        <input type="range" id="brushSize" min="1" max="50" value="5" class="form-control" style="height: 8px;">
                       </div>
                       
                       <div>
-                        <label class="form-label">Brush Size</label>
-                        <input type="range" id="brushSize" min="1" max="50" value="5" class="form-control" style="height: 8px;">
-                        <div style="display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
-                          <span>Thin</span>
-                          <span>Thick</span>
-                        </div>
+                        <label class="form-label">Transparency</label>
+                        <input type="range" id="opacitySlider" min="0" max="1" step="0.1" value="1" class="form-control" style="height: 8px;">
                       </div>
                     </div>
                   </div>
@@ -2620,23 +3209,6 @@
             </div>
             
             <div style="display: flex; gap: 15px;">
-              <div style="flex: 1; background: var(--bg-secondary); border-radius: 16px; padding: 15px;">
-                <h4 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                  <i class="fas fa-images"></i> Templates
-                </h4>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/pJbPZJ7.jpg">
-                    <i class="fas fa-user"></i> Drake
-                  </button>
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/1v8wL4G.jpg">
-                    <i class="fas fa-heart"></i> Distracted
-                  </button>
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/H9LZ1xQ.jpg">
-                    <i class="fas fa-lightbulb"></i> Change Mind
-                  </button>
-                </div>
-              </div>
-              
               <div style="flex: 1; background: var(--bg-secondary); border-radius: 16px; padding: 15px;">
                 <h4 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
                   <i class="fas fa-history"></i> History
@@ -2650,6 +3222,26 @@
                   </button>
                   <button class="btn btn-secondary" id="clearCanvasBtn" style="flex: 1;">
                     <i class="fas fa-trash"></i> Clear
+                  </button>
+                </div>
+              </div>
+              
+              <div style="width: 250px; background: var(--bg-secondary); border-radius: 16px; padding: 15px;">
+                <h4 style="color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                  <i class="fas fa-magic"></i> Templates
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/pJbPZJ7.jpg">
+                    <i class="fas fa-user"></i> Drake
+                  </button>
+                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/1v8wL4G.jpg">
+                    <i class="fas fa-heart"></i> Distracted
+                  </button>
+                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/vRtKxXK.jpg">
+                    <i class="fas fa-lightbulb"></i> Change Mind
+                  </button>
+                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/H9LZ1xQ.jpg">
+                    <i class="fas fa-cat"></i> Woman Yelling
                   </button>
                 </div>
               </div>
@@ -2674,190 +3266,19 @@
     </div>
   </div>
 
-  <!-- ===== CUSTOMIZATION MODAL ===== -->
-  <div class="modal-overlay" id="customizationModal">
-    <div class="modal-content" style="max-width: 600px;">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-palette"></i> Customize UI
-        </h2>
-        <button class="close-modal" id="closeCustomizationModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div style="margin-bottom: 20px;">
-          <h4 style="color: var(--text-primary); margin-bottom: 15px;">Theme Selection</h4>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div class="theme-option" data-theme="dark" style="background: linear-gradient(135deg, #0f0c29, #302b63); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; border: 2px solid transparent;">
-              <div style="font-weight: bold; margin-bottom: 8px;">Midnight</div>
-              <div style="font-size: 20px;">🌙</div>
-            </div>
-            <div class="theme-option" data-theme="light" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; border: 2px solid transparent;">
-              <div style="font-weight: bold; margin-bottom: 8px; color: #212529;">Daylight</div>
-              <div style="font-size: 20px; color: #212529;">☀️</div>
-            </div>
-            <div class="theme-option" data-theme="purple" style="background: linear-gradient(135deg, #1a092d, #2d1544); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; border: 2px solid transparent;">
-              <div style="font-weight: bold; margin-bottom: 8px; color: #e6d9ff;">Royal</div>
-              <div style="font-size: 20px; color: #a78bfa;">👑</div>
-            </div>
-          </div>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-          <h4 style="color: var(--text-primary); margin-bottom: 15px;">Card Appearance</h4>
-          <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-            <div style="flex: 1; min-width: 150px;">
-              <label class="form-label">Background Color</label>
-              <input type="color" id="cardBgColor" value="#242152" class="form-control" style="height: 45px; padding: 5px; border-radius: 12px;">
-            </div>
-            <div style="flex: 1; min-width: 150px;">
-              <label class="form-label">Transparency</label>
-              <input type="range" id="cardTransparency" min="0.7" max="1" step="0.05" value="0.9" class="form-control" style="height: 8px; border-radius: 12px;">
-              <div style="display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
-                <span>Transparent</span>
-                <span>Opaque</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-          <h4 style="color: var(--text-primary); margin-bottom: 15px;">Font Size</h4>
-          <div style="display: flex; justify-content: space-between; gap: 10px;">
-            <button class="btn btn-secondary" data-size="small" style="flex: 1;">
-              <i class="fas fa-font"></i> Small
-            </button>
-            <button class="btn btn-secondary active" data-size="medium" style="flex: 1;">
-              <i class="fas fa-font"></i> Medium
-            </button>
-            <button class="btn btn-secondary" data-size="large" style="flex: 1;">
-              <i class="fas fa-font"></i> Large
-            </button>
-          </div>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-          <h4 style="color: var(--text-primary); margin-bottom: 15px;">Header Buttons</h4>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            <label style="display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" id="notificationsToggle" checked>
-              <i class="fas fa-bell"></i> Notifications
-            </label>
-            <label style="display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" id="themeToggleToggle" checked>
-              <i class="fas fa-moon"></i> Theme
-            </label>
-            <label style="display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" id="chatToggleToggle" checked>
-              <i class="fas fa-comments"></i> Chat
-            </label>
-            <label style="display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" id="menuToggleToggle" checked>
-              <i class="fas fa-bars"></i> Menu
-            </label>
-          </div>
-        </div>
-        
-        <div style="display: flex; gap: 15px; margin-top: 10px;">
-          <button class="btn btn-secondary" id="resetCustomizationBtn" style="flex: 1;">
-            <i class="fas fa-redo"></i> Reset
-          </button>
-          <button class="btn btn-primary" id="saveCustomizationBtn" style="flex: 1;">
-            <i class="fas fa-save"></i> Save Changes
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== SETTINGS MODAL ===== -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal-content" style="max-width: 600px;">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-cog"></i> Settings
-        </h2>
-        <button class="close-modal" id="closeSettingsModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="menu-section">
-          <h3 class="menu-section-title">Account</h3>
-          <div class="menu-item" id="accountSettings">
-            <i class="fas fa-user-circle"></i>
-            <span>Account Settings</span>
-          </div>
-          <div class="menu-item" id="securitySettings">
-            <i class="fas fa-shield-alt"></i>
-            <span>Security Settings</span>
-          </div>
-          <div class="menu-item" id="notificationSettings">
-            <i class="fas fa-bell"></i>
-            <span>Notification Preferences</span>
-          </div>
-        </div>
-        
-        <div class="menu-section">
-          <h3 class="menu-section-title">App</h3>
-          <div class="menu-item" id="customizationSettings">
-            <i class="fas fa-palette"></i>
-            <span>UI Customization</span>
-          </div>
-          <div class="menu-item" id="soundSettings">
-            <i class="fas fa-volume-up"></i>
-            <span>Sound Effects</span>
-          </div>
-          <div class="menu-item" id="dataSettings">
-            <i class="fas fa-database"></i>
-            <span>Data & Storage</span>
-          </div>
-        </div>
-        
-        <div class="menu-section">
-          <h3 class="menu-section-title">Advanced</h3>
-          <div class="menu-item" id="developerOptions">
-            <i class="fas fa-code"></i>
-            <span>Developer Options</span>
-          </div>
-          <div class="menu-item" id="helpSupport">
-            <i class="fas fa-question-circle"></i>
-            <span>Help & Support</span>
-          </div>
-          <div class="menu-item" id="aboutApp">
-            <i class="fas fa-info-circle"></i>
-            <span>About CringeScroll</span>
-          </div>
-        </div>
-        
-        <div class="menu-section" id="logoutSection" style="display: none;">
-          <h3 class="menu-section-title" style="color: #ff4d4d;">Danger Zone</h3>
-          <div class="menu-item" id="logoutButton">
-            <i class="fas fa-sign-out-alt" style="color: #ff4d4d;"></i>
-            <span style="color: #ff4d4d;">Logout</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== SCRIPTS ===== -->
   <script>
     // ===== FABRIC.JS INITIALIZATION =====
     let fabricCanvas = null;
-    let activeTool = 'select';
+    let activeTool = 'text';
     let brushSize = 5;
-    let fontSize = 36;
     let currentColor = '#FFFFFF';
+    let opacity = 1.0;
     let canUndo = [];
     let canRedo = [];
-    let memeEditorActive = false;
     
     // Initialize Fabric.js editor
     const initMemeEditor = () => {
-      memeEditorActive = true;
-      
       if (!fabricCanvas) {
         fabricCanvas = new fabric.Canvas('canvas', {
           width: 800,
@@ -2885,23 +3306,35 @@
           btn.classList.add('active');
           activeTool = btn.dataset.tool;
           
-          if (activeTool === 'draw') {
+          if (activeTool === 'draw' || activeTool === 'eraser') {
             fabricCanvas.isDrawingMode = true;
             fabricCanvas.freeDrawingBrush.width = brushSize;
-            fabricCanvas.freeDrawingBrush.color = currentColor;
+            fabricCanvas.freeDrawingBrush.color = activeTool === 'eraser' ? '#0d0d29' : currentColor;
+            fabricCanvas.freeDrawingBrush.shadow = new fabric.Shadow({
+              blur: 10,
+              offsetX: 0,
+              offsetY: 0,
+              color: activeTool === 'eraser' ? '#0d0d29' : currentColor
+            });
           } else {
             fabricCanvas.isDrawingMode = false;
           }
         });
       });
       
-      // Font size slider
-      document.getElementById('fontSizeSlider').addEventListener('input', (e) => {
-        fontSize = parseInt(e.target.value);
-        if (fabricCanvas.getActiveObject() && fabricCanvas.getActiveObject().type === 'i-text') {
-          fabricCanvas.getActiveObject().set('fontSize', fontSize);
-          fabricCanvas.renderAll();
-        }
+      // Template buttons
+      document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const url = btn.dataset.url;
+          fabric.Image.fromURL(url, (img) => {
+            img.scaleToWidth(800);
+            img.top = (600 - img.height) / 2;
+            img.left = (800 - img.width) / 2;
+            fabricCanvas.clear();
+            fabricCanvas.add(img);
+            saveCanvasState();
+          }, { crossOrigin: 'anonymous' });
+        });
       });
       
       // Brush size slider
@@ -2912,29 +3345,17 @@
         }
       });
       
+      // Opacity slider
+      document.getElementById('opacitySlider').addEventListener('input', (e) => {
+        opacity = parseFloat(e.target.value);
+      });
+      
       // Color picker
       document.getElementById('textColorPicker').addEventListener('input', (e) => {
         currentColor = e.target.value;
         if (fabricCanvas.isDrawingMode) {
           fabricCanvas.freeDrawingBrush.color = currentColor;
         }
-      });
-      
-      // Template buttons
-      document.querySelectorAll('.template-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const url = btn.dataset.url;
-          fabric.Image.fromURL(url, (img) => {
-            if (img.width > 800) {
-              img.scaleToWidth(800);
-            }
-            img.top = (600 - img.height) / 2;
-            img.left = (800 - img.width) / 2;
-            fabricCanvas.clear();
-            fabricCanvas.add(img);
-            saveCanvasState();
-          }, { crossOrigin: 'anonymous' });
-        });
       });
       
       // Undo/Redo buttons
@@ -2945,7 +3366,6 @@
       // Action buttons
       document.getElementById('cancelMemeBtn').addEventListener('click', () => {
         document.getElementById('memeEditorModal').classList.remove('active');
-        memeEditorActive = false;
       });
       
       document.getElementById('saveDraftBtn').addEventListener('click', saveMemeDraft);
@@ -2956,7 +3376,7 @@
       fabricCanvas.on('object:added', saveCanvasState);
       fabricCanvas.on('object:removed', saveCanvasState);
       
-      // Add text on canvas click
+      // Add text on click
       fabricCanvas.on('mouse:down', (opt) => {
         if (activeTool === 'text') {
           const mouseX = opt.e.offsetX;
@@ -2966,7 +3386,7 @@
             left: mouseX,
             top: mouseY,
             fontFamily: document.getElementById('fontFamilySelect').value,
-            fontSize: fontSize,
+            fontSize: 36,
             fill: currentColor,
             stroke: '#000000',
             strokeWidth: 2,
@@ -2981,7 +3401,6 @@
           fabricCanvas.setActiveObject(text);
           text.enterEditing();
           text.selectAll();
-          saveCanvasState();
         }
       });
       
@@ -2996,9 +3415,7 @@
             const reader = new FileReader();
             reader.onload = (event) => {
               fabric.Image.fromURL(event.target.result, (img) => {
-                if (img.width > 400) {
-                  img.scaleToWidth(400);
-                }
+                img.scaleToWidth(300);
                 img.top = 150;
                 img.left = 150;
                 fabricCanvas.add(img);
@@ -3010,16 +3427,11 @@
         };
         input.click();
       });
-      
-      // Prevent text selection on canvas
-      document.getElementById('canvas').addEventListener('selectstart', (e) => {
-        e.preventDefault();
-      });
     };
     
     // Save canvas state for undo/redo
     const saveCanvasState = () => {
-      canUndo.push(JSON.stringify(fabricCanvas.toJSON()));
+      canUndo.push(fabricCanvas.toJSON());
       canRedo = []; // Clear redo stack when new action is taken
     };
     
@@ -3027,8 +3439,7 @@
     const undoCanvasAction = () => {
       if (canUndo.length > 1) {
         canRedo.push(canUndo.pop());
-        const state = JSON.parse(canUndo[canUndo.length - 1]);
-        fabricCanvas.loadFromJSON(state, fabricCanvas.renderAll.bind(fabricCanvas));
+        fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], fabricCanvas.renderAll.bind(fabricCanvas));
       }
     };
     
@@ -3036,8 +3447,7 @@
     const redoCanvasAction = () => {
       if (canRedo.length > 0) {
         canUndo.push(canRedo.pop());
-        const state = JSON.parse(canUndo[canUndo.length - 1]);
-        fabricCanvas.loadFromJSON(state, fabricCanvas.renderAll.bind(fabricCanvas));
+        fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], fabricCanvas.renderAll.bind(fabricCanvas));
       }
     };
     
@@ -3046,7 +3456,7 @@
       if (confirm('Are you sure you want to clear the canvas? All your work will be lost.')) {
         fabricCanvas.clear();
         fabricCanvas.setBackgroundColor('#0d0d29', fabricCanvas.renderAll.bind(fabricCanvas));
-        canUndo = [JSON.stringify(fabricCanvas.toJSON())];
+        canUndo = [fabricCanvas.toJSON()];
         canRedo = [];
       }
     };
@@ -3058,12 +3468,7 @@
         return;
       }
       
-      if (canUndo.length === 0) {
-        showNotification('Error', 'Nothing to save!', 'error');
-        return;
-      }
-      
-      // In a real app, this would save to Firebase
+      // In a real app, this would save to user's drafts in Firebase
       showNotification('Draft Saved!', 'Your meme draft has been saved to your profile.', 'success');
     };
     
@@ -3074,20 +3479,15 @@
         return;
       }
       
-      if (canUndo.length === 0) {
-        showNotification('Error', 'Nothing to post!', 'error');
-        return;
-      }
-      
       try {
-        // Convert canvas to data URL with higher quality
+        // Convert canvas to data URL
         const dataURL = fabricCanvas.toDataURL({
           format: 'png',
           quality: 1.0,
-          multiplier: 2
+          multiplier: 2 // Higher quality for better image
         });
         
-        // Create meme document
+        // Create meme document in Firestore
         const memeId = 'meme_' + Date.now();
         const username = currentUser.username;
         
@@ -3109,7 +3509,6 @@
         
         // Close editor and refresh feed
         document.getElementById('memeEditorModal').classList.remove('active');
-        memeEditorActive = false;
         loadFeed(true);
         
         showNotification('Meme Posted!', 'Your meme has been shared successfully! +10 CringeCoin', 'success');
@@ -3119,236 +3518,78 @@
       }
     };
     
-    // Customization modal setup
-    const setupCustomizationModal = () => {
-      // Theme selection
-      document.querySelectorAll('.theme-option').forEach(option => {
-        option.addEventListener('click', () => {
-          document.querySelectorAll('.theme-option').forEach(opt => {
-            opt.style.borderColor = 'transparent';
-          });
-          option.style.borderColor = 'var(--accent-3)';
-          userPreferences.theme = option.dataset.theme;
-        });
-      });
-      
-      // Font size selection
-      document.querySelectorAll('[data-size]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          userPreferences.fontSize = btn.dataset.size;
-        });
-      });
-      
-      // Header button toggles
-      document.getElementById('notificationsToggle').addEventListener('change', (e) => {
-        userPreferences.headerButtons.notifications = e.target.checked;
-      });
-      
-      document.getElementById('themeToggleToggle').addEventListener('change', (e) => {
-        userPreferences.headerButtons.theme = e.target.checked;
-      });
-      
-      document.getElementById('chatToggleToggle').addEventListener('change', (e) => {
-        userPreferences.headerButtons.chat = e.target.checked;
-      });
-      
-      document.getElementById('menuToggleToggle').addEventListener('change', (e) => {
-        userPreferences.headerButtons.menu = e.target.checked;
-      });
-      
-      // Reset customization
-      document.getElementById('resetCustomizationBtn').addEventListener('click', () => {
-        userPreferences = {
-          theme: 'dark',
-          cardBackground: '#242152',
-          cardTransparency: '0.9',
-          fontSize: 'medium',
-          headerButtons: {
-            notifications: true,
-            theme: true,
-            chat: true,
-            menu: true
-          }
-        };
-        
-        // Apply reset preferences
-        applyUserPreferences();
-        
-        // Update UI to reflect reset
-        document.querySelectorAll('.theme-option').forEach(opt => {
-          opt.style.borderColor = 'transparent';
-        });
-        document.querySelector('[data-theme="dark"]').style.borderColor = 'var(--accent-3)';
-        
-        document.querySelectorAll('[data-size]').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('[data-size="medium"]').classList.add('active');
-        
-        document.getElementById('cardBgColor').value = '#242152';
-        document.getElementById('cardTransparency').value = '0.9';
-        
-        document.getElementById('notificationsToggle').checked = true;
-        document.getElementById('themeToggleToggle').checked = true;
-        document.getElementById('chatToggleToggle').checked = true;
-        document.getElementById('menuToggleToggle').checked = true;
-        
-        showNotification('Reset Complete!', 'UI customization has been reset to default.', 'info');
-      });
-      
-      // Save customization
-      document.getElementById('saveCustomizationBtn').addEventListener('click', () => {
-        // Get card background color
-        userPreferences.cardBackground = document.getElementById('cardBgColor').value;
-        
-        // Get transparency
-        userPreferences.cardTransparency = document.getElementById('cardTransparency').value;
-        
-        // Save preferences
-        localStorage.setItem('cringePreferences', JSON.stringify(userPreferences));
-        
-        // Apply changes
-        applyUserPreferences();
-        
-        // Close modal
-        document.getElementById('customizationModal').classList.remove('active');
-        
-        showNotification('Customization Saved!', 'Your UI preferences have been updated.', 'success');
-      });
-      
-      // Close modal
-      document.getElementById('closeCustomizationModal').addEventListener('click', () => {
-        document.getElementById('customizationModal').classList.remove('active');
-      });
-    };
-    
-    // Settings modal setup
-    const setupSettingsModal = () => {
-      // Menu items
-      document.getElementById('customizationSettings').addEventListener('click', () => {
-        document.getElementById('settingsModal').classList.remove('active');
-        document.getElementById('customizationModal').classList.add('active');
-      });
-      
-      document.getElementById('accountSettings').addEventListener('click', () => {
-        showNotification('Coming Soon', 'Account settings will be available in the next update.', 'info');
-      });
-      
-      document.getElementById('securitySettings').addEventListener('click', () => {
-        showNotification('Coming Soon', 'Security settings will be available in the next update.', 'info');
-      });
-      
-      document.getElementById('soundSettings').addEventListener('click', () => {
-        showNotification('Coming Soon', 'Sound settings will be available in the next update.', 'info');
-      });
-      
-      document.getElementById('dataSettings').addEventListener('click', () => {
-        showNotification('Coming Soon', 'Data settings will be available in the next update.', 'info');
-      });
-      
-      document.getElementById('developerOptions').addEventListener('click', () => {
-        showNotification('Coming Soon', 'Developer options will be available in the next update.', 'info');
-      });
-      
-      document.getElementById('helpSupport').addEventListener('click', () => {
-        showNotification('Coming Soon', 'Help & support will be available in the next update.', 'info');
-      });
-      
-      document.getElementById('aboutApp').addEventListener('click', () => {
-        showNotification('About CringeScroll', 'Version 11.0 - Ultimate Meme Sharing Platform', 'info');
-      });
-      
-      document.getElementById('logoutButton').addEventListener('click', logout);
-      
-      // Close modal
-      document.getElementById('closeSettingsModal').addEventListener('click', () => {
-        document.getElementById('settingsModal').classList.remove('active');
-      });
-    };
-    
-    // Toggle chat window
-    const toggleChatWindow = () => {
+    // Chat window draggable functionality
+    const makeChatWindowDraggable = () => {
       const chatWindow = document.getElementById('chatWindow');
-      chatWindow.classList.toggle('active');
+      if (!chatWindow) return;
       
-      if (chatWindow.classList.contains('active')) {
-        loadChatMessages();
-        setTimeout(() => {
-          const messagesContainer = document.getElementById('chatMessages');
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 100);
+      let isDragging = false;
+      let currentX = 0;
+      let currentY = 0;
+      let initialX = 0;
+      let initialY = 0;
+      
+      const header = chatWindow.querySelector('.chat-header');
+      
+      // Load saved position
+      const savedPosition = localStorage.getItem('chatWindowPosition');
+      if (savedPosition) {
+        try {
+          const position = JSON.parse(savedPosition);
+          chatWindow.style.transform = `translate(${position.x}px, ${position.y}px)`;
+        } catch (e) {
+          console.error('Error loading chat window position:', e);
+        }
       }
+      
+      const dragStart = (e) => {
+        // Only drag if clicking on the header, not on buttons
+        if (e.target.closest('.close-chat')) return;
+        
+        isDragging = true;
+        initialX = e.clientX - currentX;
+        initialY = e.clientY - currentY;
+        
+        chatWindow.classList.add('dragging');
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+      };
+      
+      const dragMove = (e) => {
+        if (!isDragging) return;
+        
+        e.preventDefault();
+        
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        
+        // Keep chat window within bounds
+        const maxX = window.innerWidth - chatWindow.offsetWidth;
+        const maxY = window.innerHeight - chatWindow.offsetHeight;
+        
+        currentX = Math.max(0, Math.min(currentX, maxX));
+        currentY = Math.max(0, Math.min(currentY, maxY));
+        
+        chatWindow.style.transform = `translate(${currentX}px, ${currentY + 90}px)`;
+      };
+      
+      const dragEnd = () => {
+        isDragging = false;
+        chatWindow.classList.remove('dragging');
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+        
+        // Save current position
+        localStorage.setItem('chatWindowPosition', JSON.stringify({
+          x: currentX,
+          y: currentY
+        }));
+      };
+      
+      header.addEventListener('mousedown', dragStart);
     };
     
-    // CHAT WINDOW DRAG AND RESIZE
-    let isDragging = false;
-    let isResizing = false;
-    let dragStartX, dragStartY;
-    let resizeStartWidth, resizeStartHeight;
-    
-    // Make chat window draggable
-    document.querySelector('.chat-header').addEventListener('mousedown', (e) => {
-      isDragging = true;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      const chatWindow = document.getElementById('chatWindow');
-      chatWindow.style.cursor = 'grabbing';
-    });
-    
-    // Make chat window resizable
-    document.getElementById('resizeHandle').addEventListener('mousedown', (e) => {
-      isResizing = true;
-      resizeStartWidth = document.getElementById('chatWindow').offsetWidth;
-      resizeStartHeight = document.getElementById('chatWindow').offsetHeight;
-      document.body.style.cursor = 'se-resize';
-    });
-    
-    // Handle mouse move for drag and resize
-    document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        const chatWindow = document.getElementById('chatWindow');
-        const deltaX = e.clientX - dragStartX;
-        const deltaY = e.clientY - dragStartY;
-        const rect = chatWindow.getBoundingClientRect();
-        
-        let newX = rect.left + deltaX;
-        let newY = rect.top + deltaY;
-        
-        // Keep window within viewport bounds
-        newX = Math.max(0, Math.min(newX, window.innerWidth - rect.width));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - rect.height));
-        
-        chatWindow.style.transform = `translate(${newX}px, ${newY}px)`;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-      }
-      
-      if (isResizing) {
-        const newWidth = Math.max(250, resizeStartWidth + (e.clientX - (document.getElementById('chatWindow').getBoundingClientRect().right)));
-        const newHeight = Math.max(300, resizeStartHeight + (e.clientY - (document.getElementById('chatWindow').getBoundingClientRect().bottom)));
-        
-        document.getElementById('chatWindow').style.width = `${newWidth}px`;
-        document.getElementById('chatWindow').style.height = `${newHeight}px`;
-      }
-    });
-    
-    // Handle mouse up to stop dragging and resizing
-    document.addEventListener('mouseup', () => {
-      isDragging = false;
-      isResizing = false;
-      document.getElementById('chatWindow').style.cursor = 'default';
-      document.body.style.cursor = 'default';
-    });
-    
-    // Chat minimize button
-    document.getElementById('minimizeChat').addEventListener('click', () => {
-      document.getElementById('chatWindow').classList.remove('active');
-    });
-    
-    // Close chat button
-    document.getElementById('closeChatWindow').addEventListener('click', toggleChatWindow);
-    
-    // Send chat message
+    // ===== CHAT MESSAGE SENDING =====
     document.getElementById('sendChatMessage').addEventListener('click', sendMessage);
     document.getElementById('chatInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
@@ -3383,57 +3624,21 @@
       }, 100);
     });
     
-    // ===== CUSTOMIZATION BUTTONS =====
-    document.getElementById('menuCustomize').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.remove('active');
-      document.getElementById('customizationModal').classList.add('active');
-      
-      // Highlight current theme
-      document.querySelectorAll('.theme-option').forEach(opt => {
-        opt.style.borderColor = 'transparent';
-      });
-      document.querySelector(`[data-theme="${userPreferences.theme}"]`).style.borderColor = 'var(--accent-3)';
-      
-      // Highlight current font size
-      document.querySelectorAll('[data-size]').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`[data-size="${userPreferences.fontSize}"]`).classList.add('active');
-      
-      // Set current card background
-      document.getElementById('cardBgColor').value = userPreferences.cardBackground;
-      
-      // Set current transparency
-      document.getElementById('cardTransparency').value = userPreferences.cardTransparency;
-      
-      // Set header button toggles
-      document.getElementById('notificationsToggle').checked = userPreferences.headerButtons.notifications;
-      document.getElementById('themeToggleToggle').checked = userPreferences.headerButtons.theme;
-      document.getElementById('chatToggleToggle').checked = userPreferences.headerButtons.chat;
-      document.getElementById('menuToggleToggle').checked = userPreferences.headerButtons.menu;
-    });
-    
-    // Settings button
-    document.getElementById('menuSettings').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.remove('active');
-      document.getElementById('settingsModal').classList.add('active');
-      
-      // Show logout button only if user is logged in
-      if (currentUser) {
-        document.getElementById('logoutSection').style.display = 'block';
-      } else {
-        document.getElementById('logoutSection').style.display = 'none';
-      }
-    });
-    
     // ===== INITIALIZE APP =====
     document.addEventListener('DOMContentLoaded', initApp);
     
+    // Initialize chat window when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      makeChatWindowDraggable();
+    });
+    
     // ===== FINAL INITIALIZATION =====
-    console.log('CringeScroll v11.0 — Fully Loaded and Optimized');
+    console.log('CringeScroll v10.2 — Fully Loaded and Optimized');
     console.log('✓ Firebase Initialized');
     console.log('✓ Dynamic Card Sizing Active');
     console.log('✓ Hamburger Menu Scrollable');
     console.log('✓ All Functions Working');
-    console.log('✓ Chat Window Functional');
+    console.log('✓ Chat Window Functional & Draggable');
     console.log('✓ Meme Editor Glitch-Free');
     console.log('✓ Customization UI Fixed');
     console.log('✓ Settings Menu Functional');
@@ -3441,15 +3646,6 @@
     
     // Add final touches after everything loads
     window.addEventListener('load', () => {
-      // Apply user preferences
-      applyUserPreferences();
-      
-      // Set up customization modal
-      setupCustomizationModal();
-      
-      // Set up settings modal
-      setupSettingsModal();
-      
       // Preload common images
       const preloadUrls = [
         'https://i.imgur.com/DrakeMemeTemplate.jpg',
@@ -3476,12 +3672,110 @@
       // Trigger welcome animation
       if (!localStorage.getItem('hasSeenWelcome')) {
         setTimeout(() => {
-          showNotification('Welcome to CringeScroll v11.0!', 'The ultimate meme sharing platform with glitch-free scrolling, working editor, and real-time chat.', 'info');
+          showNotification('Welcome to CringeScroll v10.2!', 'Experience the ultimate meme sharing platform with glitch-free scrolling, working editor, and real-time chat.', 'info');
         }, 1000);
         
         localStorage.setItem('hasSeenWelcome', 'true');
       }
     });
+  </script>
+
+  <!-- ===== FIREBASE RULES ===== -->
+  <script>
+    // Firebase rules for CringeScroll v10.2
+    const firebaseRules = `
+      rules_version = '2';
+      service cloud.firestore {
+        match /databases/{database}/documents {
+          function isUser() {
+            return request.auth != null;
+          }
+          
+          function isOwner(userId) {
+            return isUser() && request.auth.uid == userId;
+          }
+          
+          function isValidUsername(username) {
+            return username.matches('^[a-zA-Z0-9_]{2,15}$');
+          }
+          
+          function isNonNegative(value) {
+            return value is number && value >= 0;
+          }
+          
+          // Users collection
+          match /users/{userId} {
+            allow read: if true;
+            allow create: if 
+              isOwner(userId) &&
+              request.resource.data.keys().hasOnly(['email', 'username', 'cringeCoin', 'streak', 'lastActive', 'createdAt', 'avatar', 'collections', 'quests', 'inventory', 'preferences']) &&
+              isValidUsername(request.resource.data.username) &&
+              request.resource.data.email is string &&
+              isNonNegative(request.resource.data.cringeCoin) &&
+              isNonNegative(request.resource.data.streak);
+              
+            allow update: if
+              isOwner(userId) &&
+              request.resource.data.keys().hasOnly(['cringeCoin', 'streak', 'lastActive', 'avatar', 'collections', 'quests', 'inventory', 'preferences']) &&
+              (request.resource.data.cringeCoin >= 0 && request.resource.data.streak >= 0);
+          }
+          
+          // Memes collection
+          match /memes/{memeId} {
+            allow read: if true;
+            allow create: if
+              isUser() &&
+              request.resource.data.keys().hasOnly(['url', 'title', 'ups', 'createdAt', 'isUserGenerated', 'createdBy', 'userId', 'reactions']) &&
+              request.resource.data.url is string &&
+              request.resource.data.title is string &&
+              request.resource.data.ups is number &&
+              request.resource.data.userId == request.auth.uid;
+              
+            allow update: if
+              request.resource.data.keys().hasOnly(['ups', 'reactions']) &&
+              request.resource.data.ups > 0;
+          }
+          
+          // Chat collection
+          match /chat/{messageId} {
+            allow read: if true;
+            allow create: if
+              isUser() &&
+              request.resource.data.keys().hasOnly(['username', 'text', 'timestamp']) &&
+              request.resource.data.username is string &&
+              request.resource.data.text is string &&
+              request.resource.data.text.size() <= 200;
+          }
+          
+          // Tips collection
+          match /tips/{tipId} {
+            allow create: if
+              isUser() &&
+              request.resource.data.from == request.auth.uid &&
+              request.resource.data.keys().hasOnly(['from', 'to', 'memeId', 'amount', 'timestamp']) &&
+              isNonNegative(request.resource.data.amount);
+              
+            allow read: if isUser();
+          }
+        }
+      }
+      
+      Required indexes:
+      1. Collection: users
+         Fields: cringeCoin (desc)
+         Query scope: Collection
+         
+      2. Collection: memes
+         Fields: userId (asc), createdAt (desc)
+         Query scope: Collection
+         
+      3. Collection: memes
+         Fields: createdAt (desc)
+         Query scope: Collection
+    `;
+    
+    console.log('Firebase Rules Ready for Deployment:');
+    console.log(firebaseRules);
   </script>
 
   <!-- ===== FINAL POLISH ===== -->
@@ -3519,7 +3813,7 @@
     .modal-overlay {
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: var(--transition);
     }
     
     .modal-overlay.active {
@@ -3609,20 +3903,6 @@
       .meme-card:hover {
         transform: translateY(-2px) !important;
       }
-    }
-    
-    /* Fabric.js specific styles */
-    canvas {
-      touch-action: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    
-    .editor-tool.active {
-      background: rgba(106, 13, 173, 0.3);
-      color: var(--accent-3);
     }
   </style>
 
