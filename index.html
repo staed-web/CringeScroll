@@ -369,6 +369,14 @@
       transform: translateY(-5px); 
       box-shadow: var(--shadow-lg); 
     }
+    .repost-badge {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .repost-badge i {
+      margin-right: 4px;
+    }
     .card-header { 
       padding: var(--card-padding); 
       display: flex; 
@@ -416,7 +424,7 @@
       flex-wrap: wrap;
     }
     .user-badge { 
-      display: flex; 
+      display: inline-flex; 
       align-items: center; 
       gap: 4px; 
       background: rgba(106, 13, 173, 0.2); 
@@ -859,6 +867,55 @@
       font-size: 0.75rem; 
       color: var(--text-secondary); 
     }
+    /* Improved Badge Item */
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .badge-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-sm);
+    }
+    .badge-icon {
+      font-size: 2.5rem;
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+    .badge-title {
+      font-weight: 700;
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+    .badge-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+    .badge-item.earned {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 215, 0, 0.15));
+      border-color: var(--gold);
+    }
+    .badge-item.earned .badge-icon {
+      color: var(--gold);
+      opacity: 1;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    }
+    .badge-item.earned .badge-title {
+      color: var(--gold);
+      opacity: 1;
+    }
+    .badge-item.earned .badge-desc {
+      color: var(--text-primary);
+      opacity: 1;
+    }
 
     /* ===== CHAT WINDOW ===== */
     .chat-window {
@@ -954,6 +1011,10 @@
     }
     .message-sender {
       font-weight: 600;
+      color: var(--accent-3); /* Make username stand out */
+    }
+    .message.outgoing .message-sender {
+      color: white;
     }
     .message.outgoing .message-meta { color: rgba(255, 255, 255, 0.8); }
     .chat-input-container { 
@@ -1015,6 +1076,7 @@
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
+      cursor: pointer;
     }
     .comment-body {
       flex: 1;
@@ -1032,6 +1094,7 @@
       font-weight: 600;
       color: var(--text-primary);
       font-size: 0.9rem;
+      cursor: pointer;
     }
     .comment-time {
       font-size: 0.75rem;
@@ -1042,6 +1105,28 @@
       color: var(--text-primary);
       line-height: 1.4;
       word-wrap: break-word;
+    }
+    .comment-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .comment-like-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .comment-like-btn.liked {
+      color: var(--error);
+    }
+    .comment-like-btn:hover {
+      color: var(--text-primary);
     }
     .comment-input-container {
       padding: 16px;
@@ -1311,6 +1396,11 @@
       color: var(--text-secondary); 
     }
     
+    .leaderboard-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
     .leaderboard-item {
       background: rgba(255, 255, 255, 0.03); 
       border-radius: 12px; 
@@ -1319,6 +1409,10 @@
       align-items: center; 
       gap: 12px;
       border: 1px solid transparent;
+    }
+    .leaderboard-item.is-user {
+      border-color: var(--accent-3);
+      background: rgba(106, 13, 173, 0.1);
     }
     .leaderboard-item:hover {
       border-color: var(--border-color);
@@ -1360,8 +1454,8 @@
     
     .collection-grid { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-      gap: 10px; 
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+      gap: 15px; 
     }
     .collection-item { 
       background: rgba(255, 255, 255, 0.05); 
@@ -1369,21 +1463,39 @@
       overflow: hidden; 
       cursor: pointer; 
       border: 1px solid var(--border-color);
+      position: relative;
+      aspect-ratio: 1 / 1;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .collection-item:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-md);
     }
     .collection-item img { 
       width: 100%; 
-      height: 100px; 
+      height: 100%;
       object-fit: cover; 
       display: block;
+      transition: transform 0.3s ease;
+    }
+    .collection-item:hover img {
+      transform: scale(1.1);
     }
     .collection-item p { 
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       padding: 8px; 
       font-size: 0.8rem; 
       text-align: center; 
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis; 
-      color: var(--text-secondary);
+      color: white;
+      font-weight: 600;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
     }
 
     /* ===== NEW SETTINGS MODAL ===== */
@@ -1602,10 +1714,12 @@
     }
 
     /* ===== CONFIRM MODAL ===== */
-    #confirmModal .modal-content {
+    #confirmModal .modal-content,
+    #repostModal .modal-content {
       max-width: 400px;
     }
-    #confirmModalBody {
+    #confirmModalBody,
+    #repostModalBody {
       font-size: 1rem;
       color: var(--text-secondary);
       line-height: 1.5;
@@ -1631,8 +1745,8 @@
       .logo-text { font-size: 1.4rem; }
       .nav-container { padding: 6px 0; }
       .nav-item { 
-        font-size: 0.65rem; 
-        padding: 4px 8px; /* Wider padding for 4 items */
+        font-size: 0.75rem; 
+        padding: 4px 12px; /* Wider padding for 4 items */
       }
       .nav-item i { font-size: 1.1rem; }
       .chat-window { 
@@ -1680,11 +1794,13 @@
       }
       /* Except editor and confirm */
       .modal-overlay.editor-modal-overlay,
-      .modal-overlay.confirm-modal-overlay {
+      .modal-overlay.confirm-modal-overlay,
+      .modal-overlay.repost-modal-overlay {
         align-items: center;
       }
       .modal-content.editor-modal,
-      #confirmModal .modal-content {
+      #confirmModal .modal-content,
+      #repostModal .modal-content {
         width: 95%;
         max-width: 1200px;
         max-height: 95vh;
@@ -1692,11 +1808,13 @@
         border-radius: 20px;
         transform: translateY(20px);
       }
-      #confirmModal .modal-content {
+      #confirmModal .modal-content,
+      #repostModal .modal-content {
          max-width: 400px;
       }
       .modal-overlay.active .modal-content.editor-modal,
-      .modal-overlay.active #confirmModal .modal-content {
+      .modal-overlay.active #confirmModal .modal-content,
+      .modal-overlay.active #repostModal .modal-content {
         transform: translateY(0);
       }
       
@@ -1746,16 +1864,19 @@
       }
       /* Except editor and confirm */
       .modal-overlay.editor-modal-overlay,
-      .modal-overlay.confirm-modal-overlay {
+      .modal-overlay.confirm-modal-overlay,
+      .modal-overlay.repost-modal-overlay {
         align-items: center;
       }
       .modal-content.editor-modal,
-      #confirmModal .modal-content {
+      #confirmModal .modal-content,
+      #repostModal .modal-content {
         height: 95vh;
         max-height: 95vh;
         border-radius: 20px;
       }
-       #confirmModal .modal-content {
+       #confirmModal .modal-content,
+       #repostModal .modal-content {
         height: auto;
         max-height: 90vh;
       }
@@ -1783,7 +1904,7 @@
       }
       
       .nav-item {
-        padding: 4px 8px;
+        padding: 4px 12px;
       }
       
       #profileMemesGrid {
@@ -1824,7 +1945,7 @@
       </div>
     </header>
     
-    <!-- ===== NAVIGATION (REMOVED 'FOLLOWING') ===== -->
+    <!-- ===== NAVIGATION (FIXED) ===== -->
     <nav class="nav-container">
       <a href="#" class="nav-item active" data-tab="hot"><i class="fas fa-fire"></i><span>Hot</span><div class="nav-indicator"></div></a>
       <a href="#" class="nav-item" data-tab="fresh"><i class="fas fa-bolt"></i><span>Fresh</span></a>
@@ -1850,7 +1971,7 @@
     </main>
   </div>
 
-  <!-- ===== SIDEBAR MENU (RESTORED CUSTOMIZE) ===== -->
+  <!-- ===== SIDEBAR MENU (FIXED) ===== -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2 class="sidebar-title">Menu</h2>
@@ -2059,8 +2180,6 @@
           </div>
         </div>
         
-        <!-- Appearance Tab (REMOVED) -->
-        
         <!-- Notifications Tab -->
         <div class="tab-content" id="settingsNotifications">
           <div class="switch-toggle">
@@ -2113,7 +2232,7 @@
     </div>
   </div>
 
-  <!-- Customize UI Modal (NEW) -->
+  <!-- Customize UI Modal (From v4.0) -->
   <div class="modal-overlay" id="customizeModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2148,7 +2267,7 @@
     </div>
   </div>
   
-  <!-- Profile Modal (Public View) -->
+  <!-- Profile Modal (Public View - IMPROVED) -->
   <div class="modal-overlay" id="profileModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2162,7 +2281,7 @@
     </div>
   </div>
   
-  <!-- Collections Modal -->
+  <!-- Collections Modal (IMPROVED UI) -->
   <div class="modal-overlay" id="collectionsModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2174,29 +2293,28 @@
         <div class="collection-grid" id="favoritesGrid">
           <div class="loading-spinner"></div>
         </div>
-        <button class="btn btn-primary" style="margin-top: 20px;" id="createNewCollectionBtn" disabled><i class="fas fa-plus"></i> Create New Collection (Soon)</button>
       </div>
     </div>
   </div>
   
-  <!-- Inventory (Badges) Modal -->
+  <!-- Inventory (Badges) Modal (IMPROVED UI) -->
   <div class="modal-overlay" id="inventoryModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-box"></i> My Inventory (Badges)</h2>
+        <h2 class="modal-title"><i class="fas fa-box"></i> My Inventory</h2>
         <button class="close-modal" data-modal-id="inventoryModal"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">Earn badges by completing milestones!</p>
-        <div class="modal-grid" id="badgeGrid">
-          <!-- Badges will be dynamically rendered here -->
-          <div class="loading-spinner"></div>
-        </div>
+         <p style="color: var(--text-secondary); margin-bottom: 20px;">Earn badges by completing milestones!</p>
+         <div class="modal-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));" id="badgeGrid">
+           <!-- Badges will be dynamically rendered here -->
+           <div class="loading-spinner"></div>
+         </div>
       </div>
     </div>
   </div>
   
-  <!-- Leaderboard Modal -->
+  <!-- Leaderboard Modal (IMPROVED UI) -->
   <div class="modal-overlay" id="leaderboardModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2205,7 +2323,12 @@
       </div>
       <div class="modal-body">
         <h3 class="menu-section-title">Top 10 Cringe Lords</h3>
-        <div style="display: flex; flex-direction: column; gap: 10px;" id="leaderboardList">
+        <div class="leaderboard-list-container" id="leaderboardList">
+          <div class="loading-spinner"></div>
+        </div>
+        <hr style="border: 1px solid var(--border-color); margin: 25px 0;">
+        <h3 class="menu-section-title">Your Rank</h3>
+        <div id="userRankContainer">
           <div class="loading-spinner"></div>
         </div>
       </div>
@@ -2276,6 +2399,25 @@
     </div>
   </div>
   
+  <!-- Report/Repost Modal (Consolidated) -->
+  <div class="modal-overlay" id="repostModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="repostModalTitle"><i class="fas fa-retweet"></i> Repost Meme</h2>
+        <button class="close-modal" data-modal-id="repostModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="repostModalBody" style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+          This will share the meme to your profile, crediting the original creator.
+        </p>
+        <div class="confirm-actions">
+          <button class="btn btn-secondary" id="repostCancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="repostOkBtn">Repost</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Report Modal -->
   <div class="modal-overlay" id="reportModal">
     <div class="modal-content">
@@ -2284,7 +2426,7 @@
         <button class="close-modal" data-modal-id="reportModal"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">Why are you reporting this meme?</p>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Why are you reporting this content?</p>
         <div class="form-radio-group">
           <label class="form-radio-label"><input type="radio" name="reportReason" value="spam" checked> Spam</label>
           <label class="form-radio-label"><input type="radio" name="reportReason" value="nsfw"> NSFW / Inappropriate</label>
@@ -2303,7 +2445,6 @@
 
   <!-- 
     Your Firebase config is placed here.
-    This is the critical fix for your login/signup bug.
   -->
   <script>
     const firebaseConfig = {
@@ -2348,7 +2489,9 @@
       runTransaction,
       writeBatch,
       deleteDoc,
-      Timestamp
+      Timestamp,
+      arrayRemove,
+      arrayUnion
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import {
       getStorage,
@@ -2384,10 +2527,10 @@
     let collectionsListener = null;
     
     // State for modals
-    let currentMemeId = null;
-    let currentMemeCreatorId = null;
+    let currentMemeData = null; // Store full meme data for repost/report
+    let currentCommentListener = null; // For real-time comment updates
 
-    // Meme API sources (Restored from original)
+    // Meme API sources (Full List)
     const MEME_SOURCES = [
       'https://meme-api.com/gimme/memes',
       'https://meme-api.com/gimme/dankmemes',
@@ -2538,6 +2681,25 @@
             modal.classList.add('active');
         });
     };
+    
+    const openRepostModal = (card) => {
+      if (!currentUser) { showAuthModal(); return; }
+      currentMemeData = {
+        docId: card.dataset.docId,
+        source: card.dataset.source,
+        title: card.dataset.title,
+        url: card.dataset.url,
+        creatorId: card.dataset.creatorId,
+        creatorUsername: card.dataset.username
+      };
+      
+      if (currentMemeData.creatorId === currentUser.uid) {
+        showNotification("Can't Repost", "You can't repost your own meme!", "error");
+        return;
+      }
+      
+      $('repostModal').classList.add('active');
+    };
 
     // ===== FIREBASE & AUTH =====
     const initFirebase = () => {
@@ -2607,7 +2769,8 @@
       });
       
       // Successfully past the snapshot, close the auth modal
-      $('authModal').classList.remove('active');
+      // This is part of the login fix, ensuring the modal closes
+      closeModal('authModal');
     };
     
     const handleUserLogout = () => {
@@ -2710,10 +2873,13 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: username });
         await createUserProfile(userCredential.user, username);
-        // onAuthStateChanged will call handleUserLogin
         
         showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
-        // No longer need to close modal here, handleUserLogin will do it
+        
+        // LOGIN FIX: Manually close modal on success
+        closeModal('authModal');
+        // onAuthStateChanged will call handleUserLogin
+
       } catch (error) { 
         console.error('Sign up error:', error); 
         errorEl.textContent = error.message.replace('Firebase: ', '');
@@ -2737,8 +2903,13 @@
       
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        // onAuthStateChanged will handle the rest
+        
         showNotification('Logged In!', 'Welcome back! Your memes are waiting.', 'success');
+        
+        // LOGIN FIX: Manually close modal on success
+        closeModal('authModal');
+        // onAuthStateChanged will handle the rest
+
       } catch (error) { 
         console.error('Login error:', error); 
         errorEl.textContent = error.message.replace('Firebase: ', '');
@@ -2788,7 +2959,7 @@
 
             // 2. Delete the single user doc
             const userRef = doc(db, 'users', userId);
-            await deleteDoc(userRef);
+            await deleteDoc(userRef); // This will also delete all subcollections via backend function (ideally)
 
             // 3. Delete user's avatar from storage
             if (currentUser.avatar && currentUser.avatar.includes('firebasestorage')) {
@@ -2858,24 +3029,41 @@
       const username = isFirestore ? meme.username : 'API';
       const creatorId = isFirestore ? meme.userId : null;
       
+      // Handle Reposts
+      const isRepost = meme.isRepost || false;
+      const originalCreatorId = meme.originalCreatorId || null;
+      const originalCreatorUsername = meme.originalCreatorUsername || null;
+
       card.dataset.id = memeId;
       card.dataset.source = dataSource;
       card.dataset.docId = isFirestore ? meme.id : '';
       card.dataset.url = memeUrl;
       card.dataset.title = title;
-      card.dataset.creatorId = creatorId;
-      card.dataset.username = username;
+      card.dataset.creatorId = creatorId; // The user who posted/reposted
+      card.dataset.username = username; // The user who posted/reposted
+      
+      // Store original creator info for reposts
+      card.dataset.originalCreatorId = originalCreatorId;
+      card.dataset.originalCreatorUsername = originalCreatorUsername;
+
       
       const isSaved = userCollections.favorites && userCollections.favorites.includes(memeId);
       
       card.innerHTML = `
         <div class="card-header">
           <div class="card-header-main">
+            ${isRepost ? `<div class="repost-badge"><i class="fas fa-retweet"></i> Reposted by</div>` : ''}
             <div class="meme-title">${escapeHtml(title)}</div>
             <div class="meme-meta">
               <span class="user-badge" ${creatorId ? `data-user-id="${creatorId}"` : ''}>
                 <i class="fas fa-${isFirestore ? 'user' : 'robot'}"></i> ${escapeHtml(username)}
               </span>
+              ${isRepost ? `
+                <span class="repost-badge" style="margin:0;">from</span>
+                <span class="user-badge" ${originalCreatorId ? `data-user-id="${originalCreatorId}"` : ''}>
+                  <i class="fas fa-user"></i> ${escapeHtml(originalCreatorUsername)}
+                </span>
+              ` : ''}
               <span class="meme-time"><i class="fas fa-clock"></i> ${isFirestore ? timeAgo(meme.createdAt?.toDate()) : '...'}</span>
             </div>
           </div>
@@ -2894,7 +3082,7 @@
             <button class="card-btn save-btn ${isSaved ? 'saved' : ''}" title="Save to collection"><i class="fas fa-bookmark"></i><span>${isSaved ? 'Saved' : 'Save'}</span></button>
             <button class="card-btn tip-btn" title="Tip creator (5 CC)" ${!isFirestore ? 'disabled' : ''}><i class="fas fa-coins"></i>Tip</button>
             <button class="card-btn comment-btn" title="Comments"><i class="fas fa-comment"></i><span>${formatNumber(meme.commentCount)}</span></button>
-            <button class="card-btn share-btn" title="Share meme"><i class="fas fa-share-alt"></i>Share</button>
+            <button class="card-btn repost-btn" title="Repost"><i class="fas fa-retweet"></i><span>${formatNumber(meme.repostCount)}</span></button>
           </div>
         </div>
       `;
@@ -2916,14 +3104,17 @@
       card.querySelector('.save-btn').onclick = () => saveMeme(card);
       card.querySelector('.tip-btn').onclick = () => tipMeme(card);
       card.querySelector('.comment-btn').onclick = () => openCommentModal(card);
-      card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl);
+      card.querySelector('.repost-btn').onclick = () => openRepostModal(card); // Changed from share
       card.querySelector('.card-more-btn').onclick = () => openReportModal(card);
       card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
       
-      const userBadge = card.querySelector('.user-badge');
-      if (userBadge && creatorId) {
-          userBadge.onclick = () => showPublicProfile(creatorId, username);
-      }
+      // Add profile click listeners to both badges
+      card.querySelectorAll('.user-badge').forEach(badge => {
+        const uid = badge.dataset.userId;
+        if (uid) {
+          badge.onclick = () => showPublicProfile(uid);
+        }
+      });
     };
     
     const loadFeed = async (clear = false) => {
@@ -2964,7 +3155,7 @@
     };
     
     const showLoadingSkeletons = () => {
-      feed.innerHTML = ''; // Clear feed
+      if (feed.innerHTML.includes('skeleton-card')) return; // Don't add more
       const skeletonCount = window.innerWidth > 1024 ? 3 : (window.innerWidth > 768 ? 2 : 1);
       for (let i = 0; i < skeletonCount; i++) {
         const skeleton = document.createElement('div');
@@ -3051,6 +3242,7 @@
       }
     };
 
+    // ===== MEME LOADING FIX: Added check for `data.memes` array =====
     const fetchMeme = async () => {
       try {
         const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
@@ -3058,14 +3250,21 @@
         if (!response.ok) throw new Error('API response not ok.');
         const data = await response.json();
         
-        if (!data?.url || data.nsfw || data.spoiler || seenUrls.has(data.url)) { 
+        // Handle APIs that return an array, e.g. { memes: [...] }
+        let meme = data;
+        if (data.memes && Array.isArray(data.memes)) {
+          meme = data.memes[0];
+        }
+
+        if (!meme?.url || meme.nsfw || meme.spoiler || seenUrls.has(meme.url)) { 
           return null; 
         } 
-        seenUrls.add(data.url);
+        
+        seenUrls.add(meme.url);
         return { 
-          url: data.url, 
-          title: data.title || 'Cringe', 
-          ups: data.ups || 0, 
+          url: meme.url, 
+          title: meme.title || 'Cringe', 
+          ups: meme.ups || 0, 
           reactions: { 
             cringe: Math.floor(Math.random() * 100), 
             laugh: Math.floor(Math.random() * 150), 
@@ -3097,7 +3296,7 @@
           <h3 class="meme-title">${escapeHtml(meme.title)}</h3>
           <p class="meme-meta">By: <span class="user-badge" data-user-id="${meme.userId}">${escapeHtml(meme.username)}</span></p>
         `;
-        motdBody.querySelector('.user-badge').onclick = () => showPublicProfile(meme.userId, meme.username);
+        motdBody.querySelector('.user-badge').onclick = () => showPublicProfile(meme.userId);
         $('motdCard').style.display = 'block';
         
       } catch (error) {
@@ -3184,9 +3383,11 @@
         return; 
       }
       
-      const creatorId = card.dataset.creatorId;
+      // Use original creator ID for tips if it's a repost
+      const creatorId = card.dataset.originalCreatorId || card.dataset.creatorId;
+      
       if (creatorId === currentUser.uid) {
-        showNotification('Self-Tip', "You can't tip your own meme!", 'error');
+        showNotification('Self-Tip', "You can't tip your own creation!", 'error');
         return;
       }
       
@@ -3228,19 +3429,60 @@
       }
     };
     
-    const remixMeme = (imageUrl) => openMemeEditor(imageUrl);
-    
-    const shareMeme = (memeUrl) => {
-      if (navigator.share) {
-        navigator.share({ 
-          title: 'CringeScroll Meme', 
-          text: 'Check out this hilarious meme on CringeScroll!', 
-          url: memeUrl 
-        }).catch((error) => console.log('Error sharing:', error));
-      } else {
-        navigator.clipboard.writeText(memeUrl)
-          .then(() => showNotification('Copied!', 'Meme link copied to clipboard!', 'success'))
-          .catch(() => showNotification('Error', 'Failed to copy to clipboard', 'error'));
+    const repostMeme = async () => {
+      if (!currentUser || !currentMemeData) { return; }
+      
+      const btn = $('repostOkBtn');
+      btn.disabled = true;
+      
+      try {
+        const { title, url, originalCreatorId, originalCreatorUsername, creatorId, creatorUsername } = currentMemeData;
+        
+        // Data for the new repost doc
+        const repostData = {
+          title: title,
+          imageUrl: url,
+          userId: currentUser.uid, // The user reposting
+          username: currentUser.username, // The user reposting
+          createdAt: serverTimestamp(),
+          isUserGenerated: true,
+          isRepost: true,
+          // Credit the original creator
+          originalCreatorId: originalCreatorId || creatorId,
+          originalCreatorUsername: originalCreatorUsername || creatorUsername,
+          reactions: { cringe: 0, laugh: 0, cry: 0 },
+          tips: 0,
+          commentCount: 0,
+          repostCount: 0
+        };
+
+        // 1. Add the new repost doc
+        await addDoc(collection(db, 'memes'), repostData);
+        
+        // 2. Increment repost count on the *original* meme, if it's a firestore doc
+        if(currentMemeData.source === 'firestore') {
+          const originalMemeRef = doc(db, 'memes', currentMemeData.docId);
+          await updateDoc(originalMemeRef, { repostCount: increment(1) });
+        }
+
+        // 3. Increment the reposter's memeCount
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, { memeCount: increment(1) });
+        
+        showNotification('Reposted!', 'Meme shared to your profile.', 'success');
+        closeModal('repostModal');
+        
+        // Go to "My Memes" to see the repost
+        $$('.nav-item.active').forEach(el => el.classList.remove('active'));
+        document.querySelector('[data-tab="mymemes"]').classList.add('active');
+        currentTab = 'mymemes';
+        loadFeed(true);
+        
+      } catch (error) {
+        console.error("Error reposting:", error);
+        showNotification('Error', 'Could not repost meme.', 'error');
+      } finally {
+        btn.disabled = false;
       }
     };
     
@@ -3344,10 +3586,15 @@
     };
     
     const sendChatMessage = async () => {
+      // CHAT USERNAME FIX: Check for currentUser.username
+      if (!currentUser || !currentUser.username) { 
+        showNotification("Please wait", "Your profile is still loading.", "info");
+        return; 
+      }
+      
       const input = $('chatInput');
       const text = input.value.trim();
       if (!text) return;
-      if (!currentUser) { showAuthModal(); return; }
       
       input.disabled = true;
       try {
@@ -3512,7 +3759,8 @@
           isUserGenerated: true,
           reactions: { cringe: 0, laugh: 0, cry: 0 }, 
           tips: 0,
-          commentCount: 0
+          commentCount: 0,
+          repostCount: 0
         });
 
         const userRef = doc(db, 'users', currentUser.uid);
@@ -3557,6 +3805,12 @@
     const closeModal = (modalId) => {
         const modal = $(modalId);
         if (modal) modal.classList.remove('active');
+        
+        // Detach comment listener when modal closes
+        if (modalId === 'commentModal' && currentCommentListener) {
+          currentCommentListener();
+          currentCommentListener = null;
+        }
     };
 
     const showSettings = () => {
@@ -3667,6 +3921,7 @@
       }
     };
     
+    // ===== PROFILE MODAL FIX: Improved UI/UX =====
     const showPublicProfile = async (userId, username) => {
       if (!userId) {
           if (!currentUser) { showAuthModal(); return; }
@@ -3687,6 +3942,7 @@
           }
           
           const user = userDoc.data();
+          const isSelf = currentUser && currentUser.uid === userId;
           
           body.innerHTML = `
             <div class="profile-card-header">
@@ -3697,6 +3953,7 @@
               </div>
             </div>
             <p class="profile-card-bio">${escapeHtml(user.bio)}</p>
+            ${isSelf ? '<button class="btn btn-secondary" id="editProfileBtn"><i class="fas fa-edit"></i> Edit Profile</button>' : ''}
             
             <div class="profile-card-stats" style="margin-top: 20px;">
               <div class="stat-item" id="profileCringeCoin">
@@ -3705,7 +3962,7 @@
               </div>
               <div class="stat-item" id="profileMemes">
                 <div class="stat-value">${formatNumber(user.memeCount)}</div>
-                <div class="stat-label">Memes Posted</div>
+                <div class="stat-label">Posts</div>
               </div>
             </div>
             
@@ -3718,6 +3975,13 @@
               </div>
             </div>
           `;
+          
+          if (isSelf) {
+            $('editProfileBtn').onclick = () => {
+              closeModal('profileModal');
+              openModal('settingsModal');
+            };
+          }
           
           // Load user's memes
           const memesGrid = $('profileMemesGrid');
@@ -3744,6 +4008,7 @@
       }
     };
 
+    // ===== COLLECTIONS MODAL FIX: Improved UI/UX =====
     const showCollections = async () => {
       if (!currentUser) { showAuthModal(); return; }
       openModal('collectionsModal');
@@ -3754,7 +4019,7 @@
       
       const snapshot = await getDocs(q);
       if (snapshot.empty) {
-          grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
+          grid.innerHTML = '<div class="feed-message" style="width: 100%; grid-column: 1 / -1;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
           return;
       }
       grid.innerHTML = '';
@@ -3762,12 +4027,15 @@
           const meme = doc.data();
           const item = document.createElement('div');
           item.className = 'collection-item';
-          item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
-          item.onclick = () => { /* Maybe open full meme modal later */ };
+          item.innerHTML = `
+            <img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy">
+            <p>${escapeHtml(meme.title)}</p>
+          `;
           grid.appendChild(item);
       });
     };
 
+    // ===== INVENTORY MODAL FIX: Improved UI/UX =====
     const showInventory = () => {
       if (!currentUser) { showAuthModal(); return; }
       openModal('inventoryModal');
@@ -3776,9 +4044,12 @@
       
       const createBadge = (icon, title, desc, earned) => {
         const item = document.createElement('div');
-        item.className = 'grid-item';
-        item.style.opacity = earned ? '1' : '0.4';
-        item.innerHTML = `<i class="fas ${icon}" style="color: ${earned ? 'var(--gold)' : 'var(--text-secondary)'};"></i><div class="grid-item-title">${title}</div><div class="grid-item-meta">${desc}</div>`;
+        item.className = `badge-item ${earned ? 'earned' : ''}`;
+        item.innerHTML = `
+          <i class="fas ${icon} badge-icon"></i>
+          <div class="badge-title">${title}</div>
+          <div class="badge-desc">${desc}</div>
+        `;
         grid.appendChild(item);
       };
 
@@ -3788,31 +4059,62 @@
       createBadge('fa-fire', 'Hot Streak', '3-day streak', currentUser.streak >= 3);
       createBadge('fa-coins', 'Coin Hoarder', '100+ CringeCoin', currentUser.cringeCoin >= 100);
       createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', currentUser.cringeCoin >= 1000);
+      createBadge('fa-comments', 'Chatterbox', 'Post in chat', false); // Example
+      createBadge('fa-retweet', 'Spreader', 'Repost a meme', false); // Example
     };
 
+    // ===== LEADERBOARD MODAL FIX: Improved UI/UX =====
     const showLeaderboard = async () => {
       openModal('leaderboardModal');
       const list = $('leaderboardList');
+      const userRankContainer = $('userRankContainer');
       list.innerHTML = '<div class="loading-spinner"></div>';
+      userRankContainer.innerHTML = '<div class="loading-spinner"></div>';
       
-      const q = query(collection(db, 'users'), orderBy('cringeCoin', 'desc'), limit(10));
-      const snapshot = await getDocs(q);
-      
-      list.innerHTML = '';
-      let rank = 1;
-      snapshot.forEach(doc => {
-          const user = doc.data();
-          const item = document.createElement('div');
-          item.className = `leaderboard-item rank-${rank}`;
-          item.innerHTML = `
-            <div class="leaderboard-rank">${rank}</div>
-            <img src="${user.avatar}" alt="avatar" class="leaderboard-avatar">
-            <div class="leaderboard-name">${escapeHtml(user.username)}</div>
-            <div class="leaderboard-score">${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i></div>
+      try {
+        const q = query(collection(db, 'users'), orderBy('cringeCoin', 'desc'), limit(10));
+        const snapshot = await getDocs(q);
+        
+        list.innerHTML = '';
+        let rank = 1;
+        snapshot.forEach(doc => {
+            const user = doc.data();
+            const isUser = currentUser && doc.id === currentUser.uid;
+            const item = document.createElement('div');
+            item.className = `leaderboard-item rank-${rank} ${isUser ? 'is-user' : ''}`;
+            item.innerHTML = `
+              <div class="leaderboard-rank">${rank}</div>
+              <img src="${user.avatar}" alt="avatar" class="leaderboard-avatar">
+              <div class="leaderboard-name">${escapeHtml(user.username)}</div>
+              <div class="leaderboard-score">${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i></div>
+            `;
+            list.appendChild(item);
+            rank++;
+        });
+
+        // Fetch current user's rank
+        if (currentUser) {
+          // This is a "hacky" way to get rank. A real app would use a Cloud Function.
+          // We'll just show their score for now.
+          const userRankItem = document.createElement('div');
+          userRankItem.className = 'leaderboard-item is-user';
+          userRankItem.innerHTML = `
+            <div class="leaderboard-rank"><i class="fas fa-user"></i></div>
+            <img src="${currentUser.avatar}" alt="avatar" class="leaderboard-avatar">
+            <div class="leaderboard-name">${escapeHtml(currentUser.username)} (You)</div>
+            <div class="leaderboard-score">${formatNumber(currentUser.cringeCoin)} <i class="fas fa-coins"></i></div>
           `;
-          list.appendChild(item);
-          rank++;
-      });
+          userRankContainer.innerHTML = '';
+          userRankContainer.appendChild(userRankItem);
+        } else {
+          userRankContainer.innerHTML = '<div class="feed-message" style="padding: 10px; font-size: 0.9rem;">Log in to see your rank!</div>';
+        }
+
+      } catch (error) {
+        console.error("Error loading leaderboard:", error);
+        list.innerHTML = '<div class="feed-message">Could not load leaderboard.</div>';
+        userRankContainer.innerHTML = '';
+      }
     };
 
     const showQuests = () => {
@@ -3898,6 +4200,9 @@
             } else if (notif.type === 'comment') {
                 icon = 'fa-comment';
                 text = `<strong>${escapeHtml(notif.fromUser)}</strong> commented on "${escapeHtml(notif.memeTitle)}"`;
+            } else if (notif.type === 'repost') {
+                icon = 'fa-retweet';
+                text = `<strong>${escapeHtml(notif.fromUser)}</strong> reposted "${escapeHtml(notif.memeTitle)}"`;
             }
             
             item.innerHTML = `<i class="fas ${icon}" style="color: ${notif.type === 'tip' ? 'var(--gold)' : 'var(--accent-3)'};"></i><div>${text}<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">${notif.timestamp ? timeAgo(notif.timestamp.toDate()) : ''}</div></div>`;
@@ -3997,50 +4302,78 @@
     // ===== Comment & Report Functions =====
     
     const openCommentModal = (card) => {
-      currentMemeId = card.dataset.docId;
-      if (!currentMemeId || card.dataset.source === 'api') {
+      currentMemeData = {
+        docId: card.dataset.docId,
+        source: card.dataset.source,
+        creatorId: card.dataset.creatorId,
+        title: card.dataset.title
+      };
+      
+      if (!currentMemeData.docId || currentMemeData.source === 'api') {
         showNotification('Comments Unavailable', 'Comments are only available for user-posted memes.', 'info');
         return;
       }
-      currentMemeCreatorId = card.dataset.creatorId; // Store for notifications
       openModal('commentModal');
-      loadComments(currentMemeId);
+      loadComments(currentMemeData.docId);
     };
     
-    const loadComments = async (memeId) => {
+    const loadComments = (memeId) => {
       const list = $('commentList');
       list.innerHTML = '<div class="loading-spinner"></div>';
       
+      if (currentCommentListener) currentCommentListener(); // Detach old listener
+      
       const q = query(collection(db, 'memes', memeId, 'comments'), orderBy('timestamp', 'asc'));
-      const snapshot = await getDocs(q);
-      
-      if (snapshot.empty) {
-        list.innerHTML = '<div class="feed-message" style="padding: 20px;">No comments yet. Be the first!</div>';
-        return;
-      }
-      
-      list.innerHTML = '';
-      snapshot.forEach(doc => {
-        renderComment(doc.data());
+      currentCommentListener = onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          list.innerHTML = '<div class="feed-message" style="padding: 20px;">No comments yet. Be the first!</div>';
+          return;
+        }
+        
+        list.innerHTML = '';
+        snapshot.forEach(doc => {
+          renderComment(doc.id, doc.data());
+        });
+        // list.scrollTop = list.scrollHeight; // Don't auto-scroll on update
       });
-      list.scrollTop = list.scrollHeight;
     };
     
-    const renderComment = (comment) => {
+    const renderComment = (commentId, comment) => {
       const list = $('commentList');
       const item = document.createElement('div');
       item.className = 'comment-item';
+      item.id = `comment-${commentId}`;
+      
+      const likes = comment.likes || [];
+      const likeCount = likes.length;
+      const isLiked = currentUser && likes.includes(currentUser.uid);
+      
       item.innerHTML = `
-        <img src="${comment.userAvatar}" alt="avatar" class="comment-avatar">
+        <img src="${comment.userAvatar}" alt="avatar" class="comment-avatar" data-user-id="${comment.userId}">
         <div class="comment-body">
           <div class="comment-header">
-            <span class="comment-user">${escapeHtml(comment.username)}</span>
+            <span class="comment-user" data-user-id="${comment.userId}">${escapeHtml(comment.username)}</span>
             <span class="comment-time">${comment.timestamp ? timeAgo(comment.timestamp.toDate()) : ''}</span>
           </div>
           <p class="comment-text">${escapeHtml(comment.text)}</p>
+          <div class="comment-actions">
+            <button class="comment-like-btn ${isLiked ? 'liked' : ''}" data-comment-id="${commentId}">
+              <i class="fas fa-heart"></i>
+              <span class="comment-like-count">${formatNumber(likeCount)}</span>
+            </button>
+          </div>
         </div>
       `;
       list.appendChild(item);
+      
+      // Add listeners
+      item.querySelector('.comment-like-btn').onclick = (e) => likeComment(e.currentTarget);
+      item.querySelectorAll('.comment-avatar, .comment-user').forEach(el => {
+        el.onclick = () => {
+          closeModal('commentModal');
+          showPublicProfile(el.dataset.userId);
+        };
+      });
     };
     
     const sendComment = async () => {
@@ -4048,7 +4381,7 @@
       
       const input = $('commentInput');
       const text = input.value.trim();
-      if (!text || !currentMemeId) return;
+      if (!text || !currentMemeData.docId) return;
       
       const btn = $('sendCommentBtn');
       btn.disabled = true;
@@ -4059,35 +4392,33 @@
           userId: currentUser.uid,
           username: currentUser.username,
           userAvatar: currentUser.avatar,
-          timestamp: serverTimestamp()
+          timestamp: serverTimestamp(),
+          likes: []
         };
         
-        await addDoc(collection(db, 'memes', currentMemeId, 'comments'), commentData);
+        // Add the comment
+        await addDoc(collection(db, 'memes', currentMemeData.docId, 'comments'), commentData);
         
-        const memeRef = doc(db, 'memes', currentMemeId);
+        // Increment the comment count on the meme
+        const memeRef = doc(db, 'memes', currentMemeData.docId);
         await updateDoc(memeRef, { commentCount: increment(1) });
         
         // Send notification to meme creator (if not self)
-        if (currentMemeCreatorId && currentMemeCreatorId !== currentUser.uid) {
-          await addDoc(collection(db, 'users', currentMemeCreatorId, 'notifications'), {
+        if (currentMemeData.creatorId && currentMemeData.creatorId !== currentUser.uid) {
+          await addDoc(collection(db, 'users', currentMemeData.creatorId, 'notifications'), {
             type: 'comment',
             fromUser: currentUser.username,
-            memeTitle: "your meme", // Simpler
+            memeTitle: currentMemeData.title,
             timestamp: serverTimestamp(),
             read: false
           });
         }
         
-        // Optimistic render
-        commentData.timestamp = new Timestamp(Date.now() / 1000, 0); 
-        if ($('commentList').querySelector('.feed-message')) {
-          $('commentList').innerHTML = '';
-        }
-        renderComment(commentData);
-        $('commentList').scrollTop = $('commentList').scrollHeight;
         input.value = '';
+        $('commentList').scrollTop = $('commentList').scrollHeight;
         
-        const cardInFeed = document.querySelector(`[data-doc-id="${currentMemeId}"]`);
+        // Update the count on the card in the feed
+        const cardInFeed = document.querySelector(`[data-doc-id="${currentMemeData.docId}"]`);
         if (cardInFeed) {
           const countEl = cardInFeed.querySelector('.comment-btn span');
           const currentCount = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
@@ -4102,10 +4433,44 @@
       }
     };
     
+    const likeComment = async (btn) => {
+      if (!currentUser) { showAuthModal(); return; }
+      
+      const commentId = btn.dataset.commentId;
+      const commentRef = doc(db, 'memes', currentMemeData.docId, 'comments', commentId);
+      const countEl = btn.querySelector('.comment-like-count');
+      let currentCount = parseInt(countEl.textContent) || 0;
+      
+      try {
+        if (btn.classList.contains('liked')) {
+          // Unlike
+          await updateDoc(commentRef, {
+            likes: arrayRemove(currentUser.uid)
+          });
+          btn.classList.remove('liked');
+          countEl.textContent = formatNumber(currentCount - 1);
+        } else {
+          // Like
+          await updateDoc(commentRef, {
+            likes: arrayUnion(currentUser.uid)
+          });
+          btn.classList.add('liked');
+          countEl.textContent = formatNumber(currentCount + 1);
+        }
+      } catch (error) {
+        console.error("Error liking comment:", error);
+        showNotification("Error", "Could not like comment.", "error");
+      }
+    };
+    
     const openReportModal = (card) => {
       if (!currentUser) { showAuthModal(); return; }
-      currentMemeId = card.dataset.docId || card.dataset.id;
-      currentMemeCreatorId = card.dataset.creatorId;
+      currentMemeData = {
+        docId: card.dataset.docId,
+        source: card.dataset.source,
+        creatorId: card.dataset.creatorId,
+        id: card.dataset.id
+      };
       openModal('reportModal');
     };
     
@@ -4119,8 +4484,8 @@
       
       try {
         await addDoc(collection(db, 'reports'), {
-          memeId: currentMemeId,
-          memeCreatorId: currentMemeCreatorId || null,
+          memeId: currentMemeData.docId || currentMemeData.id, // Use docId if available
+          memeCreatorId: currentMemeData.creatorId || null,
           reporterId: currentUser.uid,
           reporterUsername: currentUser.username,
           reason: reason,
@@ -4130,7 +4495,7 @@
         });
         
         closeModal('reportModal');
-        showNotification('Report Submitted', 'Thank you. Our moderators will review this meme.', 'success');
+        showNotification('Report Submitted', 'Thank you. Our moderators will review this content.', 'success');
         $('reportDetails').value = '';
         
       } catch (error) {
@@ -4186,7 +4551,11 @@
       
       // Sidebar
       $('closeSidebar').addEventListener('click', () => sidebar.classList.remove('active'));
-      $('menuProfile').addEventListener('click', () => { showPublicProfile(); sidebar.classList.remove('active'); });
+      $('menuProfile').addEventListener('click', () => { 
+        if (!currentUser) { showAuthModal(); return; } // PROFILE FIX
+        showPublicProfile(); 
+        sidebar.classList.remove('active'); 
+      });
       $('menuCollections').addEventListener('click', () => { showCollections(); sidebar.classList.remove('active'); });
       $('menuInventory').addEventListener('click', () => { showInventory(); sidebar.classList.remove('active'); });
       $('menuChat').addEventListener('click', () => { toggleChatWindow(); sidebar.classList.remove('active'); });
@@ -4231,7 +4600,7 @@
       }));
       
       // Settings Modal
-      $$('.tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
+      $$('#settingsModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
         const tabId = e.currentTarget.dataset.tab;
         const parentModal = e.currentTarget.closest('.modal-content');
         parentModal.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -4258,6 +4627,8 @@
       $('sendCommentBtn').addEventListener('click', sendComment);
       $('commentInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendComment(); });
       $('submitReportBtn').addEventListener('click', submitReport);
+      $('repostOkBtn').addEventListener('click', repostMeme);
+      $('repostCancelBtn').addEventListener('click', () => closeModal('repostModal'));
 
       // Infinite scroll
       feed.addEventListener('scroll', () => {
