@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f0c29" />
   <title>CringeScroll • Where Memes Live</title>
+  
+  <!-- Preconnect and DNS Prefetch for performance -->
   <link rel="preconnect" href="https://i.imgur.com">
   <link rel="preconnect" href="https://i.redd.it">
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com">
   <link rel="dns-prefetch" href="//i.imgur.com">
   <link rel="dns-prefetch" href="//i.redd.it">
+  
+  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.6.0/fabric.min.js"></script>
+  <!-- Fabric.js for Meme Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   
   <style>
     :root {
@@ -33,12 +35,11 @@
       --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
       --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.2);
       --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
-      --card-padding: 16px;
+      --card-padding: 12px; /* Reduced for conciseness */
       --header-height: 72px;
-      --meme-max-height: 650px; /* Increased max height for memes */
     }
     
-    /* Dark theme */
+    /* Dark theme (default) */
     .theme-dark {
       --bg-primary: #0f0c29;
       --bg-secondary: #1a1640;
@@ -101,6 +102,10 @@
       box-sizing: border-box;
     }
 
+    html {
+      font-size: 16px; /* Base font size */
+    }
+
     body {
       background: var(--bg-primary);
       color: var(--text-primary);
@@ -114,6 +119,10 @@
       padding-bottom: env(safe-area-inset-bottom);
       transition: var(--transition);
     }
+    
+    .font-small { font-size: 14px; }
+    .font-medium { font-size: 16px; }
+    .font-large { font-size: 18px; }
 
     @keyframes float {
       0% { transform: translateY(0px); }
@@ -287,6 +296,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 2px;
     }
 
     /* ===== NAVIGATION ===== */
@@ -305,14 +315,14 @@
 
     .nav-item {
       display: flex;
+      flex-direction: column; /* Changed for better mobile view */
       align-items: center;
-      gap: 4px;
+      gap: 2px; /* Reduced gap */
       color: var(--text-secondary);
       text-decoration: none;
-      font-size: 12px;
+      font-size: 11px; /* Slightly smaller */
       font-weight: 500;
-      padding: 6px 16px;
-      margin-bottom: 8px;
+      padding: 6px 12px; /* Adjusted padding */
       border-radius: 12px;
       transition: var(--transition);
       cursor: pointer;
@@ -324,12 +334,12 @@
     }
 
     .nav-item i {
-      font-size: 20px;
+      font-size: 18px; /* Slightly smaller icon */
     }
 
     .nav-indicator {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       background: var(--accent-3);
       margin-top: 2px;
@@ -347,12 +357,39 @@
       overflow-y: auto;
       padding: 16px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: 1fr; /* Default to single column */
       gap: 24px;
       padding-bottom: 80px;
+      justify-content: center;
+    }
+    
+    /* Center the column of cards */
+    .meme-card {
+      width: 100%;
+      max-width: 600px; /* Max width for a single card */
+      margin: 0 auto; /* Center the card */
+    }
+    
+    /* Use media query for multi-column layout on larger screens */
+    @media (min-width: 1024px) {
+      .content-area {
+        grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+        max-width: 1800px;
+        margin: 0 auto;
+      }
+      .meme-card {
+         max-width: none; /* Reset max-width when in grid */
+      }
+    }
+    
+    @media (min-width: 1800px) {
+       .content-area {
+         grid-template-columns: repeat(3, 1fr); /* Max 3 columns */
+       }
     }
 
-    /* ===== MEME CARD (FIXED LOGIC) ===== */
+
+    /* ===== MEME CARD (REFIXED) ===== */
     .meme-card {
       background: var(--card-bg);
       border-radius: var(--border-radius);
@@ -363,8 +400,7 @@
       display: flex;
       flex-direction: column;
       will-change: transform;
-      /* REMOVED fixed heights. Let content decide. */
-      height: auto; 
+      height: auto; /* Let content define height */
     }
 
     .meme-card:hover {
@@ -410,47 +446,52 @@
       font-size: 12px;
       font-weight: 600;
     }
+    
+    .user-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
 
+    /* --- THIS IS THE FIX for cut-off memes --- */
     .meme-image-container {
       width: 100%;
       position: relative;
-      background: var(--bg-primary); /* Dark background for letterboxing */
+      background: rgba(0, 0, 0, 0.2);
       overflow: hidden;
-      display: flex; /* Use flex to center image */
+      display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .meme-image {
-      width: 100%;
-      height: auto; /* Let height be automatic */
-      max-height: var(--meme-max-height); /* Set a max-height */
+      width: auto;  /* Let image width be auto */
+      height: auto; /* Let image height be auto */
+      max-width: 100%; /* Don't exceed container width */
+      max-height: 75dvh; /* Max height to prevent super long memes */
       display: block;
-      object-fit: contain; /* THIS IS THE FIX. Prevents image from being cut off. */
       transition: var(--transition);
       opacity: 0;
       transform: scale(1.02);
     }
+    /* --- END OF FIX --- */
 
     .meme-image.loaded {
       opacity: 1;
       transform: scale(1);
     }
 
-    /* Gradient overlay for text readability (REMOVED) */
-    /* .meme-gradient-overlay { ... } */
-    /* This isn't needed if we use object-fit: contain */
-
-    /* ===== CARD FOOTER (FIXED) ===== */
     .card-footer {
-      padding: 12px; /* Reduced padding */
+      padding: var(--card-padding);
       border-top: 1px solid rgba(106, 13, 173, 0.2);
     }
 
+    /* --- THIS IS THE FIX for "concise" footer --- */
     .reaction-bar {
       display: flex;
       justify-content: space-around;
-      gap: 8px; /* Reduced gap */
+      gap: 10px; /* Reduced gap */
       margin-bottom: 12px; /* Reduced margin */
     }
 
@@ -458,17 +499,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px; /* Reduced gap */
       background: none;
       border: none;
       color: var(--text-secondary);
       font-size: 18px;
       cursor: pointer;
       transition: var(--transition);
-      padding: 8px;
+      padding: 6px; /* Reduced padding */
       border-radius: 10px;
-      flex: 1; /* Make buttons share space */
     }
+    /* --- END OF FIX --- */
 
     .reaction-btn:hover {
       color: var(--text-primary);
@@ -477,6 +518,7 @@
 
     .reaction-btn.active {
       color: var(--accent-3);
+      transform: scale(1.1);
     }
 
     .reaction-count {
@@ -488,16 +530,16 @@
     .action-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 8px; /* Reduced gap */
     }
 
     .card-btn {
-      padding: 10px 0;
+      padding: 8px 0; /* Reduced padding */
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(106, 13, 173, 0.3);
       color: var(--text-primary);
-      font-size: 14px;
+      font-size: 13px; /* Reduced font size */
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
@@ -508,7 +550,7 @@
     }
 
     .card-btn i {
-      font-size: 16px;
+      font-size: 14px; /* Reduced icon size */
     }
 
     .card-btn:hover {
@@ -518,13 +560,6 @@
 
     .card-btn:active {
       transform: translateY(0);
-    }
-    
-    .card-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-        background: rgba(255, 255, 255, 0.05);
     }
 
     /* ===== SIDEBAR & MODALS ===== */
@@ -548,6 +583,34 @@
 
     .sidebar.active {
       right: 0;
+    }
+    
+    .sidebar-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(106, 13, 173, 0.3);
+    }
+    
+    #sidebarAvatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent-3);
+    }
+    
+    #sidebarUsername {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    #sidebarLoginButton {
+      width: 100%;
     }
 
     .sidebar-header {
@@ -609,14 +672,27 @@
       transition: var(--transition);
       cursor: pointer;
     }
+    
+    /* Hide auth-required items by default */
+    .auth-required {
+      display: none;
+    }
+    
+    body.logged-in .auth-required {
+      display: flex; /* Or 'block' etc. as needed */
+    }
+    
+    body.logged-in #sidebarLoginButton {
+      display: none;
+    }
+    
+    body.logged-out .auth-required {
+      display: none;
+    }
 
     .menu-item:hover, .menu-item.active {
       color: var(--accent-3);
       background: rgba(106, 13, 173, 0.1);
-    }
-    
-    .menu-item.requires-auth:hover {
-        /* You can add a specific style if needed */
     }
 
     .menu-item i {
@@ -719,10 +795,6 @@
     .modal-body {
       padding: 20px;
     }
-    
-    .modal-body .loading-spinner {
-        margin: 40px auto;
-    }
 
     .form-group {
       margin-bottom: 20px;
@@ -734,12 +806,6 @@
       font-weight: 600;
       color: var(--text-primary);
       font-size: 14px;
-    }
-    
-    .form-note {
-        font-size: 12px;
-        color: var(--text-secondary);
-        margin-top: 4px;
     }
 
     .form-control {
@@ -775,8 +841,8 @@
     }
     
     .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn-primary {
@@ -785,7 +851,7 @@
       box-shadow: 0 4px 15px rgba(106, 13, 173, 0.4);
     }
 
-    .btn-primary:hover:not(:disabled) {
+    .btn-primary:not(:disabled):hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(106, 13, 173, 0.6);
     }
@@ -796,7 +862,7 @@
       border: 1px solid rgba(106, 13, 173, 0.3);
     }
 
-    .btn-secondary:hover:not(:disabled) {
+    .btn-secondary:not(:disabled):hover {
       background: rgba(255, 255, 255, 0.15);
     }
 
@@ -804,27 +870,26 @@
       width: 100%;
     }
     
-    .auth-tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
+    .tab-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     
-    .auth-tabs .btn-secondary {
-        opacity: 0.7;
+    .tab-btn {
+      flex: 1;
     }
     
-    .auth-tabs .btn-secondary.active {
-        opacity: 1;
-        background: rgba(106, 13, 173, 0.2);
+    .tab-btn.active {
+      background: rgba(106, 13, 173, 0.2);
+      color: var(--accent-3);
     }
 
-    /* ===== CHAT WINDOW (FIXED FOR DRAGGING) ===== */
+    /* ===== CHAT WINDOW (FIXED DRAGGING) ===== */
     .chat-window {
       position: fixed;
-      /* REMOVED bottom and right. Let JS control position. */
-      top: calc(100vh - 580px); /* Initial position */
-      left: calc(100vw - 370px); /* Initial position */
+      bottom: 90px;
+      right: 20px;
       width: 350px;
       height: 500px;
       background: var(--bg-secondary);
@@ -835,14 +900,15 @@
       display: none;
       flex-direction: column;
       overflow: hidden;
-      transform: scale(0.9); /* Start slightly small */
+      transform: translateY(100px);
       opacity: 0;
       transition: transform 0.3s ease, opacity 0.3s ease;
+      /* Remove bottom/right, will be set by JS */
     }
 
     .chat-window.active {
       display: flex;
-      transform: scale(1);
+      transform: translateY(0);
       opacity: 1;
     }
 
@@ -852,7 +918,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: move; /* Add move cursor for dragging */
+      cursor: move; /* --- FIX for dragging --- */
     }
 
     .chat-title {
@@ -917,16 +983,19 @@
       color: var(--text-secondary);
       margin-top: 4px;
       display: flex;
-      justify-content: space-between;
       gap: 8px;
+      align-items: center;
     }
     
     .message.outgoing .message-meta {
-        color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 0.7);
     }
     
-    .message-sender {
-        font-weight: 600;
+    .message-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .chat-input-container {
@@ -1051,30 +1120,48 @@
       overflow: hidden;
       box-shadow: var(--shadow-md);
       animation: pulseSkeleton 1.5s infinite ease-in-out;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
     }
     
     .skeleton-header {
-        height: 60px;
-        padding: var(--card-padding);
+      height: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: var(--card-padding);
+      border-radius: 8px;
     }
-    .skeleton-img {
-        height: 250px;
-        background: rgba(255, 255, 255, 0.05);
+    
+    .skeleton-image {
+      height: 300px;
+      background: rgba(255, 255, 255, 0.05);
     }
+    
     .skeleton-footer {
-        height: 120px;
-        padding: var(--card-padding);
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: var(--card-padding);
+      border-radius: 8px;
     }
-    .skeleton-line {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
+
 
     @keyframes pulseSkeleton {
       0% { opacity: 0.6; }
       50% { opacity: 1; }
       100% { opacity: 0.6; }
+    }
+
+    .loading-spinner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
     }
 
     .loading-spinner {
@@ -1084,50 +1171,71 @@
       border-top: 4px solid var(--accent-3);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto;
     }
 
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    /* Enhanced scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(106, 13, 173, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(106, 13, 173, 0.7);
+    }
 
     /* ===== RESPONSIVE DESIGN ===== */
     @media (max-width: 768px) {
       .content-area {
-        grid-template-columns: 1fr;
         padding: 8px;
         gap: 16px;
       }
+      
       .search-container {
         margin: 0 10px;
       }
+      
       .logo-text {
         font-size: 22px;
       }
+      
       .nav-container {
         padding: 6px 0;
       }
+      
       .nav-item {
         font-size: 10px;
         padding: 4px 8px;
       }
+      
       .nav-item i {
         font-size: 18px;
       }
+      
       .chat-window {
         width: calc(100% - 20px);
         height: 450px;
-        top: auto; /* Reset for mobile */
-        left: 10px; /* Reset for mobile */
-        bottom: 80px; /* Use bottom on mobile */
-        transform: translateY(100%); /* Animate from bottom */
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+        /* Reset position for mobile */
+        transform: translateY(100px);
       }
+      
       .chat-window.active {
-          transform: translateY(0);
-      }
-      .chat-header {
-          cursor: default; /* No dragging on mobile */
+         transform: translateY(0);
       }
     }
 
@@ -1136,225 +1244,62 @@
         padding: 0 12px;
         height: 64px;
       }
+      
       .logo-container {
         gap: 8px;
       }
+      
       .logo-icon {
         width: 36px;
         height: 36px;
       }
+      
       .logo-text {
-        font-size: 20px;
+        display: none; /* Hide text on very small screens */
       }
+      
       .search-container {
         display: none;
       }
+      
       .header-actions {
         gap: 8px;
       }
+      
       .action-btn {
         width: 38px;
         height: 38px;
         font-size: 16px;
       }
+      
       .content-area {
         padding: 8px;
         gap: 12px;
       }
+      
       .meme-card {
         border-radius: 14px;
       }
+      
       .card-btn {
         padding: 8px 0;
         font-size: 13px;
       }
+      
       .card-btn i {
         font-size: 14px;
       }
+      
       .chat-window {
         height: 400px;
         bottom: 70px;
       }
     }
-    
-    /* ===== MEME EDITOR MODAL ===== */
-    .modal-content.editor-modal {
-        width: 95%;
-        max-width: 1000px;
-        max-height: 95vh;
-    }
-    
-    .editor-body {
-        padding: 0;
-        height: 80vh;
-        display: flex;
-        flex-direction: row; /* Default layout */
-    }
-
-    .editor-canvas-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-        background: var(--bg-primary);
-    }
-    
-    .editor-tools-container {
-        width: 300px;
-        background: var(--bg-secondary);
-        border-left: 1px solid rgba(106, 13, 173, 0.3);
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        overflow-y: auto;
-    }
-    
-    .editor-section-title {
-        color: var(--text-primary);
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .editor-tool-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-
-    .editor-tool {
-        font-size: 14px;
-    }
-    
-    .editor-tool.active {
-        background: rgba(106, 13, 173, 0.2);
-        color: var(--accent-3);
-    }
-    
-    .editor-settings {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    #textColorPicker {
-        width: 100%;
-        height: 40px;
-        border-radius: 12px;
-        border: 1px solid rgba(106, 13, 173, 0.3);
-        padding: 2px;
-    }
-    
-    #brushSize, #opacitySlider {
-        height: 8px;
-        padding: 0;
-    }
-
-    .canvas-wrapper {
-        width: 100%;
-        flex: 1;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 12px;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* This scales the canvas to fit its wrapper */
-    .canvas-container, #canvas {
-        width: 100% !important;
-        height: 100% !important;
-    }
-
-    .editor-history {
-        display: flex;
-        gap: 8px;
-    }
-    
-    .editor-history .btn {
-        flex: 1;
-    }
-    
-    .editor-templates {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .template-btn {
-        font-size: 13px;
-    }
-    
-    .editor-footer {
-        padding: 15px;
-        background: var(--bg-secondary);
-        border-radius: 0 0 16px 16px;
-        border-top: 1px solid rgba(106, 13, 173, 0.3);
-        display: flex;
-        gap: 15px;
-    }
-    
-    .editor-footer .btn {
-        flex: 1;
-    }
-    
-    /* Responsive Editor */
-    @media (max-width: 768px) {
-        .editor-body {
-            flex-direction: column;
-            height: calc(95vh - 140px); /* Adjust for header/footer */
-        }
-        
-        .editor-tools-container {
-            width: 100%;
-            height: 300px; /* Fixed height on mobile */
-            border-left: none;
-            border-top: 1px solid rgba(106, 13, 173, 0.3);
-            flex-direction: row; /* Side-by-side sections */
-            flex-wrap: wrap;
-        }
-        
-        .editor-tools-container > div {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .editor-footer {
-            flex-direction: column;
-        }
-    }
-    
-    /* ===== FINAL POLISH ===== */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(106, 13, 173, 0.5);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(106, 13, 173, 0.7);
-    }
-    
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        transition: none !important;
-        animation: none !important;
-      }
-    }
   </style>
 </head>
-<body class="theme-dark">
+<body class="theme-dark logged-out">
   <div class="app-container">
+    <!-- ===== HEADER ===== -->
     <header class="header">
       <a href="#" class="logo-container" id="logoLink">
         <div class="logo-icon">
@@ -1375,7 +1320,6 @@
           <i class="fas fa-bell"></i>
           <span class="notification-badge" id="notificationsBadge" style="display: none;">0</span>
         </button>
-    
         <button class="action-btn" id="themeToggleBtn" title="Toggle Theme">
           <i class="fas fa-moon"></i>
         </button>
@@ -1389,6 +1333,7 @@
       </div>
     </header>
     
+    <!-- ===== NAVIGATION ===== -->
     <nav class="nav-container">
       <a href="#" class="nav-item active" data-tab="hot">
         <i class="fas fa-fire"></i>
@@ -1399,20 +1344,23 @@
         <i class="fas fa-bolt"></i>
         <span>Fresh</span>
       </a>
-      <a href="#" class="nav-item" data-tab="crowned">
-        <i class="fas fa-crown"></i>
-        <span>Crowned</span>
-      </a>
-      <a href="#" class="nav-item requires-auth" data-tab="mymemes">
+      <a href="#" class="nav-item auth-required" data-tab="mymemes">
         <i class="fas fa-user"></i>
         <span>My Memes</span>
       </a>
+      <a href="#" class="nav-item auth-required" data-tab="favorites">
+        <i class="fas fa-bookmark"></i>
+        <span>Favorites</span>
+      </a>
     </nav>
     
+    <!-- ===== MAIN CONTENT ===== -->
     <main class="content-area" id="feed">
-     </main>
+      <!-- Feed will be populated by Firebase -->
+    </main>
   </div>
 
+  <!-- ===== SIDEBAR MENU ===== -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2 class="sidebar-title">Menu</h2>
@@ -1421,18 +1369,26 @@
       </button>
     </div>
     
+    <div class="sidebar-profile">
+      <img id="sidebarAvatar" src="https://placehold.co/80x80/6a0dad/e6e6ff?text=User" alt="User Avatar">
+      <h3 id="sidebarUsername" class="auth-required"></h3>
+      <button class="btn btn-primary" id="sidebarLoginButton">
+        <i class="fas fa-sign-in-alt"></i> Login / Sign Up
+      </button>
+    </div>
+    
     <div class="menu-section">
       <h3 class="menu-section-title">Profile</h3>
-      <div class="menu-item requires-auth" id="menuProfile">
+      <div class="menu-item auth-required" id="menuProfile">
         <i class="fas fa-user-circle"></i>
         <span>My Profile</span>
       </div>
-      <div class="menu-item requires-auth" id="menuCollections">
+      <div class="menu-item auth-required" id="menuCollections">
         <i class="fas fa-bookmark"></i>
         <span>My Collections</span>
         <span class="menu-badge" id="collectionsBadge">0</span>
       </div>
-      <div class="menu-item requires-auth" id="menuInventory">
+      <div class="menu-item auth-required" id="menuInventory">
         <i class="fas fa-box"></i>
         <span>My Inventory</span>
       </div>
@@ -1440,29 +1396,29 @@
     
     <div class="menu-section">
       <h3 class="menu-section-title">Social</h3>
-      <div class="menu-item requires-auth" id="menuChat">
+      <div class="menu-item" id="menuChat">
         <i class="fas fa-comments"></i>
-        <span>Chat</span>
+        <span>Global Chat</span>
         <span class="menu-badge" id="menuChatBadge">0</span>
       </div>
       <div class="menu-item" id="menuLeaderboard">
         <i class="fas fa-chart-line"></i>
         <span>Leaderboard</span>
       </div>
-      <div class="menu-item requires-auth" id="menuQuests">
+      <div class="menu-item auth-required" id="menuQuests">
         <i class="fas fa-trophy"></i>
         <span>Daily Quests</span>
-        <span class="menu-badge" id="questsBadge">0</span>
+        <span class="menu-badge" id="questsBadge">!</span>
       </div>
     </div>
     
     <div class="menu-section">
       <h3 class="menu-section-title">Tools</h3>
-      <div class="menu-item requires-auth" id="menuCreateMeme">
+      <div class="menu-item auth-required" id="menuCreateMeme">
         <i class="fas fa-paint-brush"></i>
         <span>Create Meme</span>
       </div>
-      <div class="menu-item requires-auth" id="menuMemeRoulette">
+      <div class="menu-item" id="menuMemeRoulette">
         <i class="fas fa-dice"></i>
         <span>Meme Roulette</span>
       </div>
@@ -1478,17 +1434,14 @@
         <i class="fas fa-cog"></i>
         <span>Settings</span>
       </div>
-      <div class="menu-item" id="menuLogin" style="display: flex;">
-        <i class="fas fa-sign-in-alt"></i>
-        <span>Login / Sign Up</span>
-      </div>
-       <div class="menu-item" id="menuLogout" style="display: none;">
+      <div class="menu-item auth-required" id="menuLogout">
         <i class="fas fa-sign-out-alt"></i>
         <span>Logout</span>
       </div>
     </div>
   </div>
 
+  <!-- ===== CHAT WINDOW ===== -->
   <div class="chat-window" id="chatWindow">
     <div class="chat-header" id="chatHeader">
       <h3 class="chat-title">CringeChat</h3>
@@ -1497,22 +1450,17 @@
       </button>
     </div>
     <div class="chat-messages" id="chatMessages">
-      <div class="message incoming">
-          <div class="message-content">Welcome to CringeChat! Log in to start chatting.</div>
-          <div class="message-meta">
-            <span class="message-sender">System</span>
-            <span class="message-time">Now</span>
-          </div>
-      </div>
+      <!-- Messages will be populated by Firebase -->
     </div>
     <div class="chat-input-container">
-      <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." disabled>
-      <button class="send-btn" id="sendChatMessage" disabled>
+      <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+      <button class="send-btn" id="sendChatMessage">
         <i class="fas fa-paper-plane"></i>
       </button>
     </div>
   </div>
 
+  <!-- ===== AUTH MODAL ===== -->
   <div class="modal-overlay" id="authModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1524,29 +1472,29 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="auth-tabs">
-          <button class="btn btn-secondary active" id="signupTab">Sign Up</button>
-          <button class="btn btn-secondary" id="loginTab">Log In</button>
+        <div class="tab-container">
+          <button class="btn btn-secondary tab-btn active" id="signupTab">Sign Up</button>
+          <button class="btn btn-secondary tab-btn" id="loginTab">Log In</button>
         </div>
         
         <div id="signupForm">
           <div class="form-group">
-            <label class="form-label" for="emailInput">Email Address</label>
-            <input type="email" class="form-control" id="emailInput" placeholder="your@email.com" required>
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="signupEmailInput" placeholder="your@email.com" required>
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="usernameInput">Username</label>
-            <input type="text" class="form-control" id="usernameInput" placeholder="your_username" required>
-            <p class="form-note">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" id="signupUsernameInput" placeholder="your_username" required>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
               Only letters, numbers, and underscores (2-15 characters)
             </p>
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="passwordInput">Password</label>
-            <input type="password" class="form-control" id="passwordInput" placeholder="••••••••" required>
-            <p class="form-note">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="signupPasswordInput" placeholder="••••••••" required>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
               At least 6 characters
             </p>
           </div>
@@ -1558,12 +1506,12 @@
         
         <div id="loginForm" style="display: none;">
           <div class="form-group">
-            <label class="form-label" for="loginEmailInput">Email Address</label>
+            <label class="form-label">Email Address</label>
             <input type="email" class="form-control" id="loginEmailInput" placeholder="your@email.com" required>
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="loginPasswordInput">Password</label>
+            <label class="form-label">Password</label>
             <input type="password" class="form-control" id="loginPasswordInput" placeholder="••••••••" required>
           </div>
           
@@ -1573,8 +1521,121 @@
         </div>
       </div>
     </div>
-   </div>
+  </div>
+  
+  <!-- ===== MEME EDITOR MODAL ===== -->
+  <div class="modal-overlay" id="memeEditorModal">
+    <div class="modal-content" style="width: 95%; max-width: 1000px; max-height: 95vh;">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <i class="fas fa-paint-brush"></i> Meme Editor
+        </h2>
+        <button class="close-modal" id="closeMemeEditor">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 0; height: 80vh; display: flex; flex-direction: column;">
+        <div style="flex: 1; display: flex; overflow: hidden; padding: 15px; gap: 15px;">
+          <!-- Left Panel: Canvas -->
+          <div style="flex: 1; display: flex; flex-direction: column; background: var(--bg-primary); border-radius: 12px; overflow: hidden;">
+            <div id="editorContainer" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px;">
+              <canvas id="canvas"></canvas>
+            </div>
+            <div style="padding: 10px; border-top: 1px solid rgba(106, 13, 173, 0.3); display: flex; gap: 10px;">
+               <button class="btn btn-secondary" id="undoBtn" style="flex: 1;">
+                <i class="fas fa-undo"></i> Undo
+              </button>
+              <button class="btn btn-secondary" id="redoBtn" style="flex: 1;">
+                <i class="fas fa-redo"></i> Redo
+              </button>
+              <button class="btn btn-secondary" id="clearCanvasBtn" style="flex: 1; color: #ef4444;">
+                <i class="fas fa-trash"></i> Clear
+              </button>
+            </div>
+          </div>
+          
+          <!-- Right Panel: Tools -->
+          <div style="width: 300px; background: var(--bg-secondary); border-radius: 12px; padding: 15px; overflow-y: auto;">
+             <div class="menu-section">
+                <h3 class="menu-section-title">Upload</h3>
+                <button class="btn btn-secondary" id="editorUploadTemplate">
+                  <i class="fas fa-upload"></i> Upload Template
+                </button>
+                <input type="file" id="templateUploader" accept="image/*" style="display: none;">
+             </div>
+          
+             <div class="menu-section">
+                <h3 class="menu-section-title">Tools</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                  <button class="btn btn-secondary editor-tool active" data-tool="text">
+                    <i class="fas fa-font"></i> Add Text
+                  </button>
+                  <button class="btn btn-secondary editor-tool" data-tool="image">
+                    <i class="fas fa-image"></i> Add Image
+                  </button>
+                  <button class="btn btn-secondary editor-tool" data-tool="draw">
+                    <i class="fas fa-pencil-alt"></i> Draw
+                  </button>
+                  <button class="btn btn-secondary" id="deleteObjectBtn">
+                    <i class="fas fa-trash-alt"></i> Delete
+                  </button>
+                </div>
+             </div>
+             
+             <div class="menu-section" id="textControls">
+                <h3 class="menu-section-title">Text Settings</h3>
+                <div class="form-group">
+                  <label class="form-label">Color</label>
+                  <input type="color" id="textColorPicker" value="#FFFFFF" class="form-control" style="height: 40px; padding: 5px;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Font Family</label>
+                  <select id="fontFamilySelect" class="form-control">
+                    <option value="Impact">Impact</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Comic Sans MS">Comic Sans</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Font Size</label>
+                  <input type="range" id="fontSizeSlider" min="10" max="150" value="40" class="form-control" style="padding: 0;">
+                </div>
+             </div>
+             
+             <div class="menu-section" id="drawControls" style="display: none;">
+                <h3 class="menu-section-title">Draw Settings</h3>
+                 <div class="form-group">
+                  <label class="form-label">Brush Color</label>
+                  <input type="color" id="drawColorPicker" value="#FFFFFF" class="form-control" style="height: 40px; padding: 5px;">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Brush Size</label>
+                  <input type="range" id="brushSize" min="1" max="50" value="5" class="form-control" style="padding: 0;">
+                </div>
+             </div>
+          </div>
+        </div>
+        <!-- Footer Actions -->
+        <div style="padding: 15px; background: var(--bg-secondary); border-top: 1px solid rgba(106, 13, 173, 0.3);">
+          <div class="form-group">
+             <label class="form-label">Meme Title</label>
+             <input type="text" class="form-control" id="memeEditorTitle" placeholder="Enter a cringe-worthy title...">
+          </div>
+          <div style="display: flex; gap: 15px;">
+            <button class="btn btn-secondary" id="cancelMemeBtn" style="flex: 1;">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn btn-primary" id="postMemeBtn" style="flex: 1;">
+              <i class="fas fa-paper-plane"></i> Post Meme
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- ===== NOTIFICATION ===== -->
   <div class="notification" id="notificationToast">
     <div class="notification-icon">
       <i class="fas fa-check"></i>
@@ -1588,193 +1649,79 @@
     </button>
   </div>
   
-  <div class="modal-overlay" id="genericModal">
-      <div class="modal-content" id="genericModalContent">
-          </div>
-  </div>
-  
-  <div class="modal-overlay" id="memeEditorModal">
-    <div class="modal-content editor-modal">
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <i class="fas fa-paint-brush"></i> Meme Editor
-        </h2>
-        <button class="close-modal" id="closeMemeEditor">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-       <div class="modal-body editor-body">
-        
-        <div class="editor-canvas-container">
-            <h4 class="editor-section-title" style="margin-bottom: 0;">
-                <i class="fas fa-image"></i> Canvas
-            </h4>
-            <div class="canvas-wrapper">
-                <canvas id="canvas"></canvas>
-            </div>
-            <div class="editor-history">
-              <button class="btn btn-secondary" id="undoBtn" style="flex: 1;">
-                <i class="fas fa-undo"></i> Undo
-              </button>
-              <button class="btn btn-secondary" id="redoBtn" style="flex: 1;">
-                <i class="fas fa-redo"></i> Redo
-              </button>
-              <button class="btn btn-secondary" id="clearCanvasBtn" style="flex: 1; color: #ff4d4d;">
-                <i class="fas fa-trash"></i> Clear
-              </button>
-           </div>
-        </div>
-        
-        <div class="editor-tools-container">
-            <div>
-                <h4 class="editor-section-title">
-                  <i class="fas fa-sliders-h"></i> Tools
-                </h4>
-                <div class="editor-tool-grid">
-                  <button class="btn btn-secondary editor-tool active" data-tool="text">
-                    <i class="fas fa-font"></i> Text
-                  </button>
-                  <button class="btn btn-secondary editor-tool" data-tool="image">
-                    <i class="fas fa-image"></i> Image
-                  </button>
-                  <button class="btn btn-secondary editor-tool" data-tool="draw">
-                    <i class="fas fa-pencil-alt"></i> Draw
-                  </button>
-                  <button class="btn btn-secondary editor-tool" data-tool="eraser">
-                    <i class="fas fa-eraser"></i> Eraser
-                  </button>
-                </div>
-            </div>
-              
-            <div>
-                <h4 class="editor-section-title">
-                  <i class="fas fa-palette"></i> Settings
-                </h4>
-                <div class="editor-settings">
-                  <div>
-                    <label class="form-label">Color</label>
-                    <input type="color" id="textColorPicker" value="#FFFFFF">
-                  </div>
-                  <div>
-                    <label class="form-label">Font Family</label>
-                    <select id="fontFamilySelect" class="form-control">
-                      <option value="Impact">Impact (Classic)</option>
-                      <option value="Arial">Arial</option>
-                      <option value="Comic Sans MS">Comic Sans (Cringe)</option>
-                      <option value="Times New Roman">Times New Roman</option>
-                      <option value="Courier New">Courier</option>
-                    </select>
-                   </div>
-                  <div>
-                    <label class="form-label">Brush Size</label>
-                    <input type="range" id="brushSize" min="1" max="50" value="5" class="form-control">
-                  </div>
-                  <div>
-                    <label class="form-label">Opacity</label>
-                    <input type="range" id="opacitySlider" min="0" max="1" step="0.1" value="1" class="form-control">
-                  </div>
-                </div>
-            </div>
-            
-            <div>
-                <h4 class="editor-section-title">
-                  <i class="fas fa-magic"></i> Templates
-                </h4>
-                <div class="editor-templates">
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/pJbPZJ7.jpg">
-                    <i class="fas fa-user"></i> Drake
-                  </button>
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/1v8wL4G.jpg">
-                    <i class="fas fa-heart"></i> Distracted
-                  </button>
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/vRtKxXK.jpg">
-                    <i class="fas fa-lightbulb"></i> Change Mind
-                  </button>
-                  <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/H9LZ1xQ.jpg">
-                    <i class="fas fa-cat"></i> Woman Yelling
-                  </button>
-                </div>
-            </div>
-        </div>
-      </div>
-      
-      <div class="editor-footer">
-          <button class="btn btn-secondary" id="cancelMemeBtn" style="flex: 1;">
-            <i class="fas fa-times"></i> Cancel
-          </button>
-          <button class="btn btn-secondary" id="saveDraftBtn" style="flex: 1;">
-            <i class="fas fa-save"></i> Save Draft
-          </button>
-          <button class="btn btn-primary" id="postMemeBtn" style="flex: 1;">
-            <i class="fas fa-paper-plane"></i> Post Meme
-          </button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Global variables from Canvas -->
   <script>
-    // ===== CORE APP LOGIC (REWRITTEN) =====
+    const __app_id = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const __firebase_config = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+    const __initial_auth_token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+  </script>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, 
+      signInAnonymously, 
+      signInWithCustomToken, 
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      updateProfile,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      deleteDoc, 
+      onSnapshot, 
+      collection, 
+      query, 
+      where, 
+      addDoc, 
+      getDocs,
+      serverTimestamp,
+      runTransaction,
+      arrayUnion,
+      arrayRemove,
+      orderBy,
+      limit
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadString,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+    // ===== CORE APP LOGIC =====
     
-    // 1. FIREBASE CONFIGURATION
-    // -------------------------------------
-    // IMPORTANT: Replace this with your own Firebase project configuration!
-    const firebaseConfig = {
-      apiKey: "AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g",
-      authDomain: "cringescroll-prod.firebaseapp.com",
-      projectId: "cringescroll-prod",
-      storageBucket: "cringescroll-prod.firebasestorage.app",
-      messagingSenderId: "802266413389",
-      appId: "1:802266413389:web:22a7274e4edc8a0529df04"
-    };
-    
-    // 2. GLOBAL VARIABLES & APP STATE
-    // -------------------------------------
-    let feed, genericModal, genericModalContent, authModal, memeEditorModal;
-    let isLoading = false;
+    // Global App State
+    let app, auth, db, storage;
+    let currentUser = null; // This will hold auth user object
+    let currentUserData = null; // This will hold user data from Firestore
     let currentTab = 'hot';
-    let lastVisibleMeme = null; // For pagination
-    const BUFFER_HEIGHT = 500;
+    let isLoading = false;
+    let feedUnsubscribe = null; // To stop listening to feed queries
+    let chatUnsubscribe = null; // To stop listening to chat
     
-    // Firebase services
-    let app, db, auth, storage;
-    
-    // App state
-    let currentUser = null;
-    let userProfile = null; // Will hold { uid, username, email, cringeCoin, ... }
-    let chatUnsubscribe = null; // To stop the chat listener
-    let feedUnsubscribe = null; // To stop the feed listener
-    
+    // DOM Elements
+    const feed = document.getElementById('feed');
+    const authModal = document.getElementById('authModal');
+    const chatWindow = document.getElementById('chatWindow');
+    const sidebar = document.getElementById('sidebar');
+
     // User preferences
-    let userPreferences = {
+    let defaultPreferences = {
       theme: 'dark',
-      fontSize: 'medium',
+      fontSize: 'font-medium',
+      soundEffects: true
     };
     
-    // Meme API (for "Fresh" tab)
-    const MEME_SOURCES = [
-      'https://meme-api.com/gimme/memes',
-      'https://meme-api.com/gimme/dankmemes',
-      'https://meme-api.com/gimme/me_irl',
-      'https://meme-api.com/gimme/wholesomememes',
-      'https://meme-api.com/gimme/funny'
-    ];
+    // --- UTILITY FUNCTIONS ---
     
-    
-    // 3. UTILITY FUNCTIONS
-    // -------------------------------------
-    
-    // Escape HTML to prevent XSS
-    const escapeHtml = (str) =>
-      str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-    
-    // Format large numbers (1000 -> 1K)
-    const formatNumber = (num) => {
-      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-      return num;
-    };
-    
-    // Show a notification
     const showNotification = (title, message, type = 'success', duration = 3000) => {
       const notification = document.getElementById('notificationToast');
       const titleEl = document.getElementById('notificationTitle');
@@ -1783,502 +1730,453 @@
       
       titleEl.textContent = title;
       messageEl.textContent = message;
-      notification.className = 'notification'; // Reset classes
       
-      let iconClass, color;
-      if (type === 'success') {
-        iconClass = 'fas fa-check';
-        color = 'var(--accent-3)';
-      } else if (type === 'error') {
-        iconClass = 'fas fa-exclamation-circle';
-        color = '#ff4d4d';
-      } else { // info
-        iconClass = 'fas fa-info-circle';
-        color = '#4dabf7';
+      notification.style.borderColor = 'var(--accent-3)';
+      notification.querySelector('.notification-icon').style.background = 'rgba(106, 13, 173, 0.2)';
+      iconEl.style.color = 'var(--accent-3)';
+      iconEl.className = 'fas fa-check';
+      
+      if (type === 'error') {
+        iconEl.className = 'fas fa-exclamation-circle';
+        notification.style.borderColor = '#ff4d4d';
+        notification.querySelector('.notification-icon').style.background = 'rgba(255, 77, 77, 0.2)';
+        iconEl.style.color = '#ff4d4d';
+      } else if (type === 'info') {
+        iconEl.className = 'fas fa-info-circle';
+        notification.style.borderColor = '#4dabf7';
+        notification.querySelector('.notification-icon').style.background = 'rgba(77, 171, 247, 0.2)';
+        iconEl.style.color = '#4dabf7';
       }
-      
-      iconEl.className = iconClass;
-      notification.style.borderColor = color;
-      notification.querySelector('.notification-icon').style.background = `${color}20`; // 20 for transparency
-      iconEl.style.color = color;
       
       notification.classList.add('show');
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, duration);
-    };
-    
-    // Show the authentication modal
-    const showAuthModal = () => {
-      authModal.classList.add('active');
-      document.getElementById('signupTab').click(); // Default to signup tab
-    };
-    
-    // Show a generic modal with custom HTML content
-    const showGenericModal = (title, htmlContent) => {
-        genericModalContent.innerHTML = `
-            <div class="modal-header">
-                <h2 class="modal-title">${title}</h2>
-                <button class="close-modal" id="closeGenericModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                ${htmlContent}
-            </div>
-        `;
-        genericModal.classList.add('active');
-        // Add listener to the new close button
-        document.getElementById('closeGenericModal').addEventListener('click', () => {
-            genericModal.classList.remove('active');
-        });
-    };
-    
-    // Show a loading spinner in the modal
-    const showModalLoading = () => {
-        showGenericModal('<i class="fas fa-spinner fa-spin"></i> Loading...', '<div class="loading-spinner"></div>');
-    };
-    
-    
-    // 4. FIREBASE INITIALIZATION & AUTH
-    // -------------------------------------
-    
-    // Initialize Firebase
-    const initFirebase = () => {
-      try {
-        if (firebase.apps.length === 0) {
-          app = firebase.initializeApp(firebaseConfig);
-        }
-        db = firebase.firestore();
-        auth = firebase.auth();
-        storage = firebase.storage();
-        
-        // Set up auth state listener
-        auth.onAuthStateChanged(handleAuthStateChange);
-      } catch (error) {
-        console.error('Firebase initialization error:', error);
-        showNotification('Fatal Error', 'Failed to initialize app. Please refresh.', 'error', 10000);
-      }
-    };
-    
-    // Handle user login/logout
-    const handleAuthStateChange = async (user) => {
-      if (user) {
-        // User is logged in
-        const userDoc = await db.collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-          currentUser = user;
-          userProfile = { uid: user.uid, ...userDoc.data() };
-          
-          await handleUserLogin();
-        } else {
-          // This should not happen if signUpUser is correct, but as a fallback:
-          await createUserProfile(user, user.email.split('@')[0]);
-        }
-      } else {
-        // User is logged out
-        handleUserLogout();
-      }
-    };
-    
-    // Update UI when user logs in
-    const handleUserLogin = async () => {
-      console.log('User logged in:', userProfile.username);
-      document.getElementById('menuLogin').style.display = 'none';
-      document.getElementById('menuLogout').style.display = 'flex';
-      
-      // Enable auth-required features
-      document.querySelectorAll('.requires-auth').forEach(el => {
-          el.classList.remove('disabled');
-          el.style.opacity = 1;
-      });
-      document.getElementById('chatInput').disabled = false;
-      document.getElementById('sendChatMessage').disabled = false;
-      document.getElementById('chatInput').placeholder = "Type a message...";
-      
-      // Apply preferences
-      loadUserPreferences();
-      applyUserPreferences();
-      
-      // Update badges
-      document.getElementById('collectionsBadge').textContent = userProfile.collectionsCount || 0;
-      document.getElementById('questsBadge').textContent = userProfile.pendingQuests || 3;
-      
-      // Start chat listener
-      startChatListener();
-      
-      // Refresh feed
-      loadFeed(true);
-      
-      showNotification('Welcome Back!', `Logged in as ${userProfile.username}`, 'success');
-      authModal.classList.remove('active');
-    };
-    
-    // Update UI when user logs out
-    const handleUserLogout = () => {
-      console.log('User logged out');
-      currentUser = null;
-      userProfile = null;
-      
-      document.getElementById('menuLogin').style.display = 'flex';
-      document.getElementById('menuLogout').style.display = 'none';
-      
-      // Disable auth-required features
-      document.querySelectorAll('.requires-auth').forEach(el => {
-          el.classList.add('disabled');
-          el.style.opacity = 0.5;
-      });
-      document.getElementById('chatInput').disabled = true;
-      document.getElementById('sendChatMessage').disabled = true;
-      document.getElementById('chatInput').placeholder = "Log in to chat";
-      
-      // Stop chat listener
-      if (chatUnsubscribe) {
-        chatUnsubscribe();
-        chatUnsubscribe = null;
-      }
-      
-      // Clear chat
-      document.getElementById('chatMessages').innerHTML = `
-        <div class="message incoming">
-            <div class="message-content">Welcome to CringeChat! Log in to start chatting.</div>
-            <div class="message-meta">
-              <span class="message-sender">System</span>
-              <span class="message-time">Now</span>
-            </div>
-        </div>`;
-      
-      // Reset badges
-      document.getElementById('chatBadge').textContent = 0;
-      document.getElementById('chatBadge').style.display = 'none';
-      document.getElementById('menuChatBadge').textContent = 0;
-      document.getElementById('collectionsBadge').textContent = 0;
-      document.getElementById('questsBadge').textContent = 0;
-      
-      // Refresh feed (to show public view)
-      loadFeed(true);
+      setTimeout(() => notification.classList.remove('show'), duration);
     };
 
-    // Sign Up New User
-    const signUpUser = async () => {
-      const email = document.getElementById('emailInput').value.trim();
-      const username = document.getElementById('usernameInput').value.trim();
-      const password = document.getElementById('passwordInput').value;
-      const btn = document.getElementById('signupBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+    const escapeHtml = (str) => 
+      str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#x27;'}[m]));
+      
+    const formatTimeAgo = (timestamp) => {
+      if (!timestamp) return 'just now';
+      const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
+      let interval = seconds / 31536000;
+      if (interval > 1) return Math.floor(interval) + "y ago";
+      interval = seconds / 2592000;
+      if (interval > 1) return Math.floor(interval) + "mo ago";
+      interval = seconds / 86400;
+      if (interval > 1) return Math.floor(interval) + "d ago";
+      interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + "h ago";
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + "m ago";
+      return Math.floor(seconds) + "s ago";
+    };
+    
+    const getAvatar = (user) => {
+      return user?.avatar || `https://placehold.co/80x80/6a0dad/e6e6ff?text=${user?.username?.charAt(0)?.toUpperCase() || 'U'}`;
+    }
+    
+    // Show a loading spinner on a button
+    const showButtonSpinner = (button, show = true) => {
+      button.disabled = show;
+      if (show) {
+        button.dataset.originalText = button.innerHTML;
+        button.innerHTML = `<span class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></span>`;
+      } else {
+        button.innerHTML = button.dataset.originalText || 'Submit';
+      }
+    };
+    
+    const showModal = (modalId) => {
+      document.getElementById(modalId)?.classList.add('active');
+    };
+    
+    const closeModal = (modalId) => {
+      document.getElementById(modalId)?.classList.remove('active');
+    };
+    
+    // --- FIREBASE & AUTH ---
+
+    const initFirebase = () => {
+      try {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        if (!firebaseConfig.apiKey) {
+          throw new Error("Firebase config is missing.");
+        }
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        storage = getStorage(app);
+        
+        console.log("Firebase Initialized Successfully.");
+        
+        setupAuthListener();
+        
+      } catch (error) {
+        console.error("Firebase initialization error:", error);
+        showNotification("Error", "Failed to connect to servers. Please refresh.", "error", 10000);
+      }
+    };
+    
+    const setupAuthListener = () => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          console.log("User is signed in:", user.uid);
+          currentUser = user;
+          await loadUserProfile(user.uid);
+          updateUIAfterLogin();
+        } else {
+          console.log("User is signed out.");
+          currentUser = null;
+          currentUserData = null;
+          updateUIAfterLogout();
+          
+          // Try to sign in with token or anonymously
+          if (__initial_auth_token) {
+            console.log("Attempting to sign in with custom token...");
+            try {
+              await signInWithCustomToken(auth, __initial_auth_token);
+              console.log("Custom token sign-in successful.");
+            } catch (tokenError) {
+              console.error("Custom token sign-in failed, trying anonymous:", tokenError);
+              await signInAnonymously(auth);
+            }
+          } else {
+            console.log("No custom token, signing in anonymously...");
+            await signInAnonymously(auth);
+          }
+        }
+      });
+    };
+    
+    const loadUserProfile = async (uid) => {
+      const userDocRef = doc(db, `users/${uid}`);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        currentUserData = userDoc.data();
+        console.log("User profile loaded:", currentUserData.username);
+        // Apply user preferences
+        applyUserPreferences(currentUserData.preferences || defaultPreferences);
+      } else {
+        console.log("User profile not found. This shouldn't happen for email signups.");
+        // This case is more for anonymous users, but email users should always have a profile.
+        // If it was a new signup, the profile is created *after* auth.
+      }
+    };
+    
+    const updateUIAfterLogin = () => {
+      document.body.classList.remove('logged-out');
+      document.body.classList.add('logged-in');
+      
+      if (currentUserData) {
+        document.getElementById('sidebarUsername').textContent = currentUserData.username;
+        document.getElementById('sidebarAvatar').src = getAvatar(currentUserData);
+      } else {
+         document.getElementById('sidebarUsername').textContent = currentUser.email;
+         document.getElementById('sidebarAvatar').src = getAvatar({ username: currentUser.email });
+      }
+      
+      closeModal('authModal');
+      loadFeed(); // Reload feed for user-specific data
+      loadChatMessages(); // Load chat
+    };
+    
+    const updateUIAfterLogout = () => {
+      document.body.classList.add('logged-out');
+      document.body.classList.remove('logged-in');
+      
+      document.getElementById('sidebarUsername').textContent = '';
+      document.getElementById('sidebarAvatar').src = getAvatar({ username: 'User' });
+      
+      currentUser = null;
+      currentUserData = null;
+      
+      applyUserPreferences(defaultPreferences); // Reset to default theme
+      if (feedUnsubscribe) feedUnsubscribe(); // Stop listening to old feed
+      if (chatUnsubscribe) chatUnsubscribe(); // Stop listening to chat
+      feed.innerHTML = ''; // Clear feed
+      loadFeed(); // Load public feed
+    };
+    
+    const handleSignup = async () => {
+      const email = document.getElementById('signupEmailInput').value.trim();
+      const username = document.getElementById('signupUsernameInput').value.trim();
+      const password = document.getElementById('signupPasswordInput').value;
+      const button = document.getElementById('signupBtn');
       
       // Validation
       if (!email || !username || !password) {
-        showNotification('Validation Error', 'All fields are required.', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
-        return;
+        return showNotification('Error', 'All fields are required.', 'error');
       }
       if (!/^[a-zA-Z0-9_]{2,15}$/.test(username)) {
-        showNotification('Invalid Username', 'Username must be 2-15 characters (letters, numbers, underscores).', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
-        return;
+        return showNotification('Invalid Username', 'Username must be 2-15 characters (letters, numbers, _).', 'error');
       }
       if (password.length < 6) {
-        showNotification('Invalid Password', 'Password must be at least 6 characters.', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
-        return;
+        return showNotification('Invalid Password', 'Password must be at least 6 characters.', 'error');
       }
       
+      showButtonSpinner(button, true);
+      
       try {
-        // Check if username is already taken
-        const usernameCheck = await db.collection('users').where('username', '==', username).get();
-        if (!usernameCheck.empty) {
-          showNotification('Error', 'That username is already taken.', 'error');
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+        // Check if username is taken
+        const usernameQuery = query(collection(db, "users"), where("username", "==", username));
+        const querySnapshot = await getDocs(usernameQuery);
+        if (!querySnapshot.empty) {
+          throw new Error("Username is already taken.");
+        }
+        
+        // Create user
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Update auth profile (displayName)
+        await updateProfile(user, { displayName: username });
+        
+        // Create user document in Firestore
+        const newUserProfile = {
+          uid: user.uid,
+          username: username,
+          email: email,
+          avatar: getAvatar({ username: username }),
+          cringeCoin: 10, // Welcome bonus
+          streak: 1,
+          lastActive: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          collections: [],
+          preferences: defaultPreferences
+        };
+        
+        await setDoc(doc(db, "users", user.uid), newUserProfile);
+        
+        // Manually set data for immediate UI update
+        currentUserData = newUserProfile;
+        
+        showNotification('Success!', `Welcome ${username}! You're all set.`, 'success');
+        closeModal('authModal');
+        // onAuthStateChanged will handle the rest
+        
+      } catch (error) {
+        console.error("Signup Error:", error);
+        showNotification('Signup Failed', error.message.replace('Firebase: ', ''), 'error');
+      } finally {
+        showButtonSpinner(button, false);
+      }
+    };
+    
+    const handleLogin = async () => {
+      const email = document.getElementById('loginEmailInput').value.trim();
+      const password = document.getElementById('loginPasswordInput').value;
+      const button = document.getElementById('loginBtn');
+      
+      if (!email || !password) {
+        return showNotification('Error', 'All fields are required.', 'error');
+      }
+      
+      showButtonSpinner(button, true);
+      
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // onAuthStateChanged will trigger, load profile, and update UI
+        showNotification('Success!', 'Welcome back!', 'success');
+        closeModal('authModal');
+      } catch (error) {
+        console.error("Login Error:", error);
+        showNotification('Login Failed', error.message.replace('Firebase: ', ''), 'error');
+      } finally {
+        showButtonSpinner(button, false);
+      }
+    };
+    
+    const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        showNotification('Logged Out', 'You have been logged out.', 'info');
+        sidebar.classList.remove('active');
+        // onAuthStateChanged will handle UI cleanup and anonymous sign-in
+      } catch (error) {
+        console.error("Logout Error:", error);
+        showNotification('Error', 'Failed to log out. Please try again.', 'error');
+      }
+    };
+
+    // --- UI CUSTOMIZATION ---
+    
+    const applyUserPreferences = (prefs) => {
+      document.body.className = `theme-${prefs.theme} ${currentUser ? 'logged-in' : 'logged-out'} ${prefs.fontSize}`;
+      document.documentElement.style.fontSize = prefs.fontSize === 'font-small' ? '14px' : prefs.fontSize === 'font-large' ? '18px' : '16px';
+      
+      const themeIcon = document.getElementById('themeToggleBtn')?.querySelector('i');
+      if (themeIcon) {
+        themeIcon.className = `fas fa-${prefs.theme === 'light' ? 'moon' : 'sun'}`;
+      }
+    };
+    
+    const toggleTheme = async () => {
+      const themes = ['dark', 'light', 'blue', 'red', 'purple'];
+      const currentTheme = currentUserData?.preferences?.theme || defaultPreferences.theme;
+      const currentIndex = themes.indexOf(currentTheme);
+      const nextTheme = themes[(currentIndex + 1) % themes.length];
+      
+      const newPrefs = { ...(currentUserData?.preferences || defaultPreferences), theme: nextTheme };
+      applyUserPreferences(newPrefs); // Apply optimistically
+      
+      if (currentUser) {
+        currentUserData.preferences = newPrefs; // Update local state
+        try {
+          await updateDoc(doc(db, "users", currentUser.uid), {
+            preferences: newPrefs
+          });
+          showNotification('Theme Saved', `Switched to ${nextTheme} theme.`, 'info');
+        } catch (error) {
+          console.error("Theme save error:", error);
+          showNotification('Error', 'Could not save theme.', 'error');
+        }
+      } else {
+        showNotification('Theme Changed', `Switched to ${nextTheme} theme.`, 'info');
+      }
+    };
+    
+    const showCustomization = () => {
+      // This is a placeholder. A full modal would be built here.
+      // For now, let's just make the theme toggle work as the customization.
+      toggleTheme();
+      showNotification('Customization', 'Theme changed! More options coming soon.', 'info');
+      sidebar.classList.remove('active');
+    };
+    
+    // --- MEME FEED LOGIC ---
+    
+    const loadFeed = (tab = 'hot') => {
+      if (isLoading) return;
+      isLoading = true;
+      feed.innerHTML = ''; // Clear feed
+      
+      // Show skeletons
+      for (let i = 0; i < 3; i++) {
+        feed.innerHTML += `
+          <div class="skeleton-card">
+            <div class="skeleton-header"></div>
+            <div class="skeleton-image"></div>
+            <div class="skeleton-footer"></div>
+          </div>`;
+      }
+      
+      // Stop listening to the old query
+      if (feedUnsubscribe) feedUnsubscribe();
+      
+      let memesQuery;
+      const memesCol = collection(db, "memes");
+      
+      currentTab = tab; // Update global tab state
+      
+      // Update active nav item
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.tab === tab);
+      });
+
+      // Define query based on tab
+      switch(tab) {
+        case 'fresh':
+          memesQuery = query(memesCol, orderBy("createdAt", "desc"), limit(20));
+          break;
+        case 'mymemes':
+          if (!currentUser) {
+             feed.innerHTML = '<h3 style="text-align: center;">Please log in to see your memes.</h3>';
+             isLoading = false;
+             return;
+          }
+          memesQuery = query(memesCol, where("uid", "==", currentUser.uid), orderBy("createdAt", "desc"), limit(20));
+          break;
+        case 'favorites':
+          if (!currentUser || !currentUserData?.collections?.length) {
+             feed.innerHTML = `<h3 style="text-align: center;">${currentUser ? 'Save some memes to see them here.' : 'Log in to see your favorites.'}</h3>`;
+             isLoading = false;
+             return;
+          }
+          memesQuery = query(memesCol, where(document.id, "in", currentUserData.collections), limit(20));
+          break;
+        case 'hot':
+        default:
+          // "Hot" is complex (based on reactions/time). For now, just sort by reactions.
+          memesQuery = query(memesCol, orderBy("reactionCount", "desc"), limit(20));
+          break;
+      }
+      
+      // Listen for real-time updates
+      feedUnsubscribe = onSnapshot(memesQuery, (snapshot) => {
+        isLoading = false;
+        feed.innerHTML = ''; // Clear skeletons
+        
+        if (snapshot.empty) {
+          feed.innerHTML = '<h3 style="text-align: center;">No memes found. Be the first to post!</h3>';
           return;
         }
         
-        // Create user in Auth
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        
-        // Create user profile in Firestore
-        await createUserProfile(userCredential.user, username);
-        
-        // Auth state listener will handle the rest
-        // showNotification('Account Created!', `Welcome ${username}!`, 'success');
-        // No need to call handleUserLogin here, onAuthStateChanged will do it.
-        
-      } catch (error) {
-        console.error('Sign up error:', error);
-        showNotification('Sign Up Error', error.message, 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
-      }
+        snapshot.docs.forEach(doc => {
+          renderMeme(doc.id, doc.data());
+        });
+      }, (error) => {
+        console.error("Error loading feed:", error);
+        showNotification('Error', 'Could not load the feed.', 'error');
+        isLoading = false;
+        feed.innerHTML = '<h3 style="text-align: center; color: #ff4d4d;">Error loading feed. Please try again.</h3>';
+      });
     };
     
-    // Create Firestore profile for new user
-    const createUserProfile = async (user, username) => {
-      const userData = {
-        username: username,
-        email: user.email,
-        cringeCoin: 10, // Starter coins
-        streak: 1,
-        lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=6a0dad&color=fff`,
-        collectionsCount: 0,
-        pendingQuests: 3,
-        preferences: userPreferences // Save default prefs
-      };
-      
-      await db.collection('users').doc(user.uid).set(userData);
-      
-      // Set the global profile object immediately
-      currentUser = user;
-      userProfile = { uid: user.uid, ...userData };
-    };
-    
-    // Log In Existing User
-    const loginUser = async () => {
-      const email = document.getElementById('loginEmailInput').value.trim();
-      const password = document.getElementById('loginPasswordInput').value;
-      const btn = document.getElementById('loginBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging In...';
-      
-      if (!email || !password) {
-        showNotification('Validation Error', 'Both email and password are required.', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In';
-        return;
-      }
-      
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        // Auth state listener will handle the rest
-      } catch (error) {
-        console.error('Login error:', error);
-        showNotification('Login Error', error.message, 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In';
-      }
-    };
-    
-    // Log Out User
-    const logoutUser = () => {
-      if (confirm('Are you sure you want to log out?')) {
-        auth.signOut();
-        showNotification('Logged Out', 'You have been logged out successfully.', 'info');
-      }
-    };
-    
-
-    // 5. MEME FEED LOGIC
-    // -------------------------------------
-    
-    // Load the meme feed
-    const loadFeed = async (clear = false) => {
-      if (isLoading) return;
-      isLoading = true;
-      
-      if (clear) {
-        feed.innerHTML = '';
-        lastVisibleMeme = null;
-        if (feedUnsubscribe) {
-            feedUnsubscribe(); // Stop any previous real-time listener
-            feedUnsubscribe = null;
-        }
-      }
-      
-      // Show skeleton loaders
-      if (clear) showSkeletons();
-      
-      try {
-        if (currentTab === 'fresh') {
-          // "Fresh" tab uses the external API
-          await loadFreshMemes();
-        } else {
-          // "Hot", "Crowned", "My Memes" use Firestore
-          await loadFirestoreMemes(clear);
-        }
-      } catch (error) {
-        console.error('Error loading feed:', error);
-        showNotification('Error', 'Could not load memes. Please try again.', 'error');
-        feed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Could not load memes. Please refresh.</p>';
-      }
-      
-      // Remove skeletons after content loads
-      document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
-      isLoading = false;
-    };
-    
-    // Show skeleton loading cards
-    const showSkeletons = () => {
-        feed.innerHTML = '';
-        const skeletonCount = window.innerWidth > 768 ? 6 : 3;
-        for (let i = 0; i < skeletonCount; i++) {
-            const skeleton = document.createElement('div');
-            skeleton.className = 'skeleton-card';
-            skeleton.style.animationDelay = `${i * 0.1}s`;
-            skeleton.innerHTML = `
-                <div class="skeleton-header">
-                    <div class="skeleton-line" style="width: 70%; height: 20px;"></div>
-                    <div class="skeleton-line" style="width: 40%; height: 14px;"></div>
-                </div>
-                <div class="skeleton-img" style="height: ${Math.random() * 150 + 200}px;"></div>
-                <div class="skeleton-footer">
-                    <div class="skeleton-line" style="width: 90%; height: 40px;"></div>
-                    <div class="skeleton-line" style="width: 100%; height: 30px;"></div>
-                </div>
-            `;
-            feed.appendChild(skeleton);
-        }
-    };
-    
-    // Load memes from External API (for "Fresh" tab)
-    const loadFreshMemes = async () => {
-      const batchSize = 5;
-      const requests = [];
-      for (let i = 0; i < batchSize; i++) {
-        const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
-        requests.push(fetch(url).then(res => res.json()));
-      }
-      
-      const results = await Promise.all(requests);
-      
-      for (const data of results) {
-        if (data && data.url) {
-          const meme = {
-            id: data.postLink.split('/').pop() || data.url,
-            title: data.title,
-            url: data.url,
-            username: data.author,
-            isUserGenerated: false,
-            // Mock reactions for API memes
-            reactions: {
-              cringe: Math.floor(Math.random() * 100),
-              laugh: Math.floor(Math.random() * 150),
-              cry: Math.floor(Math.random() * 75)
-            }
-          };
-          renderMeme(meme);
-        }
-      }
-    };
-    
-    // Load memes from Firestore (for "Hot", "My Memes", etc.)
-    const loadFirestoreMemes = async (isInitialLoad) => {
-        let query = db.collection('memes');
-        
-        // Apply tab-specific filters
-        if (currentTab === 'hot') {
-            query = query.orderBy('createdAt', 'desc');
-        } else if (currentTab === 'crowned') {
-            query = query.orderBy('totalReactions', 'desc'); // Assumes you have this field
-        } else if (currentTab === 'mymemes') {
-            if (!currentUser) {
-                feed.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Please log in to see your memes.</p>';
-                return;
-            }
-            query = query.where('userId', '==', currentUser.uid).orderBy('createdAt', 'desc');
-        }
-        
-        // Add pagination
-        if (lastVisibleMeme) {
-            query = query.startAfter(lastVisibleMeme);
-        }
-        
-        query = query.limit(6);
-        
-        try {
-            const snapshot = await query.get();
-            
-            if (snapshot.empty && isInitialLoad) {
-                let msg = 'No memes here yet. Be the first to post!';
-                if (currentTab === 'mymemes') msg = 'You haven\'t posted any memes yet.';
-                feed.innerHTML = `<p style="text-align: center; color: var(--text-secondary);">${msg}</p>`;
-                return;
-            }
-            
-            // Store the last document for pagination
-            lastVisibleMeme = snapshot.docs[snapshot.docs.length - 1];
-            
-            for (const doc of snapshot.docs) {
-                renderMeme({ id: doc.id, ...doc.data() });
-            }
-        } catch (error) {
-            console.error("Error loading Firestore memes:", error);
-            if (error.code === 'failed-precondition' && currentTab === 'crowned') {
-                // This happens if the composite index is missing
-                feed.innerHTML = `<p style="text-align: center; color: var(--text-secondary);">Feature not enabled. Missing database index for 'crowned'.</p>`;
-            }
-        }
-    };
-    
-    // Render a single meme card
-    const renderMeme = (meme) => {
+    const renderMeme = (id, meme) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
-      card.dataset.id = meme.id;
-      card.dataset.userId = meme.userId || 'api-user';
+      card.dataset.id = id;
       
-      // Safely get reaction counts
-      const reactions = meme.reactions || {};
-      const cringeCount = reactions.cringe || 0;
-      const laughCount = reactions.laugh || 0;
-      const cryCount = reactions.cry || 0;
-      
-      // Determine if user has reacted
-      let userReaction = null;
-      if (userProfile && userProfile.myReactions && userProfile.myReactions[meme.id]) {
-          userReaction = userProfile.myReactions[meme.id];
-      }
-      
+      const userReaction = meme.reactions?.[currentUser?.uid] || null;
+      const isSaved = currentUserData?.collections?.includes(id) || false;
+
       card.innerHTML = `
         <div class="card-header">
           <div>
             <div class="meme-title">${escapeHtml(meme.title)}</div>
             <div class="meme-meta">
               <span class="user-badge">
-                <i class="fas ${meme.isUserGenerated ? 'fa-user' : 'fa-robot'}"></i> 
-                ${escapeHtml(meme.username || 'Anonymous')}
+                <img src="${getAvatar(meme.user)}" alt="${meme.username}" class="user-avatar">
+                ${escapeHtml(meme.username)}
               </span>
+              <span>${formatTimeAgo(meme.createdAt)}</span>
             </div>
           </div>
         </div>
         <div class="meme-image-container">
           <img 
             class="meme-image" 
-            src="${meme.url}"
+            src="${meme.url}" 
             alt="Meme: ${escapeHtml(meme.title)}"
             loading="lazy"
           >
         </div>
         <div class="card-footer">
           <div class="reaction-bar">
-            <button class="reaction-btn ${userReaction === 'cringe' ? 'active' : ''}" data-reaction="cringe" title="Cringe">
+            <button class="reaction-btn ${userReaction === 'cringe' ? 'active' : ''}" data-reaction="cringe">
               <i class="fas fa-skull"></i>
-              <span class="reaction-count">${formatNumber(cringeCount)}</span>
+              <span class="reaction-count">${meme.reactionCounts?.cringe || 0}</span>
             </button>
-            <button class="reaction-btn ${userReaction === 'laugh' ? 'active' : ''}" data-reaction="laugh" title="Laugh">
+            <button class="reaction-btn ${userReaction === 'laugh' ? 'active' : ''}" data-reaction="laugh">
               <i class="fas fa-grin"></i>
-              <span class="reaction-count">${formatNumber(laughCount)}</span>
+              <span class="reaction-count">${meme.reactionCounts?.laugh || 0}</span>
             </button>
-            <button class="reaction-btn ${userReaction === 'cry' ? 'active' : ''}" data-reaction="cry" title="Cry">
+            <button class="reaction-btn ${userReaction === 'cry' ? 'active' : ''}" data-reaction="cry">
               <i class="fas fa-sad-tear"></i>
-              <span class="reaction-count">${formatNumber(cryCount)}</span>
+              <span class="reaction-count">${meme.reactionCounts?.cry || 0}</span>
             </button>
           </div>
           <div class="action-buttons">
-            <button class="card-btn save-btn" title="Save to collection">
-              <i class="fas fa-bookmark"></i>
-              Save
+            <button class="card-btn save-btn ${isSaved ? 'active' : ''}" title="Save to collection">
+              <i class="fas ${isSaved ? 'fa-bookmark' : 'fa-bookmark'}"></i>
+              <span>${isSaved ? 'Saved' : 'Save'}</span>
             </button>
-            <button class="card-btn tip-btn" title="Tip creator" ${!meme.isUserGenerated ? 'disabled' : ''}>
+            <button class="card-btn tip-btn" title="Tip creator">
               <i class="fas fa-coins"></i>
               Tip
             </button>
-            <button class="card-btn remix-btn" title="Remix this meme">
+            <button class="card-btn remix-btn" title="Remix this meme" data-url="${meme.url}">
               <i class="fas fa-sync-alt"></i>
               Remix
             </button>
@@ -2292,1186 +2190,575 @@
       
       feed.appendChild(card);
       
-      // Image load handler
+      // Image load handling
       const img = card.querySelector('.meme-image');
       img.onload = () => img.classList.add('loaded');
       img.onerror = () => {
-          img.alt = 'Image failed to load';
-          card.querySelector('.meme-image-container').innerHTML = '<p style="color: var(--text-secondary); padding: 20px;">Image failed to load</p>';
+         img.src = 'https://placehold.co/600x400/242152/e6e6ff?text=Image+Failed+to+Load';
+         img.classList.add('loaded');
       };
       
-      // Add event listeners for card buttons
+      // Add event listeners
       card.querySelectorAll('.reaction-btn').forEach(btn => {
-        btn.onclick = () => addReaction(meme.id, btn.dataset.reaction, card);
+        btn.addEventListener('click', () => handleReaction(id, btn.dataset.reaction));
       });
-      card.querySelector('.save-btn').onclick = () => saveMeme(meme.id, meme);
-      card.querySelector('.tip-btn').onclick = () => tipMeme(meme.id, meme.userId);
-      card.querySelector('.remix-btn').onclick = () => remixMeme(meme.url);
-      card.querySelector('.share-btn').onclick = () => shareMeme(meme.id);
+      card.querySelector('.save-btn').addEventListener('click', () => handleSave(id, !isSaved));
+      card.querySelector('.remix-btn').addEventListener('click', () => handleRemix(btn.dataset.url));
+      card.querySelector('.share-btn').addEventListener('click', () => handleShare(id, meme.title));
+      card.querySelector('.tip-btn').addEventListener('click', () => showNotification('Coming Soon', 'Tipping will be available soon!', 'info'));
     };
 
-
-    // 6. MEME CARD ACTIONS (REAL)
-    // -------------------------------------
-
-    // Add Reaction
-    const addReaction = async (memeId, reactionType, cardElement) => {
-      if (!currentUser) return showAuthModal();
+    const handleReaction = async (memeId, reaction) => {
+      if (!currentUser) return showModal('authModal');
       
-      const memeRef = db.collection('memes').doc(memeId);
-      const userRef = db.collection('users').doc(currentUser.uid);
-      const myReactionKey = `myReactions.${memeId}`; // Key for the map in user doc
-      
-      let currentReaction = userProfile.myReactions ? userProfile.myReactions[memeId] : null;
+      const memeRef = doc(db, "memes", memeId);
+      const uid = currentUser.uid;
       
       try {
-        await db.runTransaction(async (transaction) => {
+        await runTransaction(db, async (transaction) => {
           const memeDoc = await transaction.get(memeRef);
-          if (!memeDoc.exists) throw "Meme not found!";
+          if (!memeDoc.exists()) throw "Meme not found!";
           
-          let reactions = memeDoc.data().reactions || {};
-          let totalReactions = memeDoc.data().totalReactions || 0;
+          const data = memeDoc.data();
+          const reactions = data.reactions || {};
+          const reactionCounts = data.reactionCounts || { cringe: 0, laugh: 0, cry: 0 };
           
-          // User is adding a new reaction or changing it
-          if (currentReaction !== reactionType) {
-            // Add new reaction count
-            reactions[reactionType] = (reactions[reactionType] || 0) + 1;
-            totalReactions += 1;
-            
-            // If user is changing reaction, remove old one
-            if (currentReaction) {
-              reactions[currentReaction] = (reactions[currentReaction] || 1) - 1;
-              totalReactions -= 1;
-            }
-            
-            // Update meme doc
-            transaction.update(memeRef, { reactions, totalReactions });
-            // Update user doc
-            transaction.update(userRef, { [myReactionKey]: reactionType });
-            
-            // Update local state
-            if (!userProfile.myReactions) userProfile.myReactions = {};
-            userProfile.myReactions[memeId] = reactionType;
-            
+          const currentReaction = reactions[uid];
+          let reactionCount = 0; // Total reactions for the meme
+          
+          if (currentReaction === reaction) {
+            // User is un-reacting
+            delete reactions[uid];
+            reactionCounts[reaction] = (reactionCounts[reaction] || 1) - 1;
           } else {
-            // User is removing their reaction
-            reactions[reactionType] = (reactions[reactionType] || 1) - 1;
-            totalReactions -= 1;
-            
-            // Update meme doc
-            transaction.update(memeRef, { reactions, totalReactions });
-            // Update user doc (remove the key)
-            transaction.update(userRef, { [myReactionKey]: firebase.firestore.FieldValue.delete() });
-            
-            // Update local state
-            delete userProfile.myReactions[memeId];
+            if (currentReaction) {
+              // User is changing reaction
+              reactionCounts[currentReaction] = (reactionCounts[currentReaction] || 1) - 1;
+            }
+            reactions[uid] = reaction;
+            reactionCounts[reaction] = (reactionCounts[reaction] || 0) + 1;
           }
+          
+          // Recalculate total reactionCount
+          reactionCount = Object.values(reactionCounts).reduce((a, b) => a + b, 0);
+
+          transaction.update(memeRef, { 
+            reactions: reactions,
+            reactionCounts: reactionCounts,
+            reactionCount: reactionCount // For 'hot' query
+          });
         });
-        
-        // Update the UI
-        updateCardReactions(cardElement, memeId);
-        
       } catch (error) {
-        console.error("Reaction error:", error);
-        showNotification('Error', 'Could not add reaction.', 'error');
+        console.error("Reaction failed:", error);
+        showNotification('Error', 'Could not apply reaction.', 'error');
       }
     };
     
-    // Helper to update card UI after reaction
-    const updateCardReactions = async (cardElement, memeId) => {
-        // Get fresh data
-        const memeDoc = await db.collection('memes').doc(memeId).get();
-        if (!memeDoc.exists) return;
-        
-        const reactions = memeDoc.data().reactions || {};
-        const userReaction = userProfile.myReactions ? userProfile.myReactions[memeId] : null;
-        
-        cardElement.querySelector('[data-reaction="cringe"] .reaction-count').textContent = formatNumber(reactions.cringe || 0);
-        cardElement.querySelector('[data-reaction="laugh"] .reaction-count').textContent = formatNumber(reactions.laugh || 0);
-        cardElement.querySelector('[data-reaction="cry"] .reaction-count').textContent = formatNumber(reactions.cry || 0);
-        
-        cardElement.querySelectorAll('.reaction-btn').forEach(btn => btn.classList.remove('active'));
-        if (userReaction) {
-            cardElement.querySelector(`[data-reaction="${userReaction}"]`).classList.add('active');
-        }
-    };
-
-    // Save Meme
-    const saveMeme = async (memeId, memeData) => {
-      if (!currentUser) return showAuthModal();
+    const handleSave = async (memeId, shouldSave) => {
+      if (!currentUser) return showModal('authModal');
       
-      const collectionRef = db.collection('users').doc(currentUser.uid).collection('collections').doc(memeId);
-      const userRef = db.collection('users').doc(currentUser.uid);
+      const userRef = doc(db, "users", currentUser.uid);
       
       try {
-        const doc = await collectionRef.get();
-        
-        if (doc.exists) {
-            // Already saved, so unsave it
-            await collectionRef.delete();
-            await userRef.update({ collectionsCount: firebase.firestore.FieldValue.increment(-1) });
-            userProfile.collectionsCount = (userProfile.collectionsCount || 1) - 1;
-            showNotification('Unsaved', 'Meme removed from your collection.', 'info');
+        if (shouldSave) {
+          await updateDoc(userRef, {
+            collections: arrayUnion(memeId)
+          });
+          currentUserData.collections.push(memeId); // Update local state
+          showNotification('Saved!', 'Meme added to your collections.', 'success');
         } else {
-            // Not saved, so save it
-            await collectionRef.set({
-                title: memeData.title,
-                url: memeData.url,
-                savedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            await userRef.update({ collectionsCount: firebase.firestore.FieldValue.increment(1) });
-            userProfile.collectionsCount = (userProfile.collectionsCount || 0) + 1;
-            showNotification('Saved!', 'Meme added to your collection.', 'success');
+          await updateDoc(userRef, {
+            collections: arrayRemove(memeId)
+          });
+          currentUserData.collections = currentUserData.collections.filter(id => id !== memeId); // Update local state
+          showNotification('Unsaved', 'Meme removed from your collections.', 'info');
         }
-        document.getElementById('collectionsBadge').textContent = userProfile.collectionsCount;
       } catch (error) {
-        console.error('Save meme error:', error);
-        showNotification('Error', 'Could not update collection.', 'error');
+        console.error("Save failed:", error);
+        showNotification('Error', 'Could not update your collection.', 'error');
       }
     };
-
-    // Tip Meme Creator
-    const tipMeme = async (memeId, authorId) => {
-      if (!currentUser) return showAuthModal();
-      if (!authorId || authorId === 'api-user') {
-          showNotification('Cannot Tip', 'You can only tip user-generated memes.', 'info');
-          return;
-      }
-      if (authorId === currentUser.uid) {
-          showNotification('Oops!', 'You cannot tip your own meme.', 'info');
-          return;
-      }
-      
-      const tipAmount = 5;
-      if (userProfile.cringeCoin < tipAmount) {
-        showNotification('Insufficient Funds', `You need at least ${tipAmount} CringeCoin.`, 'error');
-        return;
-      }
-      
-      if (!confirm(`Tip 5 CringeCoin to this meme creator?`)) return;
-      
-      const tipperRef = db.collection('users').doc(currentUser.uid);
-      const authorRef = db.collection('users').doc(authorId);
-      
-      try {
-        await db.runTransaction(async (transaction) => {
-            const tipperDoc = await transaction.get(tipperRef);
-            const authorDoc = await transaction.get(authorRef);
-            
-            if (!tipperDoc.exists || !authorDoc.exists) {
-                throw "User not found";
-            }
-            
-            const tipperCoin = tipperDoc.data().cringeCoin;
-            if (tipperCoin < tipAmount) {
-                throw "Insufficient funds";
-            }
-            
-            // Perform updates
-            transaction.update(tipperRef, { cringeCoin: tipperCoin - tipAmount });
-            transaction.update(authorRef, { cringeCoin: firebase.firestore.FieldValue.increment(tipAmount) });
-        });
-        
-        // Update local profile
-        userProfile.cringeCoin -= tipAmount;
-        showNotification('Tip Sent!', `You sent 5 CringeCoin!`, 'success');
-        
-      } catch (error) {
-        console.error('Tip error:', error);
-        showNotification('Tip Failed', error.message || 'The transaction failed.', 'error');
-      }
-    };
-
-    // Remix Meme (Opens editor)
-    const remixMeme = (imageUrl) => {
-      if (!currentUser) return showAuthModal();
-      
-      // Open the editor
-      document.getElementById('memeEditorModal').classList.add('active');
-      
-      // Load the image onto the canvas
-      if (fabricCanvas) {
-        fabric.Image.fromURL(imageUrl, (img) => {
-            fabricCanvas.clear();
-            
-            // Scale image to fit canvas
-            const canvasWidth = 800;
-            const canvasHeight = 600;
-            const scale = Math.min(canvasWidth / img.width, canvasHeight / img.height);
-            img.scale(scale);
-            
-            // Center the image
-            img.set({
-                left: (canvasWidth - img.width * scale) / 2,
-                top: (canvasHeight - img.height * scale) / 2,
-                originX: 'left',
-                originY: 'top'
-            });
-            
-            fabricCanvas.add(img);
-            fabricCanvas.setBackgroundColor('#000000', fabricCanvas.renderAll.bind(fabricCanvas));
-            saveCanvasState();
-        }, { crossOrigin: 'anonymous' }); // Needed for external images
-      }
-    };
-
-    // Share Meme
-    const shareMeme = (memeId) => {
-      const shareUrl = `${window.location.origin}#meme=${memeId}`;
-      const shareText = `Check out this hilarious meme on CringeScroll! ${shareUrl}`;
+    
+    const handleShare = (memeId, title) => {
+      const shareUrl = `${window.location.href}?meme=${memeId}`;
+      const shareText = `Check out this meme on CringeScroll: "${title}"`;
       
       if (navigator.share) {
         navigator.share({
           title: 'CringeScroll Meme',
-          text: 'Check out this meme!',
+          text: shareText,
           url: shareUrl
         }).catch((error) => console.log('Error sharing:', error));
       } else {
-        // Fallback for desktop
         navigator.clipboard.writeText(shareUrl).then(() => {
-          showNotification('Copied!', 'Link copied to clipboard!', 'success');
-        }).catch(() => {
-          showNotification('Error', 'Failed to copy link.', 'error');
+          showNotification('Copied!', 'Meme link copied to clipboard!', 'success');
         });
       }
     };
-
-
-    // 7. CHAT LOGIC (REAL-TIME)
-    // -------------------------------------
     
-    // Start listening for new chat messages
-    const startChatListener = () => {
-      if (chatUnsubscribe) chatUnsubscribe(); // Stop old listener
+    const handleRemix = (imageUrl) => {
+      if (!currentUser) return showModal('authModal');
+      showMemeEditor(imageUrl);
+    };
+
+    // --- CHAT LOGIC ---
+    
+    const loadChatMessages = () => {
+      if (chatUnsubscribe) chatUnsubscribe(); // Stop previous listener
+      
+      const chatCol = collection(db, "chat");
+      const chatQuery = query(chatCol, orderBy("timestamp", "desc"), limit(50));
       
       const messagesContainer = document.getElementById('chatMessages');
-      messagesContainer.innerHTML = '<div class="loading-spinner"></div>';
       
-      chatUnsubscribe = db.collection('chat')
-        .orderBy('timestamp', 'desc')
-        .limit(30)
-        .onSnapshot(snapshot => {
-          messagesContainer.innerHTML = ''; // Clear
-          if (snapshot.empty) {
-              messagesContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No messages yet. Say hi!</p>';
-              return;
+      chatUnsubscribe = onSnapshot(chatQuery, (snapshot) => {
+        messagesContainer.innerHTML = '';
+        let newMessages = 0;
+        
+        snapshot.docs.reverse().forEach(doc => { // reverse to show new at bottom
+          const msg = doc.data();
+          const messageDiv = document.createElement('div');
+          messageDiv.className = `message ${msg.uid === currentUser?.uid ? 'outgoing' : 'incoming'}`;
+          
+          const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          
+          messageDiv.innerHTML = `
+            <div class="message-content">${escapeHtml(msg.text)}</div>
+            <div class="message-meta">
+              <img src="${getAvatar(msg.user)}" alt="${msg.username}" class="message-avatar">
+              <span class="message-sender">${escapeHtml(msg.username)}</span>
+              <span class="message-time">${time}</span>
+            </div>
+          `;
+          messagesContainer.appendChild(messageDiv);
+          
+          // Count new messages (very basic, not robust)
+          if (!chatWindow.classList.contains('active') && msg.timestamp && (new Date() - msg.timestamp.toDate()) < 10000) {
+            newMessages++;
           }
-          
-          let newMessages = 0;
-          snapshot.docs.reverse().forEach(doc => {
-              const msg = doc.data();
-              renderChatMessage(msg);
-              // Simple new message check (can be improved)
-              if (msg.timestamp && msg.timestamp.toMillis() > (Date.now() - 5000)) {
-                  newMessages++;
-              }
-          });
-          
-          // Scroll to bottom
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-          
-          // Update chat badge
-          if (newMessages > 0 && !document.getElementById('chatWindow').classList.contains('active')) {
-              const badge = document.getElementById('chatBadge');
-              const menuBadge = document.getElementById('menuChatBadge');
-              badge.textContent = newMessages;
-              menuBadge.textContent = newMessages;
-              badge.style.display = 'flex';
-          }
-          
-        }, error => {
-          console.error("Chat listener error:", error);
-          messagesContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Error loading chat.</p>';
         });
+        
+        // Update badge
+        if (newMessages > 0) {
+          const badge = document.getElementById('chatBadge');
+          badge.textContent = (parseInt(badge.textContent) || 0) + newMessages;
+          badge.style.display = 'flex';
+        }
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, (error) => {
+        console.error("Chat error:", error);
+        messagesContainer.innerHTML = 'Could not load chat.';
+      });
     };
     
-    // Render a single chat message
-    const renderChatMessage = (msg) => {
-      const messagesContainer = document.getElementById('chatMessages');
-      const messageDiv = document.createElement('div');
+    const sendChatMessage = async () => {
+      if (!currentUser) return showModal('authModal');
       
-      const type = (msg.sender && msg.sender.uid === currentUser?.uid) ? 'outgoing' : 'incoming';
-      messageDiv.className = `message ${type}`;
-      
-      const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...';
-      
-      messageDiv.innerHTML = `
-        <div class="message-content">${escapeHtml(msg.text)}</div>
-         <div class="message-meta">
-          <span class="message-sender">${escapeHtml(msg.sender ? msg.sender.username : 'System')}</span>
-          <span class="message-time">${time}</span>
-        </div>
-      `;
-      messagesContainer.appendChild(messageDiv);
-    };
-    
-    // Send a chat message
-    const sendMessage = async () => {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
       
-      if (!text || !currentUser) return;
+      if (!text) return;
       
-      input.value = ''; // Clear input immediately
-      
-      const message = {
-        text: text,
-        sender: {
-            uid: currentUser.uid,
-            username: userProfile.username
-        },
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      input.disabled = true;
       
       try {
-        await db.collection('chat').add(message);
+        await addDoc(collection(db, "chat"), {
+          uid: currentUser.uid,
+          username: currentUserData.username,
+          user: { // Denormalize for avatar
+            username: currentUserData.username,
+            avatar: currentUserData.avatar
+          },
+          text: text,
+          timestamp: serverTimestamp()
+        });
+        input.value = ''; // Clear input on success
       } catch (error) {
-        console.error('Send message error:', error);
+        console.error("Send message error:", error);
         showNotification('Error', 'Could not send message.', 'error');
-        input.value = text; // Put text back on failure
+      } finally {
+        input.disabled = false;
+        input.focus();
       }
     };
     
-    // Toggle chat window
-    const toggleChatWindow = () => {
-      if (!currentUser) return showAuthModal();
+    const setupChatDrag = () => {
+      const chatHeader = document.getElementById('chatHeader');
+      let isDragging = false;
+      let offset = { x: 0, y: 0 };
       
-      const chatWindow = document.getElementById('chatWindow');
-      chatWindow.classList.toggle('active');
+      // Center chat window on first open
+      chatWindow.style.top = `${(window.innerHeight - chatWindow.offsetHeight) / 2}px`;
+      chatWindow.style.left = `${(window.innerWidth - chatWindow.offsetWidth) / 2}px`;
       
-      if (chatWindow.classList.contains('active')) {
-        // Clear badges when opening
-        document.getElementById('chatBadge').style.display = 'none';
-        document.getElementById('menuChatBadge').textContent = 0;
+      chatHeader.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offset.x = chatWindow.offsetLeft - e.clientX;
+        offset.y = chatWindow.offsetTop - e.clientY;
+        chatWindow.style.transition = 'none'; // Disable transition while dragging
+        document.body.style.userSelect = 'none';
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        chatWindow.style.transition = 'transform 0.3s ease, opacity 0.3s ease'; // Re-enable
+        document.body.style.userSelect = 'auto';
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
         
-        // Scroll to bottom
-        setTimeout(() => {
-          const messagesContainer = document.getElementById('chatMessages');
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 100);
-      }
+        let newX = e.clientX + offset.x;
+        let newY = e.clientY + offset.y;
+        
+        // Constrain to viewport
+        const minX = 0;
+        const minY = 0;
+        const maxX = window.innerWidth - chatWindow.offsetWidth;
+        const maxY = window.innerHeight - chatWindow.offsetHeight;
+        
+        newX = Math.max(minX, Math.min(newX, maxX));
+        newY = Math.max(minY, Math.min(newY, maxY));
+        
+        chatWindow.style.left = `${newX}px`;
+        chatWindow.style.top = `${newY}px`;
+        chatWindow.style.bottom = 'auto'; // Override CSS
+        chatWindow.style.right = 'auto'; // Override CSS
+      });
     };
 
-
-    // 8. SIDEBAR & MODAL FUNCTIONS (REAL DATA)
-    // -------------------------------------
-    
-    // Show User Profile
-    const showProfile = async () => {
-      if (!currentUser) return showAuthModal();
-      
-      showModalLoading();
-      
-      // Refetch profile data for freshness
-      const userDoc = await db.collection('users').doc(currentUser.uid).get();
-      if (!userDoc.exists) return showNotification('Error', 'User profile not found.', 'error');
-      
-      const profile = userDoc.data();
-      userProfile = { uid: currentUser.uid, ...profile }; // Update global profile
-      
-      const htmlContent = `
-        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
-          <img src="${profile.avatar}" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; background: var(--accent-1);">
-          <div>
-            <h3 style="color: var(--text-primary); margin: 0; font-size: 24px;">${escapeHtml(profile.username)}</h3>
-            <p style="color: var(--text-secondary); margin: 5px 0 0 0;">${escapeHtml(profile.email)}</p>
-          </div>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
-          <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: gold;">${profile.cringeCoin || 0}</div>
-            <div style="color: var(--text-secondary); margin-top: 5px;">CringeCoin</div>
-          </div>
-          <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: var(--accent-3);">${profile.streak || 0}</div>
-            <div style="color: var(--text-secondary); margin-top: 5px;">Day Streak</div>
-          </div>
-        </div>
-        
-        <button class="btn btn-secondary" id="modalSettingsBtn">
-          <i class="fas fa-cog"></i> Account Settings
-        </button>
-      `;
-      
-      showGenericModal('<i class="fas fa-user-circle"></i> My Profile', htmlContent);
-      
-      // Wire up button inside modal
-      document.getElementById('modalSettingsBtn').onclick = () => {
-          genericModal.classList.remove('active');
-          showSettings();
-      };
-    };
-
-    // Show User Collections
-    const showCollections = async () => {
-      if (!currentUser) return showAuthModal();
-      
-      showModalLoading();
-      
-      const snapshot = await db.collection('users').doc(currentUser.uid).collection('collections')
-                        .orderBy('savedAt', 'desc').limit(10).get();
-      
-      let collectionsHtml = '';
-      if (snapshot.empty) {
-        collectionsHtml = '<p style="color: var(--text-secondary); text-align: center;">You have no saved memes.</p>';
-      } else {
-        snapshot.docs.forEach(doc => {
-            const item = doc.data();
-            collectionsHtml += `
-                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 12px;">
-                    <img src="${item.url}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;">
-                    <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${escapeHtml(item.title)}
-                    </div>
-                    <button class="btn btn-secondary" style="width: auto; padding: 5px 10px; font-size: 12px;" onclick="unsaveMemeFromCollection('${doc.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
-        });
-      }
-      
-      const htmlContent = `
-        <h4 style="color: var(--text-primary); margin-bottom: 15px;">Your Saved Memes</h4>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            ${collectionsHtml}
-        </div>
-      `;
-      
-      showGenericModal('<i class="fas fa-bookmark"></i> My Collections', htmlContent);
-    };
-    
-    // Helper function for the collections modal
-    const unsaveMemeFromCollection = async (memeId) => {
-        if (!currentUser || !confirm('Are you sure you want to remove this from your collection?')) return;
-        
-        try {
-            await db.collection('users').doc(currentUser.uid).collection('collections').doc(memeId).delete();
-            await db.collection('users').doc(currentUser.uid).update({ collectionsCount: firebase.firestore.FieldValue.increment(-1) });
-            userProfile.collectionsCount = (userProfile.collectionsCount || 1) - 1;
-            document.getElementById('collectionsBadge').textContent = userProfile.collectionsCount;
-            
-            showNotification('Unsaved', 'Meme removed from your collection.', 'info');
-            showCollections(); // Refresh the modal
-        } catch (error) {
-            console.error('Unsave error:', error);
-            showNotification('Error', 'Could not remove meme.', 'error');
-        }
-    };
-
-    // Show Leaderboard
-    const showLeaderboard = async () => {
-      showModalLoading();
-      
-      const snapshot = await db.collection('users')
-                            .orderBy('cringeCoin', 'desc')
-                            .limit(10)
-                            .get();
-      
-      let leaderboardHtml = '<div style="display: flex; flex-direction: column; gap: 12px;">';
-      const medalColors = ['gold', 'silver', '#cd7f32'];
-      
-      if (snapshot.empty) {
-          leaderboardHtml = '<p style="color: var(--text-secondary); text-align: center;">Leaderboard is empty.</p>';
-      } else {
-          snapshot.docs.forEach((doc, index) => {
-              const user = doc.data();
-              const rank = index + 1;
-              const style = rank <= 3 ? `background: linear-gradient(135deg, ${medalColors[index]}20, ${medalColors[index]}05); border: 1px solid ${medalColors[index]}50;` : 'background: rgba(255, 255, 255, 0.03);';
-              
-              leaderboardHtml += `
-                  <div style="border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; ${style}">
-                      <div style="width: 32px; height: 32px; border-radius: 50%; background: ${rank <= 3 ? medalColors[index] : 'var(--accent-2)'}; display: flex; align-items: center; justify-content: center; color: ${rank <= 3 ? 'var(--bg-primary)' : 'white'}; font-weight: bold;">
-                          ${rank}
-                      </div>
-                      <div style="flex: 1;">
-                          <div style="font-weight: bold; color: ${rank <= 3 ? medalColors[index] : 'var(--text-primary)'};">${escapeHtml(user.username)}</div>
-                      </div>
-                      <div style="color: gold; font-weight: bold;">
-                          ${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i>
-                      </div>
-                  </div>
-              `;
-          });
-      }
-      leaderboardHtml += '</div>';
-      
-      // Add user's rank
-      if (currentUser) {
-          // This is a simple approximation. A real rank requires a more complex query.
-          leaderboardHtml += `
-            <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(106, 13, 173, 0.2);">
-              <div style="font-weight: bold; color: var(--accent-3); margin-bottom: 5px;">Your Coins</div>
-              <div style="color: var(--text-secondary);">${formatNumber(userProfile.cringeCoin)} <i class="fas fa-coins"></i></div>
-            </div>
-          `;
-      }
-      
-      showGenericModal('<i class="fas fa-chart-line"></i> Leaderboard', leaderboardHtml);
-    };
-
-    // Show Settings (which opens other modals)
-    const showSettings = () => {
-        const htmlContent = `
-            <div class="menu-section">
-              <h3 class="menu-section-title">Account</h3>
-              <div class="menu-item" id="settingsProfileBtn">
-                <i class="fas fa-user-circle"></i> <span>Profile Settings</span>
-              </div>
-              <div class="menu-item" id="settingsSecurityBtn">
-                <i class="fas fa-shield-alt"></i> <span>Security</span>
-              </div>
-            </div>
-            
-            <div class="menu-section">
-              <h3 class="menu-section-title">App</h3>
-              <div class="menu-item" id="settingsCustomizationBtn">
-                <i class="fas fa-palette"></i> <span>UI Customization</span>
-              </div>
-              <div class="menu-item" id="settingsSoundBtn">
-                <i class="fas fa-volume-up"></i> <span>Sound Effects (Soon)</span>
-              </div>
-            </div>
-        `;
-        
-        showGenericModal('<i class="fas fa-cog"></i> Settings', htmlContent);
-        
-        // Wire up buttons
-        document.getElementById('settingsProfileBtn').onclick = () => {
-            if (!currentUser) return showAuthModal();
-            genericModal.classList.remove('active');
-            showProfile();
-        };
-        document.getElementById('settingsSecurityBtn').onclick = () => {
-            showNotification('Security', 'Security settings coming soon!', 'info');
-        };
-        document.getElementById('settingsCustomizationBtn').onclick = () => {
-            genericModal.classList.remove('active');
-            showCustomization();
-        };
-    };
-    
-    // Show UI Customization
-    const showCustomization = () => {
-        const htmlContent = `
-            <div style="margin-bottom: 25px;">
-              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Theme</h4>
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;">
-                 <div class="theme-option" data-theme="dark" style="background: #0f0c29; border: 2px solid transparent; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
-                    <div style="font-weight: bold; margin-bottom: 8px;">Midnight 🌙</div>
-                 </div>
-                 <div class="theme-option" data-theme="light" style="background: #f8f9fa; border: 2px solid transparent; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: #212529;">Daylight ☀️</div>
-                 </div>
-                 <div class="theme-option" data-theme="blue" style="background: #0d1b2a; border: 2px solid transparent; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: #e0e1dd;">Ocean 🌊</div>
-                 </div>
-                 <div class="theme-option" data-theme="red" style="background: #2c090a; border: 2px solid transparent; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: #ffe6e6;">Volcano 🌋</div>
-                 </div>
-                 <div class="theme-option" data-theme="purple" style="background: #1a092d; border: 2px solid transparent; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer;">
-                    <div style="font-weight: bold; margin-bottom: 8px; color: #e6d9ff;">Royal 👑</div>
-                 </div>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-              <h4 style="color: var(--text-primary); margin-bottom: 15px;">Font Size</h4>
-              <div style="display: flex; justify-content: space-between; gap: 10px;">
-                <button class="btn btn-secondary font-size-btn" data-size="small" style="flex: 1;"><i class="fas fa-font"></i> Small</button>
-                <button class="btn btn-secondary font-size-btn" data-size="medium" style="flex: 1;"><i class="fas fa-font"></i> Medium</button>
-                <button class="btn btn-secondary font-size-btn" data-size="large" style="flex: 1;"><i class="fas fa-font"></i> Large</button>
-              </div>
-            </div>
-            
-            <button class="btn btn-primary" id="saveCustomization">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
-        `;
-        
-        showGenericModal('<i class="fas fa-palette"></i> Customize UI', htmlContent);
-        
-        // Highlight active theme
-        const currentTheme = userPreferences.theme;
-        document.querySelector(`.theme-option[data-theme="${currentTheme}"]`).style.borderColor = 'var(--accent-3)';
-        
-        // Highlight active font size
-        const currentSize = userPreferences.fontSize;
-        document.querySelector(`.font-size-btn[data-size="${currentSize}"]`).classList.add('active');
-        
-        // Add listeners
-        let selectedTheme = currentTheme;
-        let selectedSize = currentSize;
-        
-        document.querySelectorAll('.theme-option').forEach(option => {
-            option.onclick = () => {
-                document.querySelectorAll('.theme-option').forEach(opt => opt.style.borderColor = 'transparent');
-                option.style.borderColor = 'var(--accent-3)';
-                selectedTheme = option.dataset.theme;
-            };
-        });
-        
-        document.querySelectorAll('.font-size-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedSize = btn.dataset.size;
-            };
-        });
-        
-        // Save button
-        document.getElementById('saveCustomization').onclick = () => {
-            userPreferences.theme = selectedTheme;
-            userPreferences.fontSize = selectedSize;
-            saveUserPreferences();
-            applyUserPreferences();
-            genericModal.classList.remove('active');
-            showNotification('Saved!', 'Customizations applied.', 'success');
-        };
-    };
-    
-    // Placeholder functions for other menu items
-    const showInventory = () => showNotification('Inventory', 'Inventory coming soon!', 'info');
-    const showQuests = () => showNotification('Quests', 'Daily quests coming soon!', 'info');
-    const startMemeRoulette = () => showNotification('Meme Roulette', 'Meme Roulette coming soon!', 'info');
-
-
-    // 9. MEME EDITOR LOGIC
-    // -------------------------------------
-    
+    // --- MEME EDITOR LOGIC ---
     let fabricCanvas = null;
     let activeTool = 'text';
-    let brushSize = 5;
-    let currentColor = '#FFFFFF';
-    let opacity = 1.0;
-    let canUndo = [];
-    let canRedo = [];
-    let isDrawing = false;
+    let history = [];
+    let historyIndex = -1;
 
-    // Initialize Fabric.js editor
-    const initMemeEditor = () => {
+    const showMemeEditor = (templateUrl = null) => {
+      if (!currentUser) return showModal('authModal');
+      
+      showModal('memeEditorModal');
+      
       if (!fabricCanvas) {
+        const canvasEl = document.getElementById('canvas');
+        const container = document.getElementById('editorContainer');
+        
+        // Size canvas to fit container
+        const width = container.offsetWidth;
+        const height = container.offsetHeight;
+        
+        canvasEl.width = width;
+        canvasEl.height = height;
+        
         fabricCanvas = new fabric.Canvas('canvas', {
+          width: width,
+          height: height,
           backgroundColor: '#000000',
-          selection: true,
           preserveObjectStacking: true
         });
-        
-        // Resize canvas to fit wrapper
-        const wrapper = document.querySelector('.canvas-wrapper');
-        const resizeCanvas = () => {
-            fabricCanvas.setWidth(wrapper.clientWidth);
-            fabricCanvas.setHeight(wrapper.clientHeight);
-            fabricCanvas.renderAll();
-        };
-        resizeCanvas();
-        new ResizeObserver(resizeCanvas).observe(wrapper);
-
-        // --- Add listeners only once ---
-        
-        // Tool selection
-        document.querySelectorAll('.editor-tool').forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll('.editor-tool').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeTool = btn.dataset.tool;
-            fabricCanvas.isDrawingMode = (activeTool === 'draw' || activeTool === 'eraser');
-            updateBrush();
-          });
-        });
-        
-        // Template buttons
-        document.querySelectorAll('.template-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const url = btn.dataset.url;
-            fabric.Image.fromURL(url, (img) => {
-                fabricCanvas.clear();
-                const scale = Math.min(fabricCanvas.width / img.width, fabricCanvas.height / img.height);
-                img.scale(scale);
-                img.set({ left: (fabricCanvas.width - img.width * scale) / 2, top: (fabricCanvas.height - img.height * scale) / 2 });
-                fabricCanvas.add(img);
-                fabricCanvas.setBackgroundColor('#000000', fabricCanvas.renderAll.bind(fabricCanvas));
-                saveCanvasState();
-            }, { crossOrigin: 'anonymous' });
-          });
-        });
-        
-        // Settings listeners
-        document.getElementById('brushSize').addEventListener('input', (e) => { brushSize = parseInt(e.target.value); updateBrush(); });
-        document.getElementById('opacitySlider').addEventListener('input', (e) => { opacity = parseFloat(e.target.value); updateBrush(); });
-        document.getElementById('textColorPicker').addEventListener('input', (e) => { currentColor = e.target.value; updateBrush(); });
-        document.getElementById('fontFamilySelect').addEventListener('change', (e) => {
-            const activeObj = fabricCanvas.getActiveObject();
-            if (activeObj && activeObj.type === 'i-text') {
-                activeObj.set('fontFamily', e.target.value);
-                fabricCanvas.renderAll();
-            }
-        });
-        
-        // History buttons
-        document.getElementById('undoBtn').addEventListener('click', undoCanvasAction);
-        document.getElementById('redoBtn').addEventListener('click', redoCanvasAction);
-        document.getElementById('clearCanvasBtn').addEventListener('click', clearCanvas);
-        
-        // Footer buttons
-        document.getElementById('cancelMemeBtn').addEventListener('click', () => memeEditorModal.classList.remove('active'));
-        document.getElementById('saveDraftBtn').addEventListener('click', saveMemeDraft);
-        document.getElementById('postMemeBtn').addEventListener('click', postMemeFromEditor);
-        
-        // Add image button
-        document.querySelector('.editor-tool[data-tool="image"]').addEventListener('click', () => {
-          if (activeTool !== 'image') return;
-          const input = document.createElement('input');
-          input.type = 'file';
-          input.accept = 'image/*';
-          input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                fabric.Image.fromURL(event.target.result, (img) => {
-                  img.scaleToWidth(fabricCanvas.width / 2);
-                  img.set({ top: 100, left: 100 });
-                  fabricCanvas.add(img);
-                  saveCanvasState();
-                }, { crossOrigin: 'anonymous' });
-              };
-              reader.readAsDataURL(file);
-            }
-          };
-          input.click();
-        });
-        
-        // Canvas event listeners
-        fabricCanvas.on('mouse:down', (opt) => {
-            if (activeTool === 'text' && !opt.target) {
-                addText(opt.pointer);
-            }
-            isDrawing = true;
-        });
-        fabricCanvas.on('mouse:up', () => {
-            isDrawing = false;
-            // Save state *after* drawing or modification
-            if (fabricCanvas.isDrawingMode || fabricCanvas.getActiveObject()) {
-                saveCanvasState();
-            }
-        });
-
       }
       
-      // Reset canvas for new session
       fabricCanvas.clear();
-      fabricCanvas.setBackgroundColor('#000000', fabricCanvas.renderAll.bind(fabricCanvas));
-      canUndo = [];
-      canRedo = [];
-      saveCanvasState();
-    };
-    
-    // Add Text to canvas
-    const addText = (pointer) => {
-        const text = new fabric.IText('Your text here', {
-            left: pointer.x,
-            top: pointer.y,
-            fontFamily: document.getElementById('fontFamilySelect').value,
-            fontSize: 40,
-            fill: currentColor,
-            stroke: '#000000',
-            strokeWidth: 1,
-            originX: 'center',
-            originY: 'center',
-            cornerColor: 'var(--accent-3)',
-            transparentCorners: false
-        });
-        fabricCanvas.add(text);
-        fabricCanvas.setActiveObject(text);
-        text.enterEditing();
-        text.selectAll();
-    };
-
-    // Update brush settings
-    const updateBrush = () => {
-        if (fabricCanvas.isDrawingMode) {
-            const brush = fabricCanvas.freeDrawingBrush;
-            brush.width = brushSize;
-            brush.color = (activeTool === 'eraser') ? fabricCanvas.backgroundColor : currentColor;
-            brush.globalAlpha = (activeTool === 'eraser')? 1 : opacity; // Opacity only for drawing
-        }
-    };
-    
-    // Save canvas state for undo/redo
-    const saveCanvasState = () => {
-      if (isDrawing) return; // Don't save while dragging
-      canRedo = []; // Clear redo stack
-      canUndo.push(fabricCanvas.toDatalessJSON());
-      document.getElementById('undoBtn').disabled = canUndo.length <= 1;
-      document.getElementById('redoBtn').disabled = canRedo.length === 0;
-    };
-    
-    // Undo canvas action
-    const undoCanvasAction = () => {
-      if (canUndo.length > 1) { // Keep the initial empty state
-        canRedo.push(canUndo.pop());
-        fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], () => {
-            fabricCanvas.renderAll();
-            document.getElementById('undoBtn').disabled = canUndo.length <= 1;
-            document.getElementById('redoBtn').disabled = canRedo.length === 0;
-        });
-      }
-    };
-
-    // Redo canvas action
-    const redoCanvasAction = () => {
-      if (canRedo.length > 0) {
-        canUndo.push(canRedo.pop());
-        fabricCanvas.loadFromJSON(canUndo[canUndo.length - 1], () => {
-            fabricCanvas.renderAll();
-            document.getElementById('undoBtn').disabled = canUndo.length <= 1;
-            document.getElementById('redoBtn').disabled = canRedo.length === 0;
-        });
-      }
-    };
-    
-    // Clear canvas
-    const clearCanvas = () => {
-      if (confirm('Are you sure you want to clear the canvas?')) {
-        fabricCanvas.clear();
-        fabricCanvas.setBackgroundColor('#000000', fabricCanvas.renderAll.bind(fabricCanvas));
-        saveCanvasState();
-      }
-    };
-
-    // Save meme draft (placeholder)
-    const saveMemeDraft = () => {
-      if (!currentUser) return showAuthModal();
-      showNotification('Draft Saved!', 'Drafts will be saved to your profile (coming soon).', 'info');
-    };
-    
-    // Post meme from editor
-    const postMemeFromEditor = async () => {
-      if (!currentUser) return showAuthModal();
+      fabricCanvas.setBackgroundColor('#000000');
       
-      const btn = document.getElementById('postMemeBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+      if (templateUrl) {
+        fabric.Image.fromURL(templateUrl, (img) => {
+          // Scale image to fit canvas
+          const scale = Math.min(fabricCanvas.width / img.width, fabricCanvas.height / img.height);
+          img.scale(scale);
+          img.set({
+            left: (fabricCanvas.width - img.width * scale) / 2,
+            top: (fabricCanvas.height - img.height * scale) / 2,
+            selectable: false, // Make background unselectable
+            evented: false
+          });
+          fabricCanvas.add(img);
+          fabricCanvas.sendToBack(img); // Send to back
+          saveHistory();
+        }, { crossOrigin: 'anonymous' });
+      } else {
+         saveHistory();
+      }
+      
+      // Reset title
+      document.getElementById('memeEditorTitle').value = '';
+    };
+    
+    const setupEditorEventListeners = () => {
+      // Modals
+      document.getElementById('menuCreateMeme').addEventListener('click', () => showMemeEditor());
+      document.getElementById('closeMemeEditor').addEventListener('click', () => closeModal('memeEditorModal'));
+      document.getElementById('cancelMemeBtn').addEventListener('click', () => closeModal('memeEditorModal'));
+      
+      // Tools
+      document.querySelectorAll('.editor-tool').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.editor-tool').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeTool = btn.dataset.tool;
+          
+          fabricCanvas.isDrawingMode = (activeTool === 'draw');
+          document.getElementById('textControls').style.display = activeTool === 'text' ? 'block' : 'none';
+          document.getElementById('drawControls').style.display = activeTool === 'draw' ? 'block' : 'none';
+        });
+      });
+      
+      // Upload
+      document.getElementById('editorUploadTemplate').addEventListener('click', () => {
+         document.getElementById('templateUploader').click();
+      });
+      document.getElementById('templateUploader').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => showMemeEditor(event.target.result);
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Canvas clicks
+      fabricCanvas?.on('mouse:down', (opt) => {
+        if (activeTool === 'text' && !opt.target) {
+          addEditorText(opt.pointer.x, opt.pointer.y);
+        }
+      });
+      
+      // Text Controls
+      document.getElementById('textColorPicker').addEventListener('input', (e) => {
+        const color = e.target.value;
+        const activeObj = fabricCanvas.getActiveObject();
+        if (activeObj && activeObj.type === 'i-text') {
+          activeObj.set('fill', color);
+          fabricCanvas.renderAll();
+        }
+      });
+      document.getElementById('fontFamilySelect').addEventListener('change', (e) => {
+        const font = e.target.value;
+        const activeObj = fabricCanvas.getActiveObject();
+        if (activeObj && activeObj.type === 'i-text') {
+          activeObj.set('fontFamily', font);
+          fabricCanvas.renderAll();
+        }
+      });
+      document.getElementById('fontSizeSlider').addEventListener('input', (e) => {
+        const size = parseInt(e.target.value, 10);
+        const activeObj = fabricCanvas.getActiveObject();
+        if (activeObj && activeObj.type === 'i-text') {
+          activeObj.set('fontSize', size);
+          fabricCanvas.renderAll();
+        }
+      });
+      
+      // Draw Controls
+      document.getElementById('drawColorPicker').addEventListener('input', (e) => {
+         fabricCanvas.freeDrawingBrush.color = e.target.value;
+      });
+      document.getElementById('brushSize').addEventListener('input', (e) => {
+         fabricCanvas.freeDrawingBrush.width = parseInt(e.target.value, 10);
+      });
+      
+      // Actions
+      document.getElementById('deleteObjectBtn').addEventListener('click', () => {
+         const activeObj = fabricCanvas.getActiveObject();
+         if (activeObj) {
+           fabricCanvas.remove(activeObj);
+         }
+      });
+      
+      document.getElementById('postMemeBtn').addEventListener('click', postMemeFromEditor);
+      
+      // History
+      fabricCanvas?.on('object:modified', saveHistory);
+      fabricCanvas?.on('object:added', saveHistory);
+      fabricCanvas?.on('object:removed', saveHistory);
+      document.getElementById('undoBtn').addEventListener('click', undo);
+      document.getElementById('redoBtn').addEventListener('click', redo);
+      document.getElementById('clearCanvasBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear the canvas?')) {
+          fabricCanvas.clear();
+          fabricCanvas.setBackgroundColor('#000000');
+          saveHistory();
+        }
+      });
+    };
+    
+    const addEditorText = (x, y) => {
+      const text = new fabric.IText('Cringe Text', {
+        left: x,
+        top: y,
+        fontFamily: document.getElementById('fontFamilySelect').value,
+        fontSize: parseInt(document.getElementById('fontSizeSlider').value, 10),
+        fill: document.getElementById('textColorPicker').value,
+        stroke: '#000000',
+        strokeWidth: 2,
+        paintFirst: 'stroke',
+        originX: 'center',
+        originY: 'center',
+      });
+      fabricCanvas.add(text);
+      fabricCanvas.setActiveObject(text);
+      text.enterEditing();
+    };
+    
+    const saveHistory = () => {
+      history = history.slice(0, historyIndex + 1); // Cut off redo history
+      history.push(fabricCanvas.toJSON());
+      historyIndex = history.length - 1;
+    };
+
+    const undo = () => {
+      if (historyIndex > 0) {
+        historyIndex--;
+        fabricCanvas.loadFromJSON(history[historyIndex], () => {
+          fabricCanvas.renderAll();
+        });
+      }
+    };
+    
+    const redo = () => {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        fabricCanvas.loadFromJSON(history[historyIndex], () => {
+          fabricCanvas.renderAll();
+        });
+      }
+    };
+    
+    const postMemeFromEditor = async () => {
+      const title = document.getElementById('memeEditorTitle').value.trim();
+      if (!title) {
+        return showNotification('Error', 'Please enter a title for your meme.', 'error');
+      }
+      
+      const button = document.getElementById('postMemeBtn');
+      showButtonSpinner(button, true);
       
       try {
-        // Get image data
-        const dataURL = fabricCanvas.toDataURL({
-          format: 'jpeg', // Use jpeg for smaller file size
-          quality: 0.8
-        });
+        const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.8 });
         
         // 1. Upload to Firebase Storage
-        const memeId = `meme_${Date.now()}`;
-        const storageRef = storage.ref(`memes/${currentUser.uid}/${memeId}.jpg`);
-        const uploadTask = await storageRef.putString(dataURL, 'data_url');
-        const downloadURL = await uploadTask.ref.getDownloadURL();
+        const memeRef = ref(storage, `memes/${currentUser.uid}/${Date.now()}.png`);
+        const snapshot = await uploadString(memeRef, dataURL, 'data_url');
+        const downloadURL = await getDownloadURL(snapshot.ref);
         
         // 2. Save to Firestore
-        const memeDoc = {
-          id: memeId,
+        await addDoc(collection(db, "memes"), {
+          uid: currentUser.uid,
+          username: currentUserData.username,
+          user: { // Denormalize
+            username: currentUserData.username,
+            avatar: currentUserData.avatar
+          },
+          title: title,
           url: downloadURL,
-          title: 'User-Generated Meme', // TODO: Add a title input
-          ups: 0,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          isUserGenerated: true,
-          username: userProfile.username,
-          userId: currentUser.uid,
-          reactions: { cringe: 0, laugh: 0, cry: 0 },
-          totalReactions: 0
-        };
-        
-        await db.collection('memes').doc(memeId).set(memeDoc);
-        
-        // 3. Award CringeCoin
-        await db.collection('users').doc(currentUser.uid).update({
-            cringeCoin: firebase.firestore.FieldValue.increment(10)
+          createdAt: serverTimestamp(),
+          reactions: {},
+          reactionCounts: { cringe: 0, laugh: 0, cry: 0 },
+          reactionCount: 0, // For hot query
+          isUserGenerated: true
         });
-        userProfile.cringeCoin += 10;
         
-        // 4. Close editor and refresh feed
-        memeEditorModal.classList.remove('active');
-        loadFeed(true);
-        showNotification('Meme Posted!', 'Your meme is live! +10 CringeCoin', 'success');
+        showNotification('Success!', 'Your cringe has been posted!', 'success');
+        closeModal('memeEditorModal');
+        loadFeed('mymemes'); // Switch to my memes tab
         
       } catch (error) {
-        console.error('Meme post error:', error);
+        console.error("Meme post error:", error);
         showNotification('Error', 'Failed to post your meme.', 'error');
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme';
+        showButtonSpinner(button, false);
       }
     };
 
-
-    // 10. USER PREFERENCES
-    // -------------------------------------
+    // --- MAIN EVENT LISTENER SETUP ---
     
-    // Apply preferences to the DOM
-    const applyUserPreferences = () => {
-      // Theme
-      document.body.className = `theme-${userPreferences.theme || 'dark'}`;
-      const themeIcon = (userPreferences.theme === 'light') ? 'fa-sun' : 'fa-moon';
-      document.getElementById('themeToggleBtn').innerHTML = `<i class="fas ${themeIcon}"></i>`;
-      
-      // Font size
-      const size = userPreferences.fontSize || 'medium';
-      let fontSize;
-      if (size === 'small') fontSize = '14px';
-      else if (size === 'large') fontSize = '18px';
-      else fontSize = '16px';
-      document.documentElement.style.fontSize = fontSize;
-    };
-    
-    // Save preferences to Firestore (if logged in) and localStorage
-    const saveUserPreferences = () => {
-        localStorage.setItem('cringePreferences', JSON.stringify(userPreferences));
-        if (currentUser) {
-            db.collection('users').doc(currentUser.uid).update({
-                preferences: userPreferences
-            }).catch(err => console.error("Could not save prefs to DB:", err));
-        }
-    };
-    
-    // Load preferences from localStorage or Firestore
-    const loadUserPreferences = () => {
-        const savedPrefs = localStorage.getItem('cringePreferences');
-        if (savedPrefs) {
-            userPreferences = JSON.parse(savedPrefs);
-        }
-        // If logged in, override with DB preferences
-        if (userProfile && userProfile.preferences) {
-            userPreferences = userProfile.preferences;
-        }
-    };
-    
-    // Toggle theme
-    const toggleTheme = () => {
-      const themes = ['dark', 'light', 'blue', 'red', 'purple'];
-      const currentIndex = themes.indexOf(userPreferences.theme);
-      const nextIndex = (currentIndex + 1) % themes.length;
-      userPreferences.theme = themes[nextIndex];
-      
-      saveUserPreferences();
-      applyUserPreferences();
-      
-      const themeNames = { dark: 'Midnight', light: 'Daylight', blue: 'Ocean', red: 'Volcano', purple: 'Royal' };
-      showNotification('Theme Changed', `Switched to ${themeNames[userPreferences.theme]} theme`, 'info');
-    };
-    
-    
-    // 11. DRAGGABLE CHAT WINDOW
-    // -------------------------------------
-    
-    const makeChatDraggable = () => {
-        let isDragging = false;
-        let chatOffsetX = 0, chatOffsetY = 0;
-        const chatWindow = document.getElementById('chatWindow');
-        const chatHeader = document.getElementById('chatHeader');
-
-        const onMouseDown = (e) => {
-            // Don't drag on mobile
-            if (window.innerWidth <= 768) return;
-            // Don't drag if clicking the close button
-            if (e.target.closest('.close-chat')) return;
-            
-            isDragging = true;
-            const rect = chatWindow.getBoundingClientRect();
-            chatOffsetX = e.clientX - rect.left;
-            chatOffsetY = e.clientY - rect.top;
-            chatWindow.style.transition = 'none'; // Disable transition while dragging
-        };
-
-        const onMouseMove = (e) => {
-            if (!isDragging) return;
-            
-            let newX = e.clientX - chatOffsetX;
-            let newY = e.clientY - chatOffsetY;
-            
-            // Keep within viewport bounds
-            const rect = chatWindow.getBoundingClientRect();
-            newX = Math.max(0, Math.min(newX, window.innerWidth - rect.width));
-            newY = Math.max(0, Math.min(newY, window.innerHeight - rect.height));
-            
-            chatWindow.style.left = `${newX}px`;
-            chatWindow.style.top = `${newY}px`;
-        };
-
-        const onMouseUp = () => {
-            isDragging = false;
-            chatWindow.style.transition = 'transform 0.3s ease, opacity 0.3s ease'; // Re-enable
-        };
-
-        chatHeader.addEventListener('mousedown', onMouseDown);
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-        document.addEventListener('mouseleave', onMouseUp);
-    };
-
-
-    // 12. APP INITIALIZATION
-    // -------------------------------------
-    
-    // Set up all event listeners
     const setupEventListeners = () => {
-      // Navigation tabs
+      // Header
+      document.getElementById('logoLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        loadFeed('hot');
+      });
+      document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+      document.getElementById('menuToggleBtn').addEventListener('click', () => sidebar.classList.add('active'));
+      document.getElementById('closeSidebar').addEventListener('click', () => sidebar.classList.remove('active');
+      
+      // Nav
       document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
-          const tab = item.dataset.tab;
-          
-          if (item.classList.contains('requires-auth') && !currentUser) {
-              return showAuthModal();
-          }
-          
-          if (currentTab !== tab) {
-            currentTab = tab;
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            item.classList.add('active');
-            loadFeed(true); // Clear and load new tab
-          }
+          loadFeed(item.dataset.tab);
         });
       });
       
-      // Header actions
-      document.getElementById('menuToggleBtn').addEventListener('click', () => document.getElementById('sidebar').classList.add('active'));
-      document.getElementById('closeSidebar').addEventListener('click', () => document.getElementById('sidebar').classList.remove('active'));
-      document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
-      document.getElementById('notificationsBtn').addEventListener('click', () => showNotification('Notifications', 'No new notifications.', 'info'));
-      document.getElementById('chatToggleBtn').addEventListener('click', toggleChatWindow);
-      document.getElementById('logoLink').addEventListener('click', (e) => {
-          e.preventDefault();
-          document.querySelector('.nav-item[data-tab="hot"]').click();
-      });
-      
-      // Search
-      document.getElementById('searchInput').addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-              showNotification('Search', `Search for "${e.target.value}" coming soon!`, 'info');
-          }
-      });
-      
-      // Chat
-      document.getElementById('closeChatWindow').addEventListener('click', toggleChatWindow);
-      document.getElementById('sendChatMessage').addEventListener('click', sendMessage);
-      document.getElementById('chatInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-      });
-      
       // Auth Modal
-      document.getElementById('closeAuthModal').addEventListener('click', () => authModal.classList.remove('active'));
+      document.getElementById('sidebarLoginButton').addEventListener('click', () => showModal('authModal'));
+      document.getElementById('closeAuthModal').addEventListener('click', () => closeModal('authModal'));
       document.getElementById('signupTab').addEventListener('click', () => {
         document.getElementById('signupForm').style.display = 'block';
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('signupTab').classList.add('active');
         document.getElementById('loginTab').classList.remove('active');
-        document.getElementById('authModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
       });
       document.getElementById('loginTab').addEventListener('click', () => {
         document.getElementById('signupForm').style.display = 'none';
         document.getElementById('loginForm').style.display = 'block';
         document.getElementById('signupTab').classList.remove('active');
         document.getElementById('loginTab').classList.add('active');
-        document.getElementById('authModalTitle').innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In';
       });
-      document.getElementById('signupBtn').addEventListener('click', signUpUser);
-      document.getElementById('loginBtn').addEventListener('click', loginUser);
+      document.getElementById('signupBtn').addEventListener('click', handleSignup);
+      document.getElementById('loginBtn').addEventListener('click', handleLogin);
       
-      // Notification close
+      // Sidebar
+      document.getElementById('menuLogout').addEventListener('click', handleLogout);
+      document.getElementById('menuCustomize').addEventListener('click', showCustomization);
+      
+      // --- Functional (but simple) Settings ---
+      document.getElementById('menuSettings').addEventListener('click', () => showNotification('Settings', 'Settings panel coming soon!', 'info'));
+      document.getElementById('menuProfile').addEventListener('click', () => showNotification('Profile', 'You are awesome!', 'info'));
+      document.getElementById('menuCollections').addEventListener('click', () => {
+        loadFeed('favorites');
+        sidebar.classList.remove('active');
+      });
+      document.getElementById('menuInventory').addEventListener('click', () => showNotification('Inventory', 'Your inventory is empty... for now.', 'info'));
+      document.getElementById('menuLeaderboard').addEventListener('click', () => showNotification('Leaderboard', 'You are #1 in our hearts.', 'info'));
+      document.getElementById('menuQuests').addEventListener('click', () => showNotification('Quests', 'Daily Quest: Post a cringe meme!', 'info'));
+      document.getElementById('menuMemeRoulette').addEventListener('click', () => showNotification('Roulette', 'Spinning... nothing found. Try again!', 'info'));
+      
+      // Chat
+      document.getElementById('chatToggleBtn').addEventListener('click', () => chatWindow.classList.toggle('active'));
+      document.getElementById('menuChat').addEventListener('click', () => {
+        chatWindow.classList.add('active');
+        sidebar.classList.remove('active');
+      });
+      document.getElementById('closeChatWindow').addEventListener('click', () => chatWindow.classList.remove('active');
+      document.getElementById('sendChatMessage').addEventListener('click', sendChatMessage);
+      document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+      });
+      setupChatDrag(); // Initialize chat dragging
+      
+      // Notification
       document.getElementById('closeNotification').addEventListener('click', () => {
         document.getElementById('notificationToast').classList.remove('show');
       });
       
-      // Sidebar menu items
-      const menuActions = {
-          'menuProfile': showProfile,
-          'menuCollections': showCollections,
-          'menuInventory': showInventory,
-          'menuChat': () => {
-              toggleChatWindow();
-              document.getElementById('sidebar').classList.remove('active');
-          },
-          'menuLeaderboard': showLeaderboard,
-          'menuQuests': showQuests,
-          'menuCreateMeme': () => {
-              memeEditorModal.classList.add('active');
-              initMemeEditor(); // Initialize/reset editor
-          },
-          'menuMemeRoulette': startMemeRoulette,
-          'menuCustomize': showCustomization,
-          'menuSettings': showSettings,
-          'menuLogin': showAuthModal,
-          'menuLogout': logoutUser
-      };
-      
-      Object.keys(menuActions).forEach(id => {
-          const item = document.getElementById(id);
-          if (item) {
-              item.addEventListener('click', () => {
-                  if (item.classList.contains('requires-auth') && !currentUser) {
-                      return showAuthModal();
-                  }
-                  menuActions[id](); // Call the function
-                  if (id !== 'menuChat') {
-                      document.getElementById('sidebar').classList.remove('active');
-                    }
-              });
-          }
-      });
-      
-      // Meme Editor Close
-      document.getElementById('closeMemeEditor').addEventListener('click', () => memeEditorModal.classList.remove('active'));
-      
-      // Generic Modal Close
-      genericModal.addEventListener('click', (e) => {
-          if (e.target === genericModal) { // Close on overlay click
-              genericModal.classList.remove('active');
-          }
-      });
-      
-      // Infinite scroll
-      feed.addEventListener('scroll', () => {
-        if (isLoading || currentTab === 'fresh') return; // Don't infinite scroll for API tab
-        
-        const { scrollTop, scrollHeight, clientHeight } = feed;
-        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) {
-          loadFeed(); // Load next page
-        }
-      });
+      // Meme Editor (init logic is separate, just hook up listeners)
+      if (fabric) {
+        setupMemeEditor();
+      } else {
+        console.error("Fabric.js not loaded! Editor will not work.");
+      }
     };
     
-    // Main App Entry Point
-    const initApp = () => {
-      // Get core elements
-      feed = document.getElementById('feed');
-      authModal = document.getElementById('authModal');
-      genericModal = document.getElementById('genericModal');
-      genericModalContent = document.getElementById('genericModalContent');
-      memeEditorModal = document.getElementById('memeEditorModal');
-      
-      // Load prefs from localStorage first
-      loadUserPreferences();
-      applyUserPreferences();
-      
-      // Initialize Firebase
+    // --- APP INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
       initFirebase();
-      
-      // Set up all listeners
       setupEventListeners();
-      
-      // Make chat draggable
-      makeChatDraggable();
-      
-      // Load initial feed
-      loadFeed(true);
-      
-      console.log('CringeScroll v8.0 (Functional) initialized!');
-    };
-    
-    // Start the app when DOM is ready
-    document.addEventListener('DOMContentLoaded', initApp);
+    });
 
   </script>
 </body>
 </html>
+
