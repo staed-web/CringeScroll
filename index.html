@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1632,7 +1632,7 @@
       .nav-container { padding: 6px 0; }
       .nav-item { 
         font-size: 0.65rem; 
-        padding: 4px 6px; /* Tighter padding for 5 items */
+        padding: 4px 8px; /* Wider padding for 4 items */
       }
       .nav-item i { font-size: 1.1rem; }
       .chat-window { 
@@ -1783,7 +1783,7 @@
       }
       
       .nav-item {
-        padding: 4px;
+        padding: 4px 8px;
       }
       
       #profileMemesGrid {
@@ -1824,10 +1824,9 @@
       </div>
     </header>
     
-    <!-- ===== NAVIGATION ===== -->
+    <!-- ===== NAVIGATION (REMOVED 'FOLLOWING') ===== -->
     <nav class="nav-container">
       <a href="#" class="nav-item active" data-tab="hot"><i class="fas fa-fire"></i><span>Hot</span><div class="nav-indicator"></div></a>
-      <a href="#" class="nav-item" data-tab="following"><i class="fas fa-user-check"></i><span>Following</span></a>
       <a href="#" class="nav-item" data-tab="fresh"><i class="fas fa-bolt"></i><span>Fresh</span></a>
       <a href="#" class="nav-item" data-tab="crowned"><i class="fas fa-crown"></i><span>Crowned</span></a>
       <a href="#" class="nav-item" data-tab="mymemes"><i class="fas fa-user"></i><span>My Memes</span></a>
@@ -1851,7 +1850,7 @@
     </main>
   </div>
 
-  <!-- ===== SIDEBAR MENU ===== -->
+  <!-- ===== SIDEBAR MENU (RESTORED CUSTOMIZE) ===== -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2 class="sidebar-title">Menu</h2>
@@ -1873,6 +1872,7 @@
       <h3 class="menu-section-title">Tools</h3>
       <div class="menu-item" id="menuCreateMeme"><i class="fas fa-paint-brush"></i><span>Create Meme</span></div>
       <div class="menu-item" id="menuMemeRoulette"><i class="fas fa-dice"></i><span>Meme Roulette</span></div>
+      <div class="menu-item" id="menuCustomize"><i class="fas fa-palette"></i><span>Customize UI</span></div>
     </div>
     <div class="menu-section">
       <h3 class="menu-section-title">Account</h3>
@@ -2019,7 +2019,7 @@
   
   <!-- ===== ALL OTHER MODALS ===== -->
   
-  <!-- Settings Modal (REBUILT) -->
+  <!-- Settings Modal (SIMPLIFIED) -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2029,7 +2029,6 @@
       <!-- Tab Navigation -->
       <div class="settings-tabs">
         <button class="tab-btn active" data-tab="settingsProfile"><i class="fas fa-user-circle"></i> Profile</button>
-        <button class="tab-btn" data-tab="settingsAppearance"><i class="fas fa-palette"></i> Appearance</button>
         <button class="tab-btn" data-tab="settingsNotifications"><i class="fas fa-bell"></i> Notifications</button>
         <button class="tab-btn" data-tab="settingsAccount"><i class="fas fa-key"></i> Account</button>
       </div>
@@ -2060,32 +2059,7 @@
           </div>
         </div>
         
-        <!-- Appearance Tab -->
-        <div class="tab-content" id="settingsAppearance">
-          <div class="form-group">
-            <label class="form-label" for="themeSelect">Theme</label>
-            <select id="themeSelect" class="form-control">
-              <option value="dark">Midnight (Default)</option>
-              <option value="light">Daylight</option>
-              <option value:="blue">Ocean</option>
-              <option value="red">Volcano</option>
-              <option value="purple">Royal</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="fontSizeSelect">Font Size</label>
-            <select id="fontSizeSelect" class="form-control">
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="cardBgColor">Card Background Color</label>
-            <input type="color" id="cardBgColor" class="form-control">
-          </div>
-          <button class="btn btn-primary" id="saveAppearanceSettingsBtn">Save Appearance</button>
-        </div>
+        <!-- Appearance Tab (REMOVED) -->
         
         <!-- Notifications Tab -->
         <div class="tab-content" id="settingsNotifications">
@@ -2112,13 +2086,6 @@
           </div>
           <div class="switch-toggle">
             <div>
-              <div class="switch-toggle-label">Notify on Follows</div>
-              <div class="switch-toggle-desc">Get notified when someone follows you.</div>
-            </div>
-            <label class="switch"><input type="checkbox" id="notifToggleFollows" checked><span class="slider"></span></label>
-          </div>
-          <div class="switch-toggle">
-            <div>
               <div class="switch-toggle-label">Quest Reminders</div>
               <div class="switch-toggle-desc">Remind you to complete your daily quests.</div>
             </div>
@@ -2142,6 +2109,41 @@
           <button class="btn btn-danger" id="deleteAccountBtn"><i class="fas fa-trash"></i> Delete Account</button>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">This action is permanent and cannot be undone.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customize UI Modal (NEW) -->
+  <div class="modal-overlay" id="customizeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-palette"></i> Customize UI</h2>
+        <button class="close-modal" data-modal-id="customizeModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="themeSelect">Theme</label>
+          <select id="themeSelect" class="form-control">
+            <option value="dark">Midnight (Default)</option>
+            <option value="light">Daylight</option>
+            <option value="blue">Ocean</option>
+            <option value="red">Volcano</option>
+            <option value="purple">Royal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fontSizeSelect">Font Size</label>
+          <select id="fontSizeSelect" class="form-control">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cardBgColor">Card Background Color</label>
+          <input type="color" id="cardBgColor" class="form-control">
+        </div>
+        <button class="btn btn-primary" id="saveAppearanceSettingsBtn">Save Appearance</button>
       </div>
     </div>
   </div>
@@ -2255,7 +2257,7 @@
     </div>
   </div>
   
-  <!-- NEW: Comment Modal -->
+  <!-- Comment Modal -->
   <div class="modal-overlay" id="commentModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2274,7 +2276,7 @@
     </div>
   </div>
   
-  <!-- NEW: Report Modal -->
+  <!-- Report Modal -->
   <div class="modal-overlay" id="reportModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -2346,8 +2348,6 @@
       runTransaction,
       writeBatch,
       deleteDoc,
-      collectionGroup,
-      getCountFromServer,
       Timestamp
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import {
@@ -2369,18 +2369,16 @@
     
     // Firebase instances
     let app, db, auth, storage;
-    // firebaseConfig is now globally defined from the script tag in Part 1
+    // 'firebaseConfig' is globally defined from the <script> tag in Part 1
     
     // User state
     let currentUser = null;
     let userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
     let userQuests = {};
     let userCollections = {};
-    let currentUserFollowing = []; // NEW: For following feed
     
     // Real-time listeners
     let userListener = null;
-    let userPrivateListener = null;
     let chatListener = null;
     let notificationsListener = null;
     let collectionsListener = null;
@@ -2389,7 +2387,7 @@
     let currentMemeId = null;
     let currentMemeCreatorId = null;
 
-    // NEW: All 60+ Meme API sources
+    // Meme API sources (Restored from original)
     const MEME_SOURCES = [
       'https://meme-api.com/gimme/memes',
       'https://meme-api.com/gimme/dankmemes',
@@ -2517,13 +2515,6 @@
       $('closeNotification').onclick = () => { clearTimeout(timer); notification.classList.remove('show'); };
     };
 
-    /**
-     * Shows a reusable confirmation modal.
-     * @param {string} title - The title for the modal.
-     * @param {string} message - The body text for the modal.
-     * @param {string} confirmText - The text for the confirm button (e.g., "Logout", "Delete").
-     * @returns {Promise<boolean>} - Resolves true if confirmed, false if canceled.
-     */
     const showConfirmModal = (title, message, confirmText = 'Confirm') => {
         return new Promise((resolve) => {
             const modal = $('confirmModal');
@@ -2562,7 +2553,6 @@
             handleUserLogin(user); 
           } else { 
             handleUserLogout(); 
-            // If logged out or anonymous, sign in anonymously to allow browsing
             if (!user) {
               signInAnonymously(auth).catch(err => console.error("Anonymous sign-in failed", err));
             }
@@ -2574,62 +2564,49 @@
       }
     };
     
+    // ===== LOGIN BUG FIX: Reverted to v2.0 data model =====
     const handleUserLogin = (user) => {
-      // FIX: Listen to both public and private user docs
       const userRef = doc(db, 'users', user.uid);
-      const userPrivateRef = doc(db, 'users_private', user.uid);
-
       if (userListener) userListener(); // Detach old listener
-      if (userPrivateListener) userPrivateListener();
-
-      let publicData = {};
-      let privateData = {};
-
-      const updateUserState = async () => {
-        if (!publicData.username || !privateData.email) return; // Wait for both
-        
-        currentUser = {
-          uid: user.uid,
-          email: privateData.email,
-          username: publicData.username,
-          avatar: publicData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(publicData.username)}&background=6a0dad&color=fff`,
-          bio: publicData.bio || '',
-          cringeCoin: publicData.cringeCoin || 0,
-          memeCount: publicData.memeCount || 0,
-          streak: privateData.streak || 0,
-          createdAt: publicData.createdAt?.toDate() || new Date()
-        };
-        userPreferences = privateData.preferences || userPreferences;
-        userQuests = privateData.quests || {};
-        
-        await checkDailyReset(userPrivateRef, privateData); // Check and reset quests
-        
-        applyUserPreferences();
-        updateUIAfterLogin();
-        attachRealtimeListeners(user.uid);
-        await loadFollowingList(user.uid);
-        
-        if (currentTab === 'mymemes' || currentTab === 'following') { 
-          loadFeed(true); 
-        }
-      };
       
-      userListener = onSnapshot(userRef, (doc) => {
-        if (doc.exists()) {
-          publicData = doc.data();
-          updateUserState();
+      userListener = onSnapshot(userRef, async (userDoc) => {
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          currentUser = {
+            uid: user.uid,
+            email: user.email, // Get email from auth user object
+            username: userData.username,
+            avatar: userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=6a0dad&color=fff`,
+            bio: userData.bio || '',
+            cringeCoin: userData.cringeCoin || 0,
+            streak: userData.streak || 0,
+            memeCount: userData.memeCount || 0,
+            createdAt: userData.createdAt?.toDate() || new Date()
+          };
+          userPreferences = userData.preferences || userPreferences;
+          userQuests = userData.quests || {};
+          
+          await checkDailyReset(userRef, userData);
+          
+          applyUserPreferences();
+          updateUIAfterLogin();
+          attachRealtimeListeners(user.uid);
+          
+          if (currentTab === 'mymemes') { 
+            loadFeed(true); 
+          }
         } else {
-          console.warn('Public user doc not found. Sign up might be in progress.');
+          console.warn('User doc not found, creating one...');
+          // This can happen if signup was interrupted. Let's create it.
+          await createUserProfile(user, user.displayName || user.email.split('@')[0]);
         }
+      }, (error) => {
+          console.error("Error in user snapshot:", error);
+          showNotification("Login Error", "Could not load your profile.", "error");
+          signOut(auth);
       });
       
-      userPrivateListener = onSnapshot(userPrivateRef, (doc) => {
-        if (doc.exists()) {
-          privateData = doc.data();
-          updateUserState();
-        }
-      });
-      
+      // Successfully past the snapshot, close the auth modal
       $('authModal').classList.remove('active');
     };
     
@@ -2637,30 +2614,28 @@
       currentUser = null;
       userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
       userQuests = {};
-      currentUserFollowing = [];
       
       // Detach all listeners
       if (userListener) userListener();
-      if (userPrivateListener) userPrivateListener();
       if (notificationsListener) notificationsListener();
       if (collectionsListener) collectionsListener();
       
       $('menuLogin').style.display = 'flex';
       $('menuLogout').style.display = 'none';
       
-      if (currentTab === 'mymemes' || currentTab === 'following') {
+      if (currentTab === 'mymemes') {
         $$('.nav-item.active').forEach(el => el.classList.remove('active'));
         document.querySelector('[data-tab="hot"]').classList.add('active');
         currentTab = 'hot';
         loadFeed(true);
       }
-      showNotification('Logged Out', 'You have been logged out successfully.', 'info');
+      // No "Logged Out" notification for anonymous users or initial load
     };
     
     const attachRealtimeListeners = (userId) => {
       // Notifications
       if (notificationsListener) notificationsListener();
-      const notifQuery = query(collection(db, 'users_private', userId, 'notifications'), orderBy('timestamp', 'desc'), limit(10));
+      const notifQuery = query(collection(db, 'users', userId, 'notifications'), orderBy('timestamp', 'desc'), limit(10));
       notificationsListener = onSnapshot(notifQuery, (snapshot) => {
         const unread = snapshot.docs.filter(doc => !doc.data().read).length;
         $('notificationsBadge').textContent = unread > 0 ? unread : '';
@@ -2669,7 +2644,7 @@
       
       // Collections (Favorites)
       if (collectionsListener) collectionsListener();
-      const favQuery = query(collection(db, 'users_private', userId, 'collections', 'favorites', 'memes'));
+      const favQuery = query(collection(db, 'users', userId, 'collections', 'favorites', 'memes'));
       collectionsListener = onSnapshot(favQuery, (snapshot) => {
           userCollections.favorites = snapshot.docs.map(doc => doc.id);
           $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
@@ -2677,25 +2652,20 @@
       }, (error) => console.error("Error listening to collections: ", error));
     };
     
+    // ===== LOGIN BUG FIX: Reverted to v2.0 data model =====
     const createUserProfile = async (user, username) => {
       try {
-        // FIX: Simplified paths
-        const publicUserRef = doc(db, 'users', user.uid);
-        const privateUserRef = doc(db, 'users_private', user.uid);
-        
+        const userRef = doc(db, 'users', user.uid);
         const today = new Date().toISOString().split('T')[0];
         
-        const publicData = {
+        const userData = {
           username: username,
+          email: user.email,
           cringeCoin: 10,
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=6a0dad&color=fff`,
           bio: 'New CringeScroller!',
           createdAt: serverTimestamp(),
-          memeCount: 0
-        };
-        
-        const privateData = {
-          email: user.email,
+          memeCount: 0,
           streak: 1,
           lastActive: serverTimestamp(),
           preferences: userPreferences,
@@ -2706,10 +2676,7 @@
           }
         };
 
-        const batch = writeBatch(db);
-        batch.set(publicUserRef, publicData);
-        batch.set(privateUserRef, privateData);
-        await batch.commit();
+        await setDoc(userRef, userData);
 
       } catch (error) { 
         console.error('User profile creation error:', error); 
@@ -2742,10 +2709,11 @@
         
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: username });
-        await createUserProfile(userCredential.user, username); // This will set up profiles
+        await createUserProfile(userCredential.user, username);
         // onAuthStateChanged will call handleUserLogin
         
         showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
+        // No longer need to close modal here, handleUserLogin will do it
       } catch (error) { 
         console.error('Sign up error:', error); 
         errorEl.textContent = error.message.replace('Firebase: ', '');
@@ -2818,12 +2786,9 @@
             }
             await batch.commit();
 
-            // 2. Delete public and private user docs
-            const publicUserRef = doc(db, 'users', userId);
-            const privateUserRef = doc(db, 'users_private', userId);
-            // Note: Deleting subcollections is complex. We'll delete the main docs.
-            await deleteDoc(publicUserRef);
-            await deleteDoc(privateUserRef);
+            // 2. Delete the single user doc
+            const userRef = doc(db, 'users', userId);
+            await deleteDoc(userRef);
 
             // 3. Delete user's avatar from storage
             if (currentUser.avatar && currentUser.avatar.includes('firebasestorage')) {
@@ -2983,8 +2948,6 @@
 
         if (currentTab === 'mymemes') { 
           await loadMyMemes(); 
-        } else if (currentTab === 'following') {
-          await loadFollowingFeed();
         } else if (currentTab === 'search') { 
           await loadSearchResults($('searchInput').value.trim()); 
         } else { 
@@ -3034,48 +2997,6 @@
       }
     };
     
-    // NEW: Load Following Feed
-    const loadFollowingFeed = async () => {
-      if (!currentUser) { 
-        feed.innerHTML = '<div class="feed-message">Please <a href="#" id="loginLinkFollowing">log in</a> to see memes from users you follow.</div>'; 
-        $('loginLinkFollowing').onclick = (e) => { e.preventDefault(); showAuthModal(); }; 
-        return; 
-      }
-      if (currentUserFollowing.length === 0) {
-        feed.innerHTML = '<div class="feed-message">You aren\'t following anyone yet. Find users to follow from their profiles!</div>'; 
-        return;
-      }
-      
-      try {
-        // Firestore 'in' queries are limited to 10 items. For a real app, this needs pagination or a different data model.
-        // For this demo, we'll just query for the first 10 followed users.
-        const usersToQuery = currentUserFollowing.slice(0, 10);
-        const q = query(collection(db, 'memes'), where('userId', 'in', usersToQuery), orderBy('createdAt', 'desc'), limit(20));
-        const querySnapshot = await getDocs(q);
-        
-        if (querySnapshot.empty) { 
-          feed.innerHTML = '<div class="feed-message">The users you follow haven\'t posted any memes recently.</div>'; 
-          return; 
-        }
-        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
-      } catch (error) {
-        console.error('Error loading following feed:', error); 
-        feed.innerHTML = '<div class="feed-message">Error loading your feed.</div>'; 
-      }
-    };
-    
-    // NEW: Load user's following list
-    const loadFollowingList = async (userId) => {
-      try {
-        const q = query(collection(db, 'users_private', userId, 'following'));
-        const snapshot = await getDocs(q);
-        currentUserFollowing = snapshot.docs.map(doc => doc.id);
-      } catch (error) {
-        console.error("Error loading following list: ", error);
-        currentUserFollowing = [];
-      }
-    };
-
     const loadSearchResults = async (searchTerm) => {
       if (!searchTerm) { 
         feed.innerHTML = '<div class="feed-message">Enter a username or meme title to search.</div>'; 
@@ -3100,7 +3021,6 @@
           }
         } else {
           // No user found, search for meme titles (basic exact match)
-          // A real search needs Algolia/Elasticsearch
           const memeQuery = query(collection(db, 'memes'), where('title', '==', searchTerm), orderBy('createdAt', 'desc'));
           const memeSnapshot = await getDocs(memeQuery);
           
@@ -3116,21 +3036,18 @@
       }
     };
     
-    // NEW: Faster parallel loading
+    // ===== MEME LOADING FIX: Reverted to v2.0 logic =====
     const loadApiMemes = async () => {
-      const batchSize = window.innerWidth > 768 ? 6 : 3;
-      
-      const promises = Array(batchSize).fill().map(() => fetchMeme());
-      const results = await Promise.all(promises);
-      
+      const batchSize = window.innerWidth > 768 ? 3 : 2;
       let memesFetched = 0;
-      results.filter(meme => meme).forEach(meme => {
-        renderMeme(meme, loadCount++);
-        memesFetched++;
-      });
-      
-      if (memesFetched === 0 && loadCount === 0) {
-        feed.innerHTML = '<div class="feed-message">Could not load memes from API. Please try again later.</div>';
+      let attempts = 0;
+      while (memesFetched < batchSize && attempts < 10) {
+        const meme = await fetchMeme();
+        if (meme) { 
+          renderMeme(meme, loadCount++); 
+          memesFetched++; 
+        }
+        attempts++;
       }
     };
 
@@ -3140,13 +3057,6 @@
         const response = await fetch(`${url}?_=${Date.now()}`); // Cache buster
         if (!response.ok) throw new Error('API response not ok.');
         const data = await response.json();
-        
-        if (data.memes) { // Handle APIs that return an array
-          const meme = data.memes[0];
-          if (!meme?.url || meme.nsfw || meme.spoiler || seenUrls.has(meme.url)) { return null; }
-          seenUrls.add(meme.url);
-          return { url: meme.url, title: meme.title || 'Cringe', ups: meme.ups || 0, reactions: { cringe: Math.floor(Math.random() * 100), laugh: Math.floor(Math.random() * 150), cry: Math.floor(Math.random() * 75) }, commentCount: 0 };
-        }
         
         if (!data?.url || data.nsfw || data.spoiler || seenUrls.has(data.url)) { 
           return null; 
@@ -3161,7 +3071,7 @@
             laugh: Math.floor(Math.random() * 150), 
             cry: Math.floor(Math.random() * 75) 
           },
-          commentCount: 0
+          commentCount: 0 // API memes have 0 comments
         };
       } catch (error) { 
         console.warn('Fetch meme error:', error); 
@@ -3169,7 +3079,7 @@
       }
     };
     
-    // NEW: Load Meme of the Day
+    // Load Meme of the Day
     const loadMemeOfTheDay = async () => {
       try {
         const q = query(collection(db, 'memes'), orderBy('tips', 'desc'), limit(1));
@@ -3195,7 +3105,7 @@
       }
     };
     
-    // NEW: Inject AdSense Card
+    // Inject AdSense Card
     const injectAdCard = () => {
       if ($('adCard')) return; // Don't inject if one already exists
       
@@ -3230,7 +3140,7 @@
           docId: card.dataset.docId || null
       };
       
-      const favRef = doc(db, 'users_private', currentUser.uid, 'collections', 'favorites', 'memes', memeId);
+      const favRef = doc(db, 'users', currentUser.uid, 'collections', 'favorites', 'memes', memeId);
       
       try {
           if (saveBtn.classList.contains('saved')) {
@@ -3280,28 +3190,28 @@
         return;
       }
       
-      const userPrivateRef = doc(db, 'users_private', currentUser.uid);
+      const userRef = doc(db, 'users', currentUser.uid);
       const memeId = card.dataset.docId;
       const memeRef = doc(db, 'memes', memeId);
-      const creatorPublicRef = doc(db, 'users', creatorId);
+      const creatorRef = doc(db, 'users', creatorId);
       
       try {
         await runTransaction(db, async (transaction) => {
-          const userDoc = await transaction.get(userPrivateRef);
+          const userDoc = await transaction.get(userRef);
           if (!userDoc.exists() || userDoc.data().cringeCoin < 5) { 
             throw new Error("Insufficient funds."); 
           }
           
-          // 1. Decrement tipper's coin (private)
-          transaction.update(userPrivateRef, { cringeCoin: increment(-5) });
-          // 2. Increment meme tips (public)
+          // 1. Decrement tipper's coin
+          transaction.update(userRef, { cringeCoin: increment(-5) });
+          // 2. Increment meme tips
           transaction.update(memeRef, { tips: increment(5) });
-          // 3. Increment creator's coin (public)
-          transaction.update(creatorPublicRef, { cringeCoin: increment(5) });
+          // 3. Increment creator's coin
+          transaction.update(creatorRef, { cringeCoin: increment(5) });
         });
         
         // Send notification to creator
-        await addDoc(collection(db, 'users_private', creatorId, 'notifications'), {
+        await addDoc(collection(db, 'users', creatorId, 'notifications'), {
             type: 'tip',
             fromUser: currentUser.username,
             amount: 5,
@@ -3345,11 +3255,11 @@
       
       await updateQuestProgress('react');
       
-      const userPrivateRef = doc(db, 'users_private', currentUser.uid);
+      const userRef = doc(db, 'users', currentUser.uid);
       
       if (card.dataset.source === 'api') {
         showNotification('Reaction Added!', '+1 CringeCoin for reacting!', 'success');
-        await updateDoc(userPrivateRef, { cringeCoin: increment(1) });
+        await updateDoc(userRef, { cringeCoin: increment(1) });
         return;
       }
       
@@ -3359,7 +3269,7 @@
       try {
         await runTransaction(db, async (transaction) => {
             // 1. Give user 1 coin for reacting
-            transaction.update(userPrivateRef, { cringeCoin: increment(1) });
+            transaction.update(userRef, { cringeCoin: increment(1) });
             // 2. Increment reaction count on meme
             transaction.update(memeRef, { [`reactions.${reactionType}`]: increment(1) });
         });
@@ -3605,8 +3515,8 @@
           commentCount: 0
         });
 
-        const userPublicRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userPublicRef, { memeCount: increment(1) });
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, { memeCount: increment(1) });
         
         await updateQuestProgress('post');
         
@@ -3665,11 +3575,6 @@
         $('settingsCringeCoin').textContent = currentUser.cringeCoin;
         $('settingsStreak').textContent = currentUser.streak;
         
-        // Load Appearance Tab
-        $('themeSelect').value = userPreferences.theme;
-        $('fontSizeSelect').value = userPreferences.fontSize;
-        $('cardBgColor').value = userPreferences.cardBackground;
-        
         // Load Account Tab
         $('settingsEmailInput').value = currentUser.email;
         $('settingsUserIdInput').value = currentUser.uid;
@@ -3685,7 +3590,7 @@
         try {
             if (!currentUser) throw new Error('Not logged in.');
 
-            const userPublicRef = doc(db, 'users', currentUser.uid);
+            const userRef = doc(db, 'users', currentUser.uid);
             let avatarUrl = currentUser.avatar;
 
             // Check if username changed and is available
@@ -3708,7 +3613,7 @@
             }
 
             // Update Firestore
-            await updateDoc(userPublicRef, {
+            await updateDoc(userRef, {
                 username: newUsername,
                 bio: newBio,
                 avatar: avatarUrl
@@ -3734,6 +3639,16 @@
             btn.disabled = false;
         }
     };
+    
+    // ===== CUSTOMIZE UI FIX: Added function =====
+    const showCustomization = () => {
+      if (!currentUser) { showAuthModal(); return; }
+      openModal('customizeModal');
+      // Load current settings into controls
+      $('themeSelect').value = userPreferences.theme;
+      $('fontSizeSelect').value = userPreferences.fontSize;
+      $('cardBgColor').value = userPreferences.cardBackground;
+    };
 
     const saveAppearanceSettings = async () => {
       userPreferences.theme = $('themeSelect').value;
@@ -3742,10 +3657,11 @@
       
       applyUserPreferences(); // Apply changes locally
       
-      const userPrivateRef = doc(db, 'users_private', currentUser.uid);
+      const userRef = doc(db, 'users', currentUser.uid);
       try {
-        await updateDoc(userPrivateRef, { preferences: userPreferences });
+        await updateDoc(userRef, { preferences: userPreferences });
         showNotification('Saved!', 'Your UI preferences have been saved.', 'success');
+        closeModal('customizeModal');
       } catch (error) {
         showNotification('Error', 'Could not save preferences.', 'error');
       }
@@ -3762,8 +3678,8 @@
       body.innerHTML = '<div class="loading-spinner"></div>';
       
       try {
-          const userPublicRef = doc(db, 'users', userId);
-          const userDoc = await getDoc(userPublicRef);
+          const userRef = doc(db, 'users', userId);
+          const userDoc = await getDoc(userRef);
           
           if (!userDoc.exists()) {
               body.innerHTML = '<div class="feed-message">User profile not found.</div>';
@@ -3771,8 +3687,6 @@
           }
           
           const user = userDoc.data();
-          const isFollowing = currentUserFollowing.includes(userId);
-          const isSelf = currentUser && currentUser.uid === userId;
           
           body.innerHTML = `
             <div class="profile-card-header">
@@ -3783,7 +3697,6 @@
               </div>
             </div>
             <p class="profile-card-bio">${escapeHtml(user.bio)}</p>
-            ${isSelf ? '' : `<button class="btn ${isFollowing ? 'btn-secondary' : 'btn-primary'}" id="followBtn" data-user-id="${userId}" data-username="${user.username}"><i class="fas ${isFollowing ? 'fa-user-check' : 'fa-user-plus'}"></i> ${isFollowing ? 'Following' : 'Follow'}</button>`}
             
             <div class="profile-card-stats" style="margin-top: 20px;">
               <div class="stat-item" id="profileCringeCoin">
@@ -3805,10 +3718,6 @@
               </div>
             </div>
           `;
-          
-          if (!isSelf) {
-            $('followBtn').onclick = (e) => followUser(e.currentTarget);
-          }
           
           // Load user's memes
           const memesGrid = $('profileMemesGrid');
@@ -3834,64 +3743,6 @@
           body.innerHTML = '<div class="feed-message">Could not load profile.</div>';
       }
     };
-    
-    // NEW: Follow User
-    const followUser = async (btn) => {
-        if (!currentUser) { showAuthModal(); return; }
-        
-        const userIdToFollow = btn.dataset.userId;
-        const usernameToFollow = btn.dataset.username;
-        if (userIdToFollow === currentUser.uid) return;
-        
-        btn.disabled = true;
-        const isFollowing = currentUserFollowing.includes(userIdToFollow);
-        
-        const followingRef = doc(db, 'users_private', currentUser.uid, 'following', userIdToFollow);
-        const followerRef = doc(db, 'users_private', userIdToFollow, 'followers', currentUser.uid);
-        
-        try {
-            if (isFollowing) {
-                // Unfollow
-                const batch = writeBatch(db);
-                batch.delete(followingRef);
-                batch.delete(followerRef);
-                await batch.commit();
-                
-                currentUserFollowing = currentUserFollowing.filter(id => id !== userIdToFollow);
-                btn.innerHTML = `<i class="fas fa-user-plus"></i> Follow`;
-                btn.classList.remove('btn-secondary');
-                btn.classList.add('btn-primary');
-                showNotification('Unfollowed', `You are no longer following ${usernameToFollow}.`, 'info');
-                
-            } else {
-                // Follow
-                const batch = writeBatch(db);
-                batch.set(followingRef, { username: usernameToFollow, followedAt: serverTimestamp() });
-                batch.set(followerRef, { username: currentUser.username, followedAt: serverTimestamp() });
-                await batch.commit();
-                
-                currentUserFollowing.push(userIdToFollow);
-                btn.innerHTML = `<i class="fas fa-user-check"></i> Following`;
-                btn.classList.add('btn-secondary');
-                btn.classList.remove('btn-primary');
-                showNotification('Followed!', `You are now following ${usernameToFollow}.`, 'success');
-                
-                // Send notification
-                await addDoc(collection(db, 'users_private', userIdToFollow, 'notifications'), {
-                    type: 'follow',
-                    fromUser: currentUser.username,
-                    fromUserId: currentUser.uid,
-                    timestamp: serverTimestamp(),
-                    read: false
-                });
-            }
-        } catch (error) {
-            console.error("Follow/unfollow error:", error);
-            showNotification('Error', 'Could not complete action.', 'error');
-        } finally {
-            btn.disabled = false;
-        }
-    };
 
     const showCollections = async () => {
       if (!currentUser) { showAuthModal(); return; }
@@ -3899,7 +3750,7 @@
       const grid = $('favoritesGrid');
       grid.innerHTML = '<div class="loading-spinner"></div>';
       
-      const q = query(collection(db, 'users_private', currentUser.uid, 'collections', 'favorites', 'memes'));
+      const q = query(collection(db, 'users', currentUser.uid, 'collections', 'favorites', 'memes'));
       
       const snapshot = await getDocs(q);
       if (snapshot.empty) {
@@ -3932,13 +3783,11 @@
       };
 
       createBadge('fa-user-plus', 'New Scroller', 'Joined CringeScroll', true);
-      createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', userQuests.tipCount > 0);
-      createBadge('fa-paint-brush', 'Creator', 'Post a meme', userQuests.postCount > 0);
+      createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', (userQuests.tipCount || 0) > 0);
+      createBadge('fa-paint-brush', 'Creator', 'Post a meme', (userQuests.postCount || 0) > 0);
       createBadge('fa-fire', 'Hot Streak', '3-day streak', currentUser.streak >= 3);
       createBadge('fa-coins', 'Coin Hoarder', '100+ CringeCoin', currentUser.cringeCoin >= 100);
       createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', currentUser.cringeCoin >= 1000);
-      createBadge('fa-comments', 'Chatterbox', 'Post in chat', false); // Example for future
-      createBadge('fa-user-check', 'Follower', 'Follow a user', currentUserFollowing.length > 0);
     };
 
     const showLeaderboard = async () => {
@@ -4016,9 +3865,9 @@
         openModal('notificationsModal');
         
         // Mark all as read
-        const userPrivateRef = doc(db, 'users_private', currentUser.uid);
+        const userRef = doc(db, 'users', currentUser.uid);
         const batch = writeBatch(db);
-        const q = query(collection(userPrivateRef, 'notifications'), where('read', '==', false));
+        const q = query(collection(userRef, 'notifications'), where('read', '==', false));
         const snapshot = await getDocs(q);
         snapshot.forEach(doc => {
             batch.update(doc.ref, { read: true });
@@ -4046,9 +3895,6 @@
             if (notif.type === 'tip') {
                 icon = 'fa-coins';
                 text = `<strong>${escapeHtml(notif.fromUser)}</strong> tipped you <strong>${notif.amount} CC</strong> on "${escapeHtml(notif.memeTitle)}"`;
-            } else if (notif.type === 'follow') {
-                icon = 'fa-user-plus';
-                text = `<strong>${escapeHtml(notif.fromUser)}</strong> started following you.`;
             } else if (notif.type === 'comment') {
                 icon = 'fa-comment';
                 text = `<strong>${escapeHtml(notif.fromUser)}</strong> commented on "${escapeHtml(notif.memeTitle)}"`;
@@ -4060,9 +3906,9 @@
     };
     
     // ===== QUEST SYSTEM =====
-    const checkDailyReset = async (userPrivateRef, privateData) => {
+    const checkDailyReset = async (userRef, userData) => {
         const today = new Date().toISOString().split('T')[0];
-        const lastReset = privateData.quests?.lastReset;
+        const lastReset = userData.quests?.lastReset;
         
         if (!lastReset || lastReset !== today) {
             const defaultQuests = {
@@ -4072,23 +3918,23 @@
             };
             
             let newStreak = 1;
-            if (privateData.lastActive) {
-                const lastActiveDate = privateData.lastActive.toDate();
+            if (userData.lastActive) {
+                const lastActiveDate = userData.lastActive.toDate();
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 
                 if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
-                    newStreak = (privateData.streak || 0) + 1;
+                    newStreak = (userData.streak || 0) + 1;
                 }
             }
             
-            await updateDoc(userPrivateRef, { 
+            await updateDoc(userRef, { 
                 quests: defaultQuests,
                 streak: newStreak,
                 lastActive: serverTimestamp()
             });
             userQuests = defaultQuests;
-            if (newStreak > (privateData.streak || 0)) {
+            if (newStreak > (userData.streak || 0)) {
                 showNotification('Streak Continued!', `You're on a ${newStreak}-day streak!`, 'info');
             }
         }
@@ -4107,8 +3953,8 @@
         if (!quest || userQuests[quest.claimed]) return;
         
         try {
-            const userPrivateRef = doc(db, 'users_private', currentUser.uid);
-            await updateDoc(userPrivateRef, {
+            const userRef = doc(db, 'users', currentUser.uid);
+            await updateDoc(userRef, {
                 [`quests.${quest.count}`]: increment(1)
             });
         } catch (error) {
@@ -4119,23 +3965,20 @@
     const claimQuest = async (questId, questData) => {
         if (!currentUser || !questData || questData.claimed) return;
         
-        const userPrivateRef = doc(db, 'users_private', currentUser.uid);
-        const userPublicRef = doc(db, 'users', currentUser.uid);
+        const userRef = doc(db, 'users', currentUser.uid);
         
         try {
             await runTransaction(db, async (transaction) => {
-                const userDoc = await transaction.get(userPrivateRef);
+                const userDoc = await transaction.get(userRef);
                 const quests = userDoc.data().quests;
                 
                 const progress = quests[questId + 'Count'] || 0;
                 const claimed = quests[questId + 'Claimed'] || false;
                 
                 if (progress >= questData.goal && !claimed) {
-                    transaction.update(userPrivateRef, {
+                    transaction.update(userRef, {
+                        cringeCoin: increment(questData.reward),
                         [`quests.${questId}Claimed`]: true
-                    });
-                    transaction.update(userPublicRef, {
-                        cringeCoin: increment(questData.reward)
                     });
                 } else {
                     throw new Error('Quest not completed or already claimed.');
@@ -4151,7 +3994,7 @@
         }
     };
     
-    // ===== NEW: Comment & Report Functions =====
+    // ===== Comment & Report Functions =====
     
     const openCommentModal = (card) => {
       currentMemeId = card.dataset.docId;
@@ -4159,6 +4002,7 @@
         showNotification('Comments Unavailable', 'Comments are only available for user-posted memes.', 'info');
         return;
       }
+      currentMemeCreatorId = card.dataset.creatorId; // Store for notifications
       openModal('commentModal');
       loadComments(currentMemeId);
     };
@@ -4218,15 +4062,24 @@
           timestamp: serverTimestamp()
         };
         
-        // Add the comment
         await addDoc(collection(db, 'memes', currentMemeId, 'comments'), commentData);
         
-        // Increment the comment count on the meme
         const memeRef = doc(db, 'memes', currentMemeId);
         await updateDoc(memeRef, { commentCount: increment(1) });
         
-        // Re-render the new comment
-        commentData.timestamp = new Timestamp(Date.now() / 1000, 0); // Approx.
+        // Send notification to meme creator (if not self)
+        if (currentMemeCreatorId && currentMemeCreatorId !== currentUser.uid) {
+          await addDoc(collection(db, 'users', currentMemeCreatorId, 'notifications'), {
+            type: 'comment',
+            fromUser: currentUser.username,
+            memeTitle: "your meme", // Simpler
+            timestamp: serverTimestamp(),
+            read: false
+          });
+        }
+        
+        // Optimistic render
+        commentData.timestamp = new Timestamp(Date.now() / 1000, 0); 
         if ($('commentList').querySelector('.feed-message')) {
           $('commentList').innerHTML = '';
         }
@@ -4234,8 +4087,7 @@
         $('commentList').scrollTop = $('commentList').scrollHeight;
         input.value = '';
         
-        // Update the count on the card in the feed
-        const cardInFeed = $(`[data-doc-id="${currentMemeId}"]`);
+        const cardInFeed = document.querySelector(`[data-doc-id="${currentMemeId}"]`);
         if (cardInFeed) {
           const countEl = cardInFeed.querySelector('.comment-btn span');
           const currentCount = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
@@ -4251,6 +4103,7 @@
     };
     
     const openReportModal = (card) => {
+      if (!currentUser) { showAuthModal(); return; }
       currentMemeId = card.dataset.docId || card.dataset.id;
       currentMemeCreatorId = card.dataset.creatorId;
       openModal('reportModal');
@@ -4345,6 +4198,7 @@
         showNotification('Meme Roulette', 'Loading fresh random memes!', 'info'); 
         sidebar.classList.remove('active');
       });
+      $('menuCustomize').addEventListener('click', () => { showCustomization(); sidebar.classList.remove('active'); });
       $('menuSettings').addEventListener('click', () => { showSettings(); sidebar.classList.remove('active'); });
       $('menuLogin').addEventListener('click', () => { showAuthModal(); sidebar.classList.remove('active'); });
       $('menuLogout').addEventListener('click', logout);
@@ -4379,8 +4233,9 @@
       // Settings Modal
       $$('.tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
         const tabId = e.currentTarget.dataset.tab;
-        $$('.tab-content').forEach(content => content.classList.remove('active'));
-        $$('.tab-btn').forEach(tab => tab.classList.remove('active'));
+        const parentModal = e.currentTarget.closest('.modal-content');
+        parentModal.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        parentModal.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
         $(tabId).classList.add('active');
         e.currentTarget.classList.add('active');
       }));
@@ -4406,7 +4261,7 @@
 
       // Infinite scroll
       feed.addEventListener('scroll', () => {
-        if (isLoading || currentTab === 'mymemes' || currentTab === 'search' || currentTab === 'following') return;
+        if (isLoading || currentTab === 'mymemes' || currentTab === 'search') return;
         const { scrollTop, scrollHeight, clientHeight } = feed;
         if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) { 
           loadFeed(); 
@@ -4425,8 +4280,8 @@
       userPreferences.theme = themes[nextIndex];
       
       if (currentUser) {
-        const userPrivateRef = doc(db, 'users_private', currentUser.uid);
-        updateDoc(userPrivateRef, { 'preferences.theme': userPreferences.theme });
+        const userRef = doc(db, 'users', currentUser.uid);
+        updateDoc(userRef, { 'preferences.theme': userPreferences.theme });
       }
       applyUserPreferences();
     };
@@ -4582,5 +4437,3 @@
   </script>
 </body>
 </html>
-
-
