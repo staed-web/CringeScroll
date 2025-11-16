@@ -755,10 +755,83 @@
     
     // Meme API sources
     const MEME_SOURCES = [
-      'https://meme-api.com/gimme/memes', 'https://meme-api.com/gimme/dankmemes', 'https://meme-api.com/gimme/me_irl',
-      'https://meme-api.com/gimme/wholesomememes', 'https://meme-api.com/gimme/funny', 'https://meme-api.com/gimme/HistoryMemes',
-      'https://meme-api.com/gimme/ProgrammerHumor'
-    ];
+  // === 🌐 GENERAL MEMES (Reddit-backed) ===
+  'https://meme-api.com/gimme/memes',
+  'https://meme-api.com/gimme/dankmemes',
+  'https://meme-api.com/gimme/me_irl',
+  'https://meme-api.com/gimme/wholesomememes',
+  'https://meme-api.com/gimme/funny',
+  'https://meme-api.com/gimme/ComedyCemetery',
+  'https://meme-api.com/gimme/terriblefacebookmemes',
+  'https://meme-api.com/gimme/okbuddyretard',
+  'https://meme-api.com/gimme/2meirl4meirl',
+  'https://meme-api.com/gimme/antiwork',
+  'https://meme-api.com/gimme/iamverysmart',
+  'https://meme-api.com/gimme/HistoryMemes',
+  'https://meme-api.com/gimme/ProgrammerHumor',
+  'https://meme-api.com/gimme/PrequelMemes',
+  'https://meme-api.com/gimme/SequelMemes',  'https://meme-api.com/gimme/DeepFriedMemes',
+
+  // === 🎌 ANIME MEMES ===
+  'https://meme-api.com/gimme/animemes',
+  'https://meme-api.com/gimme/AnimeFunny',
+  'https://meme-api.com/gimme/goodanimemes',
+  'https://meme-api.com/gimme/anime_irl',
+  'https://meme-api.com/gimme/sadanimemes',
+  'https://meme-api.com/gimme/wholesomeanimemes',
+  'https://meme-api.com/gimme/AnimeMemesHQ',
+
+  // === 📱 WEBTOON / MANHUA / MANHWA MEMES ===
+  'https://meme-api.com/gimme/webtoonmemes',
+  'https://meme-api.com/gimme/manhwa',
+  'https://meme-api.com/gimme/kdramamemes', // overlaps with webtoon culture
+  'https://meme-api.com/gimme/AsianMemes', // includes manhua/manhwa reactions
+
+  // === 🎮 GAMING MEMES ===
+  'https://meme-api.com/gimme/gaming',
+  'https://meme-api.com/gimme/pcmasterrace',
+  'https://meme-api.com/gimme/leagueoflegends',
+  'https://meme-api.com/gimme/DotA2',
+  'https://meme-api.com/gimme/Overwatch',
+  'https://meme-api.com/gimme/Minecraft',
+  'https://meme-api.com/gimme/AmongUs',
+  'https://meme-api.com/gimme/Valorant',
+  'https://meme-api.com/gimme/Genshin_Impact',
+  'https://meme-api.com/gimme/stardewvalley',
+
+  // === 🧠 NICHE / ABSURD / META ===
+  'https://meme-api.com/gimme/196',
+  'https://meme-api.com/gimme/DeepThoughts',
+  'https://meme-api.com/gimme/Unexpected',
+  'https://meme-api.com/gimme/ContagiousLaughter',
+  'https://meme-api.com/gimme/technicallythetruth',
+  'https://meme-api.com/gimme/holdmybeer',
+  'https://meme-api.com/gimme/theyknew',
+  'https://meme-api.com/gimme/facepalm',
+  'https://meme-api.com/gimme/whatcouldgowrong',
+  'https://meme-api.com/gimme/oddlysatisfying',
+
+  // === 💼 POLITICS / SATIRE (use cautiously) ===
+  'https://meme-api.com/gimme/PoliticalMemes',
+  'https://meme-api.com/gimme/CapitalismMemes',
+  'https://meme-api.com/gimme/SocialismMemes',
+  'https://meme-api.com/gimme/CommunismMemes',
+
+  // === 🐾 ANIMALS / WHOLESMOME ===
+  'https://meme-api.com/gimme/aww',
+  'https://meme-api.com/gimme/rarepuppers',
+  'https://meme-api.com/gimme/blep',
+  'https://meme-api.com/gimme/WhatsWrongWithYourDog',
+  'https://meme-api.com/gimme/Zoomies',
+
+  // === 🧪 EXPERIMENTAL / LOW-TRAFFIC (hidden gems) ===
+  'https://meme-api.com/gimme/IndianDankMemes',
+  'https://meme-api.com/gimme/ArabMemes',
+  'https://meme-api.com/gimme/BrazilMemes',
+  'https://meme-api.com/gimme/PhilosophyMemes',
+  'https://meme-api.com/gimme/ExistentialMemes',
+  'https://meme-api.com/gimme/ArtMemes'
+];
     
     // ===== UTILITY FUNCTIONS =====
     const $ = (selector) => document.getElementById(selector);
