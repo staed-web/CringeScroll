@@ -320,7 +320,7 @@
       .header-actions { gap: 8px; }
       .action-btn { width: 38px; height: 38px; font-size: 16px; }
       .chat-window { height: 400px; bottom: 60px; left: 10px; right: 10px; width: calc(100% - 20px); }
-      .modal-content { width: 100%; max-height: 100dvh; border-radius: 0; }
+      .modal-content { width: 100%; max-height: 100dvh; height: 100dvh; border-radius: 0; }
       .modal-overlay.active { padding: 0; }
       /* Editor responsive */
       .modal-body.editor-body { flex-direction: column; }
@@ -763,7 +763,10 @@
     // ===== UTILITY FUNCTIONS =====
     const $ = (selector) => document.getElementById(selector);
     const $$ = (selector) => document.querySelectorAll(selector);
-    const escapeHtml = (str) => str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    const escapeHtml = (str) => {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
     const formatNumber = (num) => {
       if (!num) return 0;
       if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -829,7 +832,7 @@
           if (currentTab === 'mymemes') { loadFeed(true); }
         } else {
           console.warn('User doc not found, creating one...');
-          createUserProfile(user, user.email.split('@')[0], () => handleUserLogin(user));
+          createUserProfile(user, user.displayName || user.email.split('@')[0]);
         }
       });
       authModal.classList.remove('active');
@@ -848,7 +851,7 @@
       
       if (currentTab === 'mymemes') {
         $$('.nav-item.active').forEach(el => el.classList.remove('active'));
-        $('[data-tab="hot"]').classList.add('active');
+        document.querySelector('[data-tab="hot"]').classList.add('active');
         currentTab = 'hot';
         loadFeed(true);
       }
@@ -909,6 +912,13 @@
       if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
       btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
       try {
+        // Check if username is taken
+        const usernameQuery = query(collection(db, 'users'), where('username', '==', username));
+        const usernameSnapshot = await getDocs(usernameQuery);
+        if (!usernameSnapshot.empty) {
+            throw new Error('Username is already taken.');
+        }
+        
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(userCredential.user, { displayName: username });
         await createUserProfile(userCredential.user, username);
@@ -966,7 +976,7 @@
       const card = document.createElement('div');
       card.className = 'meme-card';
       const isFirestore = !!meme.createdAt;
-      const memeId = isFirestore ? meme.id : btoa(meme.url); // Create a unique-ish ID for API memes
+      const memeId = isFirestore ? meme.id : btoa(encodeURIComponent(meme.url)); // Create a unique ID for API memes
       const dataSource = isFirestore ? 'firestore' : 'api';
       const memeUrl = isFirestore ? meme.imageUrl : meme.url;
       const title = isFirestore ? meme.title : meme.title;
@@ -1032,7 +1042,7 @@
       
       try {
         if (currentTab === 'mymemes') { await loadMyMemes(); }
-        else if (currentTab === 'search') { await loadSearchResults(); } // 'search' will be set by searchInput
+        else if (currentTab === 'search') { await loadSearchResults($('searchInput').value.trim()); } // 'search' will be set by searchInput
         else { await loadApiMemes(); }
       } catch (error) { console.error('Error loading feed:', error); feed.innerHTML = '<div class="feed-message">Could not load memes. Please try again later.</div>';
       } finally { $$('.skeleton-card').forEach(el => el.remove()); isLoading = false; }
@@ -1062,6 +1072,7 @@
     };
 
     const loadSearchResults = async (username) => {
+      if (!username) { feed.innerHTML = '<div class="feed-message">Enter a username to search.</div>'; return; }
       try {
         const q = query(collection(db, 'memes'), where('username', '==', username), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
@@ -1073,9 +1084,11 @@
     const loadApiMemes = async () => {
       const batchSize = window.innerWidth > 768 ? 3 : 2;
       let memesFetched = 0;
-      while (memesFetched < batchSize) {
+      let attempts = 0;
+      while (memesFetched < batchSize && attempts < 10) {
         const meme = await fetchMeme();
         if (meme) { renderMeme(meme, loadCount++); memesFetched++; }
+        attempts++;
       }
     };
 
@@ -1085,7 +1098,7 @@
         const response = await fetch(`${url}?_=${Date.now()}`);
         if (!response.ok) throw new Error('API response not ok.');
         const data = await response.json();
-        if (!data?.url || data.nsfw || data.spoiler || seenUrls.has(data.url)) { return fetchMeme(); }
+        if (!data?.url || data.nsfw || data.spoiler || seenUrls.has(data.url)) { return null; } // Return null, don't recurse
         seenUrls.add(data.url);
         return { url: data.url, title: data.title || 'Cringe', ups: data.ups || 0, reactions: { cringe: Math.floor(Math.random() * 100), laugh: Math.floor(Math.random() * 150), cry: Math.floor(Math.random() * 75) } };
       } catch (error) { console.warn('Fetch meme error:', error); return null; }
@@ -1112,13 +1125,13 @@
               // Unsave
               await deleteDoc(favRef);
               saveBtn.classList.remove('saved');
-              saveBtnText.textContent = 'Save';
+              if(saveBtnText) saveBtnText.textContent = 'Save';
               showNotification('Unsaved', 'Meme removed from your favorites.', 'info');
           } else {
               // Save
               await setDoc(favRef, memeData);
               saveBtn.classList.add('saved');
-              saveBtnText.textContent = 'Saved';
+              if(saveBtnText) saveBtnText.textContent = 'Saved';
               showNotification('Saved!', 'Meme added to your favorites.', 'success');
           }
       } catch (error) {
@@ -1134,10 +1147,10 @@
             const saveBtnText = saveBtn.querySelector('span');
             if (userCollections.favorites && userCollections.favorites.includes(memeId)) {
                 saveBtn.classList.add('saved');
-                saveBtnText.textContent = 'Saved';
+                if(saveBtnText) saveBtnText.textContent = 'Saved';
             } else {
                 saveBtn.classList.remove('saved');
-                saveBtnText.textContent = 'Save';
+                if(saveBtnText) saveBtnText.textContent = 'Save';
             }
         });
     };
@@ -1153,6 +1166,7 @@
       if (dataSource === 'api') {
         await updateDoc(userRef, { cringeCoin: increment(-5) });
         showNotification('Tip Sent!', '5 CringeCoin tipped to the void (API meme)!', 'info');
+        await updateQuestProgress('tip'); // Still counts for the quest
         return;
       }
       
@@ -1210,9 +1224,9 @@
       
       await updateQuestProgress('react');
       
+      const userRef = doc(db, 'users', currentUser.uid);
       if (card.dataset.source === 'api') {
         showNotification('Reaction Added!', '+1 CringeCoin for reacting!', 'success');
-        const userRef = doc(db, 'users', currentUser.uid);
         await updateDoc(userRef, { cringeCoin: increment(1) });
         return;
       }
@@ -1221,7 +1235,6 @@
       const memeRef = doc(db, 'memes', memeId);
       try {
         await runTransaction(db, async (transaction) => {
-            const userRef = doc(db, 'users', currentUser.uid);
             transaction.update(userRef, { cringeCoin: increment(1) });
             transaction.update(memeRef, { [`reactions.${reactionType}`]: increment(1) });
         });
@@ -1291,7 +1304,8 @@
     const openMemeEditor = (imageUrl = null) => {
       if (!currentUser) { showAuthModal(); return; }
       $('memeEditorModal').classList.add('active');
-      initMemeEditor(imageUrl);
+      // Delay init to allow modal to render and get dimensions
+      setTimeout(() => initMemeEditor(imageUrl), 50);
     };
     
     const initMemeEditor = (imageUrl) => {
@@ -1340,7 +1354,7 @@
       const activeObj = fabricCanvas.getActiveObject();
       if (activeObj) {
           if (activeObj.type.includes('text')) {
-              activeObj.set({ fill: fillColor, stroke: strokeColor });
+              activeObj.set({ fill: fillColor, stroke: strokeColor, fontSize: brushSize });
           }
           fabricCanvas.renderAll();
       }
@@ -1388,12 +1402,12 @@
         $('memeTitleInput').value = '';
         
         $$('.nav-item.active').forEach(el => el.classList.remove('active'));
-        $('[data-tab="mymemes"]').classList.add('active');
+        document.querySelector('[data-tab="mymemes"]').classList.add('active');
         currentTab = 'mymemes';
         loadFeed(true);
         
         showNotification('Meme Posted!', 'Your meme is live! +10 CringeCoin', 'success');
-      } catch (error) { console.error('Meme post error:', error); showNotification('Error', 'Failed to post your meme.', 'error');
+      } catch (error) { console.error('Meme post error:', error); showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
       } finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; }
     };
     
@@ -1437,7 +1451,7 @@
           const meme = doc.data();
           const item = document.createElement('div');
           item.className = 'collection-item';
-          item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}"><p>${escapeHtml(meme.title)}</p>`;
+          item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
           item.onclick = () => { /* Maybe open full meme modal later */ };
           grid.appendChild(item);
       });
@@ -1499,9 +1513,9 @@
       list.innerHTML = ''; // Clear old quests
       
       const quests = [
-        { id: 'react', title: 'Daily Reactions', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount, claimed: userQuests.reactClaimed, reward: 10 },
-        { id: 'post', title: 'Daily Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount, claimed: userQuests.postClaimed, reward: 25 },
-        { id: 'tip', title: 'Generous Tipper', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount, claimed: userQuests.tipClaimed, reward: 5 }
+        { id: 'react', title: 'Daily Reactions', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed, reward: 10 },
+        { id: 'post', title: 'Daily Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed, reward: 25 },
+        { id: 'tip', title: 'Generous Tipper', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed, reward: 5 }
       ];
 
       quests.forEach(q => {
@@ -1603,27 +1617,32 @@
         const today = new Date().toISOString().split('T')[0];
         const lastReset = userData.quests?.lastReset;
         
-        if (lastReset !== today) {
+        if (!lastReset || lastReset !== today) {
             // Reset quests
             const defaultQuests = {
               lastReset: today,
               reactCount: 0, postCount: 0, tipCount: 0,
               reactClaimed: false, postClaimed: false, tipClaimed: false
             };
-            await updateDoc(userRef, { quests: defaultQuests });
-            userQuests = defaultQuests;
             
             // Check streak
-            const lastActiveDate = userData.lastActive.toDate();
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            
-            if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
-                await updateDoc(userRef, { streak: increment(1) }); // Continue streak
-            } else {
-                await updateDoc(userRef, { streak: 1 }); // Reset streak
+            let newStreak = 1;
+            if (userData.lastActive) {
+                const lastActiveDate = userData.lastActive.toDate();
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
+                    newStreak = (userData.streak || 0) + 1; // Continue streak
+                }
             }
-            await updateDoc(userRef, { lastActive: serverTimestamp() });
+            
+            await updateDoc(userRef, { 
+                quests: defaultQuests,
+                streak: newStreak,
+                lastActive: serverTimestamp()
+            });
+            userQuests = defaultQuests;
         }
     };
     
@@ -1672,7 +1691,7 @@
                 }
             });
             showNotification('Reward Claimed!', `+${questData.reward} CringeCoin for completing ${questData.title}!`, 'success');
-            // UI will update via onSnapshot
+            // UI will update via onSnapshot, which re-renders the quest modal
         } catch (error) {
             console.error('Claim quest error:', error);
             showNotification('Error', error.message, 'error');
@@ -1691,14 +1710,17 @@
       $('themeToggleBtn').addEventListener('click', toggleTheme);
       $('notificationsBtn').addEventListener('click', showNotifications);
       $('chatToggleBtn').addEventListener('click', toggleChatWindow);
-      $('logoLink').addEventListener('click', (e) => { e.preventDefault(); $$('.nav-item.active').forEach(el => el.classList.remove('active')); $('[data-tab="hot"]').classList.add('active'); currentTab = 'hot'; loadFeed(true); });
+      $('logoLink').addEventListener('click', (e) => { e.preventDefault(); $$('.nav-item.active').forEach(el => el.classList.remove('active')); document.querySelector('[data-tab="hot"]').classList.add('active'); currentTab = 'hot'; loadFeed(true); });
       $('searchInput').addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
           const searchTerm = e.target.value.trim();
-          if (searchTerm.length < 2) return;
+          if (!searchTerm) {
+            $('logoLink').click(); // Go home if search is cleared
+            return;
+          }
+          $$('.nav-item.active').forEach(el => el.classList.remove('active'));
           currentTab = 'search';
           loadFeed(true); // loadFeed will call loadSearchResults
-          loadSearchResults(searchTerm);
         }
       });
       $('closeChatWindow').addEventListener('click', toggleChatWindow);
@@ -1718,7 +1740,7 @@
       $('menuLeaderboard').addEventListener('click', showLeaderboard);
       $('menuQuests').addEventListener('click', showQuests);
       $('menuCreateMeme').addEventListener('click', () => { openMemeEditor(); sidebar.classList.remove('active'); });
-      $('menuMemeRoulette').addEventListener('click', startMemeRoulette);
+      $('menuMemeRoulette').addEventListener('click', () => { $('logoLink').click(); showNotification('Meme Roulette', 'Loading fresh random memes!', 'info'); });
       $('menuCustomize').addEventListener('click', showCustomization);
       $('menuSettings').addEventListener('click', showSettings);
       $('menuLogin').addEventListener('click', showAuthModal);
@@ -1775,7 +1797,7 @@
       
       const onDragMove = (e) => {
         if (!isDragging) return;
-        e.preventDefault();
+        e.preventDefault(); // Prevent page scroll on touch
         const touch = e.touches ? e.touches[0] : e;
         let newX = touch.pageX - chatOffsetX;
         let newY = touch.pageY - chatOffsetY;
@@ -1829,6 +1851,14 @@
       $('textColorPicker').addEventListener('input', updateEditorSettings);
       $('strokeColorPicker').addEventListener('input', updateEditorSettings);
       $('brushSize').addEventListener('input', updateEditorSettings);
+      $('fontFamilySelect').addEventListener('change', () => {
+          const obj = fabricCanvas.getActiveObject(); 
+          if (obj?.type.includes('text')) { 
+              obj.set('fontFamily', $('fontFamilySelect').value); 
+              fabricCanvas.renderAll(); 
+              saveCanvasState(); 
+          }
+      });
       $('bringForwardBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.bringForward(fabricCanvas.getActiveObject()); saveCanvasState(); } });
       $('sendBackBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.sendBackwards(fabricCanvas.getActiveObject()); saveCanvasState(); } });
       $('deleteObjBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.remove(fabricCanvas.getActiveObject()); saveCanvasState(); } });
@@ -1848,6 +1878,17 @@
         fabricCanvas.on('object:added', saveCanvasState);
         fabricCanvas.on('object:modified', saveCanvasState);
         fabricCanvas.on('object:removed', saveCanvasState);
+        
+        fabricCanvas.on('selection:created', (e) => {
+            const obj = e.target;
+            if (obj.type.includes('text')) {
+                $('brushSize').value = obj.get('fontSize');
+                $('textColorPicker').value = obj.get('fill');
+                $('strokeColorPicker').value = obj.get('stroke');
+                $('fontFamilySelect').value = obj.get('fontFamily');
+            }
+        });
+        
         fabricCanvas.on('mouse:down', (opt) => {
           if (activeTool === 'text' && !opt.target) {
             const text = new fabric.IText('Your text here', {
@@ -1858,6 +1899,10 @@
               stroke: $('strokeColorPicker').value,
               strokeWidth: 2,
               originX: 'left', originY: 'top',
+              padding: 5,
+              cornerColor: 'var(--accent-3)',
+              transparentCorners: false,
+              borderColor: 'var(--accent-3)'
             });
             fabricCanvas.add(text);
             fabricCanvas.setActiveObject(text);
@@ -1876,3 +1921,5 @@
   </script>
 </body>
 </html>
+
+
