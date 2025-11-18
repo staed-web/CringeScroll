@@ -4268,4 +4268,2358 @@
 </body>
 </html>
 
+  <!-- ===== AUTH MODAL ===== -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="authModalTitle"><i class="fas fa-user-plus"></i> Create Account</h2>
+        <button class="close-modal" data-modal-id="authModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <button class="btn btn-secondary active" id="signupTab">Sign Up</button>
+          <button class="btn btn-secondary" id="loginTab">Log In</button>
+        </div>
+        <div id="signupForm">
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="signupEmailInput" placeholder="your@email.com" required></div>
+          <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-control" id="signupUsernameInput" placeholder="your_username" required><p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Only letters, numbers, and underscores (2-15 characters)</p></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="signupPasswordInput" placeholder="••••••••" required><p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">At least 6 characters</p></div>
+          <div class="form-error" id="signupError"></div>
+          <button class="btn btn-primary" id="signupBtn"><i class="fas fa-user-plus"></i> Create Account</button>
+        </div>
+        <div id="loginForm" style="display: none;">
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="loginEmailInput" placeholder="your@email.com" required></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="loginPasswordInput" placeholder="••••••••" required></div>
+          <div class="form-error" id="loginError"></div>
+          <button class="btn btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Log In</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- ===== MEME EDITOR MODAL ===== -->
+  <div class="modal-overlay editor-modal-overlay" id="memeEditorModal">
+    <div class="modal-content editor-modal">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-paint-brush"></i> Meme Editor</h2>
+        <button class="close-modal" data-modal-id="memeEditorModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body editor-body">
+        
+        <!-- Left: Canvas -->
+        <div class="editor-canvas-col">
+          <div id="editorContainer">
+            <canvas id="canvas"></canvas>
+          </div>
+        </div>
+        
+        <!-- Right: Tools -->
+        <div class="editor-tools-col">
+          
+          <div class="editor-tool-group">
+            <h4 class="menu-section-title">Tools</h4>
+            <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr;">
+              <button class="btn btn-secondary editor-tool active" data-tool="text"><i class="fas fa-font"></i> Text</button>
+              <button class="btn btn-secondary editor-tool" data-tool="image"><i class="fas fa-image"></i> Sticker</button>
+              <button class="btn btn-secondary editor-tool" data-tool="draw"><i class="fas fa-pencil-alt"></i> Draw</button>
+              <button class="btn btn-secondary editor-tool" data-tool="eraser"><i class="fas fa-eraser"></i> Eraser</button>
+            </div>
+          </div>
+
+          <div class="editor-tool-group">
+            <h4 class="menu-section-title">Templates</h4>
+            <button class="btn btn-secondary" id="uploadTemplateBtn"><i class="fas fa-upload"></i> Upload Template</button>
+            <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr;">
+              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/pJbPZJ7.jpg">Drake</button>
+              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/1v8wL4G.jpg">Distracted</button>
+              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/vRtKxXK.jpg">Change Mind</button>
+              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/H9LZ1xQ.jpg">Cat</button>
+            </div>
+            <input type="file" id="templateFileInput" accept="image/*" style="display: none;">
+          </div>
+          
+          <div class="editor-tool-group">
+            <h4 class="menu-section-title">Object Controls</h4>
+            <div class="editor-tool-row">
+              <button class="btn btn-secondary" id="bringForwardBtn" title="Bring Forward"><i class="fas fa-arrow-up"></i></button>
+              <button class="btn btn-secondary" id="sendBackBtn" title="Send Back"><i class="fas fa-arrow-down"></i></button>
+              <button class="btn btn-secondary" id="deleteObjBtn" title="Delete"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="editor-tool-group">
+            <h4 class="menu-section-title">Text & Draw Settings</h4>
+            <div class="color-picker-group">
+              <div style="flex: 1;"><label class="form-label" style="color: var(--text-secondary);">Fill</label><input type="color" id="textColorPicker" value="#FFFFFF" class="form-control"></div>
+              <div style="flex: 1;"><label class="form-label" style="color: var(--text-secondary);">Stroke</label><input type="color" id="strokeColorPicker" value="#000000" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Font Family</label><select id="fontFamilySelect" class="form-control"><option value="Impact">Impact</option><option value="Arial">Arial</option><option value="Comic Sans MS">Comic Sans</option></select></div>
+            <div class="form-group"><label class="form-label">Font / Brush Size</label><input type="range" id="brushSize" min="1" max="100" value="40" class="form-control"></div>
+            <div class="editor-tool-row" style="grid-template-columns: repeat(4, 1fr);">
+              <button class="btn btn-secondary" id="toggleBoldBtn" title="Bold"><i class="fas fa-bold"></i></button>
+              <button class="btn btn-secondary" id="toggleItalicBtn" title="Italic"><i class="fas fa-italic"></i></button>
+              <button class="btn btn-secondary" id="alignLeftBtn" title="Align Left"><i class="fas fa-align-left"></i></button>
+              <button class="btn btn-secondary" id="alignCenterBtn" title="Align Center"><i class="fas fa-align-center"></i></button>
+            </div>
+          </div>
+
+          <div class="editor-tool-group">
+            <h4 class="menu-section-title">History</h4>
+            <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr 1fr;">
+              <button class="btn btn-secondary" id="undoBtn"><i class="fas fa-undo"></i> Undo</button>
+              <button class="btn btn-secondary" id="redoBtn"><i class="fas fa-redo"></i> Redo</button>
+              <button class="btn btn-secondary" id="clearCanvasBtn"><i class="fas fa-trash"></i> Clear</button>
+            </div>
+          </div>
+
+          <div class="editor-tool-group" style="margin-top: auto;">
+            <h4 class="menu-section-title">Finish</h4>
+            <div class="form-group"><label class="form-label">Meme Title</label><input type="text" class="form-control" id="memeTitleInput" placeholder="Enter a catchy title..." required></div>
+            <button class="btn btn-primary" id="postMemeBtn"><i class="fas fa-paper-plane"></i> Post Meme</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NOTIFICATION TOAST ===== -->
+  <div class="notification" id="notificationToast">
+    <div class="notification-icon"><i class="fas fa-check"></i></div>
+    <div class="notification-content">
+      <h4 class="notification-title" id="notificationTitle">Success!</h4>
+      <p class="notification-message" id="notificationMessage">Your action was completed successfully.</p>
+    </div>
+    <button class="notification-close" id="closeNotification"><i class="fas fa-times"></i></button>
+  </div>
+  
+  <!-- ===== ALL OTHER MODALS ===== -->
+  
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-cog"></i> Settings</h2>
+        <button class="close-modal" data-modal-id="settingsModal"><i class="fas fa-times"></i></button>
+      </div>
+      <!-- Tab Navigation -->
+      <div class="settings-tabs">
+        <button class="tab-btn active" data-tab-id="settingsProfile"><i class="fas fa-user-circle"></i> Profile</button>
+        <button class="tab-btn" data-tab-id="settingsAppearance"><i class="fas fa-palette"></i> Appearance</button>
+        <button class="tab-btn" data-tab-id="settingsNotifications"><i class="fas fa-bell"></i> Notifications</button>
+        <button class="tab-btn" data-tab-id="settingsAccount"><i class="fas fa-key"></i> Account</button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Profile Tab -->
+        <div class="tab-content active" id="settingsProfile">
+          <div class="profile-settings-header">
+            <img src="https://placehold.co/80x80/6a0dad/fff?text=C" alt="Avatar" class="profile-avatar-lg" id="settingsAvatarImg">
+            <label for="avatarUpload" class="avatar-upload-btn" title="Upload new avatar">
+              <i class="fas fa-camera"></i>
+              <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+            </label>
+            <h3 style="color: var(--text-primary); margin: 0; font-size: 1.5rem;" id="settingsUsername">Username</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settingsUsernameInput">Username</label>
+            <input type="text" class="form-control" id="settingsUsernameInput" placeholder="Your username">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settingsBioInput">Bio</label>
+            <textarea class="form-control" id="settingsBioInput" placeholder="Tell us about yourself..."></textarea>
+          </div>
+          <button class="btn btn-primary" id="saveProfileSettingsBtn">Save Profile</button>
+          <div class="profile-settings-stats" style="margin-top: 20px;">
+            <div class="grid-item"><div style="font-size: 1.5rem; font-weight: bold; color: var(--gold);" id="settingsCringeCoin">0</div><div class="grid-item-meta">CringeCoin</div></div>
+            <div class="grid-item"><div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-3);" id="settingsStreak">0</div><div class="grid-item-meta">Day Streak</div></div>
+          </div>
+        </div>
+        
+        <!-- Appearance Tab -->
+        <div class="tab-content" id="settingsAppearance">
+          <div class="form-group">
+            <label class="form-label" for="themeSelect">Theme</label>
+            <select id="themeSelect" class="form-control">
+              <option value="dark">Midnight (Default)</option>
+              <option value="light">Daylight</option>
+              <option value="blue">Ocean</option>
+              <option value="red">Volcano</option>
+              <option value="purple">Royal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fontSizeSelect">Font Size</label>
+            <select id="fontSizeSelect" class="form-control">
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cardBgColor">Card Background Color</label>
+            <input type="color" id="cardBgColor" class="form-control">
+          </div>
+          <button class="btn btn-primary" id="saveAppearanceSettingsBtn">Save Appearance</button>
+        </div>
+        
+        <!-- Notifications Tab -->
+        <div class="tab-content" id="settingsNotifications">
+          <div class="switch-toggle">
+            <div>
+              <div class="switch-toggle-label">Enable All Notifications</div>
+              <div class="switch-toggle-desc">Master control for all app notifications.</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="notifToggleAll" checked><span class="slider"></span></label>
+          </div>
+          <div class="switch-toggle">
+            <div>
+              <div class="switch-toggle-label">Notify on Tips</div>
+              <div class="switch-toggle-desc">Get notified when someone tips your meme.</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="notifToggleTips" checked><span class="slider"></span></label>
+          </div>
+          <div class="switch-toggle">
+            <div>
+              <div class="switch-toggle-label">Quest Reminders</div>
+              <div class="switch-toggle-desc">Remind you to complete your daily quests.</div>
+            </div>
+            <label class="switch"><input type="checkbox" id="notifToggleQuests" checked><span class="slider"></span></label>
+          </div>
+        </div>
+        
+        <!-- Account Tab -->
+        <div class="tab-content" id="settingsAccount">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="settingsEmailInput" readonly disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">User ID</label>
+            <input type="text" class="form-control" id="settingsUserIdInput" readonly disabled>
+          </div>
+          <button class="btn btn-secondary" id="settingsLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          <hr style="border: 1px solid var(--border-color); margin: 25px 0;">
+          <h4 style="color: var(--error); margin-bottom: 10px;">Danger Zone</h4>
+          <button class="btn btn-danger" id="deleteAccountBtn"><i class="fas fa-trash"></i> Delete Account</button>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">This action is permanent and cannot be undone.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Profile Modal (IMPROVED & DETAILED) -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="profileModalTitle"><i class="fas fa-user-circle"></i> User Profile</h2>
+        <button class="close-modal" data-modal-id="profileModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="profileModalBody">
+        <!-- Content Injected by JS -->
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Collections Modal -->
+  <div class="modal-overlay" id="collectionsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-bookmark"></i> My Collections</h2>
+        <button class="close-modal" data-modal-id="collectionsModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <h3 class="menu-section-title">Favorites</h3>
+        <div class="collection-grid" id="favoritesGrid">
+          <div class="loading-spinner"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top: 20px;" id="createNewCollectionBtn" disabled><i class="fas fa-plus"></i> Create New Collection (Soon)</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Inventory (Badges) Modal -->
+  <div class="modal-overlay" id="inventoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-box"></i> My Inventory (Badges)</h2>
+        <button class="close-modal" data-modal-id="inventoryModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Earn badges by completing milestones!</p>
+        <div class="modal-grid" id="badgeGrid">
+          <!-- Badges will be dynamically rendered here -->
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Leaderboard Modal -->
+  <div class="modal-overlay" id="leaderboardModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-chart-line"></i> Leaderboard</h2>
+        <button class="close-modal" data-modal-id="leaderboardModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <h3 class="menu-section-title">Top 10 Cringe Lords</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;" id="leaderboardList">
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Quests Modal -->
+  <div class="modal-overlay" id="questsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-trophy"></i> Daily Quests</h2>
+        <button class="close-modal" data-modal-id="questsModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+         <p style="color: var(--text-secondary); margin-bottom: 20px;">Quests reset daily. Claim your rewards!</p>
+         <div style="display: flex; flex-direction: column; gap: 15px;" id="questList">
+           <div class="loading-spinner"></div>
+         </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Notifications Modal -->
+  <div class="modal-overlay" id="notificationsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-bell"></i> Notifications</h2>
+        <button class="close-modal" data-modal-id="notificationsModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" style="padding: 0;" id="notificationsList">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay confirm-modal-overlay" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="confirmModalTitle"><i class="fas fa-exclamation-triangle"></i> Are you sure?</h2>
+      </div>
+      <div class="modal-body">
+        <p id="confirmModalBody">This action cannot be undone.</p>
+        <div class="confirm-actions" style="margin-top: 20px;">
+          <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+          <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User's global variables for Firebase -->
+  <script>
+    // These variables are placeholders and will be injected by the environment.
+    var __firebase_config = '{"apiKey":"AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g","authDomain":"cringescroll-prod.firebaseapp.com","projectId":"cringescroll-prod","storageBucket":"cringescroll-prod.firebasestorage.app","messagingSenderId":"802266413389","appId":"1:802266413389:web:22a7274e4edc8a0529df04"}';
+    var __app_id = 'cringescroll-app';
+    var __initial_auth_token = undefined; 
+  </script>
+
+  <!-- 
+  ==========================================
+  ======== COMPLETE APPLICATION LOGIC ========
+  ==========================================
+  -->
+  <script type="module">
+    // ===== FIREBASE SDK IMPORTS =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut,
+      updateProfile,
+      deleteUser,
+      signInAnonymously,
+      signInWithCustomToken
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      addDoc, 
+      updateDoc, 
+      collection, 
+      query, 
+      where, 
+      getDocs,
+      onSnapshot,
+      orderBy,
+      serverTimestamp,
+      increment,
+      limit,
+      runTransaction,
+      writeBatch,
+      deleteDoc,
+      getCountFromServer,
+      setLogLevel
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadString,
+      getDownloadURL,
+      uploadBytes,
+      deleteObject
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+    // ===== GLOBAL APP STATE =====
+    let feed, authModal, chatWindow, sidebar;
+    let isLoading = false;
+    let loadCount = 0;
+    const BUFFER_HEIGHT = 300;
+    let currentTab = 'hot';
+    let seenUrls = new Set();
+    
+    // Firebase instances
+    let app, db, auth, storage;
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app';
+    
+    // User state
+    let currentUserId = null; // Use this to track auth state
+    let currentUser = null; // This will be populated by listeners
+    let userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
+    let userQuests = {};
+    let userCollections = { favorites: [] };
+    
+    // Real-time listeners
+    let chatListener = null;
+    let userPublicListener = null;
+    let userPrivateListener = null;
+    let notificationsListener = null;
+    let collectionsListener = null;
+    
+    // Meme API sources
+    const MEME_SOURCES = [
+      'https://meme-api.com/gimme/memes',
+      'https://meme-api.com/gimme/dankmemes',
+      'https://meme-api.com/gimme/me_irl',
+      'https://meme-api.com/gimme/wholesomememes',
+      'https://meme-api.com/gimme/funny',
+      'https://meme-api.com/gimme/HistoryMemes',
+      'https://meme-api.com/gimme/ProgrammerHumor',
+      'https://meme-api.com/gimme/animemes',
+      'https://meme-api.com/gimme/gaming',
+      'https://meme-api.com/gimme/PrequelMemes',
+    ];
+    
+    // ===== UTILITY FUNCTIONS =====
+    const $ = (selector) => document.getElementById(selector);
+    const $$ = (selector) => document.querySelectorAll(selector);
+    
+    const escapeHtml = (str) => {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
+    
+    const formatNumber = (num) => {
+      if (num === undefined || num === null) return 0;
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num;
+    };
+    
+    const timeAgo = (date) => {
+        if (!date) return '...';
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + "y ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + "mo ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + "d ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + "h ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + "m ago";
+        return Math.floor(seconds) + "s ago";
+    };
+
+    const createPlaceholder = (width, height) => {
+      const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#242152';
+      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-3').trim() || '#c46cff';
+      const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bgColor}"/><text x="50%" y="50%" fill="${accentColor}" font-size="16" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">Loading Meme...</text></svg>`;
+      return `data:image/svg+xml;base64,${btoa(svg)}`;
+    };
+    
+    const showNotification = (title, message, type = 'success', duration = 3000) => {
+      const notification = $('notificationToast'); if (!notification) return;
+      $('notificationTitle').textContent = title;
+      $('notificationMessage').textContent = message;
+      const iconEl = notification.querySelector('.notification-icon i');
+      notification.className = 'notification'; // Reset classes
+      
+      if (type === 'error') { 
+        iconEl.className = 'fas fa-exclamation-circle'; 
+        notification.classList.add('error');
+      } else if (type === 'info') { 
+        iconEl.className = 'fas fa-info-circle'; 
+        notification.classList.add('info');
+      } else { 
+        iconEl.className = 'fas fa-check'; 
+        notification.classList.add('success');
+      }
+      
+      notification.classList.add('show');
+      const timer = setTimeout(() => notification.classList.remove('show'), duration);
+      $('closeNotification').onclick = () => { clearTimeout(timer); notification.classList.remove('show'); };
+    };
+
+    const showConfirmModal = (title, message, confirmText = 'Confirm') => {
+        return new Promise((resolve) => {
+            const modal = $('confirmModal');
+            $('confirmModalTitle').innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${escapeHtml(title)}`;
+            $('confirmModalBody').textContent = message;
+            const confirmBtn = $('confirmOkBtn');
+            const cancelBtn = $('confirmCancelBtn');
+            
+            confirmBtn.textContent = confirmText;
+            
+            const close = (result) => {
+                modal.classList.remove('active');
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+                resolve(result);
+            };
+
+            confirmBtn.onclick = () => close(true);
+            cancelBtn.onclick = () => close(false);
+            
+            modal.classList.add('active');
+        });
+    };
+    
+    // ===== FIREBASE & AUTH (RE-ARCHITECTED) =====
+    const initFirebase = async () => {
+      try {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        storage = getStorage(app);
+        
+        // Enable detailed logging for debugging
+        setLogLevel('debug');
+
+        // This listener is the single source of truth for auth state
+        onAuthStateChanged(auth, async (user) => {
+          if (user) { 
+            console.log('onAuthStateChanged: User is signed in:', user.uid);
+            // This function handles everything for a logged-in user
+            await handleUserLogin(user); 
+          } else { 
+            console.log('onAuthStateChanged: User is signed out.');
+            // This function handles everything for a logged-out user
+            handleUserLogout(); 
+          }
+        });
+        
+        // Authenticate the user
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          console.log('Attempting to sign in with custom token...');
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          console.log('No custom token, signing in anonymously...');
+          await signInAnonymously(auth);
+        }
+        
+      } catch (error) { 
+        console.error('Firebase initialization error:', error); 
+        showNotification('Fatal Error', 'Failed to initialize app. Invalid configuration.', 'error', 10000); 
+      }
+    };
+    
+    const handleUserLogin = async (user) => {
+      // Idempotency check: If we're already processing this user, skip.
+      if (currentUserId === user.uid) {
+          console.log('handleUserLogin: Already processing', user.uid);
+          return;
+      }
+      currentUserId = user.uid;
+      
+      console.log('handleUserLogin: Setting up user', user.uid);
+
+      // 1. Initialize a basic currentUser object immediately
+      currentUser = {
+        uid: user.uid,
+        email: user.email,
+        username: user.displayName || 'Cringelord',
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'C')}&background=6a0dad&color=fff`
+        // Other fields will be populated by listeners
+      };
+      
+      // 2. Update UI immediately to show "Logout"
+      updateUIAfterLogin();
+      
+      // 3. Define document paths
+      const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${user.uid}`);
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${user.uid}/data/main`);
+      
+      // 4. Detach old listeners if any (safety check)
+      if (userPublicListener) userPublicListener();
+      if (userPrivateListener) userPrivateListener();
+
+      // 5. Set up new listeners
+      let isPublicDataLoaded = false;
+      let isPrivateDataLoaded = false;
+      
+      // This helper coordinates data from both async listeners
+      const checkDataLoaded = () => {
+          if (isPublicDataLoaded && isPrivateDataLoaded) {
+              console.log('Both user docs loaded. Applying preferences and listeners.');
+              applyUserPreferences();
+              attachRealtimeListeners(user.uid); // Attach sub-listeners
+              
+              // If user is on "My Memes", reload the feed
+              if (currentTab === 'mymemes') { 
+                loadFeed(true); 
+              }
+          }
+      };
+
+      // Listener for PUBLIC user data
+      userPublicListener = onSnapshot(publicUserRef, (doc) => {
+        if (doc.exists()) {
+          console.log('Public user data received');
+          const publicData = doc.data();
+          currentUser = {
+            ...currentUser,
+            username: publicData.username,
+            avatar: publicData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(publicData.username)}&background=6a0dad&color=fff`,
+            bio: publicData.bio || '',
+            cringeCoin: publicData.cringeCoin || 0,
+            memeCount: publicData.memeCount || 0,
+            createdAt: publicData.createdAt?.toDate()
+          };
+          isPublicDataLoaded = true;
+          checkDataLoaded();
+        } else {
+          console.warn('Public user document does not exist for UID:', user.uid);
+          // This can happen if signup fails to create the doc.
+        }
+      }, (error) => console.error("Error listening to public user doc:", error));
+      
+      // Listener for PRIVATE user data
+      userPrivateListener = onSnapshot(privateUserRef, async (doc) => {
+        if (doc.exists()) {
+          console.log('Private user data received');
+          const privateData = doc.data();
+          currentUser = {
+            ...currentUser,
+            streak: privateData.streak || 0
+          };
+          userPreferences = privateData.preferences || userPreferences;
+          userQuests = privateData.quests || {};
+          
+          await checkDailyReset(privateUserRef, privateData);
+          isPrivateDataLoaded = true;
+          checkDataLoaded();
+        } else {
+          console.warn('Private user document does not exist for UID:', user.uid);
+        }
+      }, (error) => console.error("Error listening to private user doc:", error));
+
+      // 6. Close auth modal if it's open
+      $('authModal').classList.remove('active');
+    };
+    
+    const handleUserLogout = () => {
+      // This function is called by onAuthStateChanged when user is null.
+      currentUser = null;
+      currentUserId = null; // Clear the tracking ID
+      
+      // 1. Reset all local user data
+      userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
+      userQuests = {};
+      userCollections = { favorites: [] };
+      
+      // 2. Detach all user-specific listeners
+      if (userPublicListener) { userPublicListener(); userPublicListener = null; }
+      if (userPrivateListener) { userPrivateListener(); userPrivateListener = null; }
+      if (notificationsListener) { notificationsListener(); notificationsListener = null; }
+      if (collectionsListener) { collectionsListener(); collectionsListener = null; }
+      if (chatListener) { chatListener(); chatListener = null; } // Also stop chat listener
+      
+      // 3. Update UI to logged-out state
+      updateUIAfterLogout(); // Show "Login" button
+      
+      // 4. Clear any UI elements that depend on user data
+      $('notificationsBadge').textContent = '';
+      $('menuCollectionsBadge').textContent = '';
+      $('chatBadge').textContent = '';
+      $('menuChatBadge').textContent = '';
+      
+      // 5. Reset to default theme and clear "saved" status from cards
+      applyUserPreferences(); 
+      updateSavedButtons();
+      
+      // 6. If user was on a protected tab, kick them to "Hot"
+      if (currentTab === 'mymemes') {
+        $$('.nav-item.active').forEach(el => el.classList.remove('active'));
+        document.querySelector('[data-tab="hot"]').classList.add('active');
+        currentTab = 'hot';
+        loadFeed(true); // This will now load API memes
+      }
+      
+      // 7. Close any open modals that require login
+      $$('.modal-overlay.active').forEach(modal => {
+        if (modal.id !== 'authModal') {
+           modal.classList.remove('active');
+        }
+      });
+      
+      console.log('User has been logged out and all state cleared.');
+    };
+    
+    // These listeners are only attached AFTER a user is fully logged in
+    const attachRealtimeListeners = (userId) => {
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${userId}/data/main`);
+      
+      // Notifications
+      if (notificationsListener) notificationsListener(); // Detach old
+      const notifQuery = query(collection(privateUserRef, 'notifications'), orderBy('timestamp', 'desc'), limit(10));
+      notificationsListener = onSnapshot(notifQuery, (snapshot) => {
+        const unread = snapshot.docs.filter(doc => !doc.data().read).length;
+        $('notificationsBadge').textContent = unread > 0 ? unread : '';
+        renderNotifications(snapshot.docs);
+      }, (error) => console.error("Error listening to notifications: ", error));
+      
+      // Collections (Favorites)
+      if (collectionsListener) collectionsListener(); // Detach old
+      const favQuery = query(collection(privateUserRef, 'collections', 'favorites', 'memes'));
+      collectionsListener = onSnapshot(favQuery, (snapshot) => {
+          userCollections.favorites = snapshot.docs.map(doc => doc.id);
+          $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
+          updateSavedButtons(); // Update UI for all visible cards
+      }, (error) => console.error("Error listening to collections: ", error));
+    };
+    
+    const createUserProfile = async (user, username) => {
+      try {
+        console.log('Creating user profile for:', user.uid, 'with username:', username);
+        const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${user.uid}`);
+        const privateUserRef = doc(db, `artifacts/${appId}/users/${user.uid}/data/main`);
+        
+        const today = new Date().toISOString().split('T')[0];
+        
+        const publicData = {
+          username: username,
+          cringeCoin: 10,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=6a0dad&color=fff`,
+          bio: 'New CringeScroller!',
+          createdAt: serverTimestamp(),
+          memeCount: 0
+        };
+        
+        const privateData = {
+          email: user.email,
+          streak: 1,
+          lastActive: serverTimestamp(),
+          preferences: userPreferences, // Default prefs
+          quests: {
+              lastReset: today,
+              reactCount: 0, postCount: 0, tipCount: 0,
+              reactClaimed: false, postClaimed: false, tipClaimed: false
+          }
+        };
+
+        const batch = writeBatch(db);
+        batch.set(publicUserRef, publicData);
+        batch.set(privateUserRef, privateData);
+        await batch.commit();
+        
+        console.log('User profile created successfully in batch.');
+        // onAuthStateChanged will handle the rest.
+
+      } catch (error) { 
+        console.error('User profile creation error:', error); 
+        showNotification('Error', 'Failed to create user profile.', 'error'); 
+      }
+    };
+    
+    const signUpUser = async () => {
+      const email = $('signupEmailInput').value.trim();
+      const username = $('signupUsernameInput').value.trim();
+      const password = $('signupPasswordInput').value;
+      const errorEl = $('signupError');
+      const btn = $('signupBtn');
+      errorEl.textContent = '';
+      
+      if (!email || !username || !password) { errorEl.textContent = 'All fields are required.'; return; }
+      if (!/^[a-zA-Z0-9_]{2,15}$/.test(username)) { errorEl.textContent = 'Username: 2-15 chars (letters, numbers, _).'; return; }
+      if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
+      
+      btn.disabled = true; 
+      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+      
+      try {
+        // 1. Check if username is taken
+        const usernameQuery = query(collection(db, `artifacts/${appId}/public/data/users`), where('username', '==', username));
+        const usernameSnapshot = await getDocs(usernameQuery);
+        if (!usernameSnapshot.empty) {
+            throw new Error('Username is already taken.');
+        }
+        
+        // 2. Create the auth user
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log('Auth user created:', userCredential.user.uid);
+        
+        // 3. Update their auth profile (displayName)
+        await updateProfile(userCredential.user, { displayName: username });
+        console.log('Auth profile updated with displayName:', username);
+        
+        // 4. Create their Firestore database documents
+        // This MUST complete before onAuthStateChanged finishes.
+        await createUserProfile(userCredential.user, username);
+        
+        // onAuthStateChanged will now fire and call handleUserLogin.
+        showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
+        // We can close the modal here. handleUserLogin will no longer be responsible for it.
+        $('authModal').classList.remove('active');
+
+      } catch (error) { 
+        console.error('Sign up error:', error); 
+        errorEl.textContent = error.message.replace('Firebase: ', '');
+      } finally { 
+        btn.disabled = false; 
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account'; 
+      }
+    };
+
+    const loginUser = async () => {
+      const email = $('loginEmailInput').value.trim();
+      const password = $('loginPasswordInput').value;
+      const errorEl = $('loginError');
+      const btn = $('loginBtn');
+      errorEl.textContent = '';
+      
+      if (!email || !password) { errorEl.textContent = 'Both email and password are required.'; return; }
+      
+      btn.disabled = true; 
+      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+      
+      try {
+        // This will trigger onAuthStateChanged, which calls handleUserLogin
+        await signInWithEmailAndPassword(auth, email, password);
+        showNotification('Logged In!', 'Welcome back! Your memes are waiting.', 'success');
+        $('authModal').classList.remove('active');
+      } catch (error) { 
+        console.error('Login error:', error); 
+        errorEl.textContent = error.message.replace('Firebase: ', '');
+      } finally { 
+        btn.disabled = false; 
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In'; 
+      }
+    };
+    
+    const logout = async () => {
+      const confirmed = await showConfirmModal('Logout', 'Are you sure you want to log out?', 'Logout');
+      if (confirmed) {
+        // This will trigger onAuthStateChanged, which calls handleUserLogout
+        signOut(auth).catch(error => showNotification('Error', 'Failed to log out.', 'error'));
+      }
+    };
+
+    const deleteAccount = async () => {
+        if (!currentUser) return;
+        
+        const confirmed = await showConfirmModal('Delete Account', 'Are you ABSOLUTELY sure? This will permanently delete your profile, memes, and all data. This cannot be undone.', 'Delete My Account');
+        
+        if (!confirmed) return;
+
+        showNotification('Deleting...', 'Your account is being deleted. This may take a moment.', 'info', 5000);
+        closeModal('settingsModal');
+        
+        try {
+            const userId = currentUser.uid;
+            const authUser = auth.currentUser;
+            
+            if (authUser.uid !== userId) {
+              console.error("CRITICAL: Auth user mismatch. Aborting delete.");
+              throw new Error("User mismatch. Please log in again.");
+            }
+            
+            // 1. Delete all user's memes and associated image files
+            const memesQuery = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', userId));
+            const memesSnapshot = await getDocs(memesQuery);
+            const batch = writeBatch(db);
+            
+            for (const doc of memesSnapshot.docs) {
+                batch.delete(doc.ref);
+                const imageUrl = doc.data().imageUrl;
+                if (imageUrl && imageUrl.includes('firebasestorage')) {
+                    try {
+                        const storageRef = ref(storage, imageUrl);
+                        await deleteObject(storageRef);
+                    } catch (storageError) {
+                        console.warn(`Failed to delete storage file: ${imageUrl}`, storageError);
+                    }
+                }
+            }
+            await batch.commit();
+
+            // 2. Delete public and private user docs
+            const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${userId}`);
+            const privateUserRef = doc(db, `artifacts/${appId}/users/${userId}/data/main`);
+            // We can't easily delete subcollections from the client, but deleting
+            // the main docs will hide them from the app.
+            await deleteDoc(publicUserRef);
+            await deleteDoc(privateUserRef);
+
+            // 3. Delete user's avatar from storage
+            if (currentUser.avatar && currentUser.avatar.includes('firebasestorage')) {
+                try {
+                    const avatarRef = ref(storage, currentUser.avatar);
+                    await deleteObject(avatarRef);
+                } catch (avatarError) {
+                    console.warn(`Failed to delete avatar: ${currentUser.avatar}`, avatarError);
+                }
+            }
+
+            // 4. Delete the user from Firebase Auth
+            // This will trigger onAuthStateChanged -> handleUserLogout
+            await deleteUser(authUser);
+
+            showNotification('Account Deleted', 'Your account has been permanently deleted.', 'success');
+            
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            showNotification('Error', 'Failed to delete account. Please log in again and retry.', 'error');
+        }
+    };
+    
+    const applyUserPreferences = () => {
+      document.body.className = `theme-${userPreferences.theme || 'dark'}`;
+      
+      const themeIcon = $('themeToggleBtn')?.querySelector('i');
+      if (themeIcon) { 
+        themeIcon.className = userPreferences.theme.includes('light') ? 'fas fa-sun' : 'fas fa-moon'; 
+      }
+      
+      document.documentElement.style.setProperty('--card-bg', userPreferences.cardBackground || '#242152');
+      
+      const fontSize = userPreferences.fontSize || 'medium';
+      document.body.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
+      document.body.classList.add(`font-size-${fontSize}`);
+    };
+    
+    // FIX: This function updates the UI when a user logs IN
+    const updateUIAfterLogin = () => {
+      if (!$('menuLogin')) return; // Check if DOM is ready
+      $('menuLogin').style.display = 'none';
+      $('menuLogout').style.display = 'flex';
+    };
+    
+    // FIX: This function updates the UI when a user logs OUT
+    const updateUIAfterLogout = () => {
+      if (!$('menuLogin')) return; // Check if DOM is ready
+      $('menuLogin').style.display = 'flex';
+      $('menuLogout').style.display = 'none';
+    };
+    
+    const showAuthModal = () => {
+      $('authModal').classList.add('active');
+      $('signupForm').style.display = 'block'; 
+      $('loginForm').style.display = 'none';
+      $('signupTab').classList.add('active'); 
+      $('loginTab').classList.remove('active');
+      $('signupError').textContent = ''; 
+      $('loginError').textContent = '';
+    };
+    
+    // ===== FEED & MEME RENDERING =====
+    const renderMeme = (meme, index) => {
+      const card = document.createElement('div');
+      card.className = 'meme-card';
+      const isFirestore = !!meme.createdAt;
+      
+      const memeId = isFirestore ? meme.id : btoa(encodeURIComponent(meme.url)); 
+      const dataSource = isFirestore ? 'firestore' : 'api';
+      const memeUrl = isFirestore ? meme.imageUrl : meme.url;
+      const title = isFirestore ? meme.title : (meme.title || 'Cringe');
+      const username = isFirestore ? meme.username : 'API';
+      const creatorId = isFirestore ? meme.userId : null;
+      
+      card.dataset.id = memeId;
+      card.dataset.source = dataSource;
+      card.dataset.docId = isFirestore ? meme.id : '';
+      card.dataset.url = memeUrl;
+      card.dataset.title = title;
+      card.dataset.creatorId = creatorId;
+      card.dataset.username = username;
+      
+      const isSaved = userCollections.favorites && userCollections.favorites.includes(memeId);
+      
+      card.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div class="meme-title">${escapeHtml(title)}</div>
+            <div class="meme-meta">
+              <span class="user-badge" ${creatorId ? `data-user-id="${creatorId}"` : ''}>
+                <i class="fas fa-${isFirestore ? 'user' : 'robot'}"></i> ${escapeHtml(username)}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="meme-image-container">
+          <img class="meme-image" src="${createPlaceholder(300, 300)}" data-src="${memeUrl}" loading="${index < 3 ? 'eager' : 'lazy'}" alt="Meme: ${escapeHtml(title)}">
+        </div>
+        <div class="card-footer">
+          <div class="reaction-bar">
+            <button class="reaction-btn" data-reaction="cringe" title="Cringe"><i class="fas fa-skull"></i><span class="reaction-count">${formatNumber(meme.reactions?.cringe)}</span></button>
+            <button class="reaction-btn" data-reaction="laugh" title="Laugh"><i class="fas fa-grin"></i><span class="reaction-count">${formatNumber(meme.reactions?.laugh)}</span></button>
+            <button class="reaction-btn" data-reaction="cry" title="Cry"><i class="fas fa-sad-tear"></i><span class="reaction-count">${formatNumber(meme.reactions?.cry)}</span></button>
+          </div>
+          <div class="action-buttons">
+            <button class="card-btn save-btn ${isSaved ? 'saved' : ''}" title="Save to collection"><i class="fas fa-bookmark"></i><span>${isSaved ? 'Saved' : 'Save'}</span></button>
+            <button class="card-btn tip-btn" title="Tip creator (5 CC)" ${(!isFirestore || (currentUser && creatorId === currentUser.uid)) ? 'disabled' : ''}><i class="fas fa-coins"></i>Tip</button>
+            <button class="card-btn remix-btn" title="Remix this meme"><i class="fas fa-sync-alt"></i>Remix</button>
+            <button class="card-btn share-btn" title="Share meme"><i class="fas fa-share-alt"></i>Share</button>
+          </div>
+        </div>
+      `;
+      feed.appendChild(card);
+      
+      // Image lazy loading
+      const img = card.querySelector('.meme-image');
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          img.src = img.dataset.src;
+          img.onload = () => img.classList.add('loaded');
+          img.onerror = () => { img.src = createPlaceholder(300, 300); img.classList.add('loaded'); };
+          observer.disconnect();
+        }
+      }, { threshold: 0.1 });
+      observer.observe(img);
+      
+      // Add event listeners
+      card.querySelector('.save-btn').onclick = () => saveMeme(card);
+      card.querySelector('.tip-btn').onclick = () => tipMeme(card);
+      card.querySelector('.remix-btn').onclick = () => remixMeme(memeUrl);
+      card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl);
+      card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
+      
+      const userBadge = card.querySelector('.user-badge');
+      if (userBadge && creatorId) {
+          userBadge.onclick = () => showPublicProfile(creatorId);
+      }
+    };
+    
+    // FIX: This function now correctly handles all feed tabs
+    const loadFeed = async (clear = false) => {
+      if (isLoading) return;
+      isLoading = true;
+      
+      if (clear) { 
+        feed.innerHTML = ''; 
+        loadCount = 0; 
+        seenUrls.clear(); 
+      }
+      
+      if (loadCount === 0) { 
+        showLoadingSkeletons(); 
+      }
+      
+      try {
+        if (currentTab === 'mymemes') {
+          // This case now requires auth
+          if (!currentUser) {
+            feed.innerHTML = '<div class="feed-message">Please <a href="#" id="loginLinkMyMemes">log in</a> to see your posted memes.</div>'; 
+            $('loginLinkMyMemes').onclick = (e) => { e.preventDefault(); showAuthModal(); };
+            isLoading = false;
+            return; // Stop execution
+          }
+          await loadMyMemes(); 
+        } else if (currentTab === 'search') { 
+          await loadSearchResults($('searchInput').value.trim()); 
+        } else { 
+          // "Hot", "Fresh", etc. load from API and don't need auth
+          await loadApiMemes(); 
+        }
+      } catch (error) { 
+        console.error('Error loading feed:', error); 
+        feed.innerHTML = '<div class="feed-message">Could not load memes. Please try again later.</div>';
+      } finally { 
+        $$('.skeleton-card').forEach(el => el.remove()); 
+        isLoading = false; 
+      }
+    };
+    
+    const showLoadingSkeletons = () => {
+      feed.innerHTML = '';
+      const skeletonCount = window.innerWidth > 1024 ? 3 : (window.innerWidth > 768 ? 2 : 1);
+      for (let i = 0; i < skeletonCount; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-card';
+        skeleton.style.height = `${Math.random() * 200 + 350}px`;
+        skeleton.style.animationDelay = `${i * 0.1}s`;
+        skeleton.innerHTML = `<div style="padding: 12px;"><div style="height: 20px; width: 80%; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 8px;"></div><div style="height: 14px; width: 30%; background: var(--bg-secondary); border-radius: 4px;"></div></div><div style="height: ${Math.random() * 150 + 200}px; background: var(--bg-secondary);"></div>`;
+        feed.appendChild(skeleton);
+      }
+    };
+    
+    // This function assumes currentUser is already checked by loadFeed
+    const loadMyMemes = async () => {
+      try {
+        const q = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) { 
+          feed.innerHTML = '<div class="feed-message">You haven\'t posted any memes yet. Go to the <a href="#" id="createMemeLink">Meme Editor</a>!</div>'; 
+          $('createMemeLink').onclick = (e) => { e.preventDefault(); openModal('memeEditorModal'); }; 
+          return; 
+        }
+        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
+      } catch (error) { 
+        console.error('Error loading my memes:', error); 
+        feed.innerHTML = '<div class="feed-message">Error loading your memes.</div>'; 
+      }
+    };
+
+    const loadSearchResults = async (username) => {
+      if (!username) { 
+        feed.innerHTML = '<div class="feed-message">Enter a username to search.</div>'; 
+        return; 
+      }
+      try {
+        const q = query(collection(db, `artifacts/${appId}/public/data/memes`), where('username', '==', username), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) { 
+          feed.innerHTML = `<div class="feed-message">No memes found for user "<strong>${escapeHtml(username)}</strong>".</div>`; 
+          return; 
+        }
+        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
+      } catch (error) { 
+        console.error('Error loading search results:', error); 
+        feed.innerHTML = '<div class="feed-message">Error loading search results.</div>'; 
+      }
+    };
+    
+    const loadApiMemes = async () => {
+      const batchSize = window.innerWidth > 768 ? 3 : 2;
+      let memesFetched = 0;
+      let attempts = 0;
+      while (memesFetched < batchSize && attempts < 10) {
+        const meme = await fetchMeme();
+        if (meme) { 
+          renderMeme(meme, loadCount++); 
+          memesFetched++; 
+        }
+        attempts++;
+      }
+    };
+
+    const fetchMeme = async () => {
+      try {
+        const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
+        const response = await fetch(`${url}?_=${Date.now()}`); // Cache buster
+        if (!response.ok) throw new Error('API response not ok.');
+        const data = await response.json();
+        if (!data?.url || data.nsfw || data.spoiler || seenUrls.has(data.url)) { 
+          return null; // Skip duplicate or invalid
+        } 
+        seenUrls.add(data.url);
+        return { 
+          url: data.url, 
+          title: data.title || 'Cringe', 
+          ups: data.ups || 0, 
+          reactions: { 
+            cringe: Math.floor(Math.random() * 100), 
+            laugh: Math.floor(Math.random() * 150), 
+            cry: Math.floor(Math.random() * 75) 
+          } 
+        };
+      } catch (error) { 
+        console.warn('Fetch meme error:', error); 
+        return null; 
+      }
+    };
+    
+    // ===== MEME INTERACTIONS =====
+    const saveMeme = async (card) => {
+      if (!currentUser) { showAuthModal(); return; }
+      const memeId = card.dataset.id;
+      const saveBtn = card.querySelector('.save-btn');
+      const saveBtnText = saveBtn.querySelector('span');
+      
+      const memeData = {
+          title: card.dataset.title,
+          url: card.dataset.url,
+          source: card.dataset.source,
+          docId: card.dataset.docId || null,
+          savedAt: serverTimestamp()
+      };
+      
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+      const favRef = doc(privateUserRef, 'collections', 'favorites', 'memes', memeId);
+      
+      try {
+          if (saveBtn.classList.contains('saved')) {
+              await deleteDoc(favRef);
+              if(saveBtnText) saveBtnText.textContent = 'Save';
+              showNotification('Unsaved', 'Meme removed from your favorites.', 'info');
+          } else {
+              await setDoc(favRef, memeData);
+              if(saveBtnText) saveBtnText.textContent = 'Saved';
+              showNotification('Saved!', 'Meme added to your favorites.', 'success');
+          }
+      } catch (error) {
+          console.error('Save meme error:', error);
+          showNotification('Error', 'Could not update your collection.', 'error');
+      }
+    };
+    
+    const updateSavedButtons = () => {
+        $$('.meme-card').forEach(card => {
+            const memeId = card.dataset.id;
+            const saveBtn = card.querySelector('.save-btn');
+            if (!saveBtn) return;
+            const saveBtnText = saveBtn.querySelector('span');
+            if (userCollections.favorites && userCollections.favorites.includes(memeId)) {
+                saveBtn.classList.add('saved');
+                if(saveBtnText) saveBtnText.textContent = 'Saved';
+            } else {
+                saveBtn.classList.remove('saved');
+                if(saveBtnText) saveBtnText.textContent = 'Save';
+            }
+        });
+    };
+    
+    const tipMeme = async (card) => {
+      if (!currentUser) { showAuthModal(); return; }
+      if (currentUser.cringeCoin < 5) { 
+        showNotification('Insufficient Funds', 'You need at least 5 CringeCoin to tip.', 'error'); 
+        return; 
+      }
+      
+      const creatorId = card.dataset.creatorId;
+      if (creatorId === currentUser.uid) {
+        showNotification('Self-Tip', "You can't tip your own meme!", 'error');
+        return;
+      }
+      
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+      const memeId = card.dataset.docId;
+      const memeRef = doc(db, `artifacts/${appId}/public/data/memes`, memeId);
+      const publicCreatorRef = doc(db, `artifacts/${appId}/public/data/users`, creatorId);
+      const privateCreatorRef = doc(db, `artifacts/${appId}/users/${creatorId}/data/main`);
+      
+      try {
+        await runTransaction(db, async (transaction) => {
+          const userDoc = await transaction.get(privateUserRef);
+          if (!userDoc.exists() || userDoc.data().cringeCoin < 5) { 
+            throw new Error("Insufficient funds."); 
+          }
+          
+          transaction.update(privateUserRef, { cringeCoin: increment(-5) });
+          transaction.update(memeRef, { tips: increment(5) });
+          transaction.update(publicCreatorRef, { cringeCoin: increment(5) });
+        });
+        
+        await addDoc(collection(privateCreatorRef, 'notifications'), {
+            type: 'tip',
+            fromUser: currentUser.username,
+            amount: 5,
+            memeTitle: card.dataset.title,
+            timestamp: serverTimestamp(),
+            read: false
+        });
+        
+        await updateQuestProgress('tip');
+        showNotification('Tip Sent!', '5 CringeCoin sent to the meme creator!', 'success');
+      } catch (error) { 
+        console.error("Tip transaction failed: ", error); 
+        showNotification('Error', error.message, 'error'); 
+      }
+    };
+    
+    const remixMeme = (imageUrl) => openModal('memeEditorModal', imageUrl);
+    
+    const shareMeme = (memeUrl) => {
+      if (navigator.share) {
+        navigator.share({ 
+          title: 'CringeScroll Meme', 
+          text: 'Check out this hilarious meme on CringeScroll!', 
+          url: memeUrl 
+        }).catch((error) => console.log('Error sharing:', error));
+      } else {
+        navigator.clipboard.writeText(memeUrl)
+          .then(() => showNotification('Copied!', 'Meme link copied to clipboard!', 'success'))
+          .catch(() => showNotification('Error', 'Failed to copy to clipboard', 'error'));
+      }
+    };
+    
+    const addReaction = async (card, reactionType) => {
+      if (!currentUser) { showAuthModal(); return; }
+      
+      const btn = card.querySelector(`.reaction-btn[data-reaction="${reactionType}"]`);
+      const countEl = btn.querySelector('.reaction-count');
+      const currentVal = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
+      countEl.textContent = formatNumber(currentVal + 1);
+      btn.classList.add('active');
+      btn.style.transform = 'scale(1.2)';
+      setTimeout(() => { btn.style.transform = 'scale(1)'; }, 300);
+      
+      await updateQuestProgress('react');
+      
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+      
+      if (card.dataset.source === 'api') {
+        showNotification('Reaction Added!', '+1 CringeCoin for reacting!', 'success');
+        await updateDoc(privateUserRef, { cringeCoin: increment(1) });
+        return;
+      }
+      
+      const memeId = card.dataset.docId;
+      const memeRef = doc(db, `artifacts/${appId}/public/data/memes`, memeId);
+      
+      try {
+        await runTransaction(db, async (transaction) => {
+            transaction.update(privateUserRef, { cringeCoin: increment(1) });
+            transaction.update(memeRef, { [`reactions.${reactionType}`]: increment(1) });
+        });
+        showNotification('Reaction Added!', `You reacted! +1 CringeCoin`, 'success');
+      } catch (error) {
+        console.error('Reaction update error:', error);
+        countEl.textContent = formatNumber(currentVal); // Revert count
+        btn.classList.remove('active');
+        showNotification('Error', 'Could not save reaction.', 'error');
+      }
+    };
+    
+    // ===== CHAT =====
+    const toggleChatWindow = () => {
+      if (!currentUser) { showAuthModal(); return; } // Protect chat
+      chatWindow.classList.toggle('active');
+      if (chatWindow.classList.contains('active')) { 
+        loadChatMessages(); 
+        $('chatBadge').textContent = '';
+        $('menuChatBadge').textContent = '';
+      } else { 
+        if (chatListener) { 
+          chatListener(); 
+          chatListener = null; 
+        } 
+      }
+    };
+    
+    const loadChatMessages = () => {
+      if (chatListener) return;
+      const messagesContainer = $('chatMessages');
+      const q = query(collection(db, `artifacts/${appId}/public/data/chat`), orderBy('timestamp', 'desc'), limit(50));
+      
+      chatListener = onSnapshot(q, (snapshot) => {
+        messagesContainer.innerHTML = '';
+        if (snapshot.empty) { 
+          messagesContainer.innerHTML = '<div class="feed-message" style="font-size: 0.9rem; padding: 20px;">No messages yet. Be the first!</div>'; 
+          return; 
+        }
+        
+        const messages = [];
+        snapshot.forEach(doc => { messages.push(doc.data()); });
+        messages.reverse().forEach(renderChatMessage);
+        
+        // Update unread count only if window is not active
+        if (!chatWindow.classList.contains('active')) {
+          const unreadCount = messages.length; // Simple count
+          $('chatBadge').textContent = unreadCount > 0 ? unreadCount : '';
+          $('menuChatBadge').textContent = unreadCount > 0 ? unreadCount : '';
+        }
+        
+        setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
+      }, (error) => { 
+        console.error("Chat error:", error); 
+        messagesContainer.innerHTML = '<div class="feed-message">Could not load chat.</div>'; 
+      });
+    };
+    
+    const renderChatMessage = (msg) => {
+        const messagesContainer = $('chatMessages');
+        const messageDiv = document.createElement('div');
+        const isOutgoing = currentUser && (msg.userId === currentUser.uid);
+        messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+        
+        let timeString = '...';
+        if (msg.timestamp) { 
+          timeString = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+        }
+        
+        messageDiv.innerHTML = `
+          <div class="message-content">${escapeHtml(msg.text)}</div>
+          <div class="message-meta">
+            <span class="message-sender">${escapeHtml(msg.sender)}</span>
+            <span class="message-time">${timeString}</span>
+          </div>
+        `;
+        messagesContainer.appendChild(messageDiv);
+    };
+    
+    const sendChatMessage = async () => {
+      const input = $('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      if (!currentUser) { showAuthModal(); return; }
+      
+      input.disabled = true;
+      try {
+        await addDoc(collection(db, `artifacts/${appId}/public/data/chat`), { 
+          text: text, 
+          sender: currentUser.username, 
+          userId: currentUser.uid, 
+          timestamp: serverTimestamp() 
+        });
+        input.value = '';
+      } catch (error) { 
+        console.error('Send message error:', error); 
+        showNotification('Error', 'Could not send message.', 'error'); 
+      }
+      input.disabled = false; 
+      input.focus();
+    };
+    
+    // ===== MEME EDITOR =====
+    let fabricCanvas = null;
+    let activeTool = 'text';
+    let history = [];
+    let historyIndex = -1;
+    
+    const openModal = (modalId, data = null) => {
+        const modal = $(modalId);
+        if (!modal) return;
+        
+        // Don't open if user is not logged in for protected modals
+        const protectedModals = ['settingsModal', 'profileModal', 'collectionsModal', 'inventoryModal', 'leaderboardModal', 'questsModal', 'notificationsModal', 'memeEditorModal'];
+        if (protectedModals.includes(modalId) && !currentUser) {
+            showAuthModal();
+            return;
+        }
+        
+        modal.classList.add('active');
+        
+        // Run modal-specific load logic
+        switch (modalId) {
+            case 'settingsModal': loadSettings(); break;
+            case 'profileModal': showPublicProfile(data); break; // `data` is userId
+            case 'collectionsModal': showCollections(); break;
+            case 'inventoryModal': showInventory(); break;
+            case 'leaderboardModal': showLeaderboard(); break;
+            case 'questsModal': showQuests(); break;
+            case 'notificationsModal': showNotifications(); break;
+            case 'memeEditorModal': setTimeout(() => initMemeEditor(data), 100); break; // `data` is imageUrl
+        }
+    };
+    
+    const initMemeEditor = (imageUrl) => {
+      const container = $('editorContainer');
+      const canvasEl = $('canvas');
+      
+      if (container.clientWidth === 0 || container.clientHeight === 0) {
+          console.warn("Editor container has no dimensions. Retrying...");
+          setTimeout(() => initMemeEditor(imageUrl), 200);
+          return;
+      }
+      
+      const containerWidth = container.clientWidth - 10;
+      const containerHeight = container.clientHeight - 10;
+      canvasEl.width = containerWidth; 
+      canvasEl.height = containerHeight;
+      
+      if (!fabricCanvas) {
+        fabricCanvas = new fabric.Canvas('canvas', { 
+          backgroundColor: '#0f0c29', 
+          selection: true, 
+          preserveObjectStacking: true 
+        });
+        setupMemeEditorCanvasListeners();
+      } else {
+        fabricCanvas.clear();
+        fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
+        fabricCanvas.setBackgroundImage(null, fabricCanvas.renderAll.bind(fabricCanvas));
+      }
+      
+      fabricCanvas.setWidth(containerWidth);
+      fabricCanvas.setHeight(containerHeight);
+      history = []; 
+      historyIndex = -1;
+      
+      if (imageUrl) {
+        setCanvasBackgroundImage(imageUrl);
+      } else { 
+        saveCanvasState(); 
+      }
+      
+      $$('.editor-tool').forEach(b => b.classList.remove('active'));
+      $('.editor-tool[data-tool="text"]').classList.add('active');
+      activeTool = 'text'; 
+      fabricCanvas.isDrawingMode = false;
+      updateEditorSettings();
+    };
+
+    const setCanvasBackgroundImage = (imageUrl) => {
+        fabric.Image.fromURL(imageUrl, (img) => {
+          const containerWidth = fabricCanvas.width;
+          const containerHeight = fabricCanvas.height;
+          const scale = Math.min(containerWidth / img.width, containerHeight / img.height);
+          img.scale(scale);
+          img.set({ 
+            left: containerWidth / 2, 
+            top: containerHeight / 2, 
+            originX: 'center', 
+            originY: 'center', 
+            selectable: false, 
+            evented: false 
+          });
+          fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
+          saveCanvasState();
+        }, { crossOrigin: 'anonymous' });
+    };
+    
+    const updateEditorSettings = () => {
+      if (!fabricCanvas) return;
+      const brushSize = parseInt($('brushSize').value);
+      const fillColor = $('textColorPicker').value;
+      const strokeColor = $('strokeColorPicker').value;
+      
+      if (fabricCanvas.isDrawingMode) {
+        fabricCanvas.freeDrawingBrush.width = brushSize;
+        fabricCanvas.freeDrawingBrush.color = activeTool === 'eraser' ? fabricCanvas.backgroundColor : fillColor;
+      }
+      
+      const activeObj = fabricCanvas.getActiveObject();
+      if (activeObj) {
+          if (activeObj.type.includes('text')) {
+              activeObj.set({ fill: fillColor, stroke: strokeColor, fontSize: brushSize });
+          }
+          fabricCanvas.renderAll();
+      }
+    };
+    
+    const saveCanvasState = () => {
+      if (!fabricCanvas) return;
+      history = history.slice(0, historyIndex + 1);
+      history.push(fabricCanvas.toJSON());
+      historyIndex = history.length - 1;
+    };
+    const undoCanvasAction = () => { 
+      if (historyIndex > 0) { 
+        historyIndex--; 
+        fabricCanvas.loadFromJSON(history[historyIndex], fabricCanvas.renderAll.bind(fabricCanvas)); 
+      } 
+    };
+    const redoCanvasAction = () => { 
+      if (historyIndex < history.length - 1) { 
+        historyIndex++; 
+        fabricCanvas.loadFromJSON(history[historyIndex], fabricCanvas.renderAll.bind(fabricCanvas)); 
+      } 
+    };
+    const clearCanvas = async () => {
+      const confirmed = await showConfirmModal('Clear Canvas', 'Are you sure you want to clear the canvas? This cannot be undone.', 'Clear');
+      if (confirmed) {
+        fabricCanvas.clear();
+        fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
+        fabricCanvas.setBackgroundImage(null, fabricCanvas.renderAll.bind(fabricCanvas));
+        saveCanvasState();
+      }
+    };
+    
+    const postMemeFromEditor = async () => {
+      if (!currentUser) { showAuthModal(); return; }
+      const title = $('memeTitleInput').value.trim();
+      if (!title) { 
+        showNotification('Title Required', 'Please enter a title for your meme.', 'error'); 
+        return; 
+      }
+      
+      const btn = $('postMemeBtn');
+      btn.disabled = true; 
+      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div> Posting...';
+      
+      try {
+        const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9 });
+        const memeId = `meme_${Date.now()}`;
+        const storageRef = ref(storage, `memes/${currentUser.uid}/${memeId}.png`);
+        
+        const uploadResult = await uploadString(storageRef, dataURL, 'data_url');
+        const downloadURL = await getDownloadURL(uploadResult.ref);
+        
+        await addDoc(collection(db, `artifacts/${appId}/public/data/memes`), {
+          title: title, 
+          imageUrl: downloadURL, 
+          userId: currentUser.uid, 
+          username: currentUser.username,
+          createdAt: serverTimestamp(), 
+          isUserGenerated: true,
+          reactions: { cringe: 0, laugh: 0, cry: 0 }, 
+          tips: 0
+        });
+
+        const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
+        await updateDoc(publicUserRef, { memeCount: increment(1) });
+        
+        await updateQuestProgress('post');
+        
+        closeModal('memeEditorModal');
+        $('memeTitleInput').value = '';
+        
+        $$('.nav-item.active').forEach(el => el.classList.remove('active'));
+        document.querySelector('[data-tab="mymemes"]').classList.add('active');
+        currentTab = 'mymemes';
+        loadFeed(true);
+        
+        showNotification('Meme Posted!', 'Your meme is live! +10 CringeCoin', 'success');
+      } catch (error) { 
+        console.error('Meme post error:', error); 
+        showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
+      } finally { 
+        btn.disabled = false; 
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; 
+      }
+    };
+    
+    // ===== MODAL FUNCTIONS (IMPROVED) =====
+    
+    const closeModal = (modalId) => {
+        const modal = $(modalId);
+        if (modal) modal.classList.remove('active');
+    };
+
+    const loadSettings = () => {
+        if (!currentUser) return; // Safety check
+        
+        // Load Profile Tab
+        $('settingsAvatarImg').src = currentUser.avatar;
+        $('settingsUsername').textContent = currentUser.username;
+        $('settingsUsernameInput').value = currentUser.username;
+        $('settingsBioInput').value = currentUser.bio || '';
+        $('settingsCringeCoin').textContent = currentUser.cringeCoin;
+        $('settingsStreak').textContent = currentUser.streak;
+        
+        // Load Appearance Tab
+        $('themeSelect').value = userPreferences.theme;
+        $('fontSizeSelect').value = userPreferences.fontSize;
+        $('cardBgColor').value = userPreferences.cardBackground;
+        
+        // Load Account Tab
+        $('settingsEmailInput').value = currentUser.email;
+        $('settingsUserIdInput').value = currentUser.uid;
+    };
+    
+    const saveProfileSettings = async () => {
+        const newUsername = $('settingsUsernameInput').value.trim();
+        const newBio = $('settingsBioInput').value.trim();
+        const avatarFile = $('avatarUpload').files[0];
+        const btn = $('saveProfileSettingsBtn');
+        btn.disabled = true;
+        
+        try {
+            if (!currentUser) throw new Error('Not logged in.');
+
+            const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
+            let avatarUrl = currentUser.avatar;
+
+            if (newUsername !== currentUser.username) {
+                if (!/^[a-zA-Z0-9_]{2,15}$/.test(newUsername)) {
+                    throw new Error('Username: 2-15 chars (letters, numbers, _).');
+                }
+                const usernameQuery = query(collection(db, `artifacts/${appId}/public/data/users`), where('username', '==', newUsername));
+                const usernameSnapshot = await getDocs(usernameQuery);
+                if (!usernameSnapshot.empty) {
+                    throw new Error('Username is already taken.');
+                }
+            }
+
+            if (avatarFile) {
+                const storageRef = ref(storage, `avatars/${currentUser.uid}/${avatarFile.name}`);
+                const uploadResult = await uploadBytes(storageRef, avatarFile);
+                avatarUrl = await getDownloadURL(uploadResult.ref);
+            }
+
+            await updateDoc(publicUserRef, {
+                username: newUsername,
+                bio: newBio,
+                avatar: avatarUrl
+            });
+            
+            await updateProfile(auth.currentUser, { displayName: newUsername });
+
+            // Update all of the user's memes with the new username
+            const memesQuery = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', currentUser.uid));
+            const memesSnapshot = await getDocs(memesQuery);
+            const batch = writeBatch(db);
+            memesSnapshot.forEach(doc => {
+                batch.update(doc.ref, { username: newUsername });
+            });
+            await batch.commit();
+
+            showNotification('Profile Saved!', 'Your profile has been updated.', 'success');
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            showNotification('Error', error.message, 'error');
+        } finally {
+            btn.disabled = false;
+        }
+    };
+    
+    const saveAppearanceSettings = async () => {
+      if (!currentUser) return;
+      userPreferences.theme = $('themeSelect').value;
+      userPreferences.fontSize = $('fontSizeSelect').value;
+      userPreferences.cardBackground = $('cardBgColor').value;
+      
+      applyUserPreferences();
+      
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+      try {
+        await updateDoc(privateUserRef, { preferences: userPreferences });
+        showNotification('Saved!', 'Your UI preferences have been saved.', 'success');
+      } catch (error) {
+        showNotification('Error', 'Could not save preferences.', 'error');
+      }
+    };
+    
+    // FIX: Revamped to be more detailed and fetch user's memes
+    const showPublicProfile = async (userId) => {
+      // Default to self-profile if no ID is given
+      if (!userId) {
+          if (!currentUser) { showAuthModal(); return; }
+          userId = currentUser.uid;
+      }
+      
+      // Open modal first, then load (this is called by openModal)
+      const body = $('profileModalBody');
+      body.innerHTML = '<div class="loading-spinner"></div>';
+      
+      try {
+          const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${userId}`);
+          const userDoc = await getDoc(publicUserRef);
+          
+          if (!userDoc.exists()) {
+              body.innerHTML = '<div class="feed-message">User profile not found.</div>';
+              return;
+          }
+          
+          const user = userDoc.data();
+          const isSelf = currentUser && currentUser.uid === userId;
+          
+          // Set modal title
+          $('profileModalTitle').innerHTML = isSelf ? '<i class="fas fa-user-circle"></i> My Profile' : `<i class="fas fa-user"></i> ${escapeHtml(user.username)}'s Profile`;
+          
+          // Render profile details
+          body.innerHTML = `
+            <div class="profile-card-header">
+              <img src="${user.avatar}" alt="Avatar" class="profile-card-avatar">
+              <div>
+                <h3 class="profile-card-name">${escapeHtml(user.username)}</h3>
+                <p class="profile-card-joined">Joined: ${user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
+              </div>
+            </div>
+            <p class="profile-card-bio">${escapeHtml(user.bio) || 'No bio yet.'}</p>
+            <div class="profile-card-stats">
+              <div class="stat-item" id="profileCringeCoin">
+                <div class="stat-value">${formatNumber(user.cringeCoin)}</div>
+                <div class="stat-label">CringeCoin</div>
+              </div>
+              <div class="stat-item" id="profileMemes">
+                <div class="stat-value">${formatNumber(user.memeCount)}</div>
+                <div class="stat-label">Memes Posted</div>
+              </div>
+            </div>
+            <h3 class="menu-section-title">Recent Memes</h3>
+            <div class="profile-memes-grid" id="profileMemesGrid">
+              <div class="loading-spinner"></div>
+            </div>
+          `;
+          
+          // Now, fetch the user's recent memes
+          const memesGrid = $('profileMemesGrid');
+          const memesQuery = query(
+            collection(db, `artifacts/${appId}/public/data/memes`), 
+            where('userId', '==', userId), 
+            orderBy('createdAt', 'desc'), 
+            limit(6)
+          );
+          const memesSnapshot = await getDocs(memesQuery);
+          
+          if (memesSnapshot.empty) {
+              memesGrid.innerHTML = '<p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem;">No memes posted yet.</p>';
+              return;
+          }
+          
+          memesGrid.innerHTML = ''; // Clear spinner
+          memesSnapshot.forEach(doc => {
+              const meme = doc.data();
+              const item = document.createElement('div');
+              item.className = 'collection-item';
+              item.innerHTML = `<img src="${meme.imageUrl}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
+              // Optional: Add click to open full meme
+              memesGrid.appendChild(item);
+          });
+          
+      } catch (error) {
+          console.error("Error fetching public profile:", error);
+          body.innerHTML = '<div class="feed-message">Could not load profile.</div>';
+      }
+    };
+
+    const showCollections = async () => {
+      // openModal already checked for currentUser
+      const grid = $('favoritesGrid');
+      grid.innerHTML = '<div class="loading-spinner"></div>';
+      
+      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+      const q = query(collection(privateUserRef, 'collections', 'favorites', 'memes'), orderBy('savedAt', 'desc'));
+      
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) {
+          grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
+          return;
+      }
+      grid.innerHTML = '';
+      snapshot.forEach(doc => {
+          const meme = doc.data();
+          const item = document.createElement('div');
+          item.className = 'collection-item';
+          item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
+          grid.appendChild(item);
+      });
+    };
+
+    const showInventory = () => {
+      // openModal already checked for currentUser
+      const grid = $('badgeGrid');
+      grid.innerHTML = '';
+      
+      const createBadge = (icon, title, desc, earned) => {
+        const item = document.createElement('div');
+        item.className = 'grid-item';
+        item.style.opacity = earned ? '1' : '0.4';
+        item.innerHTML = `<i class="fas ${icon}" style="color: ${earned ? 'var(--gold)' : 'var(--text-secondary)'};"></i><div class="grid-item-title">${title}</div><div class="grid-item-meta">${desc}</div>`;
+        grid.appendChild(item);
+      };
+
+      createBadge('fa-user-plus', 'New Scroller', 'Joined CringeScroll', true);
+      createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', userQuests.tipCount > 0);
+      createBadge('fa-paint-brush', 'Creator', 'Post a meme', currentUser.memeCount > 0);
+      createBadge('fa-fire', 'Hot Streak', '3-day streak', currentUser.streak >= 3);
+      createBadge('fa-coins', 'Coin Hoarder', '100+ CringeCoin', currentUser.cringeCoin >= 100);
+      createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', currentUser.cringeCoin >= 1000);
+    };
+
+    const showLeaderboard = async () => {
+      // openModal already checked for currentUser
+      const list = $('leaderboardList');
+      list.innerHTML = '<div class="loading-spinner"></div>';
+      
+      const q = query(collection(db, `artifacts/${appId}/public/data/users`), orderBy('cringeCoin', 'desc'), limit(10));
+      const snapshot = await getDocs(q);
+      
+      list.innerHTML = '';
+      let rank = 1;
+      snapshot.forEach(doc => {
+          const user = doc.data();
+          const item = document.createElement('div');
+          item.className = `leaderboard-item rank-${rank}`;
+          item.innerHTML = `
+            <div class="leaderboard-rank">${rank}</div>
+            <img src="${user.avatar}" alt="avatar" class="leaderboard-avatar">
+            <div class="leaderboard-name">${escapeHtml(user.username)}</div>
+            <div class="leaderboard-score">${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i></div>
+          `;
+          item.onclick = () => {
+            closeModal('leaderboardModal');
+            openModal('profileModal', doc.id); // Pass the userId
+          };
+          list.appendChild(item);
+          rank++;
+      });
+    };
+
+    const showQuests = () => {
+      // openModal already checked for currentUser
+      const list = $('questList');
+      list.innerHTML = '';
+      
+      const quests = [
+        { id: 'react', title: 'Daily Reactions', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed, reward: 10 },
+        { id: 'post', title: 'Daily Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed, reward: 25 },
+        { id: 'tip', title: 'Generous Tipper', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed, reward: 5 }
+      ];
+
+      quests.forEach(q => {
+        const item = document.createElement('div');
+        const isComplete = q.progress >= q.goal;
+        item.className = `quest-item ${isComplete ? 'completed' : ''}`;
+        item.innerHTML = `
+          <div class="quest-header">
+            <div>
+              <h4 class="quest-title">${q.title}</h4>
+              <p class="quest-desc">${q.desc}</p>
+            </div>
+            <div class="quest-reward">+${q.reward} <i class="fas fa-coins"></i></div>
+          </div>
+          <div class="progress-bar"><div class="progress-bar-inner" style="width: ${Math.min(100, (q.progress / q.goal) * 100)}%;"></div></div>
+          <div class="quest-footer">
+            <span>${q.progress}/${q.goal} completed</span>
+            <button class="btn btn-primary claim-btn btn-sm" data-quest-id="${q.id}" ${(!isComplete || q.claimed) ? 'disabled' : ''}>
+              ${q.claimed ? 'Claimed' : 'Claim'}
+            </button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      
+      $$('.claim-btn').forEach(btn => {
+          btn.onclick = () => claimQuest(btn.dataset.questId, quests.find(q => q.id === btn.dataset.questId));
+      });
+    };
+    
+    const showNotifications = async () => {
+        // openModal already checked for currentUser
+        // Mark all as read when opening
+        const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+        const batch = writeBatch(db);
+        const q = query(collection(privateUserRef, 'notifications'), where('read', '==', false));
+        const snapshot = await getDocs(q);
+        snapshot.forEach(doc => {
+            batch.update(doc.ref, { read: true });
+        });
+        await batch.commit();
+        // The onSnapshot listener will update the badge
+    };
+
+    const renderNotifications = (docs) => {
+        const list = $('notificationsList');
+        if (!list) return; // Modal might not be open
+        list.innerHTML = '';
+        if (docs.length === 0) {
+            list.innerHTML = '<div class="feed-message" style="padding: 20px;">No notifications yet.</div>';
+            return;
+        }
+        docs.forEach(doc => {
+            const notif = doc.data();
+            const item = document.createElement('div');
+            item.className = 'menu-item';
+            item.style.opacity = notif.read ? 0.6 : 1;
+            let icon = 'fa-info-circle';
+            let text = 'New notification';
+            
+            if (notif.type === 'tip') {
+                icon = 'fa-coins';
+                text = `<strong>${escapeHtml(notif.fromUser)}</strong> tipped you <strong>${notif.amount} CC</strong> on "${escapeHtml(notif.memeTitle)}"`;
+            }
+            
+            item.innerHTML = `<i class="fas ${icon}" style="color: ${notif.type === 'tip' ? 'var(--gold)' : 'var(--accent-3)'};"></i><div>${text}<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">${notif.timestamp ? timeAgo(notif.timestamp.toDate()) : ''}</div></div>`;
+            list.appendChild(item);
+        });
+    };
+    
+    // ===== QUEST SYSTEM =====
+    const checkDailyReset = async (privateUserRef, privateData) => {
+        const today = new Date().toISOString().split('T')[0];
+        const lastReset = privateData.quests?.lastReset;
+        
+        if (!lastReset || lastReset !== today) {
+            const defaultQuests = {
+              lastReset: today,
+              reactCount: 0, postCount: 0, tipCount: 0,
+              reactClaimed: false, postClaimed: false, tipClaimed: false
+            };
+            
+            let newStreak = 1;
+            if (privateData.lastActive) {
+                const lastActiveDate = privateData.lastActive.toDate();
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
+                    newStreak = (privateData.streak || 0) + 1;
+                }
+            }
+            
+            await updateDoc(privateUserRef, { 
+                quests: defaultQuests,
+                streak: newStreak,
+                lastActive: serverTimestamp()
+            });
+            userQuests = defaultQuests;
+            if (newStreak > privateData.streak) {
+                showNotification('Streak Continued!', `You're on a ${newStreak}-day streak!`, 'info');
+            }
+        }
+    };
+    
+    const updateQuestProgress = async (questType) => {
+        if (!currentUser || !userQuests) return;
+        
+        const fieldMap = {
+            'react': { count: 'reactCount', claimed: 'reactClaimed' },
+            'post': { count: 'postCount', claimed: 'postClaimed' },
+            'tip': { count: 'tipCount', claimed: 'tipClaimed' }
+        };
+        
+        const quest = fieldMap[questType];
+        if (!quest || userQuests[quest.claimed]) return;
+        
+        try {
+            const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+            await updateDoc(privateUserRef, {
+                [`quests.${quest.count}`]: increment(1)
+            });
+        } catch (error) {
+            console.error('Quest update error:', error);
+        }
+    };
+
+    const claimQuest = async (questId, questData) => {
+        if (!currentUser || !questData || questData.claimed) return;
+        
+        const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+        const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
+        
+        try {
+            await runTransaction(db, async (transaction) => {
+                const userDoc = await transaction.get(privateUserRef);
+                const quests = userDoc.data().quests;
+                
+                const progress = quests[questId + 'Count'] || 0;
+                const claimed = quests[questId + 'Claimed'] || false;
+                
+                if (progress >= questData.goal && !claimed) {
+                    transaction.update(privateUserRef, { [`quests.${questId}Claimed`]: true });
+                    transaction.update(publicUserRef, { cringeCoin: increment(questData.reward) });
+                } else {
+                    throw new Error('Quest not completed or already claimed.');
+                }
+            });
+            showNotification('Reward Claimed!', `+${questData.reward} CringeCoin for completing ${questData.title}!`, 'success');
+            if ($('questsModal').classList.contains('active')) {
+                showQuests();
+            }
+        } catch (error) {
+            console.error('Claim quest error:', error);
+            showNotification('Error', error.message, 'error');
+        }
+    };
+
+    // ===== EVENT LISTENERS (RE-ARCHITECTED) =====
+    const setupEventListeners = () => {
+      feed = $('feed'); 
+      authModal = $('authModal'); 
+      chatWindow = $('chatWindow'); 
+      sidebar = $('sidebar');
+      
+      // Nav Tabs
+      $$('.nav-item[data-tab]').forEach(item => item.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        const tab = item.dataset.tab; 
+        if (currentTab === tab) return;
+        
+        // FIX: Check for auth on "My Memes" tab
+        if (tab === 'mymemes' && !currentUser) {
+            showAuthModal();
+            return;
+        }
+        
+        currentTab = tab; 
+        $$('.nav-item').forEach(el => el.classList.remove('active')); 
+        item.classList.add('active'); 
+        loadFeed(true);
+      }));
+      
+      // Header
+      $('menuToggleBtn').addEventListener('click', () => sidebar.classList.add('active'));
+      $('themeToggleBtn').addEventListener('click', toggleTheme);
+      $('notificationsBtn').addEventListener('click', () => openModal('notificationsModal'));
+      $('chatToggleBtn').addEventListener('click', toggleChatWindow);
+      $('logoLink').addEventListener('click', (e) => { 
+        e.preventDefault(); 
+        $$('.nav-item.active').forEach(el => el.classList.remove('active')); 
+        document.querySelector('[data-tab="hot"]').classList.add('active'); 
+        currentTab = 'hot'; 
+        loadFeed(true); 
+      });
+      $('searchInput').addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+          const searchTerm = e.target.value.trim();
+          if (!searchTerm) {
+            $('logoLink').click();
+            return;
+          }
+          $$('.nav-item.active').forEach(el => el.classList.remove('active'));
+          currentTab = 'search';
+          loadFeed(true);
+        }
+      });
+      
+      // Sidebar
+      $('closeSidebar').addEventListener('click', () => sidebar.classList.remove('active'));
+      $('menuProfile').addEventListener('click', () => { openModal('profileModal'); sidebar.classList.remove('active'); });
+      $('menuCollections').addEventListener('click', () => { openModal('collectionsModal'); sidebar.classList.remove('active'); });
+      $('menuInventory').addEventListener('click', () => { openModal('inventoryModal'); sidebar.classList.remove('active'); });
+      $('menuChat').addEventListener('click', () => { toggleChatWindow(); sidebar.classList.remove('active'); });
+      $('menuLeaderboard').addEventListener('click', () => { openModal('leaderboardModal'); sidebar.classList.remove('active'); });
+      $('menuQuests').addEventListener('click', () => { openModal('questsModal'); sidebar.classList.remove('active'); });
+      $('menuCreateMeme').addEventListener('click', () => { openModal('memeEditorModal'); sidebar.classList.remove('active'); });
+      $('menuMemeRoulette').addEventListener('click', () => { 
+        $('logoLink').click(); 
+        showNotification('Meme Roulette', 'Loading fresh random memes!', 'info'); 
+        sidebar.classList.remove('active');
+      });
+      $('menuSettings').addEventListener('click', () => { openModal('settingsModal'); sidebar.classList.remove('active'); });
+      $('menuLogin').addEventListener('click', () => { showAuthModal(); sidebar.classList.remove('active'); });
+      $('menuLogout').addEventListener('click', () => { logout(); sidebar.classList.remove('active'); });
+      
+      // Chat
+      $('closeChatWindow').addEventListener('click', toggleChatWindow);
+      $('sendChatMessage').addEventListener('click', sendChatMessage);
+      $('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+      
+      // Auth Modal
+      $('signupTab').addEventListener('click', () => { 
+        $('signupForm').style.display = 'block'; 
+        $('loginForm').style.display = 'none'; 
+        $('signupTab').classList.add('active'); 
+        $('loginTab').classList.remove('active'); 
+      });
+      $('loginTab').addEventListener('click', () => { 
+        $('signupForm').style.display = 'none'; 
+        $('loginForm').style.display = 'block'; 
+        $('signupTab').classList.remove('active'); 
+        $('loginTab').classList.add('active'); 
+      });
+      $('signupBtn').addEventListener('click', signUpUser);
+      $('loginBtn').addEventListener('click', loginUser);
+      
+      // Generic Modal Closer
+      $$('.close-modal').forEach(btn => btn.addEventListener('click', (e) => {
+        const modalId = e.target.closest('.modal-overlay').id;
+        closeModal(modalId);
+      }));
+      
+      // Settings Modal
+      $$('.tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
+        const tabId = e.currentTarget.dataset.tabId;
+        $$('.tab-content').forEach(content => content.classList.remove('active'));
+        $$('.tab-btn').forEach(tab => tab.classList.remove('active'));
+        $(tabId).classList.add('active');
+        e.currentTarget.classList.add('active');
+      }));
+      $('saveProfileSettingsBtn').addEventListener('click', saveProfileSettings);
+      $('avatarUpload').addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                  $('settingsAvatarImg').src = event.target.result;
+              };
+              reader.readAsDataURL(file);
+          }
+      });
+      $('saveAppearanceSettingsBtn').addEventListener('click', saveAppearanceSettings);
+      $('settingsLogoutBtn').addEventListener('click', logout);
+      $('deleteAccountBtn').addEventListener('click', deleteAccount);
+
+      // Infinite scroll
+      feed.addEventListener('scroll', () => {
+        if (isLoading || currentTab === 'mymemes' || currentTab === 'search') return;
+        const { scrollTop, scrollHeight, clientHeight } = feed;
+        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) { 
+          loadFeed(); 
+        }
+      });
+      
+      makeChatDraggable();
+      setupMemeEditorListeners();
+    };
+    
+    const toggleTheme = () => {
+      const themes = ['dark', 'light', 'blue', 'red', 'purple'];
+      const currentTheme = userPreferences.theme || 'dark';
+      const currentIndex = themes.indexOf(currentTheme);
+      const nextIndex = (currentIndex + 1) % themes.length;
+      userPreferences.theme = themes[nextIndex];
+      
+      applyUserPreferences(); // Apply locally
+      
+      if (currentUser) {
+        const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
+        updateDoc(privateUserRef, { 'preferences.theme': userPreferences.theme });
+      }
+    };
+    
+    const makeChatDraggable = () => {
+      let isDragging = false;
+      let chatOffsetX = 0, chatOffsetY = 0;
+      const chatHeader = $('chatHeader');
+
+      const onDragStart = (e) => {
+        isDragging = true;
+        const rect = chatWindow.getBoundingClientRect();
+        const touch = e.touches ? e.touches[0] : e;
+        chatOffsetX = touch.pageX - rect.left;
+        chatOffsetY = touch.pageY - rect.top;
+        chatWindow.style.transition = 'none';
+        document.body.style.userSelect = 'none';
+      };
+      
+      const onDragMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const touch = e.touches ? e.touches[0] : e;
+        let newX = touch.pageX - chatOffsetX;
+        let newY = touch.pageY - chatOffsetY;
+        newX = Math.max(0, Math.min(newX, window.innerWidth - chatWindow.offsetWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - chatWindow.offsetHeight));
+        chatWindow.style.left = `${newX}px`;
+        chatWindow.style.top = `${newY}px`;
+        chatWindow.style.bottom = 'auto'; 
+        chatWindow.style.right = 'auto';
+      };
+      
+      const onDragEnd = () => {
+        isDragging = false;
+        chatWindow.style.transition = 'var(--transition)';
+        document.body.style.userSelect = 'auto';
+      };
+
+      chatHeader.addEventListener('mousedown', onDragStart);
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', onDragEnd);
+      
+      chatHeader.addEventListener('touchstart', onDragStart, { passive: false });
+      document.addEventListener('touchmove', onDragMove, { passive: false });
+      document.addEventListener('touchend', onDragEnd);
+    };
+    
+    const setupMemeEditorListeners = () => {
+      $$('.editor-tool').forEach(btn => btn.addEventListener('click', () => {
+        $$('.editor-tool').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTool = btn.dataset.tool;
+        fabricCanvas.isDrawingMode = (activeTool === 'draw' || activeTool === 'eraser');
+        updateEditorSettings();
+      }));
+      
+      $$('.template-btn').forEach(btn => btn.addEventListener('click', () => setCanvasBackgroundImage(btn.dataset.url)));
+      
+      const templateFileInput = $('templateFileInput');
+      $('uploadTemplateBtn').addEventListener('click', () => templateFileInput.click());
+      templateFileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => setCanvasBackgroundImage(event.target.result);
+              reader.readAsDataURL(file);
+          }
+      });
+      
+      $('.editor-tool[data-tool="image"]').addEventListener('click', () => {
+        const input = document.createElement('input'); 
+        input.type = 'file'; 
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => fabric.Image.fromURL(event.target.result, (img) => { 
+              img.scaleToWidth(fabricCanvas.width / 2); 
+              img.set({ left: 50, top: 50 }); 
+              fabricCanvas.add(img); 
+              saveCanvasState(); 
+            }, { crossOrigin: 'anonymous' });
+            reader.readAsDataURL(file);
+          }
+        };
+        input.click();
+      });
+      
+      $('textColorPicker').addEventListener('input', updateEditorSettings);
+      $('strokeColorPicker').addEventListener('input', updateEditorSettings);
+      $('brushSize').addEventListener('input', updateEditorSettings);
+      $('fontFamilySelect').addEventListener('change', () => {
+          const obj = fabricCanvas.getActiveObject(); 
+          if (obj?.type.includes('text')) { 
+              obj.set('fontFamily', $('fontFamilySelect').value); 
+              fabricCanvas.renderAll(); 
+              saveCanvasState(); 
+          }
+      });
+      $('bringForwardBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.bringForward(fabricCanvas.getActiveObject()); saveCanvasState(); } });
+      $('sendBackBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.sendBackwards(fabricCanvas.getActiveObject()); saveCanvasState(); } });
+      $('deleteObjBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.remove(fabricCanvas.getActiveObject()); saveCanvasState(); } });
+      $('toggleBoldBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontWeight', obj.get('fontWeight') === 'bold' ? 'normal' : 'bold'); fabricCanvas.renderAll(); saveCanvasState(); } });
+      $('toggleItalicBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontStyle', obj.get('fontStyle') === 'italic' ? 'normal' : 'italic'); fabricCanvas.renderAll(); saveCanvasState(); } });
+      $('alignLeftBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'left'); fabricCanvas.renderAll(); saveCanvasState(); } });
+      $('alignCenterBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'center'); fabricCanvas.renderAll(); saveCanvasState(); } });
+
+      $('undoBtn').addEventListener('click', undoCanvasAction);
+      $('redoBtn').addEventListener('click', redoCanvasAction);
+      $('clearCanvasBtn').addEventListener('click', clearCanvas);
+      $('postMemeBtn').addEventListener('click', postMemeFromEditor);
+    };
+    
+    const setupMemeEditorCanvasListeners = () => {
+        if (!fabricCanvas) return;
+        fabricCanvas.on('object:added', saveCanvasState);
+        fabricCanvas.on('object:modified', saveCanvasState);
+        fabricCanvas.on('object:removed', saveCanvasState);
+        
+        fabricCanvas.on('selection:created', (e) => {
+            const obj = e.target;
+            if (obj.type.includes('text')) {
+                $('brushSize').value = obj.get('fontSize');
+                $('textColorPicker').value = obj.get('fill');
+                $('strokeColorPicker').value = obj.get('stroke');
+                $('fontFamilySelect').value = obj.get('fontFamily');
+            }
+        });
+        
+        fabricCanvas.on('mouse:down', (opt) => {
+          if (activeTool === 'text' && !opt.target) {
+            const text = new fabric.IText('Your text here', {
+              left: opt.pointer.x, 
+              top: opt.pointer.y,
+              fontFamily: $('fontFamilySelect').value,
+              fontSize: parseInt($('brushSize').value),
+              fill: $('textColorPicker').value,
+              stroke: $('strokeColorPicker').value,
+              strokeWidth: 2,
+              originX: 'left', 
+              originY: 'top',
+              padding: 5,
+              cornerColor: 'var(--accent-3)',
+              transparentCorners: false,
+              borderColor: 'var(--accent-3)'
+            });
+            fabricCanvas.add(text);
+            fabricCanvas.setActiveObject(text);
+            text.enterEditing(); 
+            text.selectAll();
+          }
+        });
+    };
+
+    // ===== APP INITIALIZATION (RE-ARCHITECTED) =====
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize Firebase (which sets up auth listener)
+      initFirebase(); 
+      // 2. Set up all static button/element listeners
+      setupEventListeners();
+      // 3. Load the initial "Hot" feed immediately.
+      // Auth state will be handled asynchronously by onAuthStateChanged.
+      loadFeed(true);
+    });
+
+  </script>
+</body>
+</html>
