@@ -1130,6 +1130,7 @@
       align-items: center; 
       gap: 12px;
       border: 1px solid transparent;
+      cursor: pointer;
     }
     .leaderboard-item:hover {
       border-color: var(--border-color);
@@ -2002,10 +2003,15 @@
 
   <!-- User's global variables for Firebase -->
   <script>
-    // These variables are placeholders and will be injected by the environment.
+    // FIX: Replaced with your new project config
     var __firebase_config = '{"apiKey":"AIzaSyCc2YgZOUfKfDw7igOfZgfm3709nXTJTYI","authDomain":"cringescroll-meme.firebaseapp.com","projectId":"cringescroll-meme","storageBucket":"cringescroll-meme.firebasestorage.app","messagingSenderId":"952326661480","appId":"1:952326661480:web:366d94b478a6819168a2dd"}';
-    var __app_id = 'cringescroll-app';
+    
+    // This is provided by the environment, but we'll set a fallback
     var __initial_auth_token = undefined; 
+    
+    // FIX: Set __app_id to your new projectId
+    // This is the CRITICAL fix for all Firestore paths
+    var __app_id = 'cringescroll-meme'; 
   </script>
 
   <!-- 
@@ -2068,7 +2074,8 @@
     
     // Firebase instances
     let app, db, auth, storage;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app';
+    // FIX: This now correctly uses the __app_id defined in the script tag
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-meme';
     
     // User state
     let currentUserId = null; // Use this to track auth state
@@ -2529,7 +2536,7 @@
             const userId = currentUser.uid;
             const authUser = auth.currentUser;
             
-            if (authUser.uid !== userId) {
+            if (!authUser || authUser.uid !== userId) {
               console.error("CRITICAL: Auth user mismatch. Aborting delete.");
               throw new Error("User mismatch. Please log in again.");
             }
@@ -2690,13 +2697,13 @@
       // Add event listeners
       card.querySelector('.save-btn').onclick = () => saveMeme(card);
       card.querySelector('.tip-btn').onclick = () => tipMeme(card);
-      card.querySelector('.remix-btn').onclick = () => remixMeme(memeUrl);
+      card.querySelector('.remix-btn').onclick = () => openModal('memeEditorModal', memeUrl);
       card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl);
       card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
       
       const userBadge = card.querySelector('.user-badge');
       if (userBadge && creatorId) {
-          userBadge.onclick = () => showPublicProfile(creatorId);
+          userBadge.onclick = () => openModal('profileModal', creatorId);
       }
     };
     
@@ -2722,6 +2729,7 @@
             feed.innerHTML = '<div class="feed-message">Please <a href="#" id="loginLinkMyMemes">log in</a> to see your posted memes.</div>'; 
             $('loginLinkMyMemes').onclick = (e) => { e.preventDefault(); showAuthModal(); };
             isLoading = false;
+            $$('.skeleton-card').forEach(el => el.remove()); // Clear skeletons
             return; // Stop execution
           }
           await loadMyMemes(); 
@@ -2927,8 +2935,6 @@
       }
     };
     
-    const remixMeme = (imageUrl) => openModal('memeEditorModal', imageUrl);
-    
     const shareMeme = (memeUrl) => {
       if (navigator.share) {
         navigator.share({ 
@@ -3077,32 +3083,7 @@
     let history = [];
     let historyIndex = -1;
     
-    const openModal = (modalId, data = null) => {
-        const modal = $(modalId);
-        if (!modal) return;
-        
-        // Don't open if user is not logged in for protected modals
-        const protectedModals = ['settingsModal', 'profileModal', 'collectionsModal', 'inventoryModal', 'leaderboardModal', 'questsModal', 'notificationsModal', 'memeEditorModal'];
-        if (protectedModals.includes(modalId) && !currentUser) {
-            showAuthModal();
-            return;
-        }
-        
-        modal.classList.add('active');
-        
-        // Run modal-specific load logic
-        switch (modalId) {
-            case 'settingsModal': loadSettings(); break;
-            case 'profileModal': showPublicProfile(data); break; // `data` is userId
-            case 'collectionsModal': showCollections(); break;
-            case 'inventoryModal': showInventory(); break;
-            case 'leaderboardModal': showLeaderboard(); break;
-            case 'questsModal': showQuests(); break;
-            case 'notificationsModal': showNotifications(); break;
-            case 'memeEditorModal': setTimeout(() => initMemeEditor(data), 100); break; // `data` is imageUrl
-        }
-    };
-    
+    // This is now called by the unified openModal function
     const initMemeEditor = (imageUrl) => {
       const container = $('editorContainer');
       const canvasEl = $('canvas');
@@ -3233,9 +3214,11 @@
         const memeId = `meme_${Date.now()}`;
         const storageRef = ref(storage, `memes/${currentUser.uid}/${memeId}.png`);
         
+        // 1. Upload image to Storage (This was failing before)
         const uploadResult = await uploadString(storageRef, dataURL, 'data_url');
         const downloadURL = await getDownloadURL(uploadResult.ref);
         
+        // 2. Add meme to Firestore
         await addDoc(collection(db, `artifacts/${appId}/public/data/memes`), {
           title: title, 
           imageUrl: downloadURL, 
@@ -3247,6 +3230,7 @@
           tips: 0
         });
 
+        // 3. Update user's meme count (This was also failing before)
         const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
         await updateDoc(publicUserRef, { memeCount: increment(1) });
         
@@ -3263,14 +3247,62 @@
         showNotification('Meme Posted!', 'Your meme is live! +10 CringeCoin', 'success');
       } catch (error) { 
         console.error('Meme post error:', error); 
-        showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
+        showNotification('Error', 'Failed to post your meme. Check console.', 'error');
       } finally { 
         btn.disabled = false; 
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; 
       }
     };
     
-    // ===== MODAL FUNCTIONS (IMPROVED) =====
+    // ===== MODAL FUNCTIONS (RE-ARCHITECTED) =====
+    
+    // Unified modal opener with auth checks
+    const openModal = (modalId, data = null) => {
+        const modal = $(modalId);
+        if (!modal) return;
+        
+        // Check if modal is protected
+        const protectedModals = [
+          'settingsModal', 'profileModal', 'collectionsModal', 
+          'inventoryModal', 'leaderboardModal', 'questsModal', 
+          'notificationsModal', 'memeEditorModal'
+        ];
+        
+        if (protectedModals.includes(modalId) && !currentUser) {
+            showAuthModal();
+            return;
+        }
+        
+        modal.classList.add('active');
+        
+        // Run modal-specific load logic
+        switch (modalId) {
+            case 'settingsModal': 
+                loadSettings(); 
+                break;
+            case 'profileModal': 
+                showPublicProfile(data); // `data` is userId, or null for self
+                break;
+            case 'collectionsModal': 
+                showCollections(); 
+                break;
+            case 'inventoryModal': 
+                showInventory(); 
+                break;
+            case 'leaderboardModal': 
+                showLeaderboard(); 
+                break;
+            case 'questsModal': 
+                showQuests(); 
+                break;
+            case 'notificationsModal': 
+                showNotifications(); 
+                break;
+            case 'memeEditorModal': 
+                setTimeout(() => initMemeEditor(data), 100); // `data` is imageUrl
+                break;
+        }
+    };
     
     const closeModal = (modalId) => {
         const modal = $(modalId);
@@ -3322,21 +3354,24 @@
                 }
             }
 
+            // 1. Upload new avatar if one is selected (This was failing)
             if (avatarFile) {
                 const storageRef = ref(storage, `avatars/${currentUser.uid}/${avatarFile.name}`);
                 const uploadResult = await uploadBytes(storageRef, avatarFile);
                 avatarUrl = await getDownloadURL(uploadResult.ref);
             }
 
+            // 2. Update Firestore public doc (This was failing)
             await updateDoc(publicUserRef, {
                 username: newUsername,
                 bio: newBio,
                 avatar: avatarUrl
             });
             
+            // 3. Update auth profile
             await updateProfile(auth.currentUser, { displayName: newUsername });
 
-            // Update all of the user's memes with the new username
+            // 4. Update all of the user's memes with the new username
             const memesQuery = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', currentUser.uid));
             const memesSnapshot = await getDocs(memesQuery);
             const batch = writeBatch(db);
@@ -3371,7 +3406,6 @@
       }
     };
     
-    // FIX: Revamped to be more detailed and fetch user's memes
     const showPublicProfile = async (userId) => {
       // Default to self-profile if no ID is given
       if (!userId) {
@@ -3379,7 +3413,7 @@
           userId = currentUser.uid;
       }
       
-      // Open modal first, then load (this is called by openModal)
+      // openModal already opened the modal, now we load content
       const body = $('profileModalBody');
       body.innerHTML = '<div class="loading-spinner"></div>';
       
