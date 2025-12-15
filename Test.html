@@ -6,7 +6,13 @@
   <meta name="theme-color" content="#0f0c29" />
   <title>CringeScroll • Where Memes Live</title>
   
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://i.imgur.com" crossorigin>
+  <link rel="preconnect" href="https://i.redd.it" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js" defer></script>
 
   <style>
@@ -35,117 +41,98 @@
     }
     
     /* Themes */
-    .theme-light { 
-      --bg-primary: #f8f9fa; --bg-secondary: #e9ecef; --card-bg: #ffffff; 
-      --text-primary: #212529; --text-secondary: #6c757d; 
-      --accent-1: #9b59b6; --accent-2: #8e44ad; --accent-3: #7d3c98; 
-      --border-color: rgba(0, 0, 0, 0.1);
-    }
-    .theme-blue { 
-      --bg-primary: #0d1b2a; --bg-secondary: #1b263b; --card-bg: #415a77; 
-      --text-primary: #e0e1dd; --text-secondary: #adb5bd; 
-      --accent-1: #1e3a8a; --accent-2: #1d4ed8; --accent-3: #3b82f6; 
-      --border-color: rgba(59, 130, 246, 0.3); 
-    }
-    .theme-red { 
-      --bg-primary: #2c090a; --bg-secondary: #4a0d0e; --card-bg: #6d1415;
-      --text-primary: #ffe6e6; --text-secondary: #ffb3b3; 
-      --accent-1: #b91c1c; --accent-2: #dc2626; --accent-3: #ef4444; 
-      --border-color: rgba(239, 68, 68, 0.3);
-    }
-    .theme-purple { 
-      --bg-primary: #1a092d; --bg-secondary: #2d1544; --card-bg: #3f2359; 
-      --text-primary: #e6d9ff; --text-secondary: #c9b3e0; 
-      --accent-1: #7e22ce; --accent-2: #9333ea; --accent-3: #a78bfa; 
-      --border-color: rgba(139, 92, 246, 0.3); 
-    }
+    .theme-dark { --bg-primary: #0f0c29; --bg-secondary: #1a1640; --card-bg: #242152; --text-primary: #e6e6ff; --text-secondary: #b8b8e0; --border-color: rgba(106, 13, 173, 0.3); }
+    .theme-light { --bg-primary: #f8f9fa; --bg-secondary: #e9ecef; --card-bg: #ffffff; --text-primary: #212529; --text-secondary: #6c757d; --accent-1: #9b59b6; --accent-2: #8e44ad; --accent-3: #7d3c98; --border-color: rgba(0, 0, 0, 0.1); }
+    .theme-blue { --bg-primary: #0d1b2a; --bg-secondary: #1b263b; --card-bg: #415a77; --text-primary: #e0e1dd; --text-secondary: #adb5bd; --accent-1: #1e3a8a; --accent-2: #1d4ed8; --accent-3: #3b82f6; --border-color: rgba(59, 130, 246, 0.3); }
+    .theme-red { --bg-primary: #2c090a; --bg-secondary: #4a0d0e; --card-bg: #6d1415; --text-primary: #ffe6e6; --text-secondary: #ffb3b3; --accent-1: #b91c1c; --accent-2: #dc2626; --accent-3: #ef4444; --border-color: rgba(239, 68, 68, 0.3); }
+    .theme-purple { --bg-primary: #1a092d; --bg-secondary: #2d1544; --card-bg: #3f2359; --text-primary: #e6d9ff; --text-secondary: #c9b3e0; --accent-1: #7e22ce; --accent-2: #9333ea; --accent-3: #a78bfa; --border-color: rgba(139, 92, 246, 0.3); }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { font-size: 16px; height: 100%; width: 100%; overflow: hidden; }
+    
+    html { font-size: 16px; }
+    html, body { height: 100%; width: 100%; overflow: hidden; }
     
     body {
       background: var(--bg-primary);
       color: var(--text-primary);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       overflow-x: hidden;
       overscroll-behavior: none;
       -webkit-font-smoothing: antialiased;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
       transition: var(--transition);
-      height: 100%;
       font-size: var(--font-size-base, 1rem);
     }
     
     .app-container { 
-      display: flex; flex-direction: column; 
-      height: 100dvh; overflow: hidden; position: relative; width: 100%;
+      display: flex; 
+      flex-direction: column; 
+      height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); 
+      overflow: hidden; 
+      position: relative; 
+      width: 100%;
     }
     
     @keyframes float { 
-      0%, 100% { transform: translateY(0px); } 
+      0% { transform: translateY(0px); } 
       50% { transform: translateY(-5px); } 
+      100% { transform: translateY(0px); } 
     }
 
     /* ===== HEADER ===== */
     .header {
-      height: var(--header-height);
+      height: var(--header-height); 
       background: var(--bg-secondary); 
       backdrop-filter: blur(10px); 
-      position: sticky; top: 0; left: 0; width: 100%; 
-      z-index: 100; padding: 0 16px; 
-      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; 
+      top: 0; 
+      left: 0;
+      width: 100%; 
+      z-index: 100; 
+      padding: 0 16px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
       border-bottom: 1px solid var(--border-color);
       flex-shrink: 0;
     }
-    .logo-container { 
-      display: flex; align-items: center; gap: 12px; 
-      text-decoration: none; color: var(--text-primary); 
-    }
+    .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); }
     .logo-icon {
-      width: 42px; height: 42px;
+      width: 42px; height: 42px; 
       background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); 
       border-radius: 12px;
       display: flex; align-items: center; justify-content: center; 
       box-shadow: 0 4px 10px rgba(106, 13, 173, 0.3);
-      animation: float 3s ease-in-out infinite;
-      flex-shrink: 0;
+      animation: float 3s ease-in-out infinite; flex-shrink: 0;
     }
     .logo-icon i { font-size: 18px; color: white; }
     .logo-text {
-      font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+      font-size: 26px; font-weight: 800; letter-spacing: -0.5px; 
       background: linear-gradient(to right, var(--accent-1), var(--accent-3));
       -webkit-background-clip: text; background-clip: text; color: transparent; 
-      text-shadow: 0 2px 4px rgba(106, 13, 173, 0.3);
-      position: relative;
+      text-shadow: 0 2px 4px rgba(106, 13, 173, 0.3); position: relative;
     }
-    .search-container { 
-      flex: 1; max-width: 500px; margin: 0 20px; position: relative; 
-    }
+    .search-container { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
     .search-input { 
-      width: 100%; padding: 12px 20px 12px 45px; 
-      border-radius: 50px; border: 1px solid var(--border-color); 
-      background: rgba(255, 255, 255, 0.1); color: var(--text-primary); 
-      font-size: 1rem; transition: var(--transition); 
+      width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; 
+      border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.1); 
+      color: var(--text-primary); font-size: 1rem; transition: var(--transition); 
     }
-    .search-input:focus { 
-      outline: none; border-color: var(--accent-3);
-      box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); 
-    }
-    .search-icon { 
-      position: absolute; left: 20px; top: 50%; 
-      transform: translateY(-50%); color: var(--text-secondary); 
-    }
+    .search-input:focus { outline: none; border-color: var(--accent-3); box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.1rem; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .action-btn {
-      width: 42px; height: 42px; border-radius: 12px;
+      width: 42px; height: 42px; border-radius: 12px; 
       background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color);
-      color: var(--text-primary); font-size: 1.1rem; 
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: var(--transition); position: relative;
+      color: var(--text-primary); font-size: 1.1rem; display: flex; 
+      align-items: center; justify-content: center; cursor: pointer;
+      transition: var(--transition); position: relative; overflow: hidden; flex-shrink: 0;
     }
     .action-btn:hover { background: rgba(106, 13, 173, 0.2); transform: translateY(-2px); }
     .notification-badge {
-      position: absolute; top: 4px; right: 4px; background: var(--accent-3);
+      position: absolute; top: 4px; right: 4px; background: var(--accent-3); 
       color: white; font-size: 0.65rem; font-weight: bold;
       min-width: 16px; height: 16px; border-radius: 50%; 
       display: flex; align-items: center; justify-content: center; padding: 0 3px;
@@ -154,12 +141,10 @@
 
     /* ===== NAVIGATION ===== */
     .nav-container {
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color); 
-      position: sticky; bottom: 0; left: 0; width: 100%; 
-      z-index: 90; display: flex; justify-content: space-around;
-      padding: 8px 0; flex-shrink: 0;
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      background: var(--bg-secondary); border-top: 1px solid var(--border-color); 
+      position: sticky; bottom: 0; left: 0; width: 100%; z-index: 90; 
+      display: flex; justify-content: space-around; padding: 8px 0;
+      flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
     }
     .nav-item {
       display: flex; flex-direction: column; align-items: center; gap: 4px; 
@@ -167,152 +152,174 @@
       font-size: 0.75rem; font-weight: 500; padding: 6px 16px; 
       border-radius: 12px; transition: var(--transition); cursor: pointer;
     }
-    .nav-item.active, .nav-item:hover { 
-      color: var(--accent-3); background: rgba(106, 13, 173, 0.1); 
-    }
-    .nav-indicator { 
-      width: 6px; height: 6px; border-radius: 50%; 
-      background: var(--accent-3); margin-top: 2px; opacity: 0; 
-    }
+    .nav-item.active, .nav-item:hover { color: var(--accent-3); background: rgba(106, 13, 173, 0.1); }
+    .nav-item i { font-size: 1.25rem; }
+    .nav-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-3); margin-top: 2px; opacity: 0; transition: opacity 0.2s; }
     .nav-item.active .nav-indicator { opacity: 1; }
 
-    /* ===== FEED ===== */
+    /* ===== MAIN CONTENT ===== */
     .content-area {
       flex: 1; overflow-y: auto; overflow-x: hidden;
-      padding: 16px; column-count: 3; column-gap: 16px;
+      padding: 16px; column-count: 3; column-gap: 16px; 
     }
+    
+    /* ===== MEME CARD ===== */
     .meme-card {
       background: var(--card-bg); border-radius: var(--border-radius); 
       overflow: hidden; box-shadow: var(--shadow-md);
       transition: var(--transition); position: relative; 
-      display: flex; flex-direction: column; break-inside: avoid-column; 
-      margin-bottom: 16px; width: 100%;
+      display: flex; flex-direction: column; will-change: transform;
+      break-inside: avoid-column; margin-bottom: 16px; width: 100%;
     }
     .meme-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-    .card-header { padding: var(--card-padding); display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
-    .meme-title { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; word-wrap: break-word; }
+    .card-header { 
+      padding: var(--card-padding); display: flex; 
+      justify-content: space-between; align-items: start; 
+      border-bottom: 1px solid var(--border-color); 
+    }
+    .meme-title { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); line-height: 1.4; margin-bottom: 4px; word-wrap: break-word;}
+    .meme-meta { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--text-secondary); }
     .user-badge { 
-      display: inline-flex; align-items: center; gap: 4px; 
+      display: flex; align-items: center; gap: 4px; 
       background: rgba(106, 13, 173, 0.2); padding: 4px 8px; 
-      border-radius: 20px; font-size: 0.75rem; cursor: pointer;
+      border-radius: 20px; font-size: 0.75rem; font-weight: 600; 
+      cursor: pointer; transition: var(--transition);
     }
-    .meme-image-container { width: 100%; background: rgba(0,0,0,0.1); min-height: 100px; }
-    .meme-image { width: 100%; height: auto; display: block; opacity: 0; transition: 0.3s; }
-    .meme-image.loaded { opacity: 1; }
+    .user-badge:hover { background: rgba(106, 13, 173, 0.4); }
+    .meme-image-container { width: 100%; position: relative; background: rgba(0, 0, 0, 0.1); overflow: hidden; min-height: 100px; }
+    .meme-image { width: 100%; height: auto; display: block; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: scale(1.02); }
+    .meme-image.loaded { opacity: 1; transform: scale(1); }
     .card-footer { padding: var(--card-padding); border-top: 1px solid var(--border-color); }
-    .reaction-bar { display: flex; justify-content: space-around; margin-bottom: 12px; }
+    .reaction-bar { display: flex; justify-content: space-around; gap: 8px; margin-bottom: 12px; }
     .reaction-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px; 
       background: none; border: none; color: var(--text-secondary);
-      cursor: pointer; transition: 0.2s; padding: 4px; flex: 1;
-      display: flex; flex-direction: column; align-items: center;
+      font-size: 1.1rem; cursor: pointer; transition: var(--transition); 
+      padding: 4px; border-radius: 10px; flex: 1;
     }
-    .reaction-btn:hover, .reaction-btn.active { color: var(--accent-3); transform: scale(1.1); }
+    .reaction-btn:hover { color: var(--text-primary); background: rgba(106, 13, 173, 0.1); }
+    .reaction-btn.active { color: var(--accent-3); transform: scale(1.1); }
+    .reaction-count { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
     .action-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .card-btn {
-      padding: 8px 0; border-radius: 10px; background: rgba(255,255,255,0.08); 
+      padding: 8px 0; border-radius: 10px; background: rgba(255, 255, 255, 0.08); 
       border: 1px solid var(--border-color); color: var(--text-primary); 
-      font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; align-items: center;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
     }
-    .card-btn:hover { background: rgba(106, 13, 173, 0.2); }
-    .card-btn.saved { background: var(--accent-2); color: white; }
+    .card-btn i { font-size: 0.9rem; }
+    .card-btn:hover { background: rgba(106, 13, 173, 0.2); transform: translateY(-2px); }
+    .card-btn.saved { background: var(--accent-2); color: white; border-color: var(--accent-3); }
+    .card-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* ===== SIDEBAR ===== */
+    /* ===== SIDEBAR & MODALS ===== */
     .sidebar {
-      position: fixed; top: 0; right: -320px; width: 300px; height: 100%; 
+      position: fixed; top: 0; right: -320px; width: 300px; height: 100dvh; 
       background: var(--bg-secondary); backdrop-filter: blur(10px);
-      border-left: 1px solid var(--border-color); z-index: 3000;
+      border-left: 1px solid var(--border-color); z-index: 1000; 
       transition: right 0.3s ease; display: flex; flex-direction: column;
       overflow-y: auto; padding: 20px 16px;
     }
     .sidebar.active { right: 0; }
-    .sidebar-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 2999; display: none;
-    }
-    .sidebar-overlay.active { display: block; }
-    
-    .sidebar-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-    .menu-item { 
-      display: flex; align-items: center; gap: 12px; padding: 12px; 
-      margin-bottom: 8px; border-radius: 12px; color: var(--text-secondary); 
-      cursor: pointer; transition: 0.2s;
-    }
-    .menu-item:hover { background: rgba(106, 13, 173, 0.1); color: var(--accent-3); }
-    .menu-section-title { font-size: 1rem; color: var(--text-primary); margin: 15px 0 10px; border-bottom: 1px solid var(--border-color); }
+    .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+    .sidebar-title { font-size: 1.4rem; font-weight: 700; color: var(--accent-3); }
+    .close-sidebar { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .close-sidebar:hover { background: rgba(255, 255, 255, 0.1); }
+    .menu-section { margin-bottom: 25px; }
+    .menu-section-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color); }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 12px; color: var(--text-secondary); text-decoration: none; transition: var(--transition); cursor: pointer; }
+    .menu-item:hover, .menu-item.active { color: var(--accent-3); background: rgba(106, 13, 173, 0.1); }
+    .menu-badge { margin-left: auto; background: var(--accent-3); color: white; font-size: 0.65rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+    .menu-badge:empty { display: none; }
 
-    /* ===== MODALS ===== */
+    /* ===== MODAL STYLES ===== */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
-      z-index: 4000; display: flex; align-items: center; justify-content: center; 
-      opacity: 0; pointer-events: none; transition: 0.3s;
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center; 
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .modal-overlay.active { opacity: 1; pointer-events: all; }
     .modal-content {
-      background: var(--bg-secondary); border-radius: 20px; width: 90%; max-width: 500px;
+      background: var(--bg-secondary); border-radius: 20px; width: 90%; max-width: 500px; 
       max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
-      transform: translateY(20px); transition: 0.3s; border: 1px solid var(--border-color);
+      transform: translateY(20px); transition: transform 0.3s ease; 
+      border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     }
     .modal-overlay.active .modal-content { transform: translateY(0); }
-    .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-secondary); z-index: 10; flex-shrink: 0; }
+    .modal-title { font-size: 1.4rem; font-weight: 700; color: var(--accent-3); display: flex; align-items: center; gap: 10px; }
+    .close-modal { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0; }
+    .close-modal:hover { background: rgba(255, 255, 255, 0.1); }
     .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-    
-    /* Forms */
-    .form-group { margin-bottom: 15px; }
-    .form-label { display: block; margin-bottom: 8px; font-weight: 600; }
-    .form-control { 
-      width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); 
-      background: rgba(0,0,0,0.2); color: white; font-size: 1rem;
-    }
-    .btn { padding: 12px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; width: 100%; text-align: center; }
-    .btn-primary { background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); color: white; }
-    .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+    .form-control { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.1); color: var(--text-primary); font-size: 1rem; transition: var(--transition); }
+    .form-control:focus { outline: none; border-color: var(--accent-3); box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); }
+    .btn { padding: 14px 24px; border-radius: 12px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-decoration: none; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); color: white; box-shadow: 0 4px 15px rgba(106, 13, 173, 0.4); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); border: 1px solid var(--border-color); }
+    .btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); }
+    .btn-secondary.active { background: rgba(106, 13, 173, 0.2); border-color: var(--accent-3); color: var(--accent-3); }
     .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--error); border: 1px solid var(--error); }
-    .form-error { color: var(--error); font-size: 0.85rem; margin-top: 5px; }
+    .form-error { color: var(--error); font-size: 0.8rem; margin-top: -10px; margin-bottom: 15px; min-height: 1.2em; }
+    
+    /* ===== CHAT WINDOW ===== */
+    .chat-window {
+      position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px; 
+      background: var(--bg-secondary); border-radius: 20px; box-shadow: var(--shadow-lg); 
+      border: 1px solid var(--border-color); z-index: 900; display: flex; 
+      flex-direction: column; overflow: hidden; transform: translateY(100px) scale(0.9); 
+      opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none;
+    }
+    .chat-window.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+    .chat-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: move; touch-action: none; flex-shrink: 0; }
+    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.1); color: var(--text-primary); font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+    .message.incoming { align-self: flex-start; border-bottom-left-radius: 4px; }
+    .message.outgoing { align-self: flex-end; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); color: white; border-bottom-right-radius: 4px; }
+    .chat-input-container { padding: 16px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; flex-shrink: 0; }
+    .chat-input { flex: 1; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.1); color: var(--text-primary); font-size: 0.9rem; }
+    .send-btn { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); border: none; color: white; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
 
-    /* Notification Toast */
+    /* ===== NOTIFICATIONS ===== */
     .notification {
-      position: fixed; bottom: 80px; right: 20px; background: var(--bg-secondary); 
-      border-radius: 16px; padding: 16px; border-left: 4px solid var(--accent-3);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5000;
-      transform: translateX(150%); transition: 0.3s; display: flex; gap: 10px; align-items: center;
+      position: fixed; bottom: 20px; right: 20px; background: var(--bg-secondary); 
+      border-radius: 16px; padding: 16px 24px; border-left: 4px solid var(--accent-3); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); z-index: 9001;
+      transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      max-width: 350px; display: flex; align-items: center; gap: 16px;
     }
-    .notification.show { transform: translateX(0); }
-    .notification.error { border-left-color: var(--error); }
-    .notification.success { border-left-color: var(--success); }
-
-    /* Loaders */
-    .loading-spinner { 
-      width: 40px; height: 40px; border: 4px solid rgba(106, 13, 173, 0.2); 
-      border-top: 4px solid var(--accent-3); border-radius: 50%; 
-      animation: spin 1s linear infinite; margin: 20px auto; 
-    }
+    .notification.show { transform: translateX(0); opacity: 1; }
+    .notification-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; background: rgba(106, 13, 173, 0.2); color: var(--accent-3);}
+    .notification.error .notification-icon { background: rgba(255, 77, 77, 0.2); color: var(--error); }
+    .notification.success .notification-icon { background: rgba(0, 210, 106, 0.2); color: var(--success); }
+    
+    .loading-spinner { width: 40px; height: 40px; border: 4px solid rgba(106, 13, 173, 0.2); border-top: 4px solid var(--accent-3); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Responsive */
-    @media (max-width: 1024px) { .content-area { column-count: 2; } }
-    @media (max-width: 768px) { 
-      .content-area { column-count: 1; } 
-      .search-container { display: none; }
-      .sidebar { width: 80%; }
-      .modal-content.editor-modal { width: 100%; height: 100%; border-radius: 0; }
-    }
-    
-    /* Settings Tabs */
-    .settings-tabs { display: flex; border-bottom: 1px solid var(--border-color); padding: 0 10px; }
-    .tab-btn { background: none; border: none; padding: 10px 15px; color: var(--text-secondary); cursor: pointer; }
-    .tab-btn.active { color: var(--accent-3); border-bottom: 2px solid var(--accent-3); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; padding-top: 15px; }
-
     /* Editor Specifics */
-    .editor-modal { max-width: 1000px; height: 90vh; }
-    .editor-body { display: flex; gap: 15px; padding: 0; height: 100%; }
-    .editor-canvas-col { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; }
-    .editor-tools-col { width: 300px; padding: 15px; overflow-y: auto; background: var(--bg-secondary); }
-    @media (max-width: 768px) { .editor-body { flex-direction: column; } .editor-tools-col { width: 100%; height: 40%; } }
+    .modal-content.editor-modal { width: 95%; max-width: 1200px; max-height: 95vh; }
+    .modal-body.editor-body { padding: 0; max-height: calc(95vh - 78px); overflow: hidden; display: flex; }
+    .editor-canvas-col { flex: 1; padding: 15px; display: flex; flex-direction: column; background: var(--bg-primary); }
+    #editorContainer { width: 100%; height: 100%; background: var(--bg-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; min-height: 400px; border: 1px dashed var(--border-color); }
+    .editor-tools-col { width: 320px; flex-shrink: 0; overflow-y: auto; background: var(--bg-secondary); padding: 15px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
+    
+    @media (max-width: 768px) {
+      .content-area { column-count: 1; padding: 8px; }
+      .search-container { margin: 0 10px; }
+      .chat-window { width: calc(100% - 40px); height: 450px; bottom: 80px; right: 20px; left: 20px; }
+      .modal-body.editor-body { flex-direction: column; }
+      .editor-tools-col { width: 100%; max-height: 40vh; }
+      .editor-canvas-col { height: 50vh; }
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(106, 13, 173, 0.5); border-radius: 4px; }
   </style>
 </head>
+
 <body class="theme-dark">
   <div class="app-container">
     <header class="header">
@@ -322,12 +329,12 @@
       </a>
       <div class="search-container">
         <div class="search-icon"><i class="fas fa-search"></i></div>
-        <input type="text" class="search-input" id="searchInput" placeholder="Search...">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by username...">
       </div>
       <div class="header-actions">
         <button class="action-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="notification-badge" id="notificationsBadge"></span></button>
         <button class="action-btn" id="themeToggleBtn"><i class="fas fa-moon"></i></button>
-        <button class="action-btn" id="chatToggleBtn"><i class="fas fa-comments"></i><span class="notification-badge" id="chatBadge"></span></button>
+        <button class="action-btn" id="chatToggleBtn"><i class="fas fa-comments"></i></button>
         <button class="action-btn" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
       </div>
     </header>
@@ -344,53 +351,57 @@
     </main>
   </div>
 
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <h2 style="color:var(--accent-3);">Menu</h2>
-      <button class="action-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
+      <h2 class="sidebar-title">Menu</h2>
+      <button class="close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
     </div>
-    <div class="menu-section-title">Profile</div>
-    <div class="menu-item" id="menuProfile"><i class="fas fa-user-circle"></i> My Profile</div>
-    <div class="menu-item" id="menuCollections"><i class="fas fa-bookmark"></i> Collections <span class="notification-badge" id="menuCollectionsBadge"></span></div>
-    <div class="menu-item" id="menuInventory"><i class="fas fa-box"></i> Inventory</div>
-    
-    <div class="menu-section-title">Social</div>
-    <div class="menu-item" id="menuLeaderboard"><i class="fas fa-chart-line"></i> Leaderboard</div>
-    <div class="menu-item" id="menuQuests"><i class="fas fa-trophy"></i> Quests</div>
-    
-    <div class="menu-section-title">Tools</div>
-    <div class="menu-item" id="menuCreateMeme"><i class="fas fa-paint-brush"></i> Create Meme</div>
-    
-    <div class="menu-section-title">Account</div>
-    <div class="menu-item" id="menuSettings"><i class="fas fa-cog"></i> Settings</div>
-    <div class="menu-item" id="menuLogin"><i class="fas fa-sign-in-alt"></i> Login / Sign Up</div>
-    <div class="menu-item" id="menuLogout" style="display:none;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    <div class="menu-section">
+      <h3 class="menu-section-title">Account</h3>
+      <div class="menu-item" id="menuLogin" style="display: flex;"><i class="fas fa-sign-in-alt"></i><span>Login / Sign Up</span></div>
+      <div class="menu-item" id="menuLogout" style="display: none;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+    </div>
+    <div class="menu-section">
+      <h3 class="menu-section-title">Tools</h3>
+      <div class="menu-item" id="menuCreateMeme"><i class="fas fa-paint-brush"></i><span>Create Meme</span></div>
+    </div>
+  </div>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header" id="chatHeader">
+      <h3 class="chat-title">CringeChat</h3>
+      <button class="close-chat" id="closeChatWindow"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-container">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
+      <button class="send-btn" id="sendChatMessage"><i class="fas fa-paper-plane"></i></button>
+    </div>
   </div>
 
   <div class="modal-overlay" id="authModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Account Access</h3>
-        <button class="action-btn close-modal"><i class="fas fa-times"></i></button>
+        <h2 class="modal-title"><i class="fas fa-user-plus"></i> Account</h2>
+        <button class="close-modal" data-modal-id="authModal"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-          <button class="btn btn-secondary active" id="tabLogin">Log In</button>
-          <button class="btn btn-secondary" id="tabSignup">Sign Up</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <button class="btn btn-secondary active" id="signupTab">Sign Up</button>
+          <button class="btn btn-secondary" id="loginTab">Log In</button>
         </div>
-        <div id="loginForm">
-          <div class="form-group"><label class="form-label">Email</label><input type="email" id="loginEmail" class="form-control"></div>
-          <div class="form-group"><label class="form-label">Password</label><input type="password" id="loginPass" class="form-control"></div>
-          <div class="form-error" id="loginError"></div>
-          <button class="btn btn-primary" id="btnLogin">Log In</button>
-        </div>
-        <div id="signupForm" style="display:none;">
-          <div class="form-group"><label class="form-label">Email</label><input type="email" id="signupEmail" class="form-control"></div>
-          <div class="form-group"><label class="form-label">Username</label><input type="text" id="signupUser" class="form-control"></div>
-          <div class="form-group"><label class="form-label">Password</label><input type="password" id="signupPass" class="form-control"></div>
+        <div id="signupForm">
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="signupEmailInput"></div>
+          <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-control" id="signupUsernameInput"></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="signupPasswordInput"></div>
           <div class="form-error" id="signupError"></div>
-          <button class="btn btn-primary" id="btnSignup">Create Account</button>
+          <button class="btn btn-primary" id="signupBtn">Create Account</button>
+        </div>
+        <div id="loginForm" style="display: none;">
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="loginEmailInput"></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="loginPasswordInput"></div>
+          <div class="form-error" id="loginError"></div>
+          <button class="btn btn-primary" id="loginBtn">Log In</button>
         </div>
       </div>
     </div>
@@ -399,390 +410,401 @@
   <div class="modal-overlay" id="memeEditorModal">
     <div class="modal-content editor-modal">
       <div class="modal-header">
-        <h3>Meme Editor</h3>
-        <button class="action-btn close-modal"><i class="fas fa-times"></i></button>
+        <h2 class="modal-title">Meme Editor</h2>
+        <button class="close-modal" data-modal-id="memeEditorModal"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body editor-body">
-        <div class="editor-canvas-col" id="editorContainer">
-          <canvas id="canvas"></canvas>
+        <div class="editor-canvas-col">
+          <div id="editorContainer"><canvas id="canvas"></canvas></div>
         </div>
         <div class="editor-tools-col">
-          <div class="form-group">
-            <label class="form-label">Tools</label>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-               <button class="btn btn-secondary" onclick="addText()">Add Text</button>
-               <button class="btn btn-secondary" id="btnUploadImage">Add Image</button>
-               <button class="btn btn-secondary" id="btnClearCanvas">Clear</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Styling</label>
-            <input type="color" id="editorColor" value="#ffffff" class="form-control" style="height:40px;">
-            <input type="range" id="editorSize" min="10" max="100" value="40" class="form-control" style="margin-top:10px;">
-          </div>
-          <div class="form-group" style="margin-top:auto;">
-             <label class="form-label">Title</label>
-             <input type="text" id="memeTitleInput" class="form-control" placeholder="Meme title...">
-             <button class="btn btn-primary" id="btnPostMeme" style="margin-top:10px;">Post Meme</button>
-          </div>
+            <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-control" id="memeTitleInput" placeholder="Meme Title"></div>
+            <button class="btn btn-secondary" id="addTextBtn">Add Text</button>
+            <button class="btn btn-secondary" id="addImageBtn">Add Image</button>
+            <button class="btn btn-primary" id="postMemeBtn">Post Meme</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="genericModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="genericModalTitle">Title</h3>
-        <button class="action-btn close-modal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body" id="genericModalBody"></div>
     </div>
   </div>
 
   <div class="notification" id="notificationToast">
     <div class="notification-icon"><i class="fas fa-check"></i></div>
     <div class="notification-content">
-      <h4 class="notification-title" id="notifTitle">Success</h4>
-      <p class="notification-message" id="notifMsg">Message</p>
+      <h4 class="notification-title" id="notificationTitle">Success</h4>
+      <p class="notification-message" id="notificationMessage"></p>
     </div>
   </div>
 
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal-content">
-      <div class="modal-header"><h3>Settings</h3><button class="action-btn close-modal"><i class="fas fa-times"></i></button></div>
-      <div class="settings-tabs">
-        <button class="tab-btn active" onclick="switchTab('set-profile')">Profile</button>
-        <button class="tab-btn" onclick="switchTab('set-app')">Appearance</button>
-      </div>
-      <div class="modal-body">
-        <div id="set-profile" class="tab-content active">
-           <div class="form-group"><label>Bio</label><textarea id="settingsBio" class="form-control"></textarea></div>
-           <button class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
-        </div>
-        <div id="set-app" class="tab-content">
-           <div class="form-group"><label>Theme</label>
-             <select id="themeSelect" class="form-control">
-               <option value="dark">Dark</option><option value="light">Light</option>
-               <option value="blue">Blue</option><option value="purple">Purple</option>
-             </select>
-           </div>
-           <button class="btn btn-primary" id="saveAppBtn">Apply</button>
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-content" style="max-width: 350px;">
+      <div class="modal-header"><h2 class="modal-title" id="confirmModalTitle">Are you sure?</h2></div>
+      <div class="modal-body"><p id="confirmModalBody"></p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+          <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    var __firebase_config = (typeof __firebase_config !== 'undefined') ? __firebase_config : '{"apiKey":"AIzaSyCu93I__VAq5GuBrUvhvxymejwjrYBM43g","authDomain":"cringescroll-prod.firebaseapp.com","projectId":"cringescroll-prod","storageBucket":"cringescroll-prod.firebasestorage.app","messagingSenderId":"802266413389","appId":"1:802266413389:web:22a7274e4edc8a0529df04"}';
+    var __app_id = (typeof __app_id !== 'undefined') ? __app_id : 'cringescroll-app-dev';
+  </script>
 
   <script type="module">
-    // IMPORT FIREBASE v10 (Standard Modular SDK)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, collection, query, where, getDocs, orderBy, limit, serverTimestamp, increment, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+    // ===== FIREBASE IMPORTS =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, signOut, updateProfile, signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, collection, 
+      query, where, getDocs, onSnapshot, orderBy, serverTimestamp, 
+      increment, limit, runTransaction, writeBatch
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadString, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-    // =======================================================
-    // ⚠️ CRITICAL: REPLACE THIS WITH YOUR FIREBASE CONFIG ⚠️
-    // Go to Firebase Console > Project Settings > General > Your Apps
-    // =======================================================
-    const firebaseConfig = {
-  apiKey: "AIzaSyCc2YgZOUfKfDw7igOfZgfm3709nXTJTYI",
-  authDomain: "cringescroll-meme.firebaseapp.com",
-  projectId: "cringescroll-meme",
-  storageBucket: "cringescroll-meme.firebasestorage.app",
-  messagingSenderId: "952326661480",
-  appId: "1:952326661480:web:366d94b478a6819168a2dd"
-};
-
-    // INIT FIREBASE
-    let app, auth, db, storage;
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-      storage = getStorage(app);
-    } catch(e) {
-      console.error("Firebase init failed. Did you paste your config?", e);
-      alert("Error: Firebase Config missing. Check code comments.");
-    }
-
-    // STATE
-    const appId = 'cringescroll-app';
-    let currentUser = null;
+    // ===== APP STATE =====
+    let feed, fabricCanvas;
+    let isLoading = false;
+    let loadCount = 0;
     let currentTab = 'hot';
-    let fabricCanvas = null;
-
-    // DOM ELEMENTS
-    const $ = (id) => document.getElementById(id);
-    const $$ = (sel) => document.querySelectorAll(sel);
-    const feedEl = $('feed');
-
-    // --- AUTHENTICATION ---
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Fetch extended profile
-        try {
-          const userDoc = await getDoc(doc(db, `artifacts/${appId}/public/data/users/${user.uid}`));
-          if (userDoc.exists()) {
-            currentUser = { uid: user.uid, email: user.email, ...userDoc.data() };
-            updateUI(true);
-          } else {
-            console.warn("User auth exists but profile doc missing.");
-            // If profile missing (rare race condition), create generic one locally or logout
-            currentUser = { uid: user.uid, email: user.email, username: user.displayName || 'Anon' };
-            updateUI(true);
-          }
-        } catch(e) { console.error("Profile load error", e); }
-      } else {
-        currentUser = null;
-        updateUI(false);
-      }
-      loadFeed(); // Reload feed based on auth state
-    });
-
-    const updateUI = (isLoggedIn) => {
-      $('menuLogin').style.display = isLoggedIn ? 'none' : 'flex';
-      $('menuLogout').style.display = isLoggedIn ? 'flex' : 'none';
-      if(isLoggedIn) {
-        closeModal('authModal');
-        showToast('Welcome', `Logged in as ${currentUser.username}`, 'success');
-      }
-    };
-
-    // HELPER: Require Auth
-    const requireAuth = (callback) => {
-      if (!currentUser) {
-        $('authModal').classList.add('active');
-        return;
-      }
-      callback();
-    };
-
-    // SIGN UP LOGIC (Fixed)
-    $('btnSignup').onclick = async () => {
-        const email = $('signupEmail').value;
-        const pass = $('signupPass').value;
-        const username = $('signupUser').value.trim();
-        const err = $('signupError');
-        
-        if(!email || !pass || !username) return err.innerText = "All fields required";
-        if(pass.length < 6) return err.innerText = "Password too short";
-
-        $('btnSignup').disabled = true;
-        try {
-            // Check username uniqueness
-            const q = query(collection(db, `artifacts/${appId}/public/data/users`), where('username', '==', username));
-            const snap = await getDocs(q);
-            if(!snap.empty) throw new Error("Username taken");
-
-            // Create Auth User
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            await updateProfile(cred.user, { displayName: username });
-
-            // Create Database Entry (Critical Step)
-            // 1. Public Profile
-            await setDoc(doc(db, `artifacts/${appId}/public/data/users/${cred.user.uid}`), {
-                username: username,
-                cringeCoin: 10,
-                avatar: `https://ui-avatars.com/api/?name=${username}&background=random`,
-                bio: "Just joined.",
-                createdAt: serverTimestamp()
-            });
-            // 2. Private Data
-            await setDoc(doc(db, `artifacts/${appId}/users/${cred.user.uid}/data/main`), {
-                email: email,
-                quests: { lastReset: new Date().toISOString() }
-            });
-
-            showToast("Success", "Account created!", "success");
-        } catch(e) {
-            err.innerText = e.message.replace('Firebase: ', '');
-            $('btnSignup').disabled = false;
-        }
-    };
-
-    // LOGIN LOGIC
-    $('btnLogin').onclick = async () => {
-        try {
-            $('btnLogin').disabled = true;
-            await signInWithEmailAndPassword(auth, $('loginEmail').value, $('loginPass').value);
-        } catch(e) {
-            $('loginError').innerText = "Invalid email or password";
-            $('btnLogin').disabled = false;
-        }
-    };
-
-    $('menuLogout').onclick = () => signOut(auth);
-
-    // --- FEED SYSTEM ---
-
-    const loadFeed = async () => {
-        feedEl.innerHTML = '<div class="loading-spinner"></div>';
-        
-        let q;
-        const memeColl = collection(db, `artifacts/${appId}/public/data/memes`);
-
-        try {
-            if(currentTab === 'mymemes') {
-                if(!currentUser) return feedEl.innerHTML = '<div style="text-align:center; padding:20px;">Please login to see your memes.</div>';
-                // NOTE: Requires Composite Index (userId ASC, createdAt DESC)
-                q = query(memeColl, where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-            } else {
-                // Default Hot Feed (Just latest for now)
-                q = query(memeColl, orderBy('createdAt', 'desc'), limit(20));
-            }
-
-            const snap = await getDocs(q);
-            feedEl.innerHTML = '';
-            
-            if(snap.empty) {
-                feedEl.innerHTML = '<div style="text-align:center; padding:20px;">No memes found. Be the first to post!</div>';
-                return;
-            }
-
-            snap.forEach(docSnap => {
-                const data = docSnap.data();
-                renderMemeCard(docSnap.id, data);
-            });
-        } catch(e) {
-            console.error(e);
-            feedEl.innerHTML = '<div style="text-align:center;color:red;">Error loading feed. Check console for Index link.</div>';
-        }
-    };
-
-    const renderMemeCard = (id, data) => {
-        const div = document.createElement('div');
-        div.className = 'meme-card';
-        div.innerHTML = `
-            <div class="card-header">
-                <span class="meme-title">${escape(data.title)}</span>
-                <span class="user-badge" onclick="viewProfile('${data.userId}')">@${escape(data.username)}</span>
-            </div>
-            <div class="meme-image-container">
-                <img src="${data.imageUrl}" class="meme-image loaded" loading="lazy">
-            </div>
-            <div class="card-footer">
-                <div class="reaction-bar">
-                    <button class="reaction-btn" onclick="react('${id}', 'skull')"><i class="fas fa-skull"></i> ${data.reactions?.skull || 0}</button>
-                    <button class="reaction-btn" onclick="react('${id}', 'fire')"><i class="fas fa-fire"></i> ${data.reactions?.fire || 0}</button>
-                </div>
-            </div>
-        `;
-        feedEl.appendChild(div);
-    };
-
-    // --- MEME EDITOR ---
-
-    window.openMemeEditor = () => {
-        requireAuth(() => {
-            $('memeEditorModal').classList.add('active');
-            setTimeout(initCanvas, 200);
-        });
-    };
-
-    const initCanvas = () => {
-        if(!fabricCanvas) {
-            const container = $('editorContainer');
-            fabricCanvas = new fabric.Canvas('canvas', { width: container.clientWidth, height: 400, backgroundColor: '#000' });
-        }
-        fabricCanvas.clear();
-        fabricCanvas.setBackgroundColor('#000', fabricCanvas.renderAll.bind(fabricCanvas));
-    };
-
-    window.addText = () => {
-        const text = new fabric.IText('Tap to edit', { left: 50, top: 50, fill: $('editorColor').value, fontSize: 40 });
-        fabricCanvas.add(text);
-    };
-
-    $('btnPostMeme').onclick = async () => {
-        const title = $('memeTitleInput').value;
-        if(!title) return alert("Title required");
-        
-        $('btnPostMeme').disabled = true;
-        const dataUrl = fabricCanvas.toDataURL({format: 'png'});
-        
-        try {
-            // Upload Image
-            const imgRef = ref(storage, `memes/${currentUser.uid}/${Date.now()}.png`);
-            await uploadString(imgRef, dataUrl, 'data_url');
-            const url = await getDownloadURL(imgRef);
-
-            // Save Doc
-            await addDoc(collection(db, `artifacts/${appId}/public/data/memes`), {
-                userId: currentUser.uid,
-                username: currentUser.username,
-                title: title,
-                imageUrl: url,
-                createdAt: serverTimestamp(),
-                reactions: { skull: 0, fire: 0 }
-            });
-
-            closeModal('memeEditorModal');
-            showToast("Posted", "Your meme is live!", "success");
-            loadFeed();
-        } catch(e) {
-            console.error(e);
-            alert("Upload failed");
-        } finally {
-            $('btnPostMeme').disabled = false;
-        }
-    };
-
-    // --- UI/NAVIGATION LOGIC ---
-
-    const toggleSidebar = () => {
-        $('sidebar').classList.toggle('active');
-        $('sidebarOverlay').classList.toggle('active');
-    };
-
-    $('menuToggleBtn').onclick = toggleSidebar;
-    $('closeSidebar').onclick = toggleSidebar;
-    $('sidebarOverlay').onclick = toggleSidebar;
-
-    $$('.nav-item').forEach(el => {
-        el.onclick = (e) => {
-            e.preventDefault();
-            $$('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            currentTab = el.dataset.tab;
-            loadFeed();
-        };
-    });
-
-    // Sidebar menu clicks
-    $('menuProfile').onclick = () => requireAuth(() => {
-        $('genericModalTitle').innerText = "My Profile";
-        $('genericModalBody').innerHTML = `<p>Username: ${currentUser.username}</p><p>Coins: ${currentUser.cringeCoin}</p>`;
-        $('genericModal').classList.add('active');
-        toggleSidebar();
-    });
-
-    $('menuCreateMeme').onclick = () => { toggleSidebar(); window.openMemeEditor(); };
-    $('menuLogin').onclick = () => { toggleSidebar(); $('authModal').classList.add('active'); };
+    let app, db, auth, storage;
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app-dev';
+    let userId = null;
+    let currentUser = null;
+    let isAnonymous = true;
+    let userPreferences = { theme: 'dark' };
     
-    // Generic Modal Closer
-    $$('.close-modal').forEach(b => b.onclick = (e) => {
-        e.target.closest('.modal-overlay').classList.remove('active');
-    });
+    // Listeners
+    let chatListener = null;
 
-    window.closeModal = (id) => $(id).classList.remove('active');
+    const MEME_SOURCES = [
+      'https://meme-api.com/gimme/memes',
+      'https://meme-api.com/gimme/dankmemes',
+      'https://meme-api.com/gimme/me_irl'
+    ];
 
-    // Toast
-    const showToast = (title, msg, type) => {
-        const t = $('notificationToast');
-        $('notifTitle').innerText = title;
-        $('notifMsg').innerText = msg;
-        t.className = `notification show ${type}`;
-        setTimeout(() => t.classList.remove('show'), 3000);
+    // Paths
+    const paths = {
+        publicUser: (uid) => doc(db, `artifacts/${appId}/public/data/users/${uid}`),
+        privateUser: (uid) => doc(db, `artifacts/${appId}/users/${uid}/data/main`),
+        memesCol: () => collection(db, `artifacts/${appId}/public/data/memes`),
+        chatCol: () => collection(db, `artifacts/${appId}/public/data/chat`),
+        usersCol: () => collection(db, `artifacts/${appId}/public/data/users`),
     };
 
     // Utils
-    const escape = (str) => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])) : '';
+    const $ = (id) => document.getElementById(id);
+    const $$ = (sel) => document.querySelectorAll(sel);
+    const escapeHtml = (str) => !str ? '' : str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
-    // Auth Modal Tabs
-    $('tabLogin').onclick = () => { $('loginForm').style.display='block'; $('signupForm').style.display='none'; $('tabLogin').classList.add('active'); $('tabSignup').classList.remove('active'); };
-    $('tabSignup').onclick = () => { $('loginForm').style.display='none'; $('signupForm').style.display='block'; $('tabSignup').classList.add('active'); $('tabLogin').classList.remove('active'); };
+    const showNotification = (title, message, type = 'success') => {
+      const toast = $('notificationToast');
+      $('notificationTitle').textContent = title;
+      $('notificationMessage').textContent = message;
+      toast.className = `notification show ${type}`;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    };
 
+    // ===== INIT =====
+    const initFirebase = () => {
+        try {
+            const config = JSON.parse(__firebase_config);
+            app = initializeApp(config);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            storage = getStorage(app);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isAnonymous = user.isAnonymous;
+                    console.log("User:", userId, "Anon:", isAnonymous);
+                    
+                    if (isAnonymous) {
+                        $('menuLogin').style.display = 'flex';
+                        $('menuLogout').style.display = 'none';
+                        if(currentTab === 'mymemes') switchTab('hot');
+                    } else {
+                        $('menuLogin').style.display = 'none';
+                        $('menuLogout').style.display = 'flex';
+                        $('authModal').classList.remove('active');
+                        // Load User Data
+                        onSnapshot(paths.publicUser(userId), (doc) => {
+                             if(doc.exists()) currentUser = doc.data();
+                        });
+                    }
+                    
+                    setupChat();
+                    if (loadCount === 0) loadFeed();
+                } else {
+                    signInAnonymously(auth);
+                }
+            });
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+        }
+    };
+
+    // ===== AUTH =====
+    const signUpUser = async () => {
+        const email = $('signupEmailInput').value.trim();
+        const username = $('signupUsernameInput').value.trim();
+        const password = $('signupPasswordInput').value;
+        const btn = $('signupBtn');
+        
+        if (!email || !username || !password) return;
+        btn.disabled = true;
+
+        try {
+            // Check username
+            const q = query(paths.usersCol(), where('username', '==', username));
+            const snap = await getDocs(q);
+            if (!snap.empty) throw new Error("Username taken");
+
+            const cred = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(cred.user, { displayName: username });
+            
+            // Create Profile (Batch to fix permissions)
+            const batch = writeBatch(db);
+            batch.set(paths.publicUser(cred.user.uid), {
+                username: username,
+                cringeCoin: 10,
+                avatar: `https://ui-avatars.com/api/?name=${username}`,
+                createdAt: serverTimestamp()
+            });
+            batch.set(paths.privateUser(cred.user.uid), {
+                email: email,
+                preferences: userPreferences
+            });
+            await batch.commit();
+            
+            showNotification("Success", "Account created!");
+        } catch (e) {
+            $('signupError').textContent = e.message;
+        } finally {
+            btn.disabled = false;
+        }
+    };
+
+    const loginUser = async () => {
+        const email = $('loginEmailInput').value;
+        const password = $('loginPasswordInput').value;
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            showNotification("Success", "Logged in!");
+        } catch (e) {
+            $('loginError').textContent = e.message;
+        }
+    };
+
+    // ===== FEED =====
+    const loadFeed = async (clear = false) => {
+        if (isLoading) return;
+        isLoading = true;
+        if (clear) { feed.innerHTML = ''; loadCount = 0; }
+        
+        if (feed.children.length === 0) feed.innerHTML = '<div class="loading-spinner"></div>';
+
+        try {
+            if (currentTab === 'mymemes') {
+                if (isAnonymous) {
+                    feed.innerHTML = '<div style="text-align:center; padding:20px;">Please login to see your memes.</div>';
+                } else {
+                    // Requires Index: userId ASC, createdAt DESC
+                    const q = query(paths.memesCol(), where('userId', '==', userId), orderBy('createdAt', 'desc'));
+                    const snap = await getDocs(q);
+                    feed.innerHTML = '';
+                    if (snap.empty) feed.innerHTML = '<div style="text-align:center; padding:20px;">No memes yet. Create one!</div>';
+                    snap.forEach(d => renderMeme({id: d.id, ...d.data()}));
+                }
+            } else if (currentTab === 'search') {
+                const term = $('searchInput').value.trim();
+                const q = query(paths.memesCol(), where('username', '==', term), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+                feed.innerHTML = '';
+                snap.forEach(d => renderMeme({id: d.id, ...d.data()}));
+            } else {
+                // API Load
+                const promises = Array(3).fill().map(async () => {
+                    try {
+                        const res = await fetch(MEME_SOURCES[Math.floor(Math.random()*MEME_SOURCES.length)]);
+                        const data = await res.json();
+                        if (data.url && !data.nsfw) return {url: data.url, title: data.title, ups: data.ups};
+                    } catch(e) { return null; }
+                });
+                const memes = (await Promise.all(promises)).filter(m => m);
+                if(clear) feed.innerHTML = '';
+                memes.forEach(m => renderMeme(m));
+            }
+        } catch (e) {
+            console.error(e);
+            feed.innerHTML = `<div style="text-align:center;">Error loading feed. Check Indexes.</div>`;
+        } finally {
+            isLoading = false;
+            const s = feed.querySelector('.loading-spinner');
+            if(s) s.remove();
+        }
+    };
+
+    const renderMeme = (meme) => {
+        const div = document.createElement('div');
+        div.className = 'meme-card';
+        div.innerHTML = `
+            <div class="card-header"><div class="meme-title">${escapeHtml(meme.title)}</div></div>
+            <img class="meme-image" src="${meme.url || meme.imageUrl}" style="width:100%; display:block; min-height:200px;" onload="this.classList.add('loaded')">
+            <div class="card-footer">
+                <div class="reaction-bar">
+                    <button class="reaction-btn"><i class="fas fa-skull"></i></button>
+                    <button class="reaction-btn"><i class="fas fa-grin"></i></button>
+                </div>
+            </div>
+        `;
+        feed.appendChild(div);
+    };
+
+    // ===== EDITOR =====
+    const initEditor = () => {
+        if(isAnonymous) { showNotification("Login Required", "You must login to create memes.", "error"); return; }
+        $('memeEditorModal').classList.add('active');
+        setTimeout(() => {
+            if(!fabricCanvas) {
+                fabricCanvas = new fabric.Canvas('canvas', { width: $('editorContainer').clientWidth, height: 400, backgroundColor: '#1a1640' });
+            }
+            fabricCanvas.clear();
+            fabricCanvas.setBackgroundColor('#1a1640', fabricCanvas.renderAll.bind(fabricCanvas));
+        }, 100);
+    };
+
+    const postMeme = async () => {
+        const title = $('memeTitleInput').value;
+        if(!title) return;
+        const btn = $('postMemeBtn');
+        btn.disabled = true;
+        
+        try {
+            const dataUrl = fabricCanvas.toDataURL({format: 'png'});
+            const memeRef = ref(storage, `memes/${userId}/${Date.now()}.png`);
+            const upload = await uploadString(memeRef, dataUrl, 'data_url');
+            const url = await getDownloadURL(upload.ref);
+            
+            await addDoc(paths.memesCol(), {
+                title: title,
+                imageUrl: url,
+                userId: userId,
+                username: currentUser?.username || 'User',
+                createdAt: serverTimestamp(),
+                isUserGenerated: true
+            });
+            $('memeEditorModal').classList.remove('active');
+            showNotification("Posted!", "Meme is live.");
+            switchTab('mymemes');
+        } catch (e) {
+            console.error(e);
+            showNotification("Error", "Upload failed.", "error");
+        } finally {
+            btn.disabled = false;
+        }
+    };
+
+    // ===== CHAT =====
+    const setupChat = () => {
+        if(chatListener) return;
+        const q = query(paths.chatCol(), orderBy('timestamp', 'desc'), limit(50));
+        chatListener = onSnapshot(q, (snap) => {
+            const box = $('chatMessages');
+            box.innerHTML = '';
+            snap.docs.reverse().forEach(d => {
+                const m = d.data();
+                const div = document.createElement('div');
+                div.className = `message ${m.userId === userId ? 'outgoing' : 'incoming'}`;
+                div.textContent = m.text;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+    };
+
+    const sendMessage = async () => {
+        const txt = $('chatInput').value.trim();
+        if(!txt || isAnonymous) return;
+        $('chatInput').value = '';
+        await addDoc(paths.chatCol(), {
+            text: txt,
+            userId: userId,
+            sender: currentUser?.username || 'User',
+            timestamp: serverTimestamp()
+        });
+    };
+
+    // ===== UI BINDINGS =====
+    const switchTab = (tab) => {
+        currentTab = tab;
+        $$('.nav-item').forEach(n => n.classList.remove('active'));
+        $(`[data-tab="${tab}"]`).classList.add('active');
+        loadFeed(true);
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initFirebase();
+        
+        // Nav
+        $$('.nav-item').forEach(el => el.onclick = (e) => {
+            e.preventDefault();
+            switchTab(el.dataset.tab);
+        });
+        
+        // Modals
+        $$('.close-modal').forEach(b => b.onclick = (e) => e.target.closest('.modal-overlay').classList.remove('active'));
+        $('menuLogin').onclick = () => $('authModal').classList.add('active');
+        $('menuLogout').onclick = () => auth.signOut();
+        $('menuCreateMeme').onclick = initEditor;
+        
+        // Auth
+        $('signupBtn').onclick = signUpUser;
+        $('loginBtn').onclick = loginUser;
+        $('signupTab').onclick = () => { $('signupForm').style.display='block'; $('loginForm').style.display='none'; $('signupTab').classList.add('active'); $('loginTab').classList.remove('active');};
+        $('loginTab').onclick = () => { $('signupForm').style.display='none'; $('loginForm').style.display='block'; $('loginTab').classList.add('active'); $('signupTab').classList.remove('active');};
+        
+        // Chat
+        $('chatToggleBtn').onclick = () => $('chatWindow').classList.toggle('active');
+        $('closeChatWindow').onclick = () => $('chatWindow').classList.remove('active');
+        $('sendChatMessage').onclick = sendMessage;
+        $('chatInput').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+        
+        // Editor
+        $('addTextBtn').onclick = () => {
+            const t = new fabric.IText('Text', {left: 50, top: 50, fill: '#fff'});
+            fabricCanvas.add(t);
+        };
+        $('addImageBtn').onclick = () => {
+            const input = document.createElement('input'); input.type='file';
+            input.onchange = (e) => {
+                const r = new FileReader();
+                r.onload = (ev) => fabric.Image.fromURL(ev.target.result, (img) => { img.scaleToWidth(200); fabricCanvas.add(img); });
+                r.readAsDataURL(e.target.files[0]);
+            };
+            input.click();
+        };
+        $('postMemeBtn').onclick = postMeme;
+        
+        // Menu
+        $('menuToggleBtn').onclick = () => $('sidebar').classList.add('active');
+        $('closeSidebar').onclick = () => $('sidebar').classList.remove('active');
+
+        // Search
+        $('searchInput').onkeyup = (e) => {
+            if(e.key === 'Enter') {
+                currentTab = 'search';
+                loadFeed(true);
+            }
+        };
+    });
   </script>
 </body>
 </html>
