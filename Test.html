@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,16 +6,13 @@
   <meta name="theme-color" content="#0f0c29" />
   <title>CringeScroll • Where Memes Live</title>
   
-  <!-- Preconnect to external domains -->
   <link rel="preconnect" href="https://i.imgur.com" crossorigin>
   <link rel="preconnect" href="https://i.redd.it" crossorigin>
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-  <!-- Icon Font -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
   
-  <!-- Fabric.js for Meme Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js" defer></script>
 
   <style>
@@ -52,1506 +49,213 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    html {
-      font-size: 16px; /* Base font size */
-    }
-
-    html, body { 
-      height: 100%; 
-      width: 100%;
-      overflow: hidden; /* Prevent body scroll */
-    }
+    html { font-size: 16px; }
+    html, body { height: 100%; width: 100%; overflow: hidden; }
     
     body {
       background: var(--bg-primary);
       color: var(--text-primary);
-      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       overflow-x: hidden;
       overscroll-behavior: none;
       -webkit-font-smoothing: antialiased;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
       transition: var(--transition);
       font-size: var(--font-size-base, 1rem);
     }
     
     .app-container { 
-      display: flex; 
-      flex-direction: column; 
-      height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); 
-      overflow: hidden; 
-      position: relative; 
-      width: 100%;
+      display: flex; flex-direction: column; 
+      height: 100dvh; overflow: hidden; position: relative; width: 100%;
     }
     
-    @keyframes float { 
-      0% { transform: translateY(0px); } 
-      50% { transform: translateY(-5px); } 
-      100% { transform: translateY(0px); } 
-    }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
 
     /* ===== HEADER ===== */
     .header {
-      height: var(--header-height); 
-      background: var(--bg-secondary); 
-      backdrop-filter: blur(10px); 
-      position: sticky; 
-      top: 0; 
-      left: 0;
-      width: 100%; 
-      z-index: 100; 
-      padding: 0 16px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
-      border-bottom: 1px solid var(--border-color);
-      flex-shrink: 0;
+      height: var(--header-height); background: var(--bg-secondary); backdrop-filter: blur(10px); 
+      position: sticky; top: 0; width: 100%; z-index: 100; padding: 0 16px; 
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-bottom: 1px solid var(--border-color); flex-shrink: 0;
     }
-    .logo-container { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      text-decoration: none; 
-      color: var(--text-primary); 
-    }
+    .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); }
     .logo-icon {
-      width: 42px; 
-      height: 42px; 
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); 
-      border-radius: 12px;
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      box-shadow: 0 4px 10px rgba(106, 13, 173, 0.3);
-      animation: float 3s ease-in-out infinite;
-      flex-shrink: 0;
+      width: 42px; height: 42px; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); 
+      border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+      box-shadow: 0 4px 10px rgba(106, 13, 173, 0.3); animation: float 3s ease-in-out infinite;
     }
     .logo-icon i { font-size: 18px; color: white; }
     .logo-text {
-      font-size: 26px; 
-      font-weight: 800; 
-      letter-spacing: -0.5px; 
+      font-size: 26px; font-weight: 800; letter-spacing: -0.5px; 
       background: linear-gradient(to right, var(--accent-1), var(--accent-3));
-      -webkit-background-clip: text; 
-      background-clip: text; 
-      color: transparent; 
-      text-shadow: 0 2px 4px rgba(106, 13, 173, 0.3); 
-      position: relative;
+      -webkit-background-clip: text; background-clip: text; color: transparent; 
     }
-    .logo-text::after { 
-      content: ''; 
-      position: absolute; 
-      bottom: -4px; 
-      left: 0; 
-      width: 70%; 
-      height: 3px; 
-      background: linear-gradient(to right, var(--accent-1), var(--accent-3)); 
-      border-radius: 3px; 
-    }
-    .search-container { 
-      flex: 1; 
-      max-width: 500px; 
-      margin: 0 20px; 
-      position: relative; 
-    }
+    .search-container { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
     .search-input { 
-      width: 100%; 
-      padding: 12px 20px 12px 45px; 
-      border-radius: 50px; 
-      border: 1px solid var(--border-color); 
-      background: rgba(255, 255, 255, 0.1); 
-      color: var(--text-primary); 
-      font-size: 1rem; 
-      transition: var(--transition); 
+      width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; 
+      border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.1); 
+      color: var(--text-primary); transition: var(--transition); 
     }
-    .search-input:focus { 
-      outline: none; 
-      border-color: var(--accent-3); 
-      box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); 
-    }
-    .search-icon { 
-      position: absolute; 
-      left: 20px; 
-      top: 50%; 
-      transform: translateY(-50%); 
-      color: var(--text-secondary); 
-      font-size: 1.1rem; 
-    }
-    .header-actions { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-    }
+    .search-input:focus { outline: none; border-color: var(--accent-3); box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); }
+    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+    .header-actions { display: flex; gap: 12px; }
     .action-btn {
-      width: 42px; 
-      height: 42px; 
-      border-radius: 12px; 
-      background: rgba(255, 255, 255, 0.1); 
-      border: 1px solid var(--border-color);
-      color: var(--text-primary); 
-      font-size: 1.1rem; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer;
-      transition: var(--transition); 
-      position: relative; 
-      overflow: hidden;
-      flex-shrink: 0;
+      width: 42px; height: 42px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); 
+      border: 1px solid var(--border-color); color: var(--text-primary); display: flex; 
+      align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); position: relative;
     }
-    .action-btn:hover { 
-      background: rgba(106, 13, 173, 0.2); 
-      transform: translateY(-2px); 
-    }
+    .action-btn:hover { background: rgba(106, 13, 173, 0.2); transform: translateY(-2px); }
     .notification-badge {
-      position: absolute; 
-      top: 4px; 
-      right: 4px; 
-      background: var(--accent-3); 
-      color: white; 
-      font-size: 0.65rem; 
-      font-weight: bold;
-      min-width: 16px; 
-      height: 16px; 
-      border-radius: 50%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 0 3px;
+      position: absolute; top: 4px; right: 4px; background: var(--accent-3); color: white; 
+      font-size: 0.65rem; font-weight: bold; min-width: 16px; height: 16px; border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center; padding: 0 3px;
     }
     .notification-badge:empty { display: none; }
 
     /* ===== NAVIGATION ===== */
     .nav-container {
-      background: var(--bg-secondary); 
-      border-top: 1px solid var(--border-color); 
-      position: sticky; 
-      bottom: 0; 
-      left: 0;
-      width: 100%; 
-      z-index: 90; 
-      display: flex; 
-      justify-content: space-around; 
-      padding: 8px 0;
-      flex-shrink: 0;
-      padding-bottom: env(safe-area-inset-bottom);
+      background: var(--bg-secondary); border-top: 1px solid var(--border-color); 
+      position: sticky; bottom: 0; width: 100%; z-index: 90; display: flex; 
+      justify-content: space-around; padding: 8px 0; padding-bottom: env(safe-area-inset-bottom);
     }
     .nav-item {
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 4px; 
-      color: var(--text-secondary); 
-      text-decoration: none;
-      font-size: 0.75rem; 
-      font-weight: 500; 
-      padding: 6px 16px; 
-      border-radius: 12px; 
-      transition: var(--transition); 
-      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 4px; 
+      color: var(--text-secondary); text-decoration: none; font-size: 0.75rem; 
+      padding: 6px 16px; border-radius: 12px; transition: var(--transition); cursor: pointer;
     }
-    .nav-item.active, .nav-item:hover { 
-      color: var(--accent-3); 
-      background: rgba(106, 13, 173, 0.1); 
-    }
-    .nav-item i { font-size: 1.25rem; }
-    .nav-indicator { 
-      width: 6px; 
-      height: 6px; 
-      border-radius: 50%; 
-      background: var(--accent-3); 
-      margin-top: 2px; 
-      opacity: 0; 
-      transition: opacity 0.2s; 
-    }
+    .nav-item.active, .nav-item:hover { color: var(--accent-3); background: rgba(106, 13, 173, 0.1); }
+    .nav-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-3); margin-top: 2px; opacity: 0; }
     .nav-item.active .nav-indicator { opacity: 1; }
 
-    /* ===== MAIN CONTENT (MASONRY LAYOUT) ===== */
-    .content-area {
-      flex: 1; 
-      overflow-y: auto; 
-      overflow-x: hidden;
-      padding: 16px;
-      column-count: 3; 
-      column-gap: 16px; 
-    }
-    
-    /* ===== MEME CARD (DYNAMIC SIZING) ===== */
+    /* ===== CONTENT & CARDS ===== */
+    .content-area { flex: 1; overflow-y: auto; padding: 16px; column-count: 3; column-gap: 16px; }
     .meme-card {
-      background: var(--card-bg); 
-      border-radius: var(--border-radius); 
-      overflow: hidden; 
-      box-shadow: var(--shadow-md);
-      transition: var(--transition); 
-      position: relative; 
-      display: flex; 
-      flex-direction: column; 
-      will-change: transform;
-      break-inside: avoid-column; 
-      margin-bottom: 16px; 
-      width: 100%;
+      background: var(--card-bg); border-radius: var(--border-radius); overflow: hidden; 
+      box-shadow: var(--shadow-md); transition: var(--transition); position: relative; 
+      break-inside: avoid-column; margin-bottom: 16px; width: 100%; display: flex; flex-direction: column;
     }
-    .meme-card:hover { 
-      transform: translateY(-5px); 
-      box-shadow: var(--shadow-lg); 
-    }
-    .card-header { 
-      padding: var(--card-padding); 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: start; 
-      border-bottom: 1px solid var(--border-color); 
-    }
-    .meme-title { 
-      font-size: 1.1rem; 
-      font-weight: 700; 
-      color: var(--text-primary); 
-      line-height: 1.4; 
-      margin-bottom: 4px; 
-      word-wrap: break-word;
-    }
-    .meme-meta { 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-      font-size: 0.8rem; 
-      color: var(--text-secondary); 
-    }
-    .user-badge { 
-      display: flex; 
-      align-items: center; 
-      gap: 4px; 
-      background: rgba(106, 13, 173, 0.2); 
-      padding: 4px 8px; 
-      border-radius: 20px; 
-      font-size: 0.75rem; 
-      font-weight: 600; 
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .user-badge:hover {
-      background: rgba(106, 13, 173, 0.4);
-    }
-    .meme-image-container { 
-      width: 100%; 
-      position: relative; 
-      background: rgba(0, 0, 0, 0.1); 
-      overflow: hidden; 
-      min-height: 100px; /* Prevent jank on load */
-    }
-    .meme-image { 
-      width: 100%; 
-      height: auto; 
-      display: block; 
-      transition: opacity 0.3s ease, transform 0.3s ease; 
-      opacity: 0; 
-      transform: scale(1.02); 
-    }
-    .meme-image.loaded { 
-      opacity: 1; 
-      transform: scale(1); 
-    }
-    .card-footer { 
-      padding: var(--card-padding); 
-      border-top: 1px solid var(--border-color); 
-    }
-    .reaction-bar { 
-      display: flex; 
-      justify-content: space-around; 
-      gap: 8px; 
-      margin-bottom: 12px; 
-    }
+    .meme-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+    .card-header { padding: var(--card-padding); display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+    .meme-title { font-size: 1.1rem; font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
+    .meme-meta { font-size: 0.8rem; color: var(--text-secondary); }
+    .user-badge { background: rgba(106, 13, 173, 0.2); padding: 4px 8px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+    .meme-image-container { width: 100%; min-height: 200px; background: rgba(0,0,0,0.2); }
+    .meme-image { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 0.3s; }
+    .meme-image.loaded { opacity: 1; }
+    .card-footer { padding: var(--card-padding); border-top: 1px solid var(--border-color); }
+    .reaction-bar { display: flex; justify-content: space-around; margin-bottom: 12px; }
     .reaction-btn {
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 4px; 
-      background: none; 
-      border: none; 
-      color: var(--text-secondary);
-      font-size: 1.1rem; 
-      cursor: pointer; 
-      transition: var(--transition); 
-      padding: 4px; 
-      border-radius: 10px; 
-      flex: 1;
+      background: none; border: none; color: var(--text-secondary); font-size: 1.1rem; 
+      cursor: pointer; transition: var(--transition); padding: 4px; flex: 1; display: flex; flex-direction: column; align-items: center;
     }
-    .reaction-btn:hover { 
-      color: var(--text-primary); 
-      background: rgba(106, 13, 173, 0.1); 
-    }
-    .reaction-btn.active { 
-      color: var(--accent-3); 
-      transform: scale(1.1);
-    }
-    .reaction-count { 
-      font-size: 0.75rem; 
-      font-weight: 600; 
-      color: var(--text-primary); 
-    }
-    .action-buttons { 
-      display: grid; 
-      grid-template-columns: repeat(4, 1fr); 
-      gap: 8px; 
-    }
+    .reaction-btn:hover, .reaction-btn.active { color: var(--accent-3); transform: scale(1.1); }
+    .reaction-count { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+    .action-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .card-btn {
-      padding: 8px 0; 
-      border-radius: 10px; 
-      background: rgba(255, 255, 255, 0.08); 
-      border: 1px solid var(--border-color);
-      color: var(--text-primary); 
-      font-size: 0.8rem; 
-      font-weight: 600; 
-      cursor: pointer; 
-      transition: var(--transition);
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 4px;
+      padding: 8px 0; border-radius: 10px; background: rgba(255, 255, 255, 0.08); 
+      border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; 
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
     }
-    .card-btn i { font-size: 0.9rem; }
-    .card-btn:hover { 
-      background: rgba(106, 13, 173, 0.2); 
-      transform: translateY(-2px); 
-    }
-    .card-btn:active { transform: translateY(0); }
-    .card-btn.saved { 
-      background: var(--accent-2); 
-      color: white; 
-      border-color: var(--accent-3); 
-    }
+    .card-btn:hover { background: rgba(106, 13, 173, 0.2); }
+    .card-btn.saved { background: var(--accent-2); border-color: var(--accent-3); }
 
     /* ===== SIDEBAR & MODALS ===== */
     .sidebar {
-      position: fixed; 
-      top: 0; 
-      right: -320px; 
-      width: 300px; 
-      height: 100dvh; 
-      background: var(--bg-secondary); 
-      backdrop-filter: blur(10px);
-      border-left: 1px solid var(--border-color); 
-      z-index: 1000; 
-      transition: right 0.3s ease; 
-      display: flex; 
-      flex-direction: column;
-      overflow-y: auto; 
-      padding: 20px 16px;
+      position: fixed; top: 0; right: -320px; width: 300px; height: 100dvh; 
+      background: var(--bg-secondary); border-left: 1px solid var(--border-color); 
+      z-index: 1000; transition: right 0.3s ease; padding: 20px 16px; display: flex; flex-direction: column;
     }
     .sidebar.active { right: 0; }
-    .sidebar-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding-bottom: 15px; 
-      border-bottom: 1px solid var(--border-color); 
-      margin-bottom: 20px; 
-    }
-    .sidebar-title { 
-      font-size: 1.4rem; 
-      font-weight: 700; 
-      color: var(--accent-3); 
-    }
-    .close-sidebar { 
-      background: none; 
-      border: none; 
-      color: var(--text-primary); 
-      font-size: 1.5rem; 
-      cursor: pointer; 
-      width: 32px; 
-      height: 32px; 
-      border-radius: 50%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      transition: var(--transition); 
-    }
-    .close-sidebar:hover { background: rgba(255, 255, 255, 0.1); }
+    .sidebar-header { display: flex; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
     .menu-section { margin-bottom: 25px; }
-    .menu-section-title { 
-      font-size: 1rem; 
-      font-weight: 600; 
-      color: var(--text-primary); 
-      margin-bottom: 12px; 
-      padding-bottom: 6px; 
-      border-bottom: 1px solid var(--border-color); 
-    }
-    .menu-item { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      padding: 12px 16px; 
-      margin-bottom: 8px; 
-      border-radius: 12px; 
-      color: var(--text-secondary); 
-      text-decoration: none; 
-      transition: var(--transition); 
-      cursor: pointer; 
-    }
-    .menu-item:hover, .menu-item.active { 
-      color: var(--accent-3); 
-      background: rgba(106, 13, 173, 0.1); 
-    }
-    .menu-item i { 
-      width: 20px; 
-      text-align: center; 
-      font-size: 1rem; 
-    }
-    .menu-badge { 
-      margin-left: auto; 
-      background: var(--accent-3); 
-      color: white; 
-      font-size: 0.65rem; 
-      font-weight: bold; 
-      min-width: 18px; 
-      height: 18px; 
-      border-radius: 9px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      padding: 0 4px; 
-    }
-    .menu-badge:empty { display: none; }
-
-    /* ===== MODAL STYLES (Refactored for no-flicker) ===== */
+    .menu-section-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; color: var(--text-secondary); cursor: pointer; }
+    .menu-item:hover { background: rgba(106, 13, 173, 0.1); color: var(--accent-3); }
+    .menu-badge { margin-left: auto; background: var(--accent-3); color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; }
+    
+    /* Generic Modal */
     .modal-overlay {
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: rgba(0, 0, 0, 0.7); 
-      backdrop-filter: blur(5px);
-      z-index: 2000; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      opacity: 0; 
-      pointer-events: none; 
-      transition: opacity 0.3s ease;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 2000; 
+      display: flex; align-items: center; justify-content: center; opacity: 0; 
+      pointer-events: none; transition: opacity 0.3s ease;
     }
-    .modal-overlay.active { 
-      opacity: 1; 
-      pointer-events: all; 
-    }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
     .modal-content {
-      background: var(--bg-secondary); 
-      border-radius: 20px; 
-      width: 90%; 
-      max-width: 500px; 
-      max-height: 90vh; 
-      display: flex;
-      flex-direction: column;
-      overflow: hidden; /* Changed from auto to hidden */
-      transform: translateY(20px); 
-      transition: transform 0.3s ease; 
-      border: 1px solid var(--border-color); 
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      background: var(--bg-secondary); border-radius: 20px; width: 90%; max-width: 500px; 
+      max-height: 90vh; display: flex; flex-direction: column; border: 1px solid var(--border-color); 
+      transform: translateY(20px); transition: transform 0.3s ease;
     }
-    .modal-overlay.active .modal-content { 
-      transform: translateY(0); 
-    }
-    .modal-header { 
-      padding: 20px; 
-      border-bottom: 1px solid var(--border-color); 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      position: sticky; 
-      top: 0; 
-      background: var(--bg-secondary); 
-      z-index: 10; 
-      flex-shrink: 0;
-    }
-    .modal-title { 
-      font-size: 1.4rem; 
-      font-weight: 700; 
-      color: var(--accent-3); 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-    }
-    .close-modal { 
-      background: none; 
-      border: none; 
-      color: var(--text-primary); 
-      font-size: 1.5rem; 
-      cursor: pointer; 
-      width: 36px; 
-      height: 36px; 
-      border-radius: 10px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      transition: var(--transition); 
-      flex-shrink: 0;
-    }
-    .close-modal:hover { background: rgba(255, 255, 255, 0.1); }
-    .modal-body { 
-      padding: 20px; 
-      overflow-y: auto;
-      flex: 1; /* Makes modal body fill remaining space */
-    }
-    .modal-body .loading-spinner {
-      margin-top: 40px; /* Give space when loading */
-    }
-
-    /* Form Styles */
-    .form-group { margin-bottom: 20px; }
-    .form-label { 
-      display: block; 
-      margin-bottom: 8px; 
-      font-weight: 600; 
-      color: var(--text-primary); 
-      font-size: 0.9rem; 
-    }
-    .form-control { 
-      width: 100%; 
-      padding: 14px; 
-      border-radius: 12px; 
-      border: 1px solid var(--border-color); 
-      background: rgba(0, 0, 0, 0.1); 
-      color: var(--text-primary); 
-      font-size: 1rem; 
-      transition: var(--transition); 
-    }
-    .form-control:focus { 
-      outline: none; 
-      border-color: var(--accent-3); 
-      box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2); 
-    }
-    .form-control[type="color"] {
-      height: 48px;
-      padding: 5px;
-    }
-    textarea.form-control {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .btn {
-      padding: 14px 24px; 
-      border-radius: 12px; 
-      border: none; 
-      font-weight: 600; 
-      font-size: 1rem; 
-      cursor: pointer;
-      transition: var(--transition); 
-      display: inline-flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 8px; 
-      width: 100%;
-      text-decoration: none;
-    }
-    .btn:disabled { 
-      opacity: 0.5; 
-      cursor: not-allowed; 
-      transform: none !important;
-      box-shadow: none !important;
-    }
-    .btn-primary { 
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); 
-      color: white; 
-      box-shadow: 0 4px 15px rgba(106, 13, 173, 0.4); 
-    }
-    .btn-primary:hover:not(:disabled) { 
-      transform: translateY(-2px); 
-      box-shadow: 0 6px 20px rgba(106, 13, 173, 0.6); 
-    }
-    .btn-secondary { 
-      background: rgba(255, 255, 255, 0.1); 
-      color: var(--text-primary); 
-      border: 1px solid var(--border-color); 
-    }
-    .btn-secondary:hover:not(:disabled) { 
-      background: rgba(255, 255, 255, 0.15); 
-    }
-    .btn-secondary.active { 
-      background: rgba(106, 13, 173, 0.2); 
-      border-color: var(--accent-3); 
-      color: var(--accent-3);
-    }
-    .btn-danger {
-      background: rgba(255, 77, 77, 0.1);
-      color: var(--error);
-      border: 1px solid var(--error);
-    }
-    .btn-danger:hover:not(:disabled) {
-      background: rgba(255, 77, 77, 0.2);
-    }
-    .btn-sm {
-      padding: 8px 12px;
-      font-size: 0.9rem;
-      width: auto;
-    }
-
-    .form-error { 
-      color: var(--error); 
-      font-size: 0.8rem; 
-      margin-top: -10px; 
-      margin-bottom: 15px; 
-      min-height: 1.2em; /* Prevent layout shift */
-    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 20px; overflow-y: auto; }
     
-    /* Grid items used in Modals */
-    .modal-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-      gap: 10px; 
-    }
-    .grid-item { 
-      background: rgba(255, 255, 255, 0.05); 
-      border-radius: 12px; 
-      padding: 15px; 
-      text-align: center; 
-      cursor: pointer; 
-      transition: var(--transition); 
-      border: 1px solid transparent;
-    }
-    .grid-item:hover { 
-      background: rgba(255, 255, 255, 0.1); 
-      border-color: var(--border-color);
-    }
-    .grid-item i { 
-      font-size: 1.5rem; 
-      color: var(--accent-3); 
-      margin-bottom: 10px; 
-    }
-    .grid-item-title { 
-      font-weight: bold; 
-      margin-bottom: 5px; 
-      font-size: 0.9rem;
-    }
-    .grid-item-meta { 
-      font-size: 0.75rem; 
-      color: var(--text-secondary); 
-    }
-
-    /* ===== CHAT WINDOW ===== */
+    /* Meme Editor Specifics */
+    .modal-content.editor-modal { max-width: 1200px; height: 90vh; }
+    .modal-body.editor-body { padding: 0; display: flex; height: 100%; overflow: hidden; }
+    .editor-canvas-col { flex: 1; padding: 15px; background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+    .editor-tools-col { width: 320px; background: var(--bg-secondary); padding: 15px; border-left: 1px solid var(--border-color); overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+    #editorContainer { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+    
+    /* Forms & Inputs */
+    .form-group { margin-bottom: 15px; }
+    .form-label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+    .form-control { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white; }
+    .btn { padding: 12px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; width: 100%; display: flex; justify-content: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); color: white; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--border-color); }
+    
+    /* Chat Window */
     .chat-window {
-      position: fixed; 
-      bottom: 90px; 
-      right: 20px; 
-      width: 350px; 
-      height: 500px; 
-      background: var(--bg-secondary);
-      border-radius: 20px; 
-      box-shadow: var(--shadow-lg); 
-      border: 1px solid var(--border-color); 
-      z-index: 900;
-      display: flex; /* Changed from none */
-      flex-direction: column; 
-      overflow: hidden; 
-      transform: translateY(100px) scale(0.9); 
-      opacity: 0; 
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      pointer-events: none;
+      position: fixed; bottom: 80px; right: 20px; width: 350px; height: 500px; 
+      background: var(--bg-secondary); border-radius: 20px; border: 1px solid var(--border-color); 
+      z-index: 900; display: flex; flex-direction: column; transform: translateY(20px); 
+      opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: var(--shadow-lg);
     }
-    .chat-window.active { 
-      transform: translateY(0) scale(1); 
-      opacity: 1; 
-      pointer-events: all;
-    }
-    .chat-header {
-      padding: 16px; 
-      border-bottom: 1px solid var(--border-color); 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-      cursor: move; 
-      touch-action: none; /* For mobile dragging */
-      flex-shrink: 0;
-    }
-    .chat-title { 
-      font-size: 1.1rem; 
-      font-weight: 700; 
-      color: var(--accent-3); 
-    }
-    .close-chat { 
-      background: none; 
-      border: none; 
-      color: var(--text-primary); 
-      font-size: 1.1rem; 
-      cursor: pointer; 
-      width: 32px; 
-      height: 32px; 
-      border-radius: 8px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      transition: var(--transition); 
-      flex-shrink: 0;
-    }
-    .close-chat:hover { background: rgba(255, 255, 255, 0.1); }
-    .chat-messages { 
-      flex: 1; 
-      padding: 16px; 
-      overflow-y: auto; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 12px; 
-    }
-    .message { 
-      max-width: 80%; 
-      padding: 12px 16px; 
-      border-radius: 16px; 
-      background: rgba(255, 255, 255, 0.1); 
-      color: var(--text-primary); 
-      font-size: 0.9rem; 
-      line-height: 1.4; 
-      word-wrap: break-word; 
-    }
-    .message.incoming { 
-      align-self: flex-start; 
-      border-bottom-left-radius: 4px; 
-    }
-    .message.outgoing { 
-      align-self: flex-end; 
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); 
-      color: white; 
-      border-bottom-right-radius: 4px; 
-    }
-    .message-meta { 
-      font-size: 0.7rem; 
-      color: var(--text-secondary); 
-      margin-top: 4px; 
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .message.outgoing .message-meta { color: rgba(255, 255, 255, 0.8); }
-    .chat-input-container { 
-      padding: 16px; 
-      border-top: 1px solid var(--border-color); 
-      display: flex; 
-      gap: 10px; 
-      flex-shrink: 0;
-    }
-    .chat-input { 
-      flex: 1; 
-      padding: 12px 16px; 
-      border-radius: 14px; 
-      border: 1px solid var(--border-color); 
-      background: rgba(0, 0, 0, 0.1); 
-      color: var(--text-primary); 
-      font-size: 0.9rem; 
-    }
-    .chat-input:focus { 
-      outline: none; 
-      border-color: var(--accent-3); 
-    }
-    .send-btn { 
-      width: 44px; 
-      height: 44px; 
-      border-radius: 12px; 
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); 
-      border: none; 
-      color: white; 
-      font-size: 1.1rem; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer; 
-      transition: var(--transition); 
-      flex-shrink: 0; 
-    }
-    .send-btn:hover { 
-      transform: scale(1.05); 
-      box-shadow: 0 0 15px rgba(106, 13, 173, 0.5); 
-    }
-
-    /* ===== NOTIFICATIONS ===== */
+    .chat-window.active { transform: translateY(0); opacity: 1; pointer-events: all; }
+    .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .message { padding: 10px 14px; border-radius: 14px; max-width: 80%; font-size: 0.9rem; }
+    .message.incoming { background: rgba(255,255,255,0.1); align-self: flex-start; }
+    .message.outgoing { background: var(--accent-1); align-self: flex-end; }
+    
+    /* Notifications */
     .notification {
-      position: fixed; 
-      bottom: 20px; 
-      right: 20px; 
-      background: var(--bg-secondary); 
-      border-radius: 16px; 
-      padding: 16px 24px;
-      border-left: 4px solid var(--accent-3); 
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
-      z-index: 9001;
-      transform: translateX(120%); 
-      opacity: 0; 
-      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      max-width: 350px; 
-      display: flex; 
-      align-items: center; 
-      gap: 16px;
+      position: fixed; bottom: 20px; right: 20px; background: var(--bg-secondary); 
+      border-left: 4px solid var(--accent-3); padding: 16px; border-radius: 8px; 
+      transform: translateX(120%); transition: transform 0.3s; z-index: 9001; 
+      display: flex; gap: 12px; align-items: center; box-shadow: var(--shadow-lg);
     }
-    .notification.show { 
-      transform: translateX(0); 
-      opacity: 1; 
-    }
-    .notification-icon { 
-      width: 40px; 
-      height: 40px; 
-      border-radius: 12px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 1.25rem; 
-      flex-shrink: 0; 
-    }
-    .notification.success .notification-icon { background: rgba(0, 210, 106, 0.2); color: var(--success); }
-    .notification.error .notification-icon { background: rgba(255, 77, 77, 0.2); color: var(--error); }
-    .notification.info .notification-icon { background: rgba(77, 171, 247, 0.2); color: var(--info); }
+    .notification.show { transform: translateX(0); }
     
-    .notification.success { border-left-color: var(--success); }
-    .notification.error { border-left-color: var(--error); }
-    .notification.info { border-left-color: var(--info); }
+    /* Loading */
+    .loading-overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: var(--bg-primary); z-index: 9999; display: flex; 
+      align-items: center; justify-content: center; flex-direction: column;
+    }
+    .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent-3); border-radius: 50%; animation: spin 1s infinite linear; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .notification-content { flex: 1; }
-    .notification-title { 
-      font-weight: 700; 
-      color: var(--text-primary); 
-      margin-bottom: 4px; 
-    }
-    .notification-message { 
-      font-size: 0.9rem; 
-      color: var(--text-secondary); 
-      line-height: 1.4; 
-    }
-    .notification-close { 
-      background: none; 
-      border: none; 
-      color: var(--text-secondary); 
-      font-size: 1rem; 
-      cursor: pointer; 
-      width: 24px; 
-      height: 24px; 
-      border-radius: 6px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      transition: var(--transition); 
-      align-self: flex-start; 
-    }
-    .notification-close:hover { 
-      color: var(--text-primary); 
-      background: rgba(255, 255, 255, 0.1); 
-    }
-
-    /* ===== LOADING STATES ===== */
-    .skeleton-card { 
-      background: var(--card-bg); 
-      border-radius: var(--border-radius); 
-      overflow: hidden; 
-      box-shadow: var(--shadow-md); 
-      animation: pulseSkeleton 1.5s infinite ease-in-out; 
-      margin-bottom: 16px; 
-      break-inside: avoid-column; 
-    }
-    @keyframes pulseSkeleton { 
-      0% { opacity: 0.6; } 
-      50% { opacity: 1; } 
-      100% { opacity: 0.6; } 
-    }
-    .feed-message { 
-      padding: 40px 20px; 
-      text-align: center; 
-      color: var(--text-secondary); 
-      font-size: 1rem; 
-      border-radius: var(--border-radius); 
-      background: var(--card-bg); 
-      grid-column: 1 / -1; /* Span all columns */
-    }
-    .feed-message a { 
-      color: var(--accent-3); 
-      font-weight: bold; 
-      text-decoration: none; 
-      cursor: pointer;
-    }
-    .loading-spinner { 
-      width: 40px; 
-      height: 40px; 
-      border: 4px solid rgba(106, 13, 173, 0.2); 
-      border-top: 4px solid var(--accent-3); 
-      border-radius: 50%; 
-      animation: spin 1s linear infinite; 
-      margin: 20px auto; 
-    }
-    @keyframes spin { 
-      0% { transform: rotate(0deg); } 
-      100% { transform: rotate(360deg); } 
-    }
-
-    /* ===== MEME EDITOR RESPONSIVENESS ===== */
-    .modal-content.editor-modal {
-      width: 95%;
-      max-width: 1200px;
-      max-height: 95vh;
-    }
-    .modal-body.editor-body {
-      padding: 0;
-      max-height: calc(95vh - 78px); /* 78px is modal header height */
-      overflow: hidden;
-      display: flex;
-    }
-    .editor-canvas-col {
-      flex: 1;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      min-width: 0; /* Important for flex-shrink */
-    }
-    #editorContainer {
-      width: 100%;
-      height: 100%;
-      background: var(--bg-primary);
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 500px;
-    }
-    .canvas-container { 
-      margin: auto; /* Center canvas */
-    }
-    .editor-tools-col {
-      width: 320px;
-      flex-shrink: 0;
-      overflow-y: auto;
-      background: var(--bg-secondary);
-      padding: 15px;
-      border-left: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    
-    .editor-tool-group { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 15px; 
-    }
-    .editor-tool-row { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 8px; 
-    }
-    .editor-tool-row .btn, 
-    .editor-tool-row .form-control { 
-      width: 100%; 
-      padding: 8px; 
-      font-size: 0.8rem; 
-      height: 40px; 
-    }
-    .color-picker-group { 
-      display: flex; 
-      gap: 10px; 
-    }
-    .color-picker-group input[type="color"] { 
-      padding: 5px; 
-      height: 40px; 
-    }
-    .color-picker-group label { 
-      font-size: 0.75rem; 
-      margin-bottom: 4px; 
-    }
-    .form-group .form-control[type="range"] {
-      padding: 0;
-    }
-
-    /* ===== NEW MODAL STYLES (QUESTS, LEADERBOARD, ETC) ===== */
-    .quest-item {
-      background: rgba(255, 255, 255, 0.05); 
-      border-radius: 16px; 
-      padding: 15px; 
-      border: 1px solid var(--border-color);
-      display: flex; 
-      flex-direction: column; 
-      gap: 12px;
-    }
-    .quest-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: start; 
-    }
-    .quest-title { 
-      color: var(--text-primary); 
-      margin: 0 0 5px 0; 
-      font-weight: bold; 
-    }
-    .quest-desc { 
-      color: var(--text-secondary); 
-      font-size: 0.9rem; 
-      margin: 0; 
-    }
-    .quest-reward { 
-      background: rgba(255, 215, 0, 0.15); 
-      color: var(--gold); 
-      font-weight: bold; 
-      padding: 4px 10px; 
-      border-radius: 20px; 
-      font-size: 0.9rem; 
-      flex-shrink: 0;
-      margin-left: 8px;
-    }
-    .progress-bar { 
-      width: 100%; 
-      height: 8px; 
-      background: rgba(255, 255, 255, 0.1); 
-      border-radius: 4px; 
-      overflow: hidden; 
-    }
-    .progress-bar-inner { 
-      width: 0%; 
-      height: 100%; 
-      background: var(--accent-3); 
-      border-radius: 4px; 
-      transition: width 0.3s; 
-    }
-    .quest-item.completed .progress-bar-inner { 
-      background: var(--success); 
-    }
-    .quest-item.completed .quest-title { 
-      text-decoration: line-through; 
-      opacity: 0.7;
-    }
-    .quest-footer { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-      font-size: 0.9rem; 
-      color: var(--text-secondary); 
-    }
-    
-    .leaderboard-item {
-      background: rgba(255, 255, 255, 0.03); 
-      border-radius: 12px; 
-      padding: 12px; 
-      display: flex; 
-      align-items: center; 
-      gap: 12px;
-      border: 1px solid transparent;
-    }
-    .leaderboard-item:hover {
-      border-color: var(--border-color);
-    }
-    .leaderboard-rank { 
-      width: 32px; 
-      height: 32px; 
-      border-radius: 50%; 
-      background: rgba(106, 13, 173, 0.2); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      color: var(--accent-3); 
-      font-weight: bold; 
-      flex-shrink: 0; 
-    }
-    .leaderboard-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-    .leaderboard-name { 
-      flex: 1; 
-      font-weight: bold; 
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .leaderboard-score { 
-      color: var(--gold); 
-      font-weight: bold; 
-      flex-shrink: 0;
-    }
-    .leaderboard-item.rank-1 .leaderboard-rank { background: var(--gold); color: var(--bg-primary); }
-    .leaderboard-item.rank-2 .leaderboard-rank { background: #C0C0C0; color: var(--bg-primary); }
-    .leaderboard-item.rank-3 .leaderboard-rank { background: #CD7F32; color: var(--bg-primary); }
-    
-    .collection-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-      gap: 10px; 
-    }
-    .collection-item { 
-      background: rgba(255, 255, 255, 0.05); 
-      border-radius: 12px; 
-      overflow: hidden; 
-      cursor: pointer; 
-      border: 1px solid var(--border-color);
-    }
-    .collection-item img { 
-      width: 100%; 
-      height: 100px; 
-      object-fit: cover; 
-      display: block;
-    }
-    .collection-item p { 
-      padding: 8px; 
-      font-size: 0.8rem; 
-      text-align: center; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      color: var(--text-secondary);
-    }
-
-    /* ===== NEW SETTINGS MODAL ===== */
-    .settings-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border-color);
-      padding: 0 20px;
-    }
-    .tab-btn {
-      padding: 15px 20px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 0.9rem;
-      position: relative;
-    }
-    .tab-btn.active {
-      color: var(--accent-3);
-    }
-    .tab-btn.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--accent-3);
-      border-radius: 3px 3px 0 0;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    
-    /* Profile Settings Tab */
-    .profile-settings-header {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 30px;
-      position: relative;
-    }
-    .profile-avatar-lg {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .avatar-upload-btn {
-      position: absolute;
-      bottom: 0;
-      left: 55px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: var(--accent-3);
-      color: white;
-      border: 2px solid var(--bg-secondary);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .avatar-upload-btn:hover {
-      transform: scale(1.1);
-    }
-    .profile-settings-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-    
-    /* Switch Toggle */
-    .switch-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 0;
-    }
-    .switch-toggle-label {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .switch-toggle-desc {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-    }
-    .switch input { 
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(255, 255, 255, 0.1);
-      transition: .4s;
-      border-radius: 28px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: var(--accent-3);
-    }
-    input:checked + .slider:before {
-      transform: translateX(22px);
-    }
-    
-    /* ===== PUBLIC PROFILE MODAL ===== */
-    .profile-card-header {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .profile-card-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .profile-card-name {
-      color: var(--text-primary);
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-    .profile-card-joined {
-      color: var(--text-secondary);
-      margin: 5px 0 0 0;
-      font-size: 0.9rem;
-    }
-    .profile-card-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
-    .stat-item {
-      background: var(--bg-primary);
-      border-radius: 12px;
-      padding: 15px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-    }
-    #profileCringeCoin .stat-value { color: var(--gold); }
-    #profileMemes .stat-value { color: var(--accent-3); }
-
-    /* ===== CONFIRM MODAL ===== */
-    #confirmModal .modal-content {
-      max-width: 400px;
-    }
-    #confirmModalBody {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-    .confirm-actions {
-      display: flex;
-      gap: 10px;
-    }
-    
-    /* ===== RESPONSIVE DESIGN ===== */
-    @media (max-width: 1024px) { 
-      .content-area { column-count: 2; } 
-    }
-    
+    /* Responsive */
+    @media (max-width: 1024px) { .content-area { column-count: 2; } }
     @media (max-width: 768px) {
-      .content-area { 
-        column-count: 1; 
-        padding: 8px; 
-      }
-      .meme-card { margin-bottom: 12px; }
-      .search-container { margin: 0 10px; }
-      .logo-text { font-size: 1.4rem; }
-      .nav-container { padding: 6px 0; }
-      .nav-item { 
-        font-size: 0.65rem; 
-        padding: 4px 8px; 
-      }
-      .nav-item i { font-size: 1.1rem; }
-      .chat-window { 
-        width: calc(100% - 40px); 
-        height: 450px; 
-        bottom: 80px; 
-        right: 20px; 
-        left: 20px; 
-      }
-      
-      /* Editor responsive */
-      .modal-body.editor-body { 
-        flex-direction: column; 
-        max-height: calc(100vh - 78px); /* Fullscreen on mobile */
-      }
-      .editor-canvas-col { 
-        min-height: 300px; /* Smaller min height */
-        height: 50vh; /* Use viewport height */
-        flex: 1 1 auto;
-      }
-      #editorContainer {
-        min-height: 0; /* Remove min-height */
-        height: 100%;
-      }
-      .editor-tools-col { 
-        width: 100%; 
-        border-left: none;
-        border-top: 1px solid var(--border-color);
-        max-height: 50vh; /* Allow tools to scroll */
-      }
-      
-      /* Fullscreen Modals on Mobile */
-      .modal-overlay {
-        align-items: flex-end; /* Align to bottom for slide-up */
-      }
-      .modal-content {
-        width: 100%;
-        max-height: 95dvh;
-        height: 95dvh;
-        border-radius: 20px 20px 0 0;
-        transform: translateY(100%);
-      }
-      .modal-overlay.active .modal-content {
-        transform: translateY(0);
-      }
-      /* Except editor and confirm */
-      .modal-overlay.editor-modal-overlay,
-      .modal-overlay.confirm-modal-overlay {
-        align-items: center;
-      }
-      .modal-content.editor-modal,
-      #confirmModal .modal-content {
-        width: 95%;
-        max-width: 1200px;
-        max-height: 95vh;
-        height: auto; /* Let content define height */
-        border-radius: 20px;
-        transform: translateY(20px);
-      }
-      #confirmModal .modal-content {
-         max-width: 400px;
-      }
-      .modal-overlay.active .modal-content.editor-modal,
-      .modal-overlay.active #confirmModal .modal-content {
-        transform: translateY(0);
-      }
+      .content-area { column-count: 1; }
+      .search-container { display: none; }
+      .modal-content.editor-modal { width: 100%; height: 100%; border-radius: 0; }
+      .modal-body.editor-body { flex-direction: column; }
+      .editor-canvas-col { height: 50%; }
+      .editor-tools-col { width: 100%; height: 50%; }
+      .chat-window { width: 90%; left: 5%; bottom: 70px; }
     }
-    
-    @media (max-width: 480px) {
-      html { font-size: 14px; } /* Scale down base font */
-      
-      .header { 
-        padding: 0 12px; 
-        height: 64px; 
-      }
-      .logo-container { gap: 8px; }
-      .logo-icon { 
-        width: 36px; 
-        height: 36px; 
-      }
-      .logo-icon i { font-size: 16px; }
-      .logo-text { font-size: 1.25rem; }
-      .search-container { display: none; } /* Hide search */
-      .header-actions { gap: 8px; }
-      .action-btn { 
-        width: 38px; 
-        height: 38px; 
-        font-size: 1rem; 
-      }
-      .chat-window { 
-        height: 400px; 
-        bottom: 70px; 
-        left: 10px; 
-        right: 10px; 
-        width: calc(100% - 20px); 
-      }
-
-      /* Fullscreen Modals on small screens */
-      .modal-overlay {
-        align-items: flex-end;
-      }
-      .modal-content {
-        height: 100dvh;
-        max-height: 100dvh;
-        border-radius: 0;
-      }
-      /* Except editor and confirm */
-      .modal-overlay.editor-modal-overlay,
-      .modal-overlay.confirm-modal-overlay {
-        align-items: center;
-      }
-      .modal-content.editor-modal,
-      #confirmModal .modal-content {
-        height: 95vh;
-        max-height: 95vh;
-        border-radius: 20px;
-      }
-       #confirmModal .modal-content {
-        height: auto;
-        max-height: 90vh;
-      }
-
-      .editor-tool-row {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns for tools */
-      }
-      .editor-tool-row .btn {
-        font-size: 0.75rem;
-      }
-    }
-    
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb { background: rgba(106, 13, 173, 0.5); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(106, 13, 173, 0.7); }
-    
-    /* Font size classes */
-    .font-size-small { --font-size-base: 0.9rem; }
-    .font-size-medium { --font-size-base: 1rem; }
-    .font-size-large { --font-size-base: 1.1rem; }
-
   </style>
 </head>
-<body class="theme-dark font-size-medium">
+<body class="theme-dark">
+  
+  <div class="loading-overlay" id="appLoader">
+    <div class="spinner"></div>
+    <h3 style="margin-top: 20px; color: var(--text-secondary);">Loading CringeScroll...</h3>
+  </div>
+
   <div class="app-container">
-    <!-- ===== HEADER ===== -->
     <header class="header">
       <a href="#" class="logo-container" id="logoLink">
         <div class="logo-icon"><i class="fas fa-skull"></i></div>
@@ -1559,2267 +263,496 @@
       </a>
       <div class="search-container">
         <div class="search-icon"><i class="fas fa-search"></i></div>
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by username and press Enter...">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search users...">
       </div>
       <div class="header-actions">
-        <button class="action-btn" id="notificationsBtn" title="Notifications"><i class="fas fa-bell"></i><span class="notification-badge" id="notificationsBadge"></span></button>
-        <button class="action-btn" id="themeToggleBtn" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-        <button class="action-btn" id="chatToggleBtn" title="Chat"><i class="fas fa-comments"></i><span class="notification-badge" id="chatBadge"></span></button>
-        <button class="action-btn" id="menuToggleBtn" title="Menu"><i class="fas fa-bars"></i></button>
+        <button class="action-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="notification-badge" id="notificationsBadge"></span></button>
+        <button class="action-btn" id="themeToggleBtn"><i class="fas fa-moon"></i></button>
+        <button class="action-btn" id="chatToggleBtn"><i class="fas fa-comments"></i><span class="notification-badge" id="chatBadge"></span></button>
+        <button class="action-btn" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
       </div>
     </header>
     
-    <!-- ===== NAVIGATION ===== -->
     <nav class="nav-container">
       <a href="#" class="nav-item active" data-tab="hot"><i class="fas fa-fire"></i><span>Hot</span><div class="nav-indicator"></div></a>
       <a href="#" class="nav-item" data-tab="fresh"><i class="fas fa-bolt"></i><span>Fresh</span></a>
-      <a href="#" class="nav-item" data-tab="crowned"><i class="fas fa-crown"></i><span>Crowned</span></a>
       <a href="#" class="nav-item" data-tab="mymemes"><i class="fas fa-user"></i><span>My Memes</span></a>
     </nav>
     
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="content-area" id="feed">
-      <!-- Skeletons or loader will be injected here by JS -->
-      <div class="loading-spinner"></div>
-    </main>
+    <main class="content-area" id="feed"></main>
   </div>
 
-  <!-- ===== SIDEBAR MENU ===== -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2 class="sidebar-title">Menu</h2>
-      <button class="close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
+      <button class="action-btn" id="closeSidebar"><i class="fas fa-times"></i></button>
     </div>
     <div class="menu-section">
-      <h3 class="menu-section-title">Profile</h3>
       <div class="menu-item" id="menuProfile"><i class="fas fa-user-circle"></i><span>My Profile</span></div>
-      <div class="menu-item" id="menuCollections"><i class="fas fa-bookmark"></i><span>My Collections</span><span class="menu-badge" id="menuCollectionsBadge"></span></div>
-      <div class="menu-item" id="menuInventory"><i class="fas fa-box"></i><span>My Inventory</span></div>
-    </div>
-    <div class="menu-section">
-      <h3 class="menu-section-title">Social</h3>
-      <div class="menu-item" id="menuChat"><i class="fas fa-comments"></i><span>Chat</span><span class="menu-badge" id="menuChatBadge"></span></div>
-      <div class="menu-item" id="menuLeaderboard"><i class="fas fa-chart-line"></i><span>Leaderboard</span></div>
-      <div class="menu-item" id="menuQuests"><i class="fas fa-trophy"></i><span>Daily Quests</span><span class="menu-badge" id="menuQuestsBadge"></span></div>
-    </div>
-    <div class="menu-section">
-      <h3 class="menu-section-title">Tools</h3>
+      <div class="menu-item" id="menuChat"><i class="fas fa-comments"></i><span>Global Chat</span></div>
       <div class="menu-item" id="menuCreateMeme"><i class="fas fa-paint-brush"></i><span>Create Meme</span></div>
-      <div class="menu-item" id="menuMemeRoulette"><i class="fas fa-dice"></i><span>Meme Roulette</span></div>
     </div>
     <div class="menu-section">
-      <h3 class="menu-section-title">Account</h3>
-      <div class="menu-item" id="menuSettings"><i class="fas fa-cog"></i><span>Settings</span></div>
       <div class="menu-item" id="menuLogin" style="display: flex;"><i class="fas fa-sign-in-alt"></i><span>Login / Sign Up</span></div>
       <div class="menu-item" id="menuLogout" style="display: none;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
     </div>
   </div>
 
-  <!-- ===== CHAT WINDOW ===== -->
   <div class="chat-window" id="chatWindow">
-    <div class="chat-header" id="chatHeader">
-      <h3 class="chat-title">CringeChat</h3>
-      <button class="close-chat" id="closeChatWindow"><i class="fas fa-times"></i></button>
+    <div class="modal-header" id="chatHeader" style="cursor: move;">
+      <h3 class="modal-title">CringeChat</h3>
+      <button class="action-btn" id="closeChatWindow" style="width:32px;height:32px;"><i class="fas fa-times"></i></button>
     </div>
-    <div class="chat-messages" id="chatMessages"><div class="feed-message">Loading messages...</div></div>
-    <div class="chat-input-container">
-      <input type="text" class="chat-input" id="chatInput" placeholder="Type a message...">
-      <button class="send-btn" id="sendChatMessage"><i class="fas fa-paper-plane"></i></button>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div style="padding:10px; border-top:1px solid var(--border-color); display:flex; gap:10px;">
+      <input type="text" class="form-control" id="chatInput" placeholder="Say something...">
+      <button class="btn btn-primary" id="sendChatMessage" style="width:auto;"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- ===== AUTH MODAL ===== -->
   <div class="modal-overlay" id="authModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title" id="authModalTitle"><i class="fas fa-user-plus"></i> Create Account</h2>
-        <button class="close-modal" data-modal-id="authModal"><i class="fas fa-times"></i></button>
+        <h2>Authentication</h2>
+        <button class="action-btn close-modal"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-          <button class="btn btn-secondary active" id="signupTab">Sign Up</button>
-          <button class="btn btn-secondary" id="loginTab">Log In</button>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+          <button class="btn btn-primary" id="showSignup">Sign Up</button>
+          <button class="btn btn-secondary" id="showLogin">Log In</button>
         </div>
+        
         <div id="signupForm">
-          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="signupEmailInput" placeholder="your@email.com" required></div>
-          <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-control" id="signupUsernameInput" placeholder="your_username" required><p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Only letters, numbers, and underscores (2-15 characters)</p></div>
-          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="signupPasswordInput" placeholder="••••••••" required><p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">At least 6 characters</p></div>
-          <div class="form-error" id="signupError"></div>
-          <button class="btn btn-primary" id="signupBtn"><i class="fas fa-user-plus"></i> Create Account</button>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="suEmail"></div>
+          <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-control" id="suUser"></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="suPass"></div>
+          <button class="btn btn-primary" id="doSignup">Create Account</button>
         </div>
-        <div id="loginForm" style="display: none;">
-          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="loginEmailInput" placeholder="your@email.com" required></div>
-          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="loginPasswordInput" placeholder="••••••••" required></div>
-          <div class="form-error" id="loginError"></div>
-          <button class="btn btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Log In</button>
+        
+        <div id="loginForm" style="display:none;">
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="liEmail"></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="liPass"></div>
+          <button class="btn btn-primary" id="doLogin">Log In</button>
         </div>
+        <p class="form-error" id="authError" style="color:var(--error); margin-top:10px;"></p>
       </div>
     </div>
   </div>
 
-  <!-- ===== MEME EDITOR MODAL ===== -->
-  <div class="modal-overlay editor-modal-overlay" id="memeEditorModal">
+  <div class="modal-overlay" id="memeEditorModal">
     <div class="modal-content editor-modal">
       <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-paint-brush"></i> Meme Editor</h2>
-        <button class="close-modal" data-modal-id="memeEditorModal"><i class="fas fa-times"></i></button>
+        <h2>Meme Editor</h2>
+        <button class="action-btn close-modal"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body editor-body">
-        
-        <!-- Left: Canvas -->
         <div class="editor-canvas-col">
-          <div id="editorContainer">
-            <canvas id="canvas"></canvas>
-          </div>
+          <div id="editorContainer"><canvas id="canvas"></canvas></div>
         </div>
-        
-        <!-- Right: Tools -->
         <div class="editor-tools-col">
-          
-          <div class="editor-tool-group">
-            <h4 class="menu-section-title">Tools</h4>
-            <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr;">
-              <button class="btn btn-secondary editor-tool active" data-tool="text"><i class="fas fa-font"></i> Text</button>
-              <button class="btn btn-secondary editor-tool" data-tool="image"><i class="fas fa-image"></i> Image</button>
-              <button class="btn btn-secondary editor-tool" data-tool="draw"><i class="fas fa-pencil-alt"></i> Draw</button>
-              <button class="btn btn-secondary editor-tool" data-tool="eraser"><i class="fas fa-eraser"></i> Eraser</button>
-            </div>
-          </div>
-
-          <div class="editor-tool-group">
-            <h4 class="menu-section-title">Templates</h4>
-            <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr;">
-              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/pJbPZJ7.jpg">Drake</button>
-              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/1v8wL4G.jpg">Distracted</button>
-              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/vRtKxXK.jpg">Change Mind</button>
-              <button class="btn btn-secondary template-btn" data-url="https://i.imgur.com/H9LZ1xQ.jpg">Cat</button>
-            </div>
+          <h4 class="menu-section-title">Add Content</h4>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <button class="btn btn-secondary tool-btn" data-tool="text"><i class="fas fa-font"></i> Text</button>
+            <button class="btn btn-secondary tool-btn" id="uploadImageBtn"><i class="fas fa-upload"></i> Image</button>
+            <button class="btn btn-secondary tool-btn" id="drawBtn"><i class="fas fa-pencil-alt"></i> Draw</button>
+            <button class="btn btn-secondary tool-btn" id="clearCanvasBtn"><i class="fas fa-trash"></i> Clear</button>
           </div>
           
-          <div class="editor-tool-group">
-            <h4 class="menu-section-title">Object Controls</h4>
-            <div class="editor-tool-row">
-              <button class="btn btn-secondary" id="bringForwardBtn" title="Bring Forward"><i class="fas fa-arrow-up"></i></button>
-              <button class="btn btn-secondary" id="sendBackBtn" title="Send Back"><i class="fas fa-arrow-down"></i></button>
-              <button class="btn btn-secondary" id="deleteObjBtn" title="Delete"><i class="fas fa-trash"></i></button>
-            </div>
+          <input type="file" id="imageUploadInput" accept="image/*" hidden>
+
+          <h4 class="menu-section-title" style="margin-top:20px;">Styling</h4>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <input type="color" class="form-control" id="editorColor" value="#ffffff" style="height:40px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Size</label>
+            <input type="range" class="form-control" id="editorSize" min="10" max="100" value="40">
           </div>
 
-          <div class="editor-tool-group">
-            <h4 class="menu-section-title">Text & Draw Settings</h4>
-            <div class="color-picker-group">
-              <div style="flex: 1;"><label class="form-label" style="color: var(--text-secondary);">Fill</label><input type="color" id="textColorPicker" value="#FFFFFF" class="form-control"></div>
-              <div style="flex: 1;"><label class="form-label" style="color: var(--text-secondary);">Stroke</label><input type="color" id="strokeColorPicker" value="#000000" class="form-control"></div>
-            </div>
-            <div class="form-group"><label class="form-label">Font Family</label><select id="fontFamilySelect" class="form-control"><option value="Impact">Impact</option><option value="Arial">Arial</option><option value="Comic Sans MS">Comic Sans</option></select></div>
-            <div class="form-group"><label class="form-label">Font / Brush Size</label><input type="range" id="brushSize" min="1" max="100" value="40" class="form-control"></div>
-            <div class="editor-tool-row" style="grid-template-columns: repeat(4, 1fr);">
-              <button class="btn btn-secondary" id="toggleBoldBtn" title="Bold"><i class="fas fa-bold"></i></button>
-              <button class="btn btn-secondary" id="toggleItalicBtn" title="Italic"><i class="fas fa-italic"></i></button>
-              <button class="btn btn-secondary" id="alignLeftBtn" title="Align Left"><i class="fas fa-align-left"></i></button>
-              <button class="btn btn-secondary" id="alignCenterBtn" title="Align Center"><i class="fas fa-align-center"></i></button>
-            </div>
-          </div>
-
-          <div class="editor-tool-group">
-            <h4 class="menu-section-title">History</h4>
-            <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr 1fr;">
-              <button class="btn btn-secondary" id="undoBtn"><i class="fas fa-undo"></i> Undo</button>
-              <button class="btn btn-secondary" id="redoBtn"><i class="fas fa-redo"></i> Redo</button>
-              <button class="btn btn-secondary" id="clearCanvasBtn"><i class="fas fa-trash"></i> Clear</button>
-            </div>
-          </div>
-
-          <div class="editor-tool-group" style="margin-top: auto;">
-            <h4 class="menu-section-title">Finish</h4>
-            <div class="form-group"><label class="form-label">Meme Title</label><input type="text" class="form-control" id="memeTitleInput" placeholder="Enter a catchy title..." required></div>
-            <button class="btn btn-primary" id="postMemeBtn"><i class="fas fa-paper-plane"></i> Post Meme</button>
+          <div style="margin-top:auto;">
+            <input type="text" class="form-control" id="memeTitleInput" placeholder="Enter Title..." style="margin-bottom:10px;">
+            <button class="btn btn-primary" id="postMemeBtn">Post Meme</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===== NOTIFICATION TOAST ===== -->
-  <div class="notification" id="notificationToast">
-    <div class="notification-icon"><i class="fas fa-check"></i></div>
-    <div class="notification-content">
-      <h4 class="notification-title" id="notificationTitle">Success!</h4>
-      <p class="notification-message" id="notificationMessage">Your action was completed successfully.</p>
-    </div>
-    <button class="notification-close" id="closeNotification"><i class="fas fa-times"></i></button>
-  </div>
-  
-  <!-- ===== ALL OTHER MODALS ===== -->
-  
-  <!-- Settings Modal (REBUILT) -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-cog"></i> Settings</h2>
-        <button class="close-modal" data-modal-id="settingsModal"><i class="fas fa-times"></i></button>
-      </div>
-      <!-- Tab Navigation -->
-      <div class="settings-tabs">
-        <button class="tab-btn active" data-tab="settingsProfile"><i class="fas fa-user-circle"></i> Profile</button>
-        <button class="tab-btn" data-tab="settingsAppearance"><i class="fas fa-palette"></i> Appearance</button>
-        <button class="tab-btn" data-tab="settingsNotifications"><i class="fas fa-bell"></i> Notifications</button>
-        <button class="tab-btn" data-tab="settingsAccount"><i class="fas fa-key"></i> Account</button>
-      </div>
-      
-      <div class="modal-body">
-        <!-- Profile Tab -->
-        <div class="tab-content active" id="settingsProfile">
-          <div class="profile-settings-header">
-            <img src="https://placehold.co/80x80/6a0dad/fff?text=C" alt="Avatar" class="profile-avatar-lg" id="settingsAvatarImg">
-            <label for="avatarUpload" class="avatar-upload-btn" title="Upload new avatar">
-              <i class="fas fa-camera"></i>
-              <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-            </label>
-            <h3 style="color: var(--text-primary); margin: 0; font-size: 1.5rem;" id="settingsUsername">Username</h3>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="settingsUsernameInput">Username</label>
-            <input type="text" class="form-control" id="settingsUsernameInput" placeholder="Your username">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="settingsBioInput">Bio</label>
-            <textarea class="form-control" id="settingsBioInput" placeholder="Tell us about yourself..."></textarea>
-          </div>
-          <button class="btn btn-primary" id="saveProfileSettingsBtn">Save Profile</button>
-          <div class="profile-settings-stats" style="margin-top: 20px;">
-            <div class="grid-item"><div style="font-size: 1.5rem; font-weight: bold; color: var(--gold);" id="settingsCringeCoin">0</div><div class="grid-item-meta">CringeCoin</div></div>
-            <div class="grid-item"><div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-3);" id="settingsStreak">0</div><div class="grid-item-meta">Day Streak</div></div>
-          </div>
-        </div>
-        
-        <!-- Appearance Tab -->
-        <div class="tab-content" id="settingsAppearance">
-          <div class="form-group">
-            <label class="form-label" for="themeSelect">Theme</label>
-            <select id="themeSelect" class="form-control">
-              <option value="dark">Midnight (Default)</option>
-              <option value="light">Daylight</option>
-              <option value="blue">Ocean</option>
-              <option value="red">Volcano</option>
-              <option value="purple">Royal</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="fontSizeSelect">Font Size</label>
-            <select id="fontSizeSelect" class="form-control">
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="cardBgColor">Card Background Color</label>
-            <input type="color" id="cardBgColor" class="form-control">
-          </div>
-          <button class="btn btn-primary" id="saveAppearanceSettingsBtn">Save Appearance</button>
-        </div>
-        
-        <!-- Notifications Tab -->
-        <div class="tab-content" id="settingsNotifications">
-          <div class="switch-toggle">
-            <div>
-              <div class="switch-toggle-label">Enable All Notifications</div>
-              <div class="switch-toggle-desc">Master control for all app notifications.</div>
-            </div>
-            <label class="switch"><input type="checkbox" id="notifToggleAll" checked><span class="slider"></span></label>
-          </div>
-          <div class="switch-toggle">
-            <div>
-              <div class="switch-toggle-label">Notify on Tips</div>
-              <div class="switch-toggle-desc">Get notified when someone tips your meme.</div>
-            </div>
-            <label class="switch"><input type="checkbox" id="notifToggleTips" checked><span class="slider"></span></label>
-          </div>
-          <div class="switch-toggle">
-            <div>
-              <div class="switch-toggle-label">Quest Reminders</div>
-              <div class="switch-toggle-desc">Remind you to complete your daily quests.</div>
-            </div>
-            <label class="switch"><input type="checkbox" id="notifToggleQuests" checked><span class="slider"></span></label>
-          </div>
-        </div>
-        
-        <!-- Account Tab -->
-        <div class="tab-content" id="settingsAccount">
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" id="settingsEmailInput" readonly disabled>
-          </div>
-          <div class="form-group">
-            <label class="form-label">User ID</label>
-            <input type="text" class="form-control" id="settingsUserIdInput" readonly disabled>
-          </div>
-          <button class="btn btn-secondary" id="settingsLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-          <hr style="border: 1px solid var(--border-color); margin: 25px 0;">
-          <h4 style="color: var(--error); margin-bottom: 10px;">Danger Zone</h4>
-          <button class="btn btn-danger" id="deleteAccountBtn"><i class="fas fa-trash"></i> Delete Account</button>
-          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">This action is permanent and cannot be undone.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Profile Modal (Public View) -->
-  <div class="modal-overlay" id="profileModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-user-circle"></i> User Profile</h2>
-        <button class="close-modal" data-modal-id="profileModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body" id="profileModalBody">
-        <!-- Content Injected by JS -->
-        <div class="loading-spinner"></div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Collections Modal -->
-  <div class="modal-overlay" id="collectionsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-bookmark"></i> My Collections</h2>
-        <button class="close-modal" data-modal-id="collectionsModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body">
-        <h3 class="menu-section-title">Favorites</h3>
-        <div class="collection-grid" id="favoritesGrid">
-          <div class="loading-spinner"></div>
-        </div>
-        <button class="btn btn-primary" style="margin-top: 20px;" id="createNewCollectionBtn" disabled><i class="fas fa-plus"></i> Create New Collection (Soon)</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Inventory (Badges) Modal -->
-  <div class="modal-overlay" id="inventoryModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-box"></i> My Inventory (Badges)</h2>
-        <button class="close-modal" data-modal-id="inventoryModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body">
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">Earn badges by completing milestones!</p>
-        <div class="modal-grid" id="badgeGrid">
-          <!-- Badges will be dynamically rendered here -->
-          <div class="loading-spinner"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Leaderboard Modal -->
-  <div class="modal-overlay" id="leaderboardModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-chart-line"></i> Leaderboard</h2>
-        <button class="close-modal" data-modal-id="leaderboardModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body">
-        <h3 class="menu-section-title">Top 10 Cringe Lords</h3>
-        <div style="display: flex; flex-direction: column; gap: 10px;" id="leaderboardList">
-          <div class="loading-spinner"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Quests Modal -->
-  <div class="modal-overlay" id="questsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-trophy"></i> Daily Quests</h2>
-        <button class="close-modal" data-modal-id="questsModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body">
-         <p style="color: var(--text-secondary); margin-bottom: 20px;">Quests reset daily. Claim your rewards!</p>
-         <div style="display: flex; flex-direction: column; gap: 15px;" id="questList">
-           <div class="loading-spinner"></div>
-         </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Notifications Modal -->
-  <div class="modal-overlay" id="notificationsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-bell"></i> Notifications</h2>
-        <button class="close-modal" data-modal-id="notificationsModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body" style="padding: 0;" id="notificationsList">
-        <div class="loading-spinner"></div>
-      </div>
-    </div>
+  <div class="notification" id="toast">
+    <i class="fas fa-info-circle"></i> <span id="toastMsg">Notification</span>
   </div>
 
-  <!-- Confirmation Modal -->
-  <div class="modal-overlay confirm-modal-overlay" id="confirmModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title" id="confirmModalTitle"><i class="fas fa-exclamation-triangle"></i> Are you sure?</h2>
-      </div>
-      <div class="modal-body">
-        <p id="confirmModalBody">This action cannot be undone.</p>
-        <div class="confirm-actions" style="margin-top: 20px;">
-          <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
-          <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- User's global variables for Firebase -->
   <script>
+    // Config Injection
     var __firebase_config = '{"apiKey":"AIzaSyCc2YgZOUfKfDw7igOfZgfm3709nXTJTYI","authDomain":"cringescroll-meme.firebaseapp.com","projectId":"cringescroll-meme","storageBucket":"cringescroll-meme.firebasestorage.app","messagingSenderId":"952326661480","appId":"1:952326661480:web:366d94b478a6819168a2dd"}';
-    var __app_id = 'cringescroll-app';
-    var __initial_auth_token = undefined; 
+    var __app_id = 'cringescroll-app-dev';
   </script>
 
   <script type="module">
-    // ===== FIREBASE SDK IMPORTS =====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { 
-      getAuth, 
-      onAuthStateChanged, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword, 
-      signOut,
-      updateProfile,
-      deleteUser
+      getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, signOut, updateProfile, signInAnonymously,
+      setPersistence, browserLocalPersistence 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      addDoc, 
-      updateDoc, 
-      collection, 
-      query, 
-      where, 
-      getDocs,
-      onSnapshot,
-      orderBy,
-      serverTimestamp,
-      increment,
-      limit,
-      runTransaction,
-      writeBatch,
-      deleteDoc,
-      collectionGroup,
-      getCountFromServer
+      getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, collection, 
+      query, where, getDocs, onSnapshot, orderBy, serverTimestamp, increment, limit, runTransaction
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import {
-      getStorage,
-      ref,
-      uploadString,
-      getDownloadURL,
-      uploadBytes,
-      deleteObject
+    import { 
+      getStorage, ref, uploadString, getDownloadURL 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-    // ===== GLOBAL APP STATE =====
-    let feed, authModal, chatWindow, sidebar;
-    let isLoading = false;
-    let loadCount = 0;
-    const BUFFER_HEIGHT = 300;
-    let currentTab = 'hot';
-    let seenUrls = new Set();
-    
-    // Firebase instances
+    // --- State ---
     let app, db, auth, storage;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app';
-    
-    // User state
     let currentUser = null;
-    let userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
-    let userQuests = {};
-    let userBadges = {};
-    let userCollections = {};
-    
-    // Real-time listeners
-    let chatListener = null;
-    let userListener = null;
-    let notificationsListener = null;
-    let collectionsListener = null;
-    
-    // Meme API sources
+    let fabricCanvas = null;
+    let loadCount = 0;
     const MEME_SOURCES = [
-      'https://meme-api.com/gimme/memes',
-      'https://meme-api.com/gimme/dankmemes',
-      'https://meme-api.com/gimme/me_irl',
-      'https://meme-api.com/gimme/wholesomememes',
-      'https://meme-api.com/gimme/funny',
-      'https://meme-api.com/gimme/HistoryMemes',
-      'https://meme-api.com/gimme/ProgrammerHumor',
-      'https://meme-api.com/gimme/animemes',
-      'https://meme-api.com/gimme/gaming',
-      'https://meme-api.com/gimme/PrequelMemes',
+      'https://meme-api.com/gimme/memes', 'https://meme-api.com/gimme/dankmemes',
+      'https://meme-api.com/gimme/me_irl', 'https://meme-api.com/gimme/wholesomememes',
+      'https://meme-api.com/gimme/ProgrammerHumor', 'https://meme-api.com/gimme/gaming'
     ];
-    
-    // ===== UTILITY FUNCTIONS =====
-    const $ = (selector) => document.getElementById(selector);
-    const $$ = (selector) => document.querySelectorAll(selector);
-    
-    const escapeHtml = (str) => {
-      if (!str) return '';
-      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-    }
-    
-    const formatNumber = (num) => {
-      if (num === undefined || num === null) return 0;
-      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-      return num;
-    };
-    
-    const timeAgo = (date) => {
-        if (!date) return '...';
-        const seconds = Math.floor((new Date() - date) / 1000);
-        let interval = seconds / 31536000;
-        if (interval > 1) return Math.floor(interval) + "y ago";
-        interval = seconds / 2592000;
-        if (interval > 1) return Math.floor(interval) + "mo ago";
-        interval = seconds / 86400;
-        if (interval > 1) return Math.floor(interval) + "d ago";
-        interval = seconds / 3600;
-        if (interval > 1) return Math.floor(interval) + "h ago";
-        interval = seconds / 60;
-        if (interval > 1) return Math.floor(interval) + "m ago";
-        return Math.floor(seconds) + "s ago";
-    };
 
-    const createPlaceholder = (width, height) => {
-      const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#242152';
-      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-3').trim() || '#c46cff';
-      const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bgColor}"/><text x="50%" y="50%" fill="${accentColor}" font-size="16" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">Loading Meme...</text></svg>`;
-      return `data:image/svg+xml;base64,${btoa(svg)}`;
-    };
-    
-    const showNotification = (title, message, type = 'success', duration = 3000) => {
-      const notification = $('notificationToast'); if (!notification) return;
-      $('notificationTitle').textContent = title;
-      $('notificationMessage').textContent = message;
-      const iconEl = notification.querySelector('.notification-icon i');
-      notification.className = 'notification'; // Reset classes
-      
-      if (type === 'error') { 
-        iconEl.className = 'fas fa-exclamation-circle'; 
-        notification.classList.add('error');
-      } else if (type === 'info') { 
-        iconEl.className = 'fas fa-info-circle'; 
-        notification.classList.add('info');
-      } else { 
-        iconEl.className = 'fas fa-check'; 
-        notification.classList.add('success');
-      }
-      
-      notification.classList.add('show');
-      const timer = setTimeout(() => notification.classList.remove('show'), duration);
-      $('closeNotification').onclick = () => { clearTimeout(timer); notification.classList.remove('show'); };
-    };
+    // --- Init Function with Persistence Fix ---
+    const initApp = async () => {
+      const config = JSON.parse(__firebase_config);
+      app = initializeApp(config);
+      db = getFirestore(app);
+      auth = getAuth(app);
+      storage = getStorage(app);
 
-    /**
-     * Shows a reusable confirmation modal.
-     * @param {string} title - The title for the modal.
-     * @param {string} message - The body text for the modal.
-     * @param {string} confirmText - The text for the confirm button (e.g., "Logout", "Delete").
-     * @returns {Promise<boolean>} - Resolves true if confirmed, false if canceled.
-     */
-    const showConfirmModal = (title, message, confirmText = 'Confirm') => {
-        return new Promise((resolve) => {
-            const modal = $('confirmModal');
-            $('confirmModalTitle').innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${escapeHtml(title)}`;
-            $('confirmModalBody').textContent = message;
-            const confirmBtn = $('confirmOkBtn');
-            const cancelBtn = $('confirmCancelBtn');
-            
-            confirmBtn.textContent = confirmText;
-            
-            const close = (result) => {
-                modal.classList.remove('active');
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
-                resolve(result);
-            };
+      // FIX: Explicitly set persistence to Local Storage to prevent logout on refresh
+      await setPersistence(auth, browserLocalPersistence);
 
-            confirmBtn.onclick = () => close(true);
-            cancelBtn.onclick = () => close(false);
-            
-            modal.classList.add('active');
-        });
-    };
-
-    // ===== FIREBASE & AUTH =====
-    const initFirebase = () => {
-      try {
-        const firebaseConfig = JSON.parse(__firebase_config);
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-        storage = getStorage(app);
+      // Listen for auth state
+      onAuthStateChanged(auth, async (user) => {
+        const loader = document.getElementById('appLoader');
         
-        onAuthStateChanged(auth, (user) => {
-          if (user) { 
-            handleUserLogin(user); 
-          } else { 
-            handleUserLogout(); 
-          }
-        });
-      } catch (error) { 
-        console.error('Firebase initialization error:', error); 
-        showNotification('Fatal Error', 'Failed to initialize app. Invalid configuration.', 'error', 10000); 
-      }
-    };
-    
-    const handleUserLogin = (user) => {
-      const userRef = doc(db, 'users', user.uid);
-      if (userListener) userListener(); // Detach old listener
-      
-      userListener = onSnapshot(userRef, async (userDoc) => {
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          currentUser = {
-            uid: user.uid,
-            email: user.email,
-            username: userData.username,
-            avatar: userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=6a0dad&color=fff`,
-            bio: userData.bio || '',
-            cringeCoin: userData.cringeCoin || 0,
-            streak: userData.streak || 0,
-            createdAt: userData.createdAt?.toDate() || new Date()
-          };
-          userPreferences = userData.preferences || userPreferences;
-          userQuests = userData.quests || {};
+        if (user) {
+          currentUser = user;
+          document.getElementById('menuLogin').style.display = 'none';
+          document.getElementById('menuLogout').style.display = 'flex';
           
-          await checkDailyReset(userRef, userData); // Check and reset quests
-          
-          applyUserPreferences();
-          updateUIAfterLogin();
-          attachRealtimeListeners(user.uid);
-          
-          if (currentTab === 'mymemes') { 
-            loadFeed(true); 
+          // Ensure profile exists in DB
+          if (!user.isAnonymous) {
+             const userRef = doc(db, `artifacts/${__app_id}/public/data/users/${user.uid}`);
+             const snap = await getDoc(userRef);
+             if (!snap.exists()) {
+               await setDoc(userRef, { 
+                 username: user.displayName, 
+                 cringeCoin: 10, 
+                 avatar: `https://ui-avatars.com/api/?name=${user.displayName}` 
+               });
+             }
           }
         } else {
-          console.warn('User doc not found, creating one...');
-          // This happens during sign up, createUserProfile is called in signUpUser
+          // Fallback to anonymous if no session found
+          await signInAnonymously(auth);
+          return; // The listener will fire again with the anon user
         }
+
+        // Only load feed after Auth is settled to prevent race conditions
+        if (loadCount === 0) {
+            loadFeed('hot');
+            setupChatListener();
+        }
+        
+        // Hide loader
+        if(loader) loader.style.display = 'none';
       });
-      $('authModal').classList.remove('active');
+      
+      setupEventListeners();
     };
-    
-    const handleUserLogout = () => {
-      currentUser = null;
-      userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
-      userQuests = {};
-      
-      // Detach all listeners
-      if (userListener) userListener();
-      if (notificationsListener) notificationsListener();
-      if (collectionsListener) collectionsListener();
-      
-      $('menuLogin').style.display = 'flex';
-      $('menuLogout').style.display = 'none';
-      
-      if (currentTab === 'mymemes') {
-        $$('.nav-item.active').forEach(el => el.classList.remove('active'));
-        document.querySelector('[data-tab="hot"]').classList.add('active');
-        currentTab = 'hot';
-        loadFeed(true);
-      }
-      showNotification('Logged Out', 'You have been logged out successfully.', 'info');
-    };
-    
-    const attachRealtimeListeners = (userId) => {
-      const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${userId}`);
-      const privateUserRef = doc(db, `artifacts/${appId}/users/${userId}/data/main`);
-      
-      // Notifications
-      if (notificationsListener) notificationsListener();
-      const notifQuery = query(collection(privateUserRef, 'notifications'), orderBy('timestamp', 'desc'), limit(10));
-      notificationsListener = onSnapshot(notifQuery, (snapshot) => {
-        const unread = snapshot.docs.filter(doc => !doc.data().read).length;
-        $('notificationsBadge').textContent = unread > 0 ? unread : '';
-        renderNotifications(snapshot.docs);
-      }, (error) => console.error("Error listening to notifications: ", error));
-      
-      // Collections (Favorites)
-      if (collectionsListener) collectionsListener();
-      const favQuery = query(collection(privateUserRef, 'collections', 'favorites', 'memes'));
-      collectionsListener = onSnapshot(favQuery, (snapshot) => {
-          userCollections.favorites = snapshot.docs.map(doc => doc.id);
-          $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
-          updateSavedButtons();
-      }, (error) => console.error("Error listening to collections: ", error));
-    };
-    
-    const createUserProfile = async (user, username) => {
-      try {
-        const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${user.uid}`);
-        const privateUserRef = doc(db, `artifacts/${appId}/users/${user.uid}/data/main`);
-        
-        const today = new Date().toISOString().split('T')[0];
-        
-        const publicData = {
-          username: username,
-          cringeCoin: 10,
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=6a0dad&color=fff`,
-          bio: 'New CringeScroller!',
-          createdAt: serverTimestamp(),
-          memeCount: 0
-        };
-        
-        const privateData = {
-          email: user.email,
-          streak: 1,
-          lastActive: serverTimestamp(),
-          preferences: userPreferences,
-          quests: {
-              lastReset: today,
-              reactCount: 0, postCount: 0, tipCount: 0,
-              reactClaimed: false, postClaimed: false, tipClaimed: false
-          }
-        };
 
-        const batch = writeBatch(db);
-        batch.set(publicUserRef, publicData);
-        batch.set(privateUserRef, privateData);
-        await batch.commit();
-
-        // Now handle the combined user data in the app
-        handleUserLogin(user);
-
-      } catch (error) { 
-        console.error('User profile creation error:', error); 
-        showNotification('Error', 'Failed to create user profile.', 'error'); 
-      }
+    // --- Helper Functions ---
+    const $ = (id) => document.getElementById(id);
+    const showToast = (msg) => {
+      const t = $('toast');
+      $('toastMsg').textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
     };
-    
-    const signUpUser = async () => {
-      const email = $('signupEmailInput').value.trim();
-      const username = $('signupUsernameInput').value.trim();
-      const password = $('signupPasswordInput').value;
-      const errorEl = $('signupError');
-      const btn = $('signupBtn');
-      errorEl.textContent = '';
-      
-      if (!email || !username || !password) { errorEl.textContent = 'All fields are required.'; return; }
-      if (!/^[a-zA-Z0-9_]{2,15}$/.test(username)) { errorEl.textContent = 'Username: 2-15 chars (letters, numbers, _).'; return; }
-      if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
-      
-      btn.disabled = true; 
-      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+// --- Auth Functions ---
+    const toggleAuthModal = (show) => {
+      const m = $('authModal');
+      if (show) m.classList.add('active');
+      else m.classList.remove('active');
+    };
+
+    const handleAuthAction = async (isSignup) => {
+      const email = isSignup ? $('suEmail').value : $('liEmail').value;
+      const pass = isSignup ? $('suPass').value : $('liPass').value;
+      const user = isSignup ? $('suUser').value : null;
+      const errorEl = $('authError');
       
       try {
-        // Check if username is taken
-        const usernameQuery = query(collection(db, `artifacts/${appId}/public/data/users`), where('username', '==', username));
-        const usernameSnapshot = await getDocs(usernameQuery);
-        if (!usernameSnapshot.empty) {
-            throw new Error('Username is already taken.');
+        if (isSignup) {
+          const cred = await createUserWithEmailAndPassword(auth, email, pass);
+          await updateProfile(cred.user, { displayName: user });
+          // Create public profile immediately
+          await setDoc(doc(db, `artifacts/${__app_id}/public/data/users/${cred.user.uid}`), {
+             username: user, cringeCoin: 10, avatar: `https://ui-avatars.com/api/?name=${user}`
+          });
+        } else {
+          await signInWithEmailAndPassword(auth, email, pass);
         }
-        
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName: username });
-        await createUserProfile(userCredential.user, username); // This will set up profiles and call handleUserLogin
-        
-        showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
-      } catch (error) { 
-        console.error('Sign up error:', error); 
-        errorEl.textContent = error.message.replace('Firebase: ', '');
-      } finally { 
-        btn.disabled = false; 
-        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account'; 
+        toggleAuthModal(false);
+        showToast(`Welcome ${isSignup ? user : 'back'}!`);
+        window.location.reload(); // Hard reload to ensure fresh state
+      } catch (err) {
+        errorEl.textContent = err.message.replace('Firebase: ', '');
       }
     };
 
-    const loginUser = async () => {
-      const email = $('loginEmailInput').value.trim();
-      const password = $('loginPasswordInput').value;
-      const errorEl = $('loginError');
-      const btn = $('loginBtn');
-      errorEl.textContent = '';
-      
-      if (!email || !password) { errorEl.textContent = 'Both email and password are required.'; return; }
-      
-      btn.disabled = true; 
-      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+    // --- Feed Logic (Fix for "Hot" tab loading) ---
+    const loadFeed = async (tab) => {
+      const feed = $('feed');
+      feed.innerHTML = '<div class="spinner" style="margin:50px auto"></div>'; // Immediate visual feedback
       
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        // onAuthStateChanged will handle the rest
-        showNotification('Logged In!', 'Welcome back! Your memes are waiting.', 'success');
-      } catch (error) { 
-        console.error('Login error:', error); 
-        errorEl.textContent = error.message.replace('Firebase: ', '');
-      } finally { 
-        btn.disabled = false; 
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In'; 
-      }
-    };
-    
-    const logout = async () => {
-      const confirmed = await showConfirmModal('Logout', 'Are you sure you want to log out?', 'Logout');
-      if (confirmed) {
-        signOut(auth).catch(error => showNotification('Error', 'Failed to log out.', 'error'));
-      }
-    };
+        if (tab === 'hot' || tab === 'fresh') {
+          // Mix of API and Firestore
+          const memes = [];
+          
+          // 1. Fetch from Firestore (User Generated)
+          const q = query(collection(db, `artifacts/${__app_id}/public/data/memes`), orderBy('createdAt', 'desc'), limit(10));
+          const docs = await getDocs(q);
+          docs.forEach(d => memes.push({ id: d.id, ...d.data(), type: 'user' }));
 
-    const deleteAccount = async () => {
-        if (!currentUser) return;
-        
-        const confirmed = await showConfirmModal('Delete Account', 'Are you ABSOLUTELY sure? This will permanently delete your profile, memes, and all data. This cannot be undone.', 'Delete My Account');
-        
-        if (!confirmed) return;
-
-        showNotification('Deleting...', 'Your account is being deleted. This may take a moment.', 'info', 5000);
-        
-        try {
-            const userId = currentUser.uid;
-            
-            // 1. Delete all user's memes and associated image files
-            const memesQuery = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', userId));
-            const memesSnapshot = await getDocs(memesQuery);
-            const batch = writeBatch(db);
-            
-            for (const doc of memesSnapshot.docs) {
-                batch.delete(doc.ref);
-                // Delete image from storage
-                const imageUrl = doc.data().imageUrl;
-                if (imageUrl) {
-                    try {
-                        const storageRef = ref(storage, imageUrl);
-                        await deleteObject(storageRef);
-                    } catch (storageError) {
-                        console.warn(`Failed to delete storage file: ${imageUrl}`, storageError);
-                    }
-                }
+          // 2. Fetch from API (External)
+          for (let i = 0; i < 5; i++) {
+            const src = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
+            const res = await fetch(src);
+            const data = await res.json();
+            if (data.url && !data.nsfw) {
+              memes.push({ 
+                id: `api_${Date.now()}_${i}`, 
+                imageUrl: data.url, 
+                title: data.title, 
+                username: data.author, 
+                cringeCoin: 0, 
+                type: 'api' 
+              });
             }
-            await batch.commit();
-
-            // 2. Delete public and private user docs
-            const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${userId}`);
-            const privateUserRef = doc(db, `artifacts/${appId}/users/${userId}/data/main`);
-            // Note: Deleting subcollections (like notifications) requires more complex logic (e.g., a cloud function).
-            // For this client-side example, we'll delete the main docs.
-            await deleteDoc(publicUserRef);
-            await deleteDoc(privateUserRef);
-
-            // 3. Delete user's avatar from storage
-            if (currentUser.avatar && currentUser.avatar.includes('firebasestorage')) {
-                try {
-                    const avatarRef = ref(storage, currentUser.avatar);
-                    await deleteObject(avatarRef);
-                } catch (avatarError) {
-                    console.warn(`Failed to delete avatar: ${currentUser.avatar}`, avatarError);
-                }
-            }
-
-            // 4. Delete the user from Firebase Auth
-            const authUser = auth.currentUser;
-            await deleteUser(authUser);
-
-            showNotification('Account Deleted', 'Your account has been permanently deleted.', 'success');
-            // handleUserLogout will be called by onAuthStateChanged
-            
-        } catch (error) {
-            console.error('Error deleting account:', error);
-            showNotification('Error', 'Failed to delete account. Please log in again and retry.', 'error');
-        }
-    };
-    
-    const applyUserPreferences = () => {
-      document.body.className = `theme-${userPreferences.theme || 'dark'}`;
-      
-      const themeIcon = $('themeToggleBtn')?.querySelector('i');
-      if (themeIcon) { 
-        themeIcon.className = userPreferences.theme.includes('light') ? 'fas fa-sun' : 'fas fa-moon'; 
-      }
-      
-      document.documentElement.style.setProperty('--card-bg', userPreferences.cardBackground || '#242152');
-      
-      const fontSize = userPreferences.fontSize || 'medium';
-      document.body.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
-      document.body.classList.add(`font-size-${fontSize}`);
-    };
-    
-    const updateUIAfterLogin = () => {
-      if (currentUser) {
-        $('menuLogin').style.display = 'none';
-        $('menuLogout').style.display = 'flex';
-      }
-    };
-    
-    const showAuthModal = () => {
-      $('authModal').classList.add('active');
-      $('signupForm').style.display = 'block'; 
-      $('loginForm').style.display = 'none';
-      $('signupTab').classList.add('active'); 
-      $('loginTab').classList.remove('active');
-      $('signupError').textContent = ''; 
-      $('loginError').textContent = '';
-    };
-    
-    // ===== FEED & MEME RENDERING =====
-    const renderMeme = (meme, index) => {
-      const card = document.createElement('div');
-      card.className = 'meme-card';
-      const isFirestore = !!meme.createdAt;
-      
-      // Use Firestore doc ID if available, otherwise create ID from URL
-      const memeId = isFirestore ? meme.id : btoa(encodeURIComponent(meme.url)); 
-      const dataSource = isFirestore ? 'firestore' : 'api';
-      const memeUrl = isFirestore ? meme.imageUrl : meme.url;
-      const title = isFirestore ? meme.title : (meme.title || 'Cringe');
-      const username = isFirestore ? meme.username : 'API';
-      const creatorId = isFirestore ? meme.userId : null;
-      
-      card.dataset.id = memeId;
-      card.dataset.source = dataSource;
-      card.dataset.docId = isFirestore ? meme.id : ''; // Firestore doc ID
-      card.dataset.url = memeUrl;
-      card.dataset.title = title;
-      card.dataset.creatorId = creatorId;
-      card.dataset.username = username;
-      
-      const isSaved = userCollections.favorites && userCollections.favorites.includes(memeId);
-      
-      card.innerHTML = `
-        <div class="card-header">
-          <div>
-            <div class="meme-title">${escapeHtml(title)}</div>
-            <div class="meme-meta">
-              <span class="user-badge" ${creatorId ? `data-user-id="${creatorId}"` : ''}>
-                <i class="fas fa-${isFirestore ? 'user' : 'robot'}"></i> ${escapeHtml(username)}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="meme-image-container">
-          <img class="meme-image" src="${createPlaceholder(300, 300)}" data-src="${memeUrl}" loading="${index < 3 ? 'eager' : 'lazy'}" alt="Meme: ${escapeHtml(title)}">
-        </div>
-        <div class="card-footer">
-          <div class="reaction-bar">
-            <button class="reaction-btn" data-reaction="cringe" title="Cringe"><i class="fas fa-skull"></i><span class="reaction-count">${formatNumber(meme.reactions?.cringe)}</span></button>
-            <button class="reaction-btn" data-reaction="laugh" title="Laugh"><i class="fas fa-grin"></i><span class="reaction-count">${formatNumber(meme.reactions?.laugh)}</span></button>
-            <button class="reaction-btn" data-reaction="cry" title="Cry"><i class="fas fa-sad-tear"></i><span class="reaction-count">${formatNumber(meme.reactions?.cry)}</span></button>
-          </div>
-          <div class="action-buttons">
-            <button class="card-btn save-btn ${isSaved ? 'saved' : ''}" title="Save to collection"><i class="fas fa-bookmark"></i><span>${isSaved ? 'Saved' : 'Save'}</span></button>
-            <button class="card-btn tip-btn" title="Tip creator (5 CC)" ${!isFirestore ? 'disabled' : ''}><i class="fas fa-coins"></i>Tip</button>
-            <button class="card-btn remix-btn" title="Remix this meme"><i class="fas fa-sync-alt"></i>Remix</button>
-            <button class="card-btn share-btn" title="Share meme"><i class="fas fa-share-alt"></i>Share</button>
-          </div>
-        </div>
-      `;
-      feed.appendChild(card);
-      
-      // Image lazy loading
-      const img = card.querySelector('.meme-image');
-      const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          img.src = img.dataset.src;
-          img.onload = () => img.classList.add('loaded');
-          img.onerror = () => { img.src = createPlaceholder(300, 300); img.classList.add('loaded'); };
-          observer.disconnect();
-        }
-      }, { threshold: 0.1 });
-      observer.observe(img);
-      
-      // Add event listeners
-      card.querySelector('.save-btn').onclick = () => saveMeme(card);
-      card.querySelector('.tip-btn').onclick = () => tipMeme(card);
-      card.querySelector('.remix-btn').onclick = () => remixMeme(memeUrl);
-      card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl);
-      card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
-      
-      // Add profile modal listener
-      const userBadge = card.querySelector('.user-badge');
-      if (userBadge && creatorId) {
-          userBadge.onclick = () => showPublicProfile(creatorId, username);
-      }
-    };
-    
-    const loadFeed = async (clear = false) => {
-      if (isLoading) return;
-      isLoading = true;
-      
-      if (clear) { 
-        feed.innerHTML = ''; 
-        loadCount = 0; 
-        seenUrls.clear(); 
-      }
-      
-      if (loadCount === 0) { 
-        showLoadingSkeletons(); 
-      }
-      
-      try {
-        if (currentTab === 'mymemes') { 
-          await loadMyMemes(); 
-        } else if (currentTab === 'search') { 
-          await loadSearchResults($('searchInput').value.trim()); 
-        } else { 
-          await loadApiMemes(); 
-        }
-      } catch (error) { 
-        console.error('Error loading feed:', error); 
-        feed.innerHTML = '<div class="feed-message">Could not load memes. Please try again later.</div>';
-      } finally { 
-        $$('.skeleton-card').forEach(el => el.remove()); 
-        isLoading = false; 
-      }
-    };
-    
-    const showLoadingSkeletons = () => {
-      feed.innerHTML = '';
-      const skeletonCount = window.innerWidth > 1024 ? 3 : (window.innerWidth > 768 ? 2 : 1);
-      for (let i = 0; i < skeletonCount; i++) {
-        const skeleton = document.createElement('div');
-        skeleton.className = 'skeleton-card';
-        skeleton.style.height = `${Math.random() * 200 + 350}px`;
-        skeleton.style.animationDelay = `${i * 0.1}s`;
-        skeleton.innerHTML = `<div style="padding: 12px;"><div style="height: 20px; width: 80%; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 8px;"></div><div style="height: 14px; width: 30%; background: var(--bg-secondary); border-radius: 4px;"></div></div><div style="height: ${Math.random() * 150 + 200}px; background: var(--bg-secondary);"></div>`;
-        feed.appendChild(skeleton);
-      }
-    };
-    
-    const loadMyMemes = async () => {
-      if (!currentUser) { 
-        feed.innerHTML = '<div class="feed-message">Please <a href="#" id="loginLinkMyMemes">log in</a> to see your posted memes.</div>'; 
-        $('loginLinkMyMemes').onclick = (e) => { e.preventDefault(); showAuthModal(); }; 
-        return; 
-      }
-      try {
-        const q = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) { 
-          feed.innerHTML = '<div class="feed-message">You haven\'t posted any memes yet. Go to the <a href="#" id="createMemeLink">Meme Editor</a>!</div>'; 
-          $('createMemeLink').onclick = (e) => { e.preventDefault(); openMemeEditor(); }; 
-          return; 
-        }
-        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
-      } catch (error) { 
-        console.error('Error loading my memes:', error); 
-        feed.innerHTML = '<div class="feed-message">Error loading your memes.</div>'; 
-      }
-    };
-
-    const loadSearchResults = async (username) => {
-      if (!username) { 
-        feed.innerHTML = '<div class="feed-message">Enter a username to search.</div>'; 
-        return; 
-      }
-      try {
-        const q = query(collection(db, `artifacts/${appId}/public/data/memes`), where('username', '==', username), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) { 
-          feed.innerHTML = `<div class="feed-message">No memes found for user "<strong>${escapeHtml(username)}</strong>".</div>`; 
-          return; 
-        }
-        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
-      } catch (error) { 
-        console.error('Error loading search results:', error); 
-        feed.innerHTML = '<div class="feed-message">Error loading search results.</div>'; 
-      }
-    };
-    
-    const loadApiMemes = async () => {
-      const batchSize = window.innerWidth > 768 ? 3 : 2;
-      let memesFetched = 0;
-      let attempts = 0;
-      while (memesFetched < batchSize && attempts < 10) {
-        const meme = await fetchMeme();
-        if (meme) { 
-          renderMeme(meme, loadCount++); 
-          memesFetched++; 
-        }
-        attempts++;
-      }
-    };
-
-    const fetchMeme = async () => {
-      try {
-        const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
-        const response = await fetch(`${url}?_=${Date.now()}`); // Cache buster
-        if (!response.ok) throw new Error('API response not ok.');
-        const data = await response.json();
-        if (!data?.url || data.nsfw || data.spoiler || seenUrls.has(data.url)) { 
-          return null; // Skip duplicate or invalid
-        } 
-        seenUrls.add(data.url);
-        return { 
-          url: data.url, 
-          title: data.title || 'Cringe', 
-          ups: data.ups || 0, 
-          reactions: { 
-            cringe: Math.floor(Math.random() * 100), 
-            laugh: Math.floor(Math.random() * 150), 
-            cry: Math.floor(Math.random() * 75) 
-          } 
-        };
-      } catch (error) { 
-        console.warn('Fetch meme error:', error); 
-        return null; 
-      }
-    };
-    
-    // ===== MEME INTERACTIONS =====
-    const saveMeme = async (card) => {
-      if (!currentUser) { showAuthModal(); return; }
-      const memeId = card.dataset.id;
-      const saveBtn = card.querySelector('.save-btn');
-      const saveBtnText = saveBtn.querySelector('span');
-      
-      const memeData = {
-          title: card.dataset.title,
-          url: card.dataset.url,
-          source: card.dataset.source,
-          docId: card.dataset.docId || null
-      };
-      
-      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-      const favRef = doc(privateUserRef, 'collections', 'favorites', 'memes', memeId);
-      
-      try {
-          if (saveBtn.classList.contains('saved')) {
-              // Unsave
-              await deleteDoc(favRef);
-              saveBtn.classList.remove('saved');
-              if(saveBtnText) saveBtnText.textContent = 'Save';
-              showNotification('Unsaved', 'Meme removed from your favorites.', 'info');
-          } else {
-              // Save
-              await setDoc(favRef, memeData);
-              saveBtn.classList.add('saved');
-              if(saveBtnText) saveBtnText.textContent = 'Saved';
-              showNotification('Saved!', 'Meme added to your favorites.', 'success');
-          }
-      } catch (error) {
-          console.error('Save meme error:', error);
-          showNotification('Error', 'Could not update your collection.', 'error');
-      }
-    };
-    
-    const updateSavedButtons = () => {
-        $$('.meme-card').forEach(card => {
-            const memeId = card.dataset.id;
-            const saveBtn = card.querySelector('.save-btn');
-            const saveBtnText = saveBtn.querySelector('span');
-            if (userCollections.favorites && userCollections.favorites.includes(memeId)) {
-                saveBtn.classList.add('saved');
-                if(saveBtnText) saveBtnText.textContent = 'Saved';
-            } else {
-                saveBtn.classList.remove('saved');
-                if(saveBtnText) saveBtnText.textContent = 'Save';
-            }
-        });
-    };
-    
-    const tipMeme = async (card) => {
-      if (!currentUser) { showAuthModal(); return; }
-      if (currentUser.cringeCoin < 5) { 
-        showNotification('Insufficient Funds', 'You need at least 5 CringeCoin to tip.', 'error'); 
-        return; 
-      }
-      
-      const creatorId = card.dataset.creatorId;
-      if (creatorId === currentUser.uid) {
-        showNotification('Self-Tip', "You can't tip your own meme!", 'error');
-        return;
-      }
-      
-      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-      const memeId = card.dataset.docId;
-      const memeRef = doc(db, `artifacts/${appId}/public/data/memes`, memeId);
-      const publicCreatorRef = doc(db, `artifacts/${appId}/public/data/users`, creatorId);
-      const privateCreatorRef = doc(db, `artifacts/${appId}/users/${creatorId}/data/main`);
-      
-      try {
-        await runTransaction(db, async (transaction) => {
-          const userDoc = await transaction.get(privateUserRef);
-          if (!userDoc.exists() || userDoc.data().cringeCoin < 5) { 
-            throw new Error("Insufficient funds."); 
           }
           
-          // 1. Decrement tipper's coin
-          transaction.update(privateUserRef, { cringeCoin: increment(-5) });
-          // 2. Increment meme tips (public)
-          transaction.update(memeRef, { tips: increment(5) });
-          // 3. Increment creator's coin (public)
-          transaction.update(publicCreatorRef, { cringeCoin: increment(5) });
-        });
-        
-        // Send notification to creator
-        await addDoc(collection(privateCreatorRef, 'notifications'), {
-            type: 'tip',
-            fromUser: currentUser.username,
-            amount: 5,
-            memeTitle: card.dataset.title,
-            timestamp: serverTimestamp(),
-            read: false
-        });
-        
-        await updateQuestProgress('tip');
-        showNotification('Tip Sent!', '5 CringeCoin sent to the meme creator!', 'success');
-      } catch (error) { 
-        console.error("Tip transaction failed: ", error); 
-        showNotification('Error', error.message, 'error'); 
+          renderMemes(memes.sort(() => 0.5 - Math.random())); // Shuffle
+        } else if (tab === 'mymemes') {
+          if (currentUser.isAnonymous) {
+             feed.innerHTML = '<div style="text-align:center; padding:40px;">Please Login to see your memes</div>';
+             return;
+          }
+          const q = query(collection(db, `artifacts/${__app_id}/public/data/memes`), where('userId', '==', currentUser.uid));
+          const docs = await getDocs(q);
+          const memes = [];
+          docs.forEach(d => memes.push({ id: d.id, ...d.data(), type: 'user' }));
+          renderMemes(memes);
+        }
+      } catch (e) {
+        console.error(e);
+        feed.innerHTML = '<div style="text-align:center">Failed to load memes.</div>';
       }
     };
-    
-    const remixMeme = (imageUrl) => openMemeEditor(imageUrl);
-    
-    const shareMeme = (memeUrl) => {
-      if (navigator.share) {
-        navigator.share({ 
-          title: 'CringeScroll Meme', 
-          text: 'Check out this hilarious meme on CringeScroll!', 
-          url: memeUrl 
-        }).catch((error) => console.log('Error sharing:', error));
-      } else {
-        navigator.clipboard.writeText(memeUrl)
-          .then(() => showNotification('Copied!', 'Meme link copied to clipboard!', 'success'))
-          .catch(() => showNotification('Error', 'Failed to copy to clipboard', 'error'));
-      }
-    };
-    
-    const addReaction = async (card, reactionType) => {
-      if (!currentUser) { showAuthModal(); return; }
-      
-      const btn = card.querySelector(`.reaction-btn[data-reaction="${reactionType}"]`);
-      const countEl = btn.querySelector('.reaction-count');
-      const currentVal = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
-      countEl.textContent = formatNumber(currentVal + 1);
-      btn.classList.add('active');
-      btn.style.transform = 'scale(1.2)';
-      setTimeout(() => { btn.style.transform = 'scale(1)'; }, 300);
-      
-      await updateQuestProgress('react');
-      
-      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-      
-      if (card.dataset.source === 'api') {
-        showNotification('Reaction Added!', '+1 CringeCoin for reacting!', 'success');
-        await updateDoc(privateUserRef, { cringeCoin: increment(1) });
+
+    const renderMemes = (list) => {
+      const feed = $('feed');
+      feed.innerHTML = '';
+      if (list.length === 0) {
+        feed.innerHTML = '<div style="text-align:center; padding:40px;">No memes found.</div>';
         return;
       }
-      
-      const memeId = card.dataset.docId;
-      const memeRef = doc(db, `artifacts/${appId}/public/data/memes`, memeId);
-      
-      try {
-        await runTransaction(db, async (transaction) => {
-            // 1. Give user 1 coin for reacting
-            transaction.update(privateUserRef, { cringeCoin: increment(1) });
-            // 2. Increment reaction count on meme
-            transaction.update(memeRef, { [`reactions.${reactionType}`]: increment(1) });
-        });
-        showNotification('Reaction Added!', `You reacted! +1 CringeCoin`, 'success');
-      } catch (error) {
-        console.error('Reaction update error:', error);
-        countEl.textContent = formatNumber(currentVal); // Revert count
-        btn.classList.remove('active');
-        showNotification('Error', 'Could not save reaction.', 'error');
-      }
-    };
-    
-    // ===== CHAT =====
-    const toggleChatWindow = () => {
-      chatWindow.classList.toggle('active');
-      if (chatWindow.classList.contains('active')) { 
-        loadChatMessages(); 
-      } else { 
-        if (chatListener) { 
-          chatListener(); 
-          chatListener = null; 
-        } 
-      }
-    };
-    
-    const loadChatMessages = () => {
-      if (chatListener) return;
-      const messagesContainer = $('chatMessages');
-      const q = query(collection(db, `artifacts/${appId}/public/data/chat`), orderBy('timestamp', 'desc'), limit(50));
-      
-      chatListener = onSnapshot(q, (snapshot) => {
-        messagesContainer.innerHTML = '';
-        if (snapshot.empty) { 
-          messagesContainer.innerHTML = '<div class="feed-message" style="font-size: 0.9rem; padding: 20px;">No messages yet. Be the first!</div>'; 
-          return; 
-        }
-        
-        const messages = [];
-        snapshot.forEach(doc => { messages.push(doc.data()); });
-        messages.reverse().forEach(renderChatMessage);
-        
-        const unreadCount = messages.length; // Simple count for badge
-        $('chatBadge').textContent = unreadCount > 0 ? unreadCount : '';
-        $('menuChatBadge').textContent = unreadCount > 0 ? unreadCount : '';
-        
-        setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
-      }, (error) => { 
-        console.error("Chat error:", error); 
-        messagesContainer.innerHTML = '<div class="feed-message">Could not load chat.</div>'; 
-      });
-    };
-    
-    const renderChatMessage = (msg) => {
-        const messagesContainer = $('chatMessages');
-        const messageDiv = document.createElement('div');
-        const isOutgoing = currentUser && (msg.userId === currentUser.uid || msg.sender === currentUser.username);
-        messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
-        
-        let timeString = '...';
-        if (msg.timestamp) { 
-          timeString = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-        }
-        
-        messageDiv.innerHTML = `
-          <div class="message-content">${escapeHtml(msg.text)}</div>
-          <div class="message-meta">
-            <span class="message-sender">${escapeHtml(msg.sender)}</span>
-            <span class="message-time">${timeString}</span>
+
+      list.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'meme-card';
+        div.innerHTML = `
+          <div class="card-header">
+            <span class="meme-title">${m.title || 'Untitled'}</span>
+            <span class="user-badge">${m.username || 'Anon'}</span>
+          </div>
+          <div class="meme-image-container">
+            <img src="${m.imageUrl}" class="meme-image" onload="this.classList.add('loaded')" loading="lazy">
+          </div>
+          <div class="card-footer">
+            <div class="action-buttons">
+              <button class="card-btn"><i class="fas fa-skull"></i>Cringe</button>
+              <button class="card-btn"><i class="fas fa-grin-squint"></i>Laugh</button>
+              <button class="card-btn"><i class="fas fa-bookmark"></i>Save</button>
+              <button class="card-btn"><i class="fas fa-share"></i>Share</button>
+            </div>
           </div>
         `;
-        messagesContainer.appendChild(messageDiv);
+        feed.appendChild(div);
+      });
     };
-    
-    const sendChatMessage = async () => {
-      const input = $('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-      if (!currentUser) { showAuthModal(); return; }
-      
-      input.disabled = true;
-      try {
-        await addDoc(collection(db, `artifacts/${appId}/public/data/chat`), { 
-          text: text, 
-          sender: currentUser.username, 
-          userId: currentUser.uid, 
-          timestamp: serverTimestamp() 
+
+    // --- Chat Logic ---
+    const setupChatListener = () => {
+      const q = query(collection(db, `artifacts/${__app_id}/public/data/chat`), orderBy('timestamp', 'desc'), limit(50));
+      onSnapshot(q, (snap) => {
+        const div = $('chatMessages');
+        div.innerHTML = '';
+        const msgs = [];
+        snap.forEach(d => msgs.push(d.data()));
+        msgs.reverse().forEach(m => {
+          const el = document.createElement('div');
+          el.className = `message ${m.uid === currentUser?.uid ? 'outgoing' : 'incoming'}`;
+          el.innerText = `${m.user}: ${m.text}`;
+          div.appendChild(el);
         });
-        input.value = '';
-      } catch (error) { 
-        console.error('Send message error:', error); 
-        showNotification('Error', 'Could not send message.', 'error'); 
-      }
-      input.disabled = false; 
-      input.focus();
+        div.scrollTop = div.scrollHeight;
+        
+        // Update Badge
+        if (!document.getElementById('chatWindow').classList.contains('active')) {
+             $('chatBadge').innerText = '•';
+        }
+      });
     };
-    
-    // ===== MEME EDITOR =====
-    let fabricCanvas = null;
-    let activeTool = 'text';
-    let history = [];
-    let historyIndex = -1;
-    
-    const openMemeEditor = (imageUrl = null) => {
-      if (!currentUser) { showAuthModal(); return; }
-      $('memeEditorModal').classList.add('active');
-      // Delay init to allow modal to render and get dimensions
-      setTimeout(() => initMemeEditor(imageUrl), 100);
+
+    const sendChat = async () => {
+      const inp = $('chatInput');
+      const txt = inp.value.trim();
+      if (!txt) return;
+      await addDoc(collection(db, `artifacts/${__app_id}/public/data/chat`), {
+        text: txt, user: currentUser.displayName || 'Anon', uid: currentUser.uid, timestamp: serverTimestamp()
+      });
+      inp.value = '';
     };
-    
-    const initMemeEditor = (imageUrl) => {
-      const container = $('editorContainer');
-      const canvasEl = $('canvas');
-      
-      // Ensure container has dimensions
-      if (container.clientWidth === 0 || container.clientHeight === 0) {
-          console.warn("Editor container has no dimensions. Retrying...");
-          setTimeout(() => initMemeEditor(imageUrl), 200);
-          return;
-      }
-      
-      const containerWidth = container.clientWidth - 10;
-      const containerHeight = container.clientHeight - 10;
-      canvasEl.width = containerWidth; 
-      canvasEl.height = containerHeight;
-      
+
+    // --- Meme Editor Logic (Fixed Upload) ---
+    const initEditor = () => {
       if (!fabricCanvas) {
-        fabricCanvas = new fabric.Canvas('canvas', { 
-          backgroundColor: '#0f0c29', 
-          selection: true, 
-          preserveObjectStacking: true 
-        });
-        setupMemeEditorCanvasListeners(); // Setup listeners only once
-      } else {
-        fabricCanvas.clear();
-        fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
+        fabricCanvas = new fabric.Canvas('canvas', { height: 400, width: 400, backgroundColor: '#000' });
+        
+        // Fix: Responsive canvas resizing
+        const container = document.getElementById('editorContainer');
+        fabricCanvas.setDimensions({ width: container.clientWidth, height: container.clientHeight });
       }
-      
-      fabricCanvas.setWidth(containerWidth);
-      fabricCanvas.setHeight(containerHeight);
-      history = []; 
-      historyIndex = -1;
-      
-      if (imageUrl) {
-        fabric.Image.fromURL(imageUrl, (img) => {
-          const scale = Math.min(containerWidth / img.width, containerHeight / img.height);
-          img.scale(scale);
-          img.set({ 
-            left: containerWidth / 2, 
-            top: containerHeight / 2, 
-            originX: 'center', 
-            originY: 'center', 
-            selectable: false, 
-            evented: false 
+      $('memeEditorModal').classList.add('active');
+    };
+
+    const handleImageUpload = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (f) => {
+        fabric.Image.fromURL(f.target.result, (img) => {
+          fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
+            scaleX: fabricCanvas.width / img.width,
+            scaleY: fabricCanvas.height / img.height
           });
-          fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
-          saveCanvasState();
-        }, { crossOrigin: 'anonymous' });
-      } else { 
-        saveCanvasState(); 
-      }
-      
-      $$('.editor-tool').forEach(b => b.classList.remove('active'));
-      $('.editor-tool[data-tool="text"]').classList.add('active');
-      activeTool = 'text'; 
-      fabricCanvas.isDrawingMode = false;
-      updateEditorSettings();
+        });
+      };
+      reader.readAsDataURL(file);
     };
-    
-    const updateEditorSettings = () => {
-      if (!fabricCanvas) return;
-      const brushSize = parseInt($('brushSize').value);
-      const fillColor = $('textColorPicker').value;
-      const strokeColor = $('strokeColorPicker').value;
-      
-      if (fabricCanvas.isDrawingMode) {
-        fabricCanvas.freeDrawingBrush.width = brushSize;
-        fabricCanvas.freeDrawingBrush.color = activeTool === 'eraser' ? fabricCanvas.backgroundColor : fillColor;
-      }
-      
-      const activeObj = fabricCanvas.getActiveObject();
-      if (activeObj) {
-          if (activeObj.type.includes('text')) {
-              activeObj.set({ fill: fillColor, stroke: strokeColor, fontSize: brushSize });
-          }
-          fabricCanvas.renderAll();
-      }
-    };
-    
-    const saveCanvasState = () => {
-      if (!fabricCanvas) return;
-      history = history.slice(0, historyIndex + 1);
-      history.push(fabricCanvas.toJSON());
-      historyIndex = history.length - 1;
-    };
-    const undoCanvasAction = () => { 
-      if (historyIndex > 0) { 
-        historyIndex--; 
-        fabricCanvas.loadFromJSON(history[historyIndex], fabricCanvas.renderAll.bind(fabricCanvas)); 
-      } 
-    };
-    const redoCanvasAction = () => { 
-      if (historyIndex < history.length - 1) { 
-        historyIndex++; 
-        fabricCanvas.loadFromJSON(history[historyIndex], fabricCanvas.renderAll.bind(fabricCanvas)); 
-      } 
-    };
-    const clearCanvas = async () => {
-      const confirmed = await showConfirmModal('Clear Canvas', 'Are you sure you want to clear the canvas? This cannot be undone.', 'Clear');
-      if (confirmed) {
-        fabricCanvas.clear();
-        fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
-        fabricCanvas.setBackgroundImage(null, fabricCanvas.renderAll.bind(fabricCanvas));
-        saveCanvasState();
-      }
-    };
-    
-    const postMemeFromEditor = async () => {
-      if (!currentUser) { showAuthModal(); return; }
-      const title = $('memeTitleInput').value.trim();
-      if (!title) { 
-        showNotification('Title Required', 'Please enter a title for your meme.', 'error'); 
-        return; 
-      }
+
+    const postMeme = async () => {
+      if (currentUser.isAnonymous) { showToast('Login to post!'); return; }
       
       const btn = $('postMemeBtn');
-      btn.disabled = true; 
-      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div> Posting...';
+      btn.innerText = 'Uploading...';
+      const dataUrl = fabricCanvas.toDataURL('image/jpeg', 0.8);
       
       try {
-        const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9 });
-        const memeId = `meme_${Date.now()}`;
-        const storageRef = ref(storage, `memes/${currentUser.uid}/${memeId}.png`);
+        // Upload to Storage
+        const storeRef = ref(storage, `memes/${currentUser.uid}/${Date.now()}.jpg`);
+        await uploadString(storeRef, dataUrl, 'data_url');
+        const url = await getDownloadURL(storeRef);
         
-        // Upload image
-        const uploadResult = await uploadString(storageRef, dataURL, 'data_url');
-        const downloadURL = await getDownloadURL(uploadResult.ref);
-        
-        // Add meme to Firestore
-        await addDoc(collection(db, `artifacts/${appId}/public/data/memes`), {
-          title: title, 
-          imageUrl: downloadURL, 
-          userId: currentUser.uid, 
-          username: currentUser.username,
-          createdAt: serverTimestamp(), 
-          isUserGenerated: true,
-          reactions: { cringe: 0, laugh: 0, cry: 0 }, 
-          tips: 0
+        // Save to Firestore
+        await addDoc(collection(db, `artifacts/${__app_id}/public/data/memes`), {
+          imageUrl: url, 
+          title: $('memeTitleInput').value || 'Untitled',
+          userId: currentUser.uid,
+          username: currentUser.displayName,
+          createdAt: serverTimestamp()
         });
-
-        // Update user's meme count
-        const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
-        await updateDoc(publicUserRef, { memeCount: increment(1) });
         
-        await updateQuestProgress('post');
-        
+        showToast('Meme Posted!');
         $('memeEditorModal').classList.remove('active');
-        $('memeTitleInput').value = '';
-        
-        // Switch to "My Memes" tab
-        $$('.nav-item.active').forEach(el => el.classList.remove('active'));
-        document.querySelector('[data-tab="mymemes"]').classList.add('active');
-        currentTab = 'mymemes';
-        loadFeed(true);
-        
-        showNotification('Meme Posted!', 'Your meme is live! +10 CringeCoin', 'success');
-      } catch (error) { 
-        console.error('Meme post error:', error); 
-        showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
-      } finally { 
-        btn.disabled = false; 
-        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; 
-      }
-    };
-    
-    // ===== MODAL FUNCTIONS (ALL FUNCTIONAL) =====
-    
-    const openModal = (modalId) => {
-        const modal = $(modalId);
-        if (modal) {
-            modal.classList.add('active');
-            // Re-run modal-specific logic if needed
-            if (modalId === 'settingsModal') loadSettings();
-            if (modalId === 'profileModal') showPublicProfile(); // Needs ID
-            if (modalId === 'collectionsModal') showCollections();
-            if (modalId === 'inventoryModal') showInventory();
-            if (modalId === 'leaderboardModal') showLeaderboard();
-            if (modalId === 'questsModal') showQuests();
-            if (modalId === 'notificationsModal') showNotifications();
-        }
-    };
-    
-    const closeModal = (modalId) => {
-        const modal = $(modalId);
-        if (modal) modal.classList.remove('active');
-    };
-
-    const showSettings = () => {
-        if (!currentUser) { showAuthModal(); return; }
-        openModal('settingsModal');
-    };
-
-    const loadSettings = () => {
-        if (!currentUser) return;
-        
-        // Load Profile Tab
-        $('settingsAvatarImg').src = currentUser.avatar;
-        $('settingsUsername').textContent = currentUser.username;
-        $('settingsUsernameInput').value = currentUser.username;
-        $('settingsBioInput').value = currentUser.bio || '';
-        $('settingsCringeCoin').textContent = currentUser.cringeCoin;
-        $('settingsStreak').textContent = currentUser.streak;
-        
-        // Load Appearance Tab
-        $('themeSelect').value = userPreferences.theme;
-        $('fontSizeSelect').value = userPreferences.fontSize;
-        $('cardBgColor').value = userPreferences.cardBackground;
-        
-        // Load Account Tab
-        $('settingsEmailInput').value = currentUser.email;
-        $('settingsUserIdInput').value = currentUser.uid;
-    };
-
-    const saveProfileSettings = async () => {
-        const newUsername = $('settingsUsernameInput').value.trim();
-        const newBio = $('settingsBioInput').value.trim();
-        const avatarFile = $('avatarUpload').files[0];
-        const btn = $('saveProfileSettingsBtn');
-        btn.disabled = true;
-        
-        try {
-            if (!currentUser) throw new Error('Not logged in.');
-
-            const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
-            let avatarUrl = currentUser.avatar;
-
-            // Check if username changed and is available
-            if (newUsername !== currentUser.username) {
-                if (!/^[a-zA-Z0-9_]{2,15}$/.test(newUsername)) {
-                    throw new Error('Username: 2-15 chars (letters, numbers, _).');
-                }
-                const usernameQuery = query(collection(db, `artifacts/${appId}/public/data/users`), where('username', '==', newUsername));
-                const usernameSnapshot = await getDocs(usernameQuery);
-                if (!usernameSnapshot.empty) {
-                    throw new Error('Username is already taken.');
-                }
-            }
-
-            // Upload new avatar if one is selected
-            if (avatarFile) {
-                const storageRef = ref(storage, `avatars/${currentUser.uid}/${avatarFile.name}`);
-                const uploadResult = await uploadBytes(storageRef, avatarFile);
-                avatarUrl = await getDownloadURL(uploadResult.ref);
-            }
-
-            // Update Firestore
-            await updateDoc(publicUserRef, {
-                username: newUsername,
-                bio: newBio,
-                avatar: avatarUrl
-            });
-            
-            // Update auth profile
-            await updateProfile(auth.currentUser, { displayName: newUsername });
-
-            // Update all of the user's memes with the new username
-            // This is a heavy operation, can be slow.
-            // Consider a Cloud Function for this in a real app.
-            const memesQuery = query(collection(db, `artifacts/${appId}/public/data/memes`), where('userId', '==', currentUser.uid));
-            const memesSnapshot = await getDocs(memesQuery);
-            const batch = writeBatch(db);
-            memesSnapshot.forEach(doc => {
-                batch.update(doc.ref, { username: newUsername });
-            });
-            await batch.commit();
-
-            showNotification('Profile Saved!', 'Your profile has been updated.', 'success');
-        } catch (error) {
-            console.error('Error saving profile:', error);
-            showNotification('Error', error.message, 'error');
-        } finally {
-            btn.disabled = false;
-        }
-    };
-
-    const saveAppearanceSettings = async () => {
-      userPreferences.theme = $('themeSelect').value;
-      userPreferences.fontSize = $('fontSizeSelect').value;
-      userPreferences.cardBackground = $('cardBgColor').value;
-      
-      applyUserPreferences(); // Apply changes locally
-      
-      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-      try {
-        await updateDoc(privateUserRef, { preferences: userPreferences });
-        showNotification('Saved!', 'Your UI preferences have been saved.', 'success');
-      } catch (error) {
-        showNotification('Error', 'Could not save preferences.', 'error');
-      }
-    };
-    
-    const showPublicProfile = async (userId, username) => {
-      if (!userId) {
-          if (!currentUser) { showAuthModal(); return; }
-          userId = currentUser.uid; // Show own profile
-      }
-      
-      openModal('profileModal');
-      const body = $('profileModalBody');
-      body.innerHTML = '<div class="loading-spinner"></div>';
-      
-      try {
-          const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${userId}`);
-          const userDoc = await getDoc(publicUserRef);
-          
-          if (!userDoc.exists()) {
-              body.innerHTML = '<div class="feed-message">User profile not found.</div>';
-              return;
-          }
-          
-          const user = userDoc.data();
-          
-          body.innerHTML = `
-            <div class="profile-card-header">
-              <img src="${user.avatar}" alt="Avatar" class="profile-card-avatar">
-              <div>
-                <h3 class="profile-card-name">${escapeHtml(user.username)}</h3>
-                <p class="profile-card-joined">Joined: ${user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
-              </div>
-            </div>
-            <p style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 30px;">${escapeHtml(user.bio)}</p>
-            <div class="profile-card-stats">
-              <div class="stat-item" id="profileCringeCoin">
-                <div class="stat-value">${formatNumber(user.cringeCoin)}</div>
-                <div class="stat-label">CringeCoin</div>
-              </div>
-              <div class="stat-item" id="profileMemes">
-                <div class="stat-value">${formatNumber(user.memeCount)}</div>
-                <div class="stat-label">Memes Posted</div>
-              </div>
-            </div>
-          `;
-          
-      } catch (error) {
-          console.error("Error fetching public profile:", error);
-          body.innerHTML = '<div class="feed-message">Could not load profile.</div>';
+        loadFeed('hot'); // Refresh feed
+      } catch (e) {
+        showToast('Upload failed');
+        console.error(e);
+      } finally {
+        btn.innerText = 'Post Meme';
       }
     };
 
-    const showCollections = async () => {
-      if (!currentUser) { showAuthModal(); return; }
-      openModal('collectionsModal');
-      const grid = $('favoritesGrid');
-      grid.innerHTML = '<div class="loading-spinner"></div>';
-      
-      const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-      const q = query(collection(privateUserRef, 'collections', 'favorites', 'memes'));
-      
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) {
-          grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
-          return;
-      }
-      grid.innerHTML = '';
-      snapshot.forEach(doc => {
-          const meme = doc.data();
-          const item = document.createElement('div');
-          item.className = 'collection-item';
-          item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
-          item.onclick = () => { /* Maybe open full meme modal later */ };
-          grid.appendChild(item);
-      });
-    };
-
-    const showInventory = () => {
-      if (!currentUser) { showAuthModal(); return; }
-      openModal('inventoryModal');
-      const grid = $('badgeGrid');
-      grid.innerHTML = ''; // Clear old badges
-      
-      const createBadge = (icon, title, desc, earned) => {
-        const item = document.createElement('div');
-        item.className = 'grid-item';
-        item.style.opacity = earned ? '1' : '0.4';
-        item.innerHTML = `<i class="fas ${icon}" style="color: ${earned ? 'var(--gold)' : 'var(--text-secondary)'};"></i><div class="grid-item-title">${title}</div><div class="grid-item-meta">${desc}</div>`;
-        grid.appendChild(item);
-      };
-
-      // Check for badges
-      createBadge('fa-user-plus', 'New Scroller', 'Joined CringeScroll', true); // Everyone gets this
-      createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', userQuests.tipCount > 0);
-      createBadge('fa-paint-brush', 'Creator', 'Post a meme', userQuests.postCount > 0);
-      createBadge('fa-fire', 'Hot Streak', '3-day streak', currentUser.streak >= 3);
-      createBadge('fa-coins', 'Coin Hoarder', '100+ CringeCoin', currentUser.cringeCoin >= 100);
-      createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', currentUser.cringeCoin >= 1000);
-    };
-
-    const showLeaderboard = async () => {
-      if (!currentUser) { showAuthModal(); return; }
-      openModal('leaderboardModal');
-      const list = $('leaderboardList');
-      list.innerHTML = '<div class="loading-spinner"></div>';
-      
-      const q = query(collection(db, `artifacts/${appId}/public/data/users`), orderBy('cringeCoin', 'desc'), limit(10));
-      const snapshot = await getDocs(q);
-      
-      list.innerHTML = '';
-      let rank = 1;
-      snapshot.forEach(doc => {
-          const user = doc.data();
-          const item = document.createElement('div');
-          item.className = `leaderboard-item rank-${rank}`;
-          item.innerHTML = `
-            <div class="leaderboard-rank">${rank}</div>
-            <img src="${user.avatar}" alt="avatar" class="leaderboard-avatar">
-            <div class="leaderboard-name">${escapeHtml(user.username)}</div>
-            <div class="leaderboard-score">${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i></div>
-          `;
-          list.appendChild(item);
-          rank++;
-      });
-    };
-
-    const showQuests = () => {
-      if (!currentUser) { showAuthModal(); return; }
-      openModal('questsModal');
-      const list = $('questList');
-      list.innerHTML = ''; // Clear old quests
-      
-      const quests = [
-        { id: 'react', title: 'Daily Reactions', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed, reward: 10 },
-        { id: 'post', title: 'Daily Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed, reward: 25 },
-        { id: 'tip', title: 'Generous Tipper', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed, reward: 5 }
-      ];
-
-      if (quests.length === 0) {
-        list.innerHTML = '<div class="feed-message">No quests available.</div>';
-        return;
-      }
-
-      quests.forEach(q => {
-        const item = document.createElement('div');
-        const isComplete = q.progress >= q.goal;
-        item.className = `quest-item ${isComplete ? 'completed' : ''}`;
-        item.innerHTML = `
-          <div class="quest-header">
-            <div>
-              <h4 class="quest-title">${q.title}</h4>
-              <p class="quest-desc">${q.desc}</p>
-            </div>
-            <div class="quest-reward">+${q.reward} <i class="fas fa-coins"></i></div>
-          </div>
-          <div class="progress-bar"><div class="progress-bar-inner" style="width: ${Math.min(100, (q.progress / q.goal) * 100)}%;"></div></div>
-          <div class="quest-footer">
-            <span>${q.progress}/${q.goal} completed</span>
-            <button class="btn btn-primary claim-btn btn-sm" data-quest-id="${q.id}" ${(!isComplete || q.claimed) ? 'disabled' : ''}>
-              ${q.claimed ? 'Claimed' : 'Claim'}
-            </button>
-          </div>
-        `;
-        list.appendChild(item);
-      });
-      
-      // Add event listeners to claim buttons
-      $$('.claim-btn').forEach(btn => {
-          btn.onclick = () => claimQuest(btn.dataset.questId, quests.find(q => q.id === btn.dataset.questId));
-      });
-    };
-    
-    const showNotifications = async () => {
-        if (!currentUser) { showAuthModal(); return; }
-        openModal('notificationsModal');
-        // Data is already loaded by `renderNotifications` via snapshot
-        
-        // Mark all as read when opening
-        const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-        const batch = writeBatch(db);
-        const q = query(collection(privateUserRef, 'notifications'), where('read', '==', false));
-        const snapshot = await getDocs(q);
-        snapshot.forEach(doc => {
-            batch.update(doc.ref, { read: true });
-        });
-        await batch.commit();
-        $('notificationsBadge').textContent = '';
-    };
-
-    const renderNotifications = (docs) => {
-        const list = $('notificationsList');
-        if (!list) return;
-        list.innerHTML = '';
-        if (docs.length === 0) {
-            list.innerHTML = '<div class="feed-message" style="padding: 20px;">No notifications yet.</div>';
-            return;
-        }
-        docs.forEach(doc => {
-            const notif = doc.data();
-            const item = document.createElement('div');
-            item.className = 'menu-item';
-            item.style.opacity = notif.read ? 0.6 : 1;
-            let icon = 'fa-info-circle';
-            let text = 'New notification';
-            
-            if (notif.type === 'tip') {
-                icon = 'fa-coins';
-                text = `<strong>${escapeHtml(notif.fromUser)}</strong> tipped you <strong>${notif.amount} CC</strong> on "${escapeHtml(notif.memeTitle)}"`;
-            }
-            
-            item.innerHTML = `<i class="fas ${icon}" style="color: ${notif.type === 'tip' ? 'var(--gold)' : 'var(--accent-3)'};"></i><div>${text}<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">${notif.timestamp ? timeAgo(notif.timestamp.toDate()) : ''}</div></div>`;
-            list.appendChild(item);
-        });
-    };
-    
-    // ===== QUEST SYSTEM =====
-    const checkDailyReset = async (privateUserRef, userData) => {
-        const today = new Date().toISOString().split('T')[0];
-        const lastReset = userData.quests?.lastReset;
-        
-        if (!lastReset || lastReset !== today) {
-            // Reset quests
-            const defaultQuests = {
-              lastReset: today,
-              reactCount: 0, postCount: 0, tipCount: 0,
-              reactClaimed: false, postClaimed: false, tipClaimed: false
-            };
-            
-            // Check streak
-            let newStreak = 1;
-            if (userData.lastActive) {
-                const lastActiveDate = userData.lastActive.toDate();
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                
-                if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
-                    newStreak = (userData.streak || 0) + 1; // Continue streak
-                }
-            }
-            
-            await updateDoc(privateUserRef, { 
-                quests: defaultQuests,
-                streak: newStreak,
-                lastActive: serverTimestamp()
-            });
-            userQuests = defaultQuests;
-            if (newStreak > userData.streak) {
-                showNotification('Streak Continued!', `You're on a ${newStreak}-day streak!`, 'info');
-            }
-        }
-    };
-    
-    const updateQuestProgress = async (questType) => {
-        if (!currentUser || !userQuests) return;
-        
-        const fieldMap = {
-            'react': { count: 'reactCount', claimed: 'reactClaimed' },
-            'post': { count: 'postCount', claimed: 'postClaimed' },
-            'tip': { count: 'tipCount', claimed: 'tipClaimed' }
-        };
-        
-        const quest = fieldMap[questType];
-        if (!quest || userQuests[quest.claimed]) return; // Don't update if already claimed
-        
-        try {
-            const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-            await updateDoc(privateUserRef, {
-                [`quests.${quest.count}`]: increment(1)
-            });
-            // userQuests will update via onSnapshot
-        } catch (error) {
-            console.error('Quest update error:', error);
-        }
-    };
-
-    const claimQuest = async (questId, questData) => {
-        if (!currentUser || !questData || questData.claimed) return;
-        
-        const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-        const publicUserRef = doc(db, `artifacts/${appId}/public/data/users/${currentUser.uid}`);
-        
-        try {
-            await runTransaction(db, async (transaction) => {
-                const userDoc = await transaction.get(privateUserRef);
-                const quests = userDoc.data().quests;
-                
-                const progress = quests[questId + 'Count'] || 0;
-                const claimed = quests[questId + 'Claimed'] || false;
-                
-                if (progress >= questData.goal && !claimed) {
-                    // Update private doc
-                    transaction.update(privateUserRef, {
-                        [`quests.${questId}Claimed`]: true
-                    });
-                    // Update public doc
-                    transaction.update(publicUserRef, {
-                        cringeCoin: increment(questData.reward)
-                    });
-                } else {
-                    throw new Error('Quest not completed or already claimed.');
-                }
-            });
-            showNotification('Reward Claimed!', `+${questData.reward} CringeCoin for completing ${questData.title}!`, 'success');
-            // UI will update via onSnapshot, which re-renders the quest modal
-            if ($('questsModal').classList.contains('active')) {
-                showQuests();
-            }
-        } catch (error) {
-            console.error('Claim quest error:', error);
-            showNotification('Error', error.message, 'error');
-        }
-    };
-
-    // ===== EVENT LISTENERS =====
+    // --- Event Listeners (Wiring it all up) ---
     const setupEventListeners = () => {
-      feed = $('feed'); 
-      authModal = $('authModal'); 
-      chatWindow = $('chatWindow'); 
-      sidebar = $('sidebar');
-      
-      // Nav Tabs
-      $$('.nav-item[data-tab]').forEach(item => item.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        const tab = item.dataset.tab; 
-        if (currentTab === tab) return;
-        currentTab = tab; 
-        $$('.nav-item').forEach(el => el.classList.remove('active')); 
-        item.classList.add('active'); 
-        loadFeed(true);
-      }));
-      
-      // Header
-      $('menuToggleBtn').addEventListener('click', () => sidebar.classList.add('active'));
-      $('themeToggleBtn').addEventListener('click', toggleTheme);
-      $('notificationsBtn').addEventListener('click', showNotifications);
-      $('chatToggleBtn').addEventListener('click', toggleChatWindow);
-      $('logoLink').addEventListener('click', (e) => { 
-        e.preventDefault(); 
-        $$('.nav-item.active').forEach(el => el.classList.remove('active')); 
-        document.querySelector('[data-tab="hot"]').classList.add('active'); 
-        currentTab = 'hot'; 
-        loadFeed(true); 
-      });
-      $('searchInput').addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-          const searchTerm = e.target.value.trim();
-          if (!searchTerm) {
-            $('logoLink').click(); // Go home if search is cleared
-            return;
-          }
-          $$('.nav-item.active').forEach(el => el.classList.remove('active'));
-          currentTab = 'search';
-          loadFeed(true);
-        }
-      });
-      
-      // Sidebar
-      $('closeSidebar').addEventListener('click', () => sidebar.classList.remove('active'));
-      $('menuProfile').addEventListener('click', () => { showPublicProfile(currentUser.uid, currentUser.username); sidebar.classList.remove('active'); });
-      $('menuCollections').addEventListener('click', () => { showCollections(); sidebar.classList.remove('active'); });
-      $('menuInventory').addEventListener('click', () => { showInventory(); sidebar.classList.remove('active'); });
-      $('menuChat').addEventListener('click', () => { toggleChatWindow(); sidebar.classList.remove('active'); });
-      $('menuLeaderboard').addEventListener('click', () => { showLeaderboard(); sidebar.classList.remove('active'); });
-      $('menuQuests').addEventListener('click', () => { showQuests(); sidebar.classList.remove('active'); });
-      $('menuCreateMeme').addEventListener('click', () => { openMemeEditor(); sidebar.classList.remove('active'); });
-      $('menuMemeRoulette').addEventListener('click', () => { 
-        $('logoLink').click(); 
-        showNotification('Meme Roulette', 'Loading fresh random memes!', 'info'); 
-        sidebar.classList.remove('active');
-      });
-      $('menuSettings').addEventListener('click', () => { showSettings(); sidebar.classList.remove('active'); });
-      $('menuLogin').addEventListener('click', () => { showAuthModal(); sidebar.classList.remove('active'); });
-      $('menuLogout').addEventListener('click', logout);
-      
-      // Chat
-      $('closeChatWindow').addEventListener('click', toggleChatWindow);
-      $('sendChatMessage').addEventListener('click', sendChatMessage);
-      $('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
-      
-      // Auth Modal
-      $('signupTab').addEventListener('click', () => { 
-        $('signupForm').style.display = 'block'; 
-        $('loginForm').style.display = 'none'; 
-        $('signupTab').classList.add('active'); 
-        $('loginTab').classList.remove('active'); 
-      });
-      $('loginTab').addEventListener('click', () => { 
-        $('signupForm').style.display = 'none'; 
-        $('loginForm').style.display = 'block'; 
-        $('signupTab').classList.remove('active'); 
-        $('loginTab').classList.add('active'); 
-      });
-      $('signupBtn').addEventListener('click', signUpUser);
-      $('loginBtn').addEventListener('click', loginUser);
-      
-      // Generic Modal Closer
-      $$('.close-modal').forEach(btn => btn.addEventListener('click', (e) => {
-        const modalId = e.target.closest('.modal-overlay').id;
-        closeModal(modalId);
-      }));
-      
-      // Settings Modal
-      $$('.tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
-        const tabId = e.currentTarget.dataset.tab;
-        // Hide all content
-        $$('.tab-content').forEach(content => content.classList.remove('active'));
-        // Deactivate all tabs
-        $$('.tab-btn').forEach(tab => tab.classList.remove('active'));
-        // Show selected
-        $(tabId).classList.add('active');
-        e.currentTarget.classList.add('active');
-      }));
-      $('saveProfileSettingsBtn').addEventListener('click', saveProfileSettings);
-      $('avatarUpload').addEventListener('change', (e) => {
-          const file = e.target.files[0];
-          if (file) {
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                  $('settingsAvatarImg').src = event.target.result;
-              };
-              reader.readAsDataURL(file);
-          }
-      });
-      $('saveAppearanceSettingsBtn').addEventListener('click', saveAppearanceSettings);
-      $('settingsLogoutBtn').addEventListener('click', logout);
-      $('deleteAccountBtn').addEventListener('click', deleteAccount);
-
-      // Infinite scroll
-      feed.addEventListener('scroll', () => {
-        if (isLoading || currentTab === 'mymemes' || currentTab === 'search') return;
-        const { scrollTop, scrollHeight, clientHeight } = feed;
-        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) { 
-          loadFeed(); 
-        }
-      });
-      
-      makeChatDraggable();
-      setupMemeEditorListeners();
-    };
-    
-    // Toggle theme
-    const toggleTheme = () => {
-      const themes = ['dark', 'light', 'blue', 'red', 'purple'];
-      const currentTheme = userPreferences.theme || 'dark';
-      const currentIndex = themes.indexOf(currentTheme);
-      const nextIndex = (currentIndex + 1) % themes.length;
-      userPreferences.theme = themes[nextIndex];
-      
-      if (currentUser) {
-        const privateUserRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/data/main`);
-        updateDoc(privateUserRef, { 'preferences.theme': userPreferences.theme });
-      }
-      applyUserPreferences();
-    };
-    
-    // Make chat window draggable (with touch support)
-    const makeChatDraggable = () => {
-      let isDragging = false;
-      let chatOffsetX = 0, chatOffsetY = 0;
-      const chatHeader = $('chatHeader');
-
-      const onDragStart = (e) => {
-        isDragging = true;
-        const rect = chatWindow.getBoundingClientRect();
-        const touch = e.touches ? e.touches[0] : e;
-        chatOffsetX = touch.pageX - rect.left;
-        chatOffsetY = touch.pageY - rect.top;
-        chatWindow.style.transition = 'none';
-        document.body.style.userSelect = 'none';
-      };
-      
-      const onDragMove = (e) => {
-        if (!isDragging) return;
-        e.preventDefault(); // Prevent page scroll on touch
-        const touch = e.touches ? e.touches[0] : e;
-        let newX = touch.pageX - chatOffsetX;
-        let newY = touch.pageY - chatOffsetY;
-        newX = Math.max(0, Math.min(newX, window.innerWidth - chatWindow.offsetWidth));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - chatWindow.offsetHeight));
-        chatWindow.style.left = `${newX}px`;
-        chatWindow.style.top = `${newY}px`;
-        chatWindow.style.bottom = 'auto'; 
-        chatWindow.style.right = 'auto';
-      };
-      
-      const onDragEnd = () => {
-        isDragging = false;
-        chatWindow.style.transition = 'var(--transition)';
-        document.body.style.userSelect = 'auto';
-      };
-
-      chatHeader.addEventListener('mousedown', onDragStart);
-      document.addEventListener('mousemove', onDragMove);
-      document.addEventListener('mouseup', onDragEnd);
-      
-      chatHeader.addEventListener('touchstart', onDragStart, { passive: false });
-      document.addEventListener('touchmove', onDragMove, { passive: false });
-      document.addEventListener('touchend', onDragEnd);
-    };
-    
-    // Setup listeners for meme editor controls
-    const setupMemeEditorListeners = () => {
-      $$('.editor-tool').forEach(btn => btn.addEventListener('click', () => {
-        $$('.editor-tool').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeTool = btn.dataset.tool;
-        fabricCanvas.isDrawingMode = (activeTool === 'draw' || activeTool === 'eraser');
-        updateEditorSettings();
-      }));
-      
-      $$('.template-btn').forEach(btn => btn.addEventListener('click', () => initMemeEditor(btn.dataset.url)));
-      
-      $('.editor-tool[data-tool="image"]').addEventListener('click', () => {
-        const input = document.createElement('input'); 
-        input.type = 'file'; 
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => fabric.Image.fromURL(event.target.result, (img) => { 
-              img.scaleToWidth(fabricCanvas.width / 2); 
-              img.set({ left: 50, top: 50 }); 
-              fabricCanvas.add(img); 
-              saveCanvasState(); 
-            }, { crossOrigin: 'anonymous' });
-            reader.readAsDataURL(file);
-          }
+      // Nav
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.onclick = () => {
+          document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          el.classList.add('active');
+          loadFeed(el.dataset.tab);
         };
-        input.click();
+      });
+
+      // Sidebar
+      $('menuToggleBtn').onclick = () => $('sidebar').classList.add('active');
+      $('closeSidebar').onclick = () => $('sidebar').classList.remove('active');
+      
+      // Auth
+      $('menuLogin').onclick = () => { toggleAuthModal(true); $('sidebar').classList.remove('active'); };
+      $('menuLogout').onclick = () => signOut(auth).then(() => window.location.reload());
+      $('showSignup').onclick = () => { $('signupForm').style.display='block'; $('loginForm').style.display='none'; };
+      $('showLogin').onclick = () => { $('signupForm').style.display='none'; $('loginForm').style.display='block'; };
+      $('doSignup').onclick = () => handleAuthAction(true);
+      $('doLogin').onclick = () => handleAuthAction(false);
+      
+      // Editor - FIX: Using the hidden input
+      $('menuCreateMeme').onclick = initEditor;
+      $('uploadImageBtn').onclick = () => $('imageUploadInput').click(); // Trigger hidden input
+      $('imageUploadInput').onchange = handleImageUpload; // Handle file
+      $('postMemeBtn').onclick = postMeme;
+      
+      // Editor Tools
+      document.querySelectorAll('.tool-btn[data-tool="text"]').forEach(b => {
+        b.onclick = () => {
+          const t = new fabric.IText('Text Here', { left: 100, top: 100, fill: $('editorColor').value, fontSize: 40 });
+          fabricCanvas.add(t);
+        };
+      });
+      $('drawBtn').onclick = () => {
+         fabricCanvas.isDrawingMode = !fabricCanvas.isDrawingMode;
+         fabricCanvas.freeDrawingBrush.color = $('editorColor').value;
+         fabricCanvas.freeDrawingBrush.width = parseInt($('editorSize').value, 10) / 4;
+      };
+      $('clearCanvasBtn').onclick = () => fabricCanvas.clear();
+
+      // Chat
+      $('chatToggleBtn').onclick = () => {
+         $('chatWindow').classList.toggle('active');
+         $('chatBadge').innerText = '';
+      };
+      $('closeChatWindow').onclick = () => $('chatWindow').classList.remove('active');
+      $('sendChatMessage').onclick = sendChat;
+      
+      // Close Modals
+      document.querySelectorAll('.close-modal').forEach(b => {
+        b.onclick = () => b.closest('.modal-overlay').classList.remove('active');
       });
       
-      // Controls
-      $('textColorPicker').addEventListener('input', updateEditorSettings);
-      $('strokeColorPicker').addEventListener('input', updateEditorSettings);
-      $('brushSize').addEventListener('input', updateEditorSettings);
-      $('fontFamilySelect').addEventListener('change', () => {
-          const obj = fabricCanvas.getActiveObject(); 
-          if (obj?.type.includes('text')) { 
-              obj.set('fontFamily', $('fontFamilySelect').value); 
-              fabricCanvas.renderAll(); 
-              saveCanvasState(); 
-          }
-      });
-      $('bringForwardBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.bringForward(fabricCanvas.getActiveObject()); saveCanvasState(); } });
-      $('sendBackBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.sendBackwards(fabricCanvas.getActiveObject()); saveCanvasState(); } });
-      $('deleteObjBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.remove(fabricCanvas.getActiveObject()); saveCanvasState(); } });
-      $('toggleBoldBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontWeight', obj.get('fontWeight') === 'bold' ? 'normal' : 'bold'); fabricCanvas.renderAll(); saveCanvasState(); } });
-      $('toggleItalicBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontStyle', obj.get('fontStyle') === 'italic' ? 'normal' : 'italic'); fabricCanvas.renderAll(); saveCanvasState(); } });
-      $('alignLeftBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'left'); fabricCanvas.renderAll(); saveCanvasState(); } });
-      $('alignCenterBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'center'); fabricCanvas.renderAll(); saveCanvasState(); } });
-
-      $('undoBtn').addEventListener('click', undoCanvasAction);
-      $('redoBtn').addEventListener('click', redoCanvasAction);
-      $('clearCanvasBtn').addEventListener('click', clearCanvas);
-      $('postMemeBtn').addEventListener('click', postMemeFromEditor);
-    };
-    
-    const setupMemeEditorCanvasListeners = () => {
-        if (!fabricCanvas) return;
-        fabricCanvas.on('object:added', saveCanvasState);
-        fabricCanvas.on('object:modified', saveCanvasState);
-        fabricCanvas.on('object:removed', saveCanvasState);
-        
-        fabricCanvas.on('selection:created', (e) => {
-            const obj = e.target;
-            if (obj.type.includes('text')) {
-                $('brushSize').value = obj.get('fontSize');
-                $('textColorPicker').value = obj.get('fill');
-                $('strokeColorPicker').value = obj.get('stroke');
-                $('fontFamilySelect').value = obj.get('fontFamily');
-            }
-        });
-        
-        fabricCanvas.on('mouse:down', (opt) => {
-          if (activeTool === 'text' && !opt.target) {
-            const text = new fabric.IText('Your text here', {
-              left: opt.pointer.x, 
-              top: opt.pointer.y,
-              fontFamily: $('fontFamilySelect').value,
-              fontSize: parseInt($('brushSize').value),
-              fill: $('textColorPicker').value,
-              stroke: $('strokeColorPicker').value,
-              strokeWidth: 2,
-              originX: 'left', 
-              originY: 'top',
-              padding: 5,
-              cornerColor: 'var(--accent-3)',
-              transparentCorners: false,
-              borderColor: 'var(--accent-3)'
-            });
-            fabricCanvas.add(text);
-            fabricCanvas.setActiveObject(text);
-            text.enterEditing(); 
-            text.selectAll();
-          }
-        });
+      // Draggable Chat
+      const drag = $('chatHeader');
+      let isDown = false, offset = [0,0];
+      drag.onmousedown = (e) => { isDown = true; offset = [drag.parentElement.offsetLeft - e.clientX, drag.parentElement.offsetTop - e.clientY]; };
+      document.onmouseup = () => isDown = false;
+      document.onmousemove = (e) => {
+        if (isDown) {
+          drag.parentElement.style.left = (e.clientX + offset[0]) + 'px';
+          drag.parentElement.style.top = (e.clientY + offset[1]) + 'px';
+          drag.parentElement.style.bottom = 'auto'; drag.parentElement.style.right = 'auto';
+        }
+      };
     };
 
-    // ===== APP INITIALIZATION =====
-    document.addEventListener('DOMContentLoaded', () => {
-      initFirebase();
-      setupEventListeners();
-      loadFeed();
-    });
-
+    // --- Start ---
+    window.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
