@@ -965,6 +965,7 @@
       background: var(--card-bg); 
       grid-column: 1 / -1; /* Span all columns */
       column-span: all;
+      margin: 16px;
     }
     .feed-message a { 
       color: var(--accent-3); 
@@ -1185,8 +1186,8 @@
       background: var(--success); 
     }
     .quest-item.completed .quest-title { 
-      text-decoration: line-through; 
-      opacity: 0.7;
+      /*text-decoration: line-through;*/ /* Removed line-through as it conflicts with 'Claim' button visibility */
+      opacity: 1;
     }
     .quest-footer { 
       display: flex; 
@@ -1783,7 +1784,8 @@
             <h4 class="menu-section-title">Tools</h4>
             <div class="editor-tool-row" style="grid-template-columns: 1fr 1fr 1fr;">
               <button class="btn btn-secondary editor-tool active" data-tool="text" title="Add Text"><i class="fas fa-font"></i> Text</button>
-              <button class="btn btn-secondary editor-tool" data-tool="image" title="Upload Image"><i class="fas fa-upload"></i> Upload</button>
+              <label class="btn btn-secondary editor-tool" for="imageUploadInput" title="Upload Image"><i class="fas fa-upload"></i> Upload</label>
+              <input type="file" id="imageUploadInput" accept="image/*" style="display: none;">
               <button class="btn btn-secondary editor-tool" data-tool="image-url" title="Image from URL"><i class="fas fa-link"></i> URL</button>
               <button class="btn btn-secondary editor-tool" data-tool="draw" title="Draw"><i class="fas fa-pencil-alt"></i> Draw</button>
               <button class="btn btn-secondary editor-tool" data-tool="sticker" title="Stickers"><i class="fas fa-smile"></i> Sticker</button>
@@ -2116,402 +2118,323 @@
     var __initial_auth_token = (typeof __initial_auth_token !== 'undefined') ? __initial_auth_token : undefined; 
   </script>
 
-  <script type="module">
+  <script type="module" id="appScript">
     // ===== FIREBASE SDK IMPORTS =====
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-      getAuth, 
-      onAuthStateChanged, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword, 
-      signOut,
-      updateProfile,
-      deleteUser,
-      signInAnonymously,
-      signInWithCustomToken
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      addDoc, 
-      updateDoc, 
-      collection, 
-      query, 
-      where, 
-      getDocs,
-      onSnapshot,
-      orderBy,
-      serverTimestamp,
-      increment,
-      limit,
-      runTransaction,
-      writeBatch,
-      deleteDoc,
-      collectionGroup,
-      getCountFromServer
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import {
-      getStorage,
-      ref,
-      uploadString,
-      getDownloadURL,
-      uploadBytes,
-      deleteObject
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut,
+  updateProfile,
+  deleteUser,
+  signInAnonymously,
+  signInWithCustomToken,
+  setPersistence, // NEW: Import for persistence fix
+  browserLocalPersistence // NEW: Import for local storage persistence
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  addDoc, 
+  updateDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs,
+  onSnapshot,
+  orderBy,
+  serverTimestamp,
+  increment,
+  limit,
+  runTransaction,
+  writeBatch,
+  deleteDoc,
+  collectionGroup,
+  startAfter // NEW: For pagination
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadString,
+  getDownloadURL,
+  uploadBytes,
+  deleteObject
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-    // ===== GLOBAL APP STATE (UPDATED FOR AUTH FIX) =====
-    let feed, authModal, chatWindow, sidebar;
-    let isLoading = false;
-    let loadCount = 0;
-    const BUFFER_HEIGHT = 300;
-    let currentTab = 'hot';
-    let seenUrls = new Set();
+// ===== GLOBAL APP STATE =====
+let feed, authModal, chatWindow, sidebar;
+let isLoading = false;
+const BUFFER_HEIGHT = 300;
+let currentTab = 'hot';
+let lastVisible = null; // NEW: Cursor for Firestore pagination
+let seenUrls = new Set();
+const MEME_LOAD_LIMIT = 10; // New constant for pagination limit
+
+// Firebase instances
+let app, db, auth, storage;
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app-dev';
+let userId = null; 
+
+// User state
+let currentUser = null; 
+let isAnonymous = true;
+let userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
+let userQuests = {};
+let userBadges = {};
+let userCollections = { favorites: [] };
+let initialLoadComplete = false; // NEW: Flag to track initial feed load
+
+// Real-time listeners
+let chatListener = null;
+let publicUserListener = null;
+let privateUserListener = null;
+let notificationsListener = null;
+let collectionsListener = null;
+
+// Meme API sources (EXPANDED LIST)
+const MEME_SOURCES = [
+  'https://meme-api.com/gimme/memes',
+  'https://meme-api.com/gimme/dankmemes',
+  'https://meme-api.com/gimme/me_irl',
+  'https://meme-api.com/gimme/wholesomememes',
+  'https://meme-api.com/gimme/funny',
+  'https://meme-api.com/gimme/HistoryMemes',
+  'https://meme-api.com/gimme/ProgrammerHumor',
+  'https://meme-api.com/gimme/animemes',
+  'https://meme-api.com/gimme/gaming',
+  'https://meme-api.com/gimme/PrequelMemes',
+  'https://meme-api.com/gimme/terriblefacebookmemes',
+  'https://meme-api.com/gimme/lotrmemes',
+  'https://meme-api.com/gimme/starwarsmemes',
+  'https://meme-api.com/gimme/AdviceAnimals',
+];
+
+// ===== FIRESTORE PATHS =====
+const paths = {
+    publicUser: (uid) => doc(db, `artifacts/${appId}/public/data/users/${uid}`),
+    privateUser: (uid) => doc(db, `artifacts/${appId}/users/${uid}/data/main`),
     
-    // Firebase instances
-    let app, db, auth, storage;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app-dev';
-    let userId = null; // Will be set after auth
+    // Collections
+    memesCol: () => collection(db, `artifacts/${appId}/public/data/memes`),
+    memeDoc: (id) => doc(db, `artifacts/${appId}/public/data/memes/${id}`),
+    usersCol: () => collection(db, `artifacts/${appId}/public/data/users`),
+    chatCol: () => collection(db, `artifacts/${appId}/public/data/chat`),
     
-    // User state
-    let currentUser = null; // This will store the combined public/private user data
-    let isAnonymous = true;
-    let userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152' };
-    let userQuests = {};
-    let userBadges = {};
-    let userCollections = { favorites: [] };
-    
-    // Real-time listeners
-    let chatListener = null;
-    let publicUserListener = null;
-    let privateUserListener = null;
-    let notificationsListener = null;
-    let collectionsListener = null;
-    
-    // *** FIX 1: Promise to ensure Firebase Auth is initialized before loading the UI ***
-    let authInitializedResolver;
-    const authInitializedPromise = new Promise(resolve => {
-        authInitializedResolver = resolve;
+    // Private Collections
+    favoritesCol: (uid) => collection(paths.privateUser(uid), 'collections', 'favorites', 'memes'),
+    favoriteDoc: (uid, memeId) => doc(paths.favoritesCol(uid), memeId),
+    notificationsCol: (uid) => collection(paths.privateUser(uid), 'notifications'),
+};
+
+// ===== UTILITY FUNCTIONS =====
+const $ = (selector) => document.getElementById(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
+
+const escapeHtml = (str) => {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+const formatNumber = (num) => {
+  if (num === undefined || num === null) return 0;
+  // Ensure num is a number before comparison
+  const n = typeof num === 'object' ? num.toNumber() : num;
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n;
+};
+
+const timeAgo = (date) => {
+    if (!date) return '...';
+    // Ensure date is a Date object if it's a Firestore Timestamp
+    const jsDate = date.toDate ? date.toDate() : date;
+    const seconds = Math.floor((new Date() - jsDate) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + "y ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + "mo ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + "d ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + "h ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + "m ago";
+    return Math.floor(seconds) + "s ago";
+};
+
+const createPlaceholder = (width, height) => {
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#242152';
+  const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-3').trim() || '#c46cff';
+  const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bgColor}"/><text x="50%" y="50%" fill="${accentColor}" font-size="16" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">Loading Meme...</text></svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+};
+
+const showNotification = (title, message, type = 'success', duration = 3000) => {
+  const notification = $('notificationToast'); if (!notification) return;
+  $('notificationTitle').textContent = title;
+  $('notificationMessage').textContent = message;
+  const iconEl = notification.querySelector('.notification-icon i');
+  notification.className = 'notification'; // Reset classes
+  
+  if (type === 'error') { 
+    iconEl.className = 'fas fa-exclamation-circle'; 
+    notification.classList.add('error');
+  } else if (type === 'info') { 
+    iconEl.className = 'fas fa-info-circle'; 
+    notification.classList.add('info');
+  } else { 
+    iconEl.className = 'fas fa-check'; 
+    notification.classList.add('success');
+  }
+  
+  notification.classList.add('show');
+  const timer = setTimeout(() => notification.classList.remove('show'), duration);
+  $('closeNotification').onclick = () => { clearTimeout(timer); notification.classList.remove('show'); };
+};
+
+/**
+ * Shows a reusable confirmation modal.
+ * @param {string} title - The title for the modal.
+ * @param {string} message - The body text for the modal.
+ * @param {string} confirmText - The text for the confirm button (e.g., "Logout", "Delete").
+ * @returns {Promise<boolean>} - Resolves true if confirmed, false if canceled.
+ */
+const showConfirmModal = (title, message, confirmText = 'Confirm') => {
+    return new Promise((resolve) => {
+        const modal = $('confirmModal');
+        $('confirmModalTitle').innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${escapeHtml(title)}`;
+        $('confirmModalBody').textContent = message;
+        const confirmBtn = $('confirmOkBtn');
+        const cancelBtn = $('confirmCancelBtn');
+        
+        confirmBtn.textContent = confirmText;
+        
+        const close = (result) => {
+            modal.classList.remove('active');
+            confirmBtn.onclick = null;
+            cancelBtn.onclick = null;
+            resolve(result);
+        };
+
+        confirmBtn.onclick = () => close(true);
+        cancelBtn.onclick = () => close(false);
+        
+        modal.classList.add('active');
     });
-    
-    // *** FIX 4: Expanded Meme API Sources ***
-    const MEME_SOURCES = [
-      'https://meme-api.com/gimme/memes',
-      'https://meme-api.com/gimme/dankmemes',
-      'https://meme-api.com/gimme/me_irl',
-      'https://meme-api.com/gimme/wholesomememes',
-      'https://meme-api.com/gimme/funny',
-      'https://meme-api.com/gimme/HistoryMemes',
-      'https://meme-api.com/gimme/ProgrammerHumor',
-      'https://meme-api.com/gimme/PrequelMemes',
-      'https://meme-api.com/gimme/ComedyCemetery',
-      'https://meme-api.com/gimme/terriblefacebookmemes',
-      'https://meme-api.com/gimme/BikiniBottomTwitter',
-      'https://meme-api.com/gimme/lotrmemes',
-      'https://meme-api.com/gimme/AdviceAnimals',
-      'https://meme-api.com/gimme/reactiongifs',
-      'https://meme-api.com/gimme/starterpacks',
-      'https://meme-api.com/gimme/okbuddyretard',
-      'https://meme-api.com/gimme/Animemes', 
-      'https://meme-api.com/gimme/gaming',
-    ];
+};
 
-    // ===== FIRESTORE PATHS (UNCHANGED) =====
-    // Use functions to ensure paths are always correct, even if userId changes
-    const paths = {
-        publicUser: (uid) => doc(db, `artifacts/${appId}/public/data/users/${uid}`),
-        privateUser: (uid) => doc(db, `artifacts/${appId}/users/${uid}/data/main`),
-        
-        // Collections
-        memesCol: () => collection(db, `artifacts/${appId}/public/data/memes`),
-        memeDoc: (id) => doc(db, `artifacts/${appId}/public/data/memes/${id}`),
-        usersCol: () => collection(db, `artifacts/${appId}/public/data/users`),
-        chatCol: () => collection(db, `artifacts/${appId}/public/data/chat`),
-        
-        // Private Collections
-        favoritesCol: (uid) => collection(paths.privateUser(uid), 'collections', 'favorites', 'memes'),
-        favoriteDoc: (uid, memeId) => doc(paths.favoritesCol(uid), memeId),
-        notificationsCol: (uid) => collection(paths.privateUser(uid), 'notifications'),
-    };
+// ===== FIREBASE & AUTH (FIXED PERSISTENCE) =====
+const initFirebase = async () => {
+  try {
+    const firebaseConfig = JSON.parse(__firebase_config);
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    storage = getStorage(app);
     
-    // ===== UTILITY FUNCTIONS (UNCHANGED) =====
-    const $ = (selector) => document.getElementById(selector);
-    const $$ = (selector) => document.querySelectorAll(selector);
-    
-    const escapeHtml = (str) => {
-      if (!str) return '';
-      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-    }
-    
-    const formatNumber = (num) => {
-      if (num === undefined || num === null) return 0;
-      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-      return num;
-    };
-    
-    const timeAgo = (date) => {
-        if (!date) return '...';
-        const seconds = Math.floor((new Date() - date) / 1000);
-        let interval = seconds / 31536000;
-        if (interval > 1) return Math.floor(interval) + "y ago";
-        interval = seconds / 2592000;
-        if (interval > 1) return Math.floor(interval) + "mo ago";
-        interval = seconds / 86400;
-        if (interval > 1) return Math.floor(interval) + "d ago";
-        interval = seconds / 3600;
-        if (interval > 1) return Math.floor(interval) + "h ago";
-        interval = seconds / 60;
-        if (interval > 1) return Math.floor(interval) + "m ago";
-        return Math.floor(seconds) + "s ago";
-    };
+    // FIX: Set persistence to keep user logged in across refreshes
+    await setPersistence(auth, browserLocalPersistence);
 
-    const createPlaceholder = (width, height) => {
-      const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || '#242152';
-      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-3').trim() || '#c46cff';
-      const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bgColor}"/><text x="50%" y="50%" fill="${accentColor}" font-size="16" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">Loading Meme...</text></svg>`;
-      return `data:image/svg+xml;base64,${btoa(svg)}`;
-    };
-    
-    const showNotification = (title, message, type = 'success', duration = 3000) => {
-      const notification = $('notificationToast'); if (!notification) return;
-      $('notificationTitle').textContent = title;
-      $('notificationMessage').textContent = message;
-      const iconEl = notification.querySelector('.notification-icon i');
-      notification.className = 'notification'; // Reset classes
-      
-      if (type === 'error') { 
-        iconEl.className = 'fas fa-exclamation-circle'; 
-        notification.classList.add('error');
-      } else if (type === 'info') { 
-        iconEl.className = 'fas fa-info-circle'; 
-        notification.classList.add('info');
-      } else { 
-        iconEl.className = 'fas fa-check'; 
-        notification.classList.add('success');
-      }
-      
-      notification.classList.add('show');
-      const timer = setTimeout(() => notification.classList.remove('show'), duration);
-      $('closeNotification').onclick = () => { clearTimeout(timer); notification.classList.remove('show'); };
-    };
-
-    /**
-     * Shows a reusable confirmation modal.
-     * @param {string} title - The title for the modal.
-     * @param {string} message - The body text for the modal.
-     * @param {string} confirmText - The text for the confirm button (e.g., "Logout", "Delete").
-     * @returns {Promise<boolean>} - Resolves true if confirmed, false if canceled.
-     */
-    const showConfirmModal = (title, message, confirmText = 'Confirm') => {
-        return new Promise((resolve) => {
-            const modal = $('confirmModal');
-            $('confirmModalTitle').innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${escapeHtml(title)}`;
-            $('confirmModalBody').textContent = message;
-            const confirmBtn = $('confirmOkBtn');
-            const cancelBtn = $('confirmCancelBtn');
-            
-            confirmBtn.textContent = confirmText;
-            
-            const close = (result) => {
-                modal.classList.remove('active');
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
-                resolve(result);
-            };
-
-            confirmBtn.onclick = () => close(true);
-            cancelBtn.onclick = () => close(false);
-            
-            modal.classList.add('active');
-        });
-    };
-
-    // ===== FIREBASE & AUTH (UPDATED) =====
-    const initFirebase = () => {
-      try {
-        const firebaseConfig = JSON.parse(__firebase_config);
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-        storage = getStorage(app);
-        
-        onAuthStateChanged(auth, async (user) => {
-          if (user) {
-            // User is signed in.
-            userId = user.uid;
-            isAnonymous = user.isAnonymous;
-            if (isAnonymous) {
-              handleAnonymousLogin(user);
-            } else {
-              await handleUserLogin(user);
-            }
-          } else {
-            // User is signed out. This shouldn't happen unless we call signOut.
-            // Sign in anonymously to keep the app running.
-            signInAnonymously(auth).catch(error => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        userId = user.uid;
+        isAnonymous = user.isAnonymous;
+        if (isAnonymous) {
+          handleAnonymousLogin(user);
+        } else {
+          await handleUserLogin(user);
+        }
+      } else {
+        // User is signed out or first time load. Attempt to sign in anonymously.
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+             // The custom token sign-in logic will run below
+        } else {
+             // Default to anonymous sign-in if no user or token is present
+             signInAnonymously(auth).catch(error => {
                 console.error('Anonymous sign-in failed:', error);
                 showNotification('Fatal Error', 'Could not connect to service.', 'error', 10000);
             });
-          }
-          
-          // *** FIX 1: Resolve the promise once the initial auth state is known ***
-          if (authInitializedResolver) {
-              authInitializedResolver();
-              authInitializedResolver = null; // Prevent multiple resolutions
-          }
-        });
-        
-        // Custom auth token sign-in logic
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            signInWithCustomToken(auth, __initial_auth_token)
-                .catch((error) => {
-                    console.error('Custom token sign-in failed:', error);
-                    // Fallback to anonymous
-                    signInAnonymously(auth);
-                });
-        } else {
-            // Default to anonymous sign-in
-            signInAnonymously(auth);
         }
-
-      } catch (error) { 
-        console.error('Firebase initialization error:', error); 
-        showNotification('Fatal Error', 'Failed to initialize app. Invalid configuration.', 'error', 10000); 
-      }
-    };
-    
-    const handleAnonymousLogin = (user) => {
-        console.log('Signed in anonymously:', user.uid);
-        currentUser = null;
-        isAnonymous = true;
-        userId = user.uid;
-        
-        // Show login, hide logout
-        $('menuLogin').style.display = 'flex';
-        $('menuLogout').style.display = 'none';
-        
-        // Detach any existing listeners
-        detachAllListeners();
-        
-        // Attach public listeners (chat)
-        attachPublicListeners();
-        
-        // Reset UI elements that require login
-        $('notificationsBadge').textContent = '';
-        $('menuCollectionsBadge').textContent = '';
-        $('menuQuestsBadge').textContent = '';
-        
-        // If on a private tab, kick to 'hot'
-        if (currentTab === 'mymemes') {
-            switchTab('hot');
-        }
-        updateSavedButtons(); // Clear all saved buttons
-    };
-    
-    const handleUserLogin = async (user) => {
-      console.log('Signed in as user:', user.uid);
-      isAnonymous = false;
-      userId = user.uid;
-      
-      // Show logout, hide login
-      $('menuLogin').style.display = 'none';
-      $('menuLogout').style.display = 'flex';
-      
-      // Detach old listeners
-      detachAllListeners();
-      
-      // Attach all listeners
-      attachPublicListeners(); // Chat
-      attachPrivateListeners(user.uid); // User data, collections, notifications
-      
-      // Check if user profile exists
-      const publicUserDoc = await getDoc(paths.publicUser(user.uid));
-      if (!publicUserDoc.exists()) {
-          console.warn('User doc not found, creating one...');
-          // This can happen if sign-up was interrupted
-          // The signUpUser function is the primary creator
       }
       
-      $('authModal').classList.remove('active');
-    };
-
-    const detachAllListeners = () => {
-        if (chatListener) chatListener();
-        if (publicUserListener) publicUserListener();
-        if (privateUserListener) privateUserListener();
-        if (notificationsListener) notificationsListener();
-        if (collectionsListener) collectionsListener();
-        chatListener = null;
-        publicUserListener = null;
-        privateUserListener = null;
-        notificationsListener = null;
-        collectionsListener = null;
-    };
+      // NEW: Trigger the initial feed load regardless of auth state
+      if (!initialLoadComplete) {
+          initialLoadComplete = true;
+          loadFeed(true);
+      }
+    });
     
-    const attachPublicListeners = () => {
-        // Chat
-        if (chatListener) return; // Already attached
-        const q = query(paths.chatCol(), orderBy('timestamp', 'desc'), limit(50));
-        chatListener = onSnapshot(q, (snapshot) => {
-            renderChatMessages(snapshot.docs);
-            const unreadCount = snapshot.size; // Simple count for badge
-            $('chatBadge').textContent = unreadCount > 0 ? unreadCount : '';
-            $('menuChatBadge').textContent = unreadCount > 0 ? unreadCount : '';
-        }, (error) => console.error("Error listening to chat: ", error));
-    };
+    // Custom auth token sign-in logic (Run only if no user is already logged in)
+    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && !auth.currentUser) {
+        signInWithCustomToken(auth, __initial_auth_token)
+            .catch((error) => {
+                console.error('Custom token sign-in failed, falling back to anonymous:', error);
+                // Fallback to anonymous
+                signInAnonymously(auth);
+            });
+    }
 
-    const attachPrivateListeners = (uid) => {
-        // --- Combined User Data Listener ---
-        // 1. Listen to Public User Doc
-        if (publicUserListener) publicUserListener();
-        publicUserListener = onSnapshot(paths.publicUser(uid), (doc) => {
-            if (doc.exists()) {
-                const publicData = doc.data();
-                currentUser = { ...currentUser, ...publicData, uid: uid, email: auth.currentUser.email };
-                applyUserPreferences(); // Apply theme from public data if private isn't loaded yet
-                updateUIAfterLogin();
-            }
-        }, (error) => console.error("Error listening to public user doc: ", error));
+  } catch (error) { 
+    console.error('Firebase initialization error:', error); 
+    showNotification('Fatal Error', 'Failed to initialize app. Invalid configuration.', 'error', 10000); 
+  }
+};
 
-        // 2. Listen to Private User Doc
-        if (privateUserListener) privateUserListener();
-        privateUserListener = onSnapshot(paths.privateUser(uid), async (doc) => {
-            if (doc.exists()) {
-                const privateData = doc.data();
-                currentUser = { ...currentUser, ...privateData };
-                userPreferences = privateData.preferences || userPreferences;
-                userQuests = privateData.quests || {};
-                
-                await checkDailyReset(paths.privateUser(uid), privateData); // Check and reset quests
-                
-                applyUserPreferences();
-                updateUIAfterLogin();
-            }
-        }, (error) => console.error("Error listening to private user doc: ", error));
+const handleAnonymousLogin = (user) => {
+    console.log('Signed in anonymously:', user.uid);
+    currentUser = null;
+    isAnonymous = true;
+    userId = user.uid;
+    
+    $('menuLogin').style.display = 'flex';
+    $('menuLogout').style.display = 'none';
+    
+    detachAllListeners();
+    attachPublicListeners();
+    
+    $('notificationsBadge').textContent = '';
+    $('menuCollectionsBadge').textContent = '';
+    $('menuQuestsBadge').textContent = '';
+    
+    if (currentTab === 'mymemes') {
+        switchTab('hot');
+    }
+    updateSavedButtons();
+};
 
-        // --- Other Private Listeners ---
-        // 3. Notifications
-        if (notificationsListener) notificationsListener();
-        const notifQuery = query(paths.notificationsCol(uid), orderBy('timestamp', 'desc'), limit(10));
-        notificationsListener = onSnapshot(notifQuery, (snapshot) => {
-            const unread = snapshot.docs.filter(doc => !doc.data().read).length;
-            $('notificationsBadge').textContent = unread > 0 ? unread : '';
-            renderNotifications(snapshot.docs);
-        }, (error) => console.error("Error listening to notifications: ", error));
+const handleUserLogin = async (user) => {
+  console.log('Signed in as user:', user.uid);
+  isAnonymous = false;
+  userId = user.uid;
+  
+  $('menuLogin').style.display = 'none';
+  $('menuLogout').style.display = 'flex';
+  
+  detachAllListeners();
+  
+  // Check and create profile if needed
+  const publicUserDoc = await getDoc(paths.publicUser(user.uid));
+  if (!publicUserDoc.exists()) {
+      // Re-run profile creation if sign-up was interrupted
+      console.warn('User doc not found, attempting to re-create minimal public profile...');
+      const username = user.displayName || 'User' + user.uid.slice(0, 5);
+      // Fallback: create minimal profile to avoid errors in listeners
+      await createUserProfile(user, username, true); 
+  }
 
-        // 4. Collections (Favorites)
-        if (collectionsListener) collectionsListener();
-        collectionsListener = onSnapshot(paths.favoritesCol(uid), (snapshot) => {
-            userCollections.favorites = snapshot.docs.map(doc => doc.id);
-            $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
-            updateSavedButtons();
-        }, (error) => console.error("Error listening to collections: ", error));
-    };
+  attachPublicListeners(); 
+  attachPrivateListeners(user.uid);
+  
+  $('authModal').classList.remove('active');
+};
 
-    const createUserProfile = async (user, username) => {
-      try {
+// NEW: Function to create or update profile (with optional minimal flag)
+const createUserProfile = async (user, username, minimal = false) => {
+    try {
         const publicUserRef = paths.publicUser(user.uid);
         const privateUserRef = paths.privateUser(user.uid);
         
@@ -2527,7 +2450,7 @@
         };
         
         const privateData = {
-          email: user.email,
+          email: user.email || '',
           streak: 1,
           lastActive: serverTimestamp(),
           preferences: userPreferences,
@@ -2539,461 +2462,837 @@
         };
 
         const batch = writeBatch(db);
-        batch.set(publicUserRef, publicData);
-        batch.set(privateUserRef, privateData);
+        // Only set the doc if it doesn't exist, to avoid overwriting existing data if this is a fallback
+        if (!minimal) {
+            batch.set(publicUserRef, publicData, { merge: true });
+            batch.set(privateUserRef, privateData, { merge: true });
+        } else {
+             // Merge only the critical fields for a seamless fallback login
+            batch.set(publicUserRef, publicData, { merge: true });
+        }
         await batch.commit();
         
-        // onAuthStateChanged will call handleUserLogin and attach listeners
-        
-      } catch (error) { 
-        console.error('User profile creation error:', error); 
-        showNotification('Error', 'Failed to create user profile.', 'error'); 
-      }
-    };
-    
-    const signUpUser = async () => {
-      const email = $('signupEmailInput').value.trim();
-      const username = $('signupUsernameInput').value.trim();
-      const password = $('signupPasswordInput').value;
-      const errorEl = $('signupError');
-      const btn = $('signupBtn');
-      errorEl.textContent = '';
-      
-      if (!email || !username || !password) { errorEl.textContent = 'All fields are required.'; return; }
-      if (!/^[a-zA-Z0-9_]{2,15}$/.test(username)) { errorEl.textContent = 'Username: 2-15 chars (letters, numbers, _).'; return; }
-      if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
-      
-      btn.disabled = true; 
-      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
-      
-      try {
-        // Check if username is taken
-        const usernameQuery = query(paths.usersCol(), where('username', '==', username));
-        const usernameSnapshot = await getDocs(usernameQuery);
-        if (!usernameSnapshot.empty) {
-            throw new Error('Username is already taken.');
+    } catch (error) { 
+      console.error('User profile creation error:', error); 
+      showNotification('Error', 'Failed to create user profile.', 'error'); 
+    }
+};
+
+const detachAllListeners = () => {
+    if (chatListener) chatListener();
+    if (publicUserListener) publicUserListener();
+    if (privateUserListener) privateUserListener();
+    if (notificationsListener) notificationsListener();
+    if (collectionsListener) collectionsListener();
+    chatListener = null;
+    publicUserListener = null;
+    privateUserListener = null;
+    notificationsListener = null;
+    collectionsListener = null;
+};
+
+const attachPublicListeners = () => {
+    // Chat
+    if (chatListener) return; 
+    const q = query(paths.chatCol(), orderBy('timestamp', 'desc'), limit(50));
+    chatListener = onSnapshot(q, (snapshot) => {
+        renderChatMessages(snapshot.docs);
+        // Simple count for badge - could be improved with a dedicated 'unread' field
+        const unreadCount = snapshot.size; 
+        $('chatBadge').textContent = unreadCount > 0 ? unreadCount : '';
+        $('menuChatBadge').textContent = unreadCount > 0 ? unreadCount : '';
+    }, (error) => console.error("Error listening to chat: ", error));
+};
+
+const attachPrivateListeners = (uid) => {
+    // --- Combined User Data Listener ---
+    // 1. Listen to Public User Doc
+    if (publicUserListener) publicUserListener();
+    publicUserListener = onSnapshot(paths.publicUser(uid), (doc) => {
+        if (doc.exists()) {
+            const publicData = doc.data();
+            currentUser = { ...currentUser, ...publicData, uid: uid, email: auth.currentUser.email };
+            applyUserPreferences(); 
+            updateUIAfterLogin();
         }
-        
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName: username });
-        await createUserProfile(userCredential.user, username); // This will set up profiles
-        
-        // onAuthStateChanged will handle the rest
-        showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
-      } catch (error) { 
-        console.error('Sign up error:', error); 
-        errorEl.textContent = error.message.replace('Firebase: ', '');
-      } finally { 
-        btn.disabled = false; 
-        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account'; 
-      }
-    };
+    }, (error) => console.error("Error listening to public user doc: ", error));
 
-    const loginUser = async () => {
-      const email = $('loginEmailInput').value.trim();
-      const password = $('loginPasswordInput').value;
-      const errorEl = $('loginError');
-      const btn = $('loginBtn');
-      errorEl.textContent = '';
-      
-      if (!email || !password) { errorEl.textContent = 'Both email and password are required.'; return; }
-      
-      btn.disabled = true; 
-      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
-      
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        // onAuthStateChanged will handle the rest
-        showNotification('Logged In!', 'Welcome back! Your memes are waiting.', 'success');
-      } catch (error) { 
-        console.error('Login error:', error); 
-        errorEl.textContent = error.message.replace('Firebase: ', '');
-      } finally { 
-        btn.disabled = false; 
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In'; 
-      }
-    };
+    // 2. Listen to Private User Doc
+    if (privateUserListener) privateUserListener();
+    privateUserListener = onSnapshot(paths.privateUser(uid), async (doc) => {
+        if (doc.exists()) {
+            const privateData = doc.data();
+            currentUser = { ...currentUser, ...privateData };
+            userPreferences = privateData.preferences || userPreferences;
+            userQuests = privateData.quests || {};
+            
+            // FIX: Check daily reset here when private data is confirmed loaded
+            await checkDailyReset(paths.privateUser(uid), privateData);
+            
+            applyUserPreferences();
+            updateUIAfterLogin();
+        } else if (!isAnonymous) {
+            // FIX: If private doc is missing but user is logged in, attempt to create
+            const user = auth.currentUser;
+            const username = user.displayName || 'User';
+            console.warn('Private user doc not found, re-creating it.');
+            await createUserProfile(user, username, false);
+        }
+    }, (error) => console.error("Error listening to private user doc: ", error));
+
+    // --- Other Private Listeners ---
+    // 3. Notifications
+    if (notificationsListener) notificationsListener();
+    const notifQuery = query(paths.notificationsCol(uid), orderBy('timestamp', 'desc'), limit(10));
+    notificationsListener = onSnapshot(notifQuery, (snapshot) => {
+        const unread = snapshot.docs.filter(doc => !doc.data().read).length;
+        $('notificationsBadge').textContent = unread > 0 ? unread : '';
+        renderNotifications(snapshot.docs);
+    }, (error) => console.error("Error listening to notifications: ", error));
+
+    // 4. Collections (Favorites)
+    if (collectionsListener) collectionsListener();
+    collectionsListener = onSnapshot(paths.favoritesCol(uid), (snapshot) => {
+        userCollections.favorites = snapshot.docs.map(doc => doc.id);
+        $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
+        updateSavedButtons();
+    }, (error) => console.error("Error listening to collections: ", error));
+};
+
+const signUpUser = async () => {
+  const email = $('signupEmailInput').value.trim();
+  const username = $('signupUsernameInput').value.trim();
+  const password = $('signupPasswordInput').value;
+  const errorEl = $('signupError');
+  const btn = $('signupBtn');
+  errorEl.textContent = '';
+  
+  if (!email || !username || !password) { errorEl.textContent = 'All fields are required.'; return; }
+  if (!/^[a-zA-Z0-9_]{2,15}$/.test(username)) { errorEl.textContent = 'Username: 2-15 chars (letters, numbers, _).'; return; }
+  if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
+  
+  btn.disabled = true; 
+  btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+  
+  try {
+    // Check if username is taken
+    const usernameQuery = query(paths.usersCol(), where('username', '==', username));
+    const usernameSnapshot = await getDocs(usernameQuery);
+    if (!usernameSnapshot.empty) {
+        throw new Error('Username is already taken.');
+    }
     
-    const logout = async () => {
-      const confirmed = await showConfirmModal('Logout', 'Are you sure you want to log out?', 'Logout');
-      if (confirmed) {
-        signOut(auth)
-            .then(() => {
-                // onAuthStateChanged will fire and sign in anonymously
-                showNotification('Logged Out', 'You have been logged out successfully.', 'info');
-            })
-            .catch(error => showNotification('Error', 'Failed to log out.', 'error'));
-      }
-    };
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(userCredential.user, { displayName: username });
+    await createUserProfile(userCredential.user, username, false); 
+    
+    showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
+  } catch (error) { 
+    console.error('Sign up error:', error); 
+    errorEl.textContent = error.message.replace('Firebase: ', '');
+  } finally { 
+    btn.disabled = false; 
+    btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account'; 
+  }
+};
 
-    const deleteAccount = async () => {
-        if (!currentUser || isAnonymous) return;
+const loginUser = async () => {
+  const email = $('loginEmailInput').value.trim();
+  const password = $('loginPasswordInput').value;
+  const errorEl = $('loginError');
+  const btn = $('loginBtn');
+  errorEl.textContent = '';
+  
+  if (!email || !password) { errorEl.textContent = 'Both email and password are required.'; return; }
+  
+  btn.disabled = true; 
+  btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+  
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    showNotification('Logged In!', 'Welcome back! Your memes are waiting.', 'success');
+  } catch (error) { 
+    console.error('Login error:', error); 
+    errorEl.textContent = error.message.replace('Firebase: ', '');
+  } finally { 
+    btn.disabled = false; 
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In'; 
+  }
+};
+
+const logout = async () => {
+  const confirmed = await showConfirmModal('Logout', 'Are you sure you want to log out?', 'Logout');
+  if (confirmed) {
+    signOut(auth)
+        .then(() => {
+            // FIX: Manually clear current user and refresh state immediately to ensure UI is anonymous while waiting for onAuthStateChanged to complete the anonymous sign in.
+            handleAnonymousLogin({ uid: null });
+            showNotification('Logged Out', 'You have been logged out successfully.', 'info');
+        })
+        .catch(error => showNotification('Error', 'Failed to log out.', 'error'));
+  }
+};
+
+const deleteAccount = async () => {
+    if (!currentUser || isAnonymous) return;
+    
+    const confirmed = await showConfirmModal('Delete Account', 'Are you ABSOLUTELY sure? This will permanently delete your profile, memes, and all data. This cannot be undone.', 'Delete My Account');
+    
+    if (!confirmed) return;
+
+    showNotification('Deleting...', 'Your account is being deleted. This may take a moment.', 'info', 5000);
+    
+    try {
+        const uid = currentUser.uid;
         
-        const confirmed = await showConfirmModal('Delete Account', 'Are you ABSOLUTELY sure? This will permanently delete your profile, memes, and all data. This cannot be undone.', 'Delete My Account');
+        // 1. Delete all user's memes and associated image files
+        const memesQuery = query(paths.memesCol(), where('userId', '==', uid));
+        const memesSnapshot = await getDocs(memesQuery);
+        const batch = writeBatch(db);
         
-        if (!confirmed) return;
-
-        showNotification('Deleting...', 'Your account is being deleted. This may take a moment.', 'info', 5000);
-        
-        try {
-            const uid = currentUser.uid;
-            
-            // 1. Delete all user's memes and associated image files
-            const memesQuery = query(paths.memesCol(), where('userId', '==', uid));
-            const memesSnapshot = await getDocs(memesQuery);
-            const batch = writeBatch(db);
-            
-            for (const doc of memesSnapshot.docs) {
-                batch.delete(doc.ref);
-                const imageUrl = doc.data().imageUrl;
-                if (imageUrl && imageUrl.includes('firebasestorage')) {
-                    try {
-                        const storageRef = ref(storage, imageUrl);
-                        await deleteObject(storageRef);
-                    } catch (storageError) {
-                        console.warn(`Failed to delete storage file: ${imageUrl}`, storageError);
-                    }
-                }
-            }
-            await batch.commit();
-
-            // 2. Delete public and private user docs
-            // Note: Deleting subcollections is complex, but we'll delete the main docs.
-            await deleteDoc(paths.publicUser(uid));
-            await deleteDoc(paths.privateUser(uid));
-
-            // 3. Delete user's avatar from storage
-            if (currentUser.avatar && currentUser.avatar.includes('firebasestorage')) {
+        for (const doc of memesSnapshot.docs) {
+            batch.delete(doc.ref);
+            const imageUrl = doc.data().imageUrl;
+            if (imageUrl && imageUrl.includes('firebasestorage')) {
                 try {
-                    const avatarRef = ref(storage, currentUser.avatar);
-                    await deleteObject(avatarRef);
-                } catch (avatarError) {
-                    console.warn(`Failed to delete avatar: ${currentUser.avatar}`, avatarError);
+                    const storageRef = ref(storage, imageUrl);
+                    // Use batch for document deletion but await storage deletion immediately
+                    await deleteObject(storageRef);
+                } catch (storageError) {
+                    console.warn(`Failed to delete storage file: ${imageUrl}`, storageError);
                 }
             }
-
-            // 4. Delete the user from Firebase Auth
-            const authUser = auth.currentUser;
-            await deleteUser(authUser);
-
-            showNotification('Account Deleted', 'Your account has been permanently deleted.', 'success');
-            // onAuthStateChanged will fire and sign in anonymously
-            
-        } catch (error) {
-            console.error('Error deleting account:', error);
-            showNotification('Error', 'Failed to delete account. Please log in again and retry.', 'error');
         }
-    };
-    
-    const applyUserPreferences = () => {
-      document.body.className = `theme-${userPreferences.theme || 'dark'}`;
-      
-      const themeIcon = $('themeToggleBtn')?.querySelector('i');
-      if (themeIcon) { 
-        themeIcon.className = (userPreferences.theme || 'dark') === 'light' ? 'fas fa-sun' : 'fas fa-moon'; 
-      }
-      
-      document.documentElement.style.setProperty('--card-bg', userPreferences.cardBackground || '#242152');
-      
-      const fontSize = userPreferences.fontSize || 'medium';
-      document.body.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
-      document.body.classList.add(`font-size-${fontSize}`);
-    };
-    
-    const updateUIAfterLogin = () => {
-      if (currentUser && !isAnonymous) {
-        // Update quest badge
-        const quests = [
-            { id: 'react', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed },
-            { id: 'post', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed },
-            { id: 'tip', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed }
-        ];
-        const unclaimed = quests.filter(q => q.progress >= q.goal && !q.claimed).length;
-        $('menuQuestsBadge').textContent = unclaimed > 0 ? unclaimed : '';
-      }
-    };
-    
-    const showAuthModal = (tab = 'signup') => {
-      $('authModal').classList.add('active');
-      if(tab === 'login') {
-        $('signupForm').style.display = 'none'; 
-        $('loginForm').style.display = 'block'; 
-        $('signupTab').classList.remove('active'); 
-        $('loginTab').classList.add('active'); 
-      } else {
-        $('signupForm').style.display = 'block'; 
-        $('loginForm').style.display = 'none';
-        $('signupTab').classList.add('active'); 
-        $('loginTab').classList.remove('active');
-      }
-      $('signupError').textContent = ''; 
-      $('loginError').textContent = '';
-    };
+        await batch.commit();
 
-    // Helper to check for login
-    const checkAuth = (action = 'this action') => {
-      if (isAnonymous) {
+        // 2. Delete public and private user docs
+        // Note: Deleting subcollections is still a manual cleanup process outside of this scope, but the main docs are gone.
+        await deleteDoc(paths.publicUser(uid));
+        await deleteDoc(paths.privateUser(uid));
+
+        // 3. Delete user's avatar from storage
+        if (currentUser.avatar && currentUser.avatar.includes('firebasestorage')) {
+            try {
+                const avatarRef = ref(storage, currentUser.avatar);
+                await deleteObject(avatarRef);
+            } catch (avatarError) {
+                console.warn(`Failed to delete avatar: ${currentUser.avatar}`, avatarError);
+            }
+        }
+
+        // 4. Delete the user from Firebase Auth
+        const authUser = auth.currentUser;
+        await deleteUser(authUser);
+
+        showNotification('Account Deleted', 'Your account has been permanently deleted.', 'success');
+        
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        showNotification('Error', 'Failed to delete account. Please log in again and retry.', 'error');
+    }
+};
+
+const applyUserPreferences = () => {
+  document.body.className = `theme-${userPreferences.theme || 'dark'}`;
+  
+  const themeIcon = $('themeToggleBtn')?.querySelector('i');
+  if (themeIcon) { 
+    themeIcon.className = (userPreferences.theme || 'dark') === 'light' ? 'fas fa-sun' : 'fas fa-moon'; 
+  }
+  
+  document.documentElement.style.setProperty('--card-bg', userPreferences.cardBackground || '#242152');
+  
+  const fontSize = userPreferences.fontSize || 'medium';
+  document.body.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
+  document.body.classList.add(`font-size-${fontSize}`);
+};
+
+const updateUIAfterLogin = () => {
+  if (currentUser && !isAnonymous) {
+    const quests = [
+        { id: 'react', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed },
+        { id: 'post', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed },
+        { id: 'tip', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed }
+    ];
+    const unclaimed = quests.filter(q => q.progress >= q.goal && !q.claimed).length;
+    $('menuQuestsBadge').textContent = unclaimed > 0 ? unclaimed : '';
+  }
+};
+
+const showAuthModal = (tab = 'signup') => {
+  $('authModal').classList.add('active');
+  if(tab === 'login') {
+    $('signupForm').style.display = 'none'; 
+    $('loginForm').style.display = 'block'; 
+    $('signupTab').classList.remove('active'); 
+    $('loginTab').classList.add('active'); 
+  } else {
+    $('signupForm').style.display = 'block'; 
+    $('loginForm').style.display = 'none';
+    $('signupTab').classList.add('active'); 
+    $('loginTab').classList.remove('active');
+  }
+  $('signupError').textContent = ''; 
+  $('loginError').textContent = '';
+};
+
+const checkAuth = (action = 'this action', notify = true) => {
+  if (isAnonymous) {
+    if (notify) {
         showNotification('Login Required', `You must log in or sign up to ${action}.`, 'info');
         showAuthModal('signup');
-        return false;
-      }
-      return true;
+    }
+    return false;
+  }
+  return true;
+};
+
+// ===== QUEST SYSTEM (IMPROVED RESET LOGIC) =====
+const checkDailyReset = async (privateUserRef, privateData) => {
+    const today = new Date().toISOString().split('T')[0];
+    const lastReset = privateData.quests?.lastReset;
+    const lastActive = privateData.lastActive?.toDate().toISOString().split('T')[0];
+    
+    let needsReset = !lastReset || lastReset !== today;
+    
+    if (needsReset) {
+        // --- Streak Calculation ---
+        let newStreak = 1;
+        if (lastActive) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            // If the last active day was exactly yesterday, continue the streak
+            if (lastActive === yesterdayStr) {
+                newStreak = (privateData.streak || 0) + 1;
+            }
+        }
+        
+        // --- Quest Reset ---
+        const defaultQuests = {
+          lastReset: today,
+          reactCount: 0, postCount: 0, tipCount: 0,
+          reactClaimed: false, postClaimed: false, tipClaimed: false
+        };
+        
+        try {
+            const batch = writeBatch(db);
+            
+            // 2. Auto-claim rewards before resetting quests
+            const previousQuests = privateData.quests || {};
+            let autoClaimedCoins = 0;
+            
+            const questRewards = { react: 10, post: 25, tip: 5 };
+            const questGoals = { react: 5, post: 1, tip: 1 };
+            
+            ['react', 'post', 'tip'].forEach(id => {
+                const count = previousQuests[id + 'Count'] || 0;
+                const claimed = previousQuests[id + 'Claimed'] || false;
+                
+                if (count >= questGoals[id] && !claimed) {
+                    autoClaimedCoins += questRewards[id];
+                }
+            });
+            
+            if (autoClaimedCoins > 0) {
+                 // Update public doc: increment coin
+                 batch.update(paths.publicUser(userId), { 
+                     cringeCoin: increment(autoClaimedCoins) 
+                 });
+                 // Send a notification about the auto-claim
+                 await addDoc(paths.notificationsCol(userId), {
+                    type: 'tip',
+                    text: `Auto-claimed ${autoClaimedCoins} CC from yesterday's completed, but unclaimed quests!`,
+                    timestamp: serverTimestamp(),
+                    read: false
+                 });
+            }
+
+            // 1. Reset quests and update streak/last active time
+            batch.update(privateUserRef, { 
+                quests: defaultQuests,
+                streak: newStreak,
+                lastActive: serverTimestamp()
+            });
+
+            await batch.commit();
+            
+            // Update local state to reflect new values immediately after successful commit
+            userQuests = defaultQuests;
+            currentUser.streak = newStreak;
+            currentUser.cringeCoin = (currentUser.cringeCoin || 0) + autoClaimedCoins;
+
+            if (newStreak > (privateData.streak || 0)) {
+                showNotification('Streak Continued!', `You're on a ${newStreak}-day streak!`, 'info');
+            }
+            
+        } catch (error) {
+            console.error('Daily reset failed:', error);
+            // Non-critical error, continue running
+        }
+    }
+};
+
+const updateQuestProgress = async (questType) => {
+    if (!currentUser || isAnonymous || !userQuests) return;
+    
+    const fieldMap = {
+        'react': { count: 'reactCount', claimed: 'reactClaimed', goal: 5 },
+        'post': { count: 'postCount', claimed: 'postClaimed', goal: 1 },
+        'tip': { count: 'tipCount', claimed: 'tipClaimed', goal: 1 }
     };
     
-    // ===== FEED & MEME RENDERING =====
-    const renderMeme = (meme, index) => {
-      const card = document.createElement('div');
-      card.className = 'meme-card';
-      const isFirestore = !!meme.createdAt;
-      
-      // Use Firestore doc ID if available, otherwise create ID from URL
-      const memeId = isFirestore ? meme.id : btoa(encodeURIComponent(meme.url)); 
-      const dataSource = isFirestore ? 'firestore' : 'api';
-      const memeUrl = isFirestore ? meme.imageUrl : meme.url;
-      const title = isFirestore ? meme.title : (meme.title || 'Cringe');
-      const username = isFirestore ? meme.username : 'API';
-      const creatorId = isFirestore ? meme.userId : null;
-      
-      card.dataset.id = memeId;
-      card.dataset.source = dataSource;
-      card.dataset.docId = isFirestore ? meme.id : ''; // Firestore doc ID
-      card.dataset.url = memeUrl;
-      card.dataset.title = title;
-      card.dataset.creatorId = creatorId;
-      card.dataset.username = username;
-      
-      const isSaved = userCollections.favorites && userCollections.favorites.includes(memeId);
-      const cringeCount = meme.reactions?.cringe || 0;
-      const laughCount = meme.reactions?.laugh || 0;
-      const cryCount = meme.reactions?.cry || 0;
-      
-      card.innerHTML = `
+    const quest = fieldMap[questType];
+    if (!quest) return; 
+    
+    // Optimistic check based on local state (will be validated in Firestore later)
+    if (userQuests[quest.claimed] || userQuests[quest.count] >= quest.goal) return;
+
+    try {
+        await updateDoc(paths.privateUser(userId), {
+            [`quests.${quest.count}`]: increment(1)
+        });
+        // userQuests will update via onSnapshot
+    } catch (error) {
+        console.error('Quest update error:', error);
+    }
+};
+
+const claimQuest = async (questId, questData) => {
+    if (!currentUser || isAnonymous || !questData || questData.claimed) return;
+    
+    try {
+        await runTransaction(db, async (transaction) => {
+            const privateDoc = await transaction.get(paths.privateUser(userId));
+            const publicDoc = await transaction.get(paths.publicUser(userId));
+            
+            if (!privateDoc.exists() || !publicDoc.exists()) throw new Error('User profile missing.');
+
+            const quests = privateDoc.data().quests;
+            
+            const progress = quests[questId + 'Count'] || 0;
+            const claimed = quests[questId + 'Claimed'] || false;
+            
+            if (progress >= questData.goal && !claimed) {
+                // Update private doc: mark as claimed
+                transaction.update(paths.privateUser(userId), {
+                    [`quests.${questId}Claimed`]: true
+                });
+                // Update public doc: increment coin
+                transaction.update(paths.publicUser(userId), {
+                    cringeCoin: increment(questData.reward)
+                });
+            } else {
+                throw new Error('Quest not completed or already claimed.');
+            }
+        });
+        showNotification('Reward Claimed!', `+${questData.reward} CringeCoin for completing ${questData.title}!`, 'success');
+        // Re-render the modal if it's open
+        if ($('questsModal').classList.contains('active')) {
+            showQuests();
+        }
+    } catch (error) {
+        console.error('Claim quest error:', error);
+        showNotification('Error', error.message.includes('User profile missing') ? 'Login required or profile error.' : 'Could not claim reward.', 'error');
+    }
+};
+
+// ===== FEED & MEME RENDERING (FIXED INITIAL LOAD & PAGINATION) =====
+
+const getHotMemesQuery = () => {
+    // Hot = Highest reactions in the last 24 hours (simplified: order by total reactions)
+    let q = query(
+        paths.memesCol(), 
+        orderBy('reactions.cringe', 'desc'), // Use cringe as main score for 'Hot'
+        limit(MEME_LOAD_LIMIT)
+    );
+    if (lastVisible) {
+        q = query(
+            paths.memesCol(), 
+            orderBy('reactions.cringe', 'desc'), 
+            startAfter(lastVisible), 
+            limit(MEME_LOAD_LIMIT)
+        );
+    }
+    return q;
+}
+
+const getFreshMemesQuery = () => {
+    // Fresh = Newest memes
+    let q = query(
+        paths.memesCol(), 
+        orderBy('createdAt', 'desc'), 
+        limit(MEME_LOAD_LIMIT)
+    );
+    if (lastVisible) {
+        q = query(
+            paths.memesCol(), 
+            orderBy('createdAt', 'desc'), 
+            startAfter(lastVisible), 
+            limit(MEME_LOAD_LIMIT)
+        );
+    }
+    return q;
+}
+
+const getCrownedMemesQuery = () => {
+    // Crowned = Highest Tips
+    let q = query(
+        paths.memesCol(), 
+        orderBy('tips', 'desc'), 
+        limit(MEME_LOAD_LIMIT)
+    );
+    if (lastVisible) {
+        q = query(
+            paths.memesCol(), 
+            orderBy('tips', 'desc'), 
+            startAfter(lastVisible), 
+            limit(MEME_LOAD_LIMIT)
+        );
+    }
+    return q;
+}
+
+const renderMeme = (meme, index) => {
+    const card = document.createElement('div');
+    card.className = 'meme-card';
+    const isFirestore = !!meme.createdAt;
+    
+    // Use Firestore doc ID if available, otherwise create ID from URL
+    const memeId = isFirestore ? meme.id : btoa(encodeURIComponent(meme.url)); 
+    const dataSource = isFirestore ? 'firestore' : 'api';
+    const memeUrl = isFirestore ? meme.imageUrl : meme.url;
+    const title = isFirestore ? meme.title : (meme.title || 'Cringe');
+    const username = isFirestore ? meme.username : 'API';
+    const creatorId = isFirestore ? meme.userId : null;
+    
+    card.dataset.id = memeId;
+    card.dataset.source = dataSource;
+    card.dataset.docId = isFirestore ? meme.id : ''; // Firestore doc ID
+    card.dataset.url = memeUrl;
+    card.dataset.title = title;
+    card.dataset.creatorId = creatorId;
+    card.dataset.username = username;
+    
+    // Default reactions for API memes
+    const reactions = meme.reactions || { cringe: 0, laugh: 0, cry: 0 };
+    const cringeCount = reactions.cringe;
+    const laughCount = reactions.laugh;
+    const cryCount = reactions.cry;
+    
+    // Check if meme is saved
+    const isSaved = userCollections.favorites && userCollections.favorites.includes(memeId);
+
+    card.innerHTML = `
         <div class="card-header">
-          <div>
-            <div class="meme-title">${escapeHtml(title)}</div>
-            <div class="meme-meta">
-              <span class="user-badge" ${creatorId ? `data-user-id="${creatorId}"` : ''}>
-                <i class="fas fa-${isFirestore ? 'user' : 'robot'}"></i> ${escapeHtml(username)}
-              </span>
+            <div>
+                <div class="meme-title">${escapeHtml(title)}</div>
+                <div class="meme-meta">
+                    <span class="user-badge" ${creatorId ? `data-user-id="${creatorId}"` : ''}>
+                        <i class="fas fa-${isFirestore ? 'user' : 'robot'}"></i> ${escapeHtml(username)}
+                    </span>
+                    ${isFirestore && meme.createdAt ? `<span style="margin-left: 10px; color: var(--text-secondary);"><i class="fas fa-clock"></i> ${timeAgo(meme.createdAt)}</span>` : ''}
+                </div>
             </div>
-          </div>
         </div>
         <div class="meme-image-container">
-          <img class="meme-image" src="${createPlaceholder(300, 300)}" data-src="${memeUrl}" loading="${index < 3 ? 'eager' : 'lazy'}" alt="Meme: ${escapeHtml(title)}">
+            <img class="meme-image" src="${createPlaceholder(300, 300)}" data-src="${memeUrl}" loading="lazy" alt="Meme: ${escapeHtml(title)}">
         </div>
         <div class="card-footer">
-          <div class="reaction-bar">
-            <button class="reaction-btn" data-reaction="cringe" title="Cringe"><i class="fas fa-skull"></i><span class="reaction-count">${formatNumber(cringeCount)}</span></button>
-            <button class="reaction-btn" data-reaction="laugh" title="Laugh"><i class="fas fa-grin"></i><span class="reaction-count">${formatNumber(laughCount)}</span></button>
-            <button class="reaction-btn" data-reaction="cry" title="Cry"><i class="fas fa-sad-tear"></i><span class="reaction-count">${formatNumber(cryCount)}</span></button>
-          </div>
-          <div class="action-buttons">
-            <button class="card-btn save-btn ${isSaved ? 'saved' : ''}" title="Save to collection"><i class="fas fa-bookmark"></i><span>${isSaved ? 'Saved' : 'Save'}</span></button>
-            <button class="card-btn tip-btn" title="Tip creator (5 CC)" ${!isFirestore ? 'disabled' : ''}><i class="fas fa-coins"></i>Tip</button>
-            <button class="card-btn remix-btn" title="Remix this meme"><i class="fas fa-sync-alt"></i>Remix</button>
-            <button class="card-btn share-btn" title="Share meme"><i class="fas fa-share-alt"></i>Share</button>
-          </div>
+            <div class="reaction-bar">
+                <button class="reaction-btn" data-reaction="cringe" title="Cringe"><i class="fas fa-skull"></i><span class="reaction-count">${formatNumber(cringeCount)}</span></button>
+                <button class="reaction-btn" data-reaction="laugh" title="Laugh"><i class="fas fa-grin"></i><span class="reaction-count">${formatNumber(laughCount)}</span></button>
+                <button class="reaction-btn" data-reaction="cry" title="Cry"><i class="fas fa-sad-tear"></i><span class="reaction-count">${formatNumber(cryCount)}</span></button>
+            </div>
+            <div class="action-buttons">
+                <button class="card-btn save-btn ${isSaved ? 'saved' : ''}" title="Save to collection"><i class="fas fa-bookmark"></i><span>${isSaved ? 'Saved' : 'Save'}</span></button>
+                <button class="card-btn tip-btn" title="Tip creator (5 CC)" ${!isFirestore || creatorId === userId ? 'disabled' : ''}><i class="fas fa-coins"></i>Tip</button>
+                <button class="card-btn remix-btn" title="Remix this meme"><i class="fas fa-sync-alt"></i>Remix</button>
+                <button class="card-btn share-btn" title="Share meme"><i class="fas fa-share-alt"></i>Share</button>
+            </div>
         </div>
-      `;
-      feed.appendChild(card);
-      
-      // Image lazy loading
-      const img = card.querySelector('.meme-image');
-      const observer = new IntersectionObserver((entries) => {
+    `;
+    feed.appendChild(card);
+    
+    // Image lazy loading
+    const img = card.querySelector('.meme-image');
+    // For the very first items, load eagerly to avoid initial blank screen
+    if (index < 3) {
+        img.src = img.dataset.src;
+    }
+    const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-          img.src = img.dataset.src;
-          img.onload = () => img.classList.add('loaded');
-          img.onerror = () => { img.src = createPlaceholder(300, 300); img.classList.add('loaded'); };
-          observer.disconnect();
+            if (!img.src.startsWith('data:image/svg+xml')) {
+                img.src = img.dataset.src;
+            }
+            img.onload = () => img.classList.add('loaded');
+            img.onerror = () => { img.src = createPlaceholder(300, 300); img.classList.add('loaded'); };
+            observer.disconnect();
         }
-      }, { threshold: 0.1 });
-      observer.observe(img);
-      
-      // Add event listeners
-      card.querySelector('.save-btn').onclick = () => saveMeme(card);
-      card.querySelector('.tip-btn').onclick = () => tipMeme(card);
-      card.querySelector('.remix-btn').onclick = () => remixMeme(memeUrl);
-      card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl);
-      card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
-      
-      // Add profile modal listener
-      const userBadge = card.querySelector('.user-badge');
-      if (userBadge && creatorId) {
-          userBadge.onclick = () => showPublicProfile(creatorId);
-      }
-    };
+    }, { threshold: 0.1 });
+    observer.observe(img);
     
-    const loadFeed = async (clear = false) => {
-      // *** FIX 3: Ensure feed clears and shows spinner immediately, then loads ***
-      if (clear) { 
+    // Add event listeners
+    card.querySelector('.save-btn').onclick = () => saveMeme(card);
+    card.querySelector('.tip-btn').onclick = () => tipMeme(card);
+    card.querySelector('.remix-btn').onclick = () => remixMeme(memeUrl);
+    card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl);
+    card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
+    
+    // Add profile modal listener
+    const userBadge = card.querySelector('.user-badge');
+    if (userBadge && creatorId) {
+        userBadge.onclick = () => showPublicProfile(creatorId);
+    }
+};
+
+const loadFeed = async (clear = false) => {
+    if (isLoading) return;
+    isLoading = true;
+    
+    if (clear) { 
         feed.innerHTML = ''; 
-        loadCount = 0; 
+        lastVisible = null;
         seenUrls.clear(); 
-        showLoadingSkeletons();
-      }
-      
-      if (isLoading) return;
-      isLoading = true;
-      
-      try {
-        if (currentTab === 'mymemes') { 
-          await loadMyMemes(); 
-        } else if (currentTab === 'search') { 
-          await loadSearchResults($('searchInput').value.trim()); 
-        } else { 
-          await loadApiMemes(); 
-        }
-      } catch (error) { 
-        console.error('Error loading feed:', error); 
-        feed.innerHTML = '<div class="feed-message">Could not load memes. Please try again later.</div>';
-      } finally { 
-        // Remove skeletons after successful load or if content loaded fine
-        $$('.skeleton-card').forEach(el => el.remove()); 
-        // If content is empty after load, show a message
-        if (feed.children.length === 0) {
-            feed.innerHTML = '<div class="feed-message">No memes found! Try another tab.</div>';
-        }
-        isLoading = false; 
-      }
-    };
+    }
     
-    const showLoadingSkeletons = () => {
-      feed.innerHTML = '';
-      const skeletonCount = window.innerWidth > 1024 ? 3 : (window.innerWidth > 768 ? 2 : 1);
-      for (let i = 0; i < skeletonCount; i++) {
+    if (!lastVisible && currentTab !== 'search') { 
+        showLoadingSkeletons(); 
+    }
+    
+    try {
+        if (currentTab === 'mymemes') { 
+            await loadMyMemes(); 
+        } else if (currentTab === 'search') { 
+            await loadSearchResults($('searchInput').value.trim()); 
+        } else if (currentTab === 'hot' || currentTab === 'fresh' || currentTab === 'crowned') {
+            await loadDynamicMemes(currentTab);
+        } else {
+             // Fallback to API memes for hot/fresh/crowned if Firestore is empty or tab is unknown
+             await loadApiMemes(); 
+        }
+    } catch (error) { 
+        console.error('Error loading feed:', error); 
+        if (clear) feed.innerHTML = '<div class="feed-message">Could not load memes. Please try again later.</div>';
+    } finally { 
+        $$('.skeleton-card').forEach(el => el.remove()); 
+        isLoading = false; 
+        
+        // Ensure feed is not empty on initial load
+        if (clear && feed.children.length === 0 && currentTab !== 'mymemes' && currentTab !== 'search') {
+            // Load some API memes if the Firestore query failed or was empty
+            await loadApiMemes();
+        }
+    }
+};
+
+const loadDynamicMemes = async (tab) => {
+    let q;
+    let queryName;
+    if (tab === 'fresh') {
+        q = getFreshMemesQuery();
+        queryName = 'Newest';
+    } else if (tab === 'crowned') {
+        q = getCrownedMemesQuery();
+        queryName = 'Top Tips';
+    } else { // 'hot'
+        q = getHotMemesQuery();
+        queryName = 'Top Cringe';
+    }
+
+    const snapshot = await getDocs(q);
+    const loadedCount = snapshot.docs.length;
+    
+    if (loadedCount === 0 && !lastVisible) {
+        // If this is the first load and no Firestore memes, try fetching API memes
+        return loadApiMemes();
+    }
+    
+    if (loadedCount === 0) {
+        showNotification('End of Feed', `You've reached the end of ${queryName} memes!`, 'info');
+        return;
+    }
+    
+    snapshot.docs.forEach((doc, index) => renderMeme({ id: doc.id, ...doc.data() }, index));
+    lastVisible = snapshot.docs[snapshot.docs.length - 1];
+}
+
+
+const showLoadingSkeletons = () => {
+    // Only show skeletons if the feed is truly empty (e.g., first load)
+    if (feed.children.length > 0) return;
+    feed.innerHTML = '';
+    const skeletonCount = window.innerWidth > 1024 ? 3 : (window.innerWidth > 768 ? 2 : 1);
+    for (let i = 0; i < skeletonCount; i++) {
         const skeleton = document.createElement('div');
         skeleton.className = 'skeleton-card';
         skeleton.style.height = `${Math.random() * 200 + 350}px`;
         skeleton.style.animationDelay = `${i * 0.1}s`;
         skeleton.innerHTML = `<div style="padding: 12px;"><div style="height: 20px; width: 80%; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 8px;"></div><div style="height: 14px; width: 30%; background: var(--bg-secondary); border-radius: 4px;"></div></div><div style="height: ${Math.random() * 150 + 200}px; background: var(--bg-secondary);"></div>`;
         feed.appendChild(skeleton);
-      }
-    };
-    
-    const loadMyMemes = async () => {
-      if (!checkAuth('view your memes', false)) { 
+    }
+};
+
+const loadMyMemes = async () => {
+    if (!checkAuth('view your memes', false)) { 
         feed.innerHTML = '<div class="feed-message">Please <a href="#" id="loginLinkMyMemes">log in</a> to see your posted memes.</div>'; 
         $('loginLinkMyMemes').onclick = (e) => { e.preventDefault(); showAuthModal(); }; 
         return; 
-      }
-      try {
-        const q = query(paths.memesCol(), where('userId', '==', userId), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) { 
-          feed.innerHTML = '<div class="feed-message">You haven\'t posted any memes yet. Go to the <a href="#" id="createMemeLink">Meme Editor</a>!</div>'; 
-          $('createMemeLink').onclick = (e) => { e.preventDefault(); openMemeEditor(); }; 
-          return; 
+    }
+    try {
+        let q = query(paths.memesCol(), where('userId', '==', userId), orderBy('createdAt', 'desc'), limit(MEME_LOAD_LIMIT));
+        if (lastVisible) {
+            q = query(paths.memesCol(), where('userId', '==', userId), orderBy('createdAt', 'desc'), startAfter(lastVisible), limit(MEME_LOAD_LIMIT));
         }
-        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
-      } catch (error) { 
+        
+        const querySnapshot = await getDocs(q);
+        const loadedCount = querySnapshot.docs.length;
+
+        if (loadedCount === 0 && !lastVisible) { 
+            feed.innerHTML = '<div class="feed-message">You haven\'t posted any memes yet. Go to the <a href="#" id="createMemeLink">Meme Editor</a>!</div>'; 
+            $('createMemeLink').onclick = (e) => { e.preventDefault(); openMemeEditor(); }; 
+            return; 
+        }
+        
+        querySnapshot.forEach((doc, index) => renderMeme({ id: doc.id, ...doc.data() }, index));
+        if (loadedCount > 0) {
+             lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        } else if (lastVisible) {
+             showNotification('End of Feed', `You've posted all your memes.`, 'info');
+        }
+
+    } catch (error) { 
         console.error('Error loading my memes:', error); 
         feed.innerHTML = '<div class="feed-message">Error loading your memes.</div>'; 
-      }
-    };
+    }
+};
 
-    const loadSearchResults = async (username) => {
-      if (!username) { 
+const loadSearchResults = async (username) => {
+    if (!username) { 
         feed.innerHTML = '<div class="feed-message">Enter a username to search.</div>'; 
         return; 
-      }
-      try {
-        const q = query(paths.memesCol(), where('username', '==', username), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) { 
-          feed.innerHTML = `<div class="feed-message">No memes found for user "<strong>${escapeHtml(username)}</strong>".</div>`; 
-          return; 
+    }
+    try {
+        let q = query(paths.memesCol(), where('username', '==', username), orderBy('createdAt', 'desc'), limit(MEME_LOAD_LIMIT));
+        if (lastVisible) {
+             q = query(paths.memesCol(), where('username', '==', username), orderBy('createdAt', 'desc'), startAfter(lastVisible), limit(MEME_LOAD_LIMIT));
         }
-        querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
-      } catch (error) { 
+        
+        const querySnapshot = await getDocs(q);
+        const loadedCount = querySnapshot.docs.length;
+        
+        if (loadedCount === 0 && !lastVisible) { 
+            feed.innerHTML = `<div class="feed-message">No memes found for user "<strong>${escapeHtml(username)}</strong>".</div>`; 
+            return; 
+        }
+        
+        querySnapshot.forEach((doc, index) => renderMeme({ id: doc.id, ...doc.data() }, index));
+        if (loadedCount > 0) {
+             lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        } else if (lastVisible) {
+             showNotification('End of Search', `No more memes from ${username}.`, 'info');
+        }
+    } catch (error) { 
         console.error('Error loading search results:', error); 
         feed.innerHTML = '<div class="feed-message">Error loading search results.</div>'; 
-      }
-    };
-    
-    const loadApiMemes = async () => {
-      const batchSize = window.innerWidth > 768 ? 3 : 2;
-      let memesFetched = 0;
-      let attempts = 0;
-      while (memesFetched < batchSize && attempts < 10) {
+    }
+};
+
+const loadApiMemes = async () => {
+    lastVisible = null; // No pagination cursor for API memes
+    const batchSize = window.innerWidth > 768 ? 5 : 3;
+    let memesFetched = 0;
+    let attempts = 0;
+    while (memesFetched < batchSize && attempts < 15) { // Increased attempts for more resilience
         const meme = await fetchMeme();
         if (meme) { 
-          renderMeme(meme, loadCount++); 
-          memesFetched++; 
+            renderMeme(meme, feed.children.length); 
+            memesFetched++; 
         }
         attempts++;
-      }
-    };
+    }
+    if (memesFetched === 0 && feed.children.length === 0) {
+        feed.innerHTML = '<div class="feed-message">Error fetching external memes. The API might be down.</div>';
+    }
+};
 
-    const fetchMeme = async () => {
-      try {
+const fetchMeme = async () => {
+    try {
         const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
-        const response = await fetch(`${url}?_=${Date.now()}`); // Cache buster
+        const response = await fetch(`${url}?_=${Date.now()}`); 
         if (!response.ok) throw new Error('API response not ok.');
         const data = await response.json();
-        // The API returns an array or a single object. Normalize.
-        const memeData = data.memes ? data.memes[0] : data;
         
-        if (!memeData?.url || memeData.nsfw || memeData.spoiler || seenUrls.has(memeData.url)) { 
-          return null; // Skip duplicate or invalid
-        } 
-        seenUrls.add(memeData.url);
-        return { 
-          url: memeData.url, 
-          title: memeData.title || 'Cringe', 
-          ups: memeData.ups || 0, 
-          reactions: { 
-            cringe: Math.floor(Math.random() * 100), 
-            laugh: Math.floor(Math.random() * 150), 
-            cry: Math.floor(Math.random() * 75) 
-          } 
-        };
-      } catch (error) { 
+        // Handle single or multiple memes response
+        const memes = data.memes || [data];
+        
+        for (const meme of memes) {
+            if (meme?.url && !meme.nsfw && !meme.spoiler && !seenUrls.has(meme.url)) {
+                seenUrls.add(meme.url);
+                return { 
+                    url: meme.url, 
+                    title: meme.title || 'Cringe', 
+                    reactions: { 
+                        cringe: Math.floor(Math.random() * 100), 
+                        laugh: Math.floor(Math.random() * 150), 
+                        cry: Math.floor(Math.random() * 75) 
+                    } 
+                };
+            }
+        }
+        return null;
+    } catch (error) { 
         console.warn('Fetch meme error:', error); 
         return null; 
-      }
+    }
+};
+
+// ===== MEME INTERACTIONS (REMAINDER) =====
+
+const saveMeme = async (card) => {
+    if (!checkAuth('save memes')) return;
+    // ... (rest of saveMeme is correct)
+    const memeId = card.dataset.id;
+    const saveBtn = card.querySelector('.save-btn');
+    const saveBtnText = saveBtn.querySelector('span');
+    
+    const memeData = {
+        title: card.dataset.title,
+        url: card.dataset.url,
+        source: card.dataset.source,
+        docId: card.dataset.docId || null,
+        savedAt: serverTimestamp() // Added timestamp for sorting/collections
     };
     
-    // ===== MEME INTERACTIONS (UNCHANGED) =====
-    const saveMeme = async (card) => {
-      if (!checkAuth('save memes')) return;
-      const memeId = card.dataset.id;
-      const saveBtn = card.querySelector('.save-btn');
-      const saveBtnText = saveBtn.querySelector('span');
-      
-      const memeData = {
-          title: card.dataset.title,
-          url: card.dataset.url,
-          source: card.dataset.source,
-          docId: card.dataset.docId || null
-      };
-      
-      const favRef = paths.favoriteDoc(userId, memeId);
-      
-      try {
-          if (saveBtn.classList.contains('saved')) {
-              // Unsave
-              await deleteDoc(favRef);
-              saveBtn.classList.remove('saved');
-              if(saveBtnText) saveBtnText.textContent = 'Save';
-              showNotification('Unsaved', 'Meme removed from your favorites.', 'info');
-          } else {
-              // Save
-              await setDoc(favRef, memeData);
-              saveBtn.classList.add('saved');
-              if(saveBtnText) saveBtnText.textContent = 'Saved';
-              showNotification('Saved!', 'Meme added to your favorites.', 'success');
-          }
-      } catch (error) {
-          console.error('Save meme error:', error);
-          showNotification('Error', 'Could not update your collection.', 'error');
-      }
-    };
+    const favRef = paths.favoriteDoc(userId, memeId);
     
-    const updateSavedButtons = () => {
-        $$('.meme-card').forEach(card => {
-            const memeId = card.dataset.id;
-            const saveBtn = card.querySelector('.save-btn');
-            const saveBtnText = saveBtn.querySelector('span');
+    try {
+        if (saveBtn.classList.contains('saved')) {
+            // Unsave
+            await deleteDoc(favRef);
+            saveBtn.classList.remove('saved');
+            if(saveBtnText) saveBtnText.textContent = 'Save';
+            showNotification('Unsaved', 'Meme removed from your favorites.', 'info');
+        } else {
+            // Save
+            await setDoc(favRef, memeData);
+            saveBtn.classList.add('saved');
+            if(saveBtnText) saveBtnText.textContent = 'Saved';
+            showNotification('Saved!', 'Meme added to your favorites.', 'success');
+        }
+    } catch (error) {
+        console.error('Save meme error:', error);
+        showNotification('Error', 'Could not update your collection.', 'error');
+    }
+};
+
+const updateSavedButtons = () => {
+    $$('.meme-card').forEach(card => {
+        const memeId = card.dataset.id;
+        const saveBtn = card.querySelector('.save-btn');
+        const saveBtnText = saveBtn.querySelector('span');
+        if (saveBtn) { // Check if button exists before trying to access
             if (userCollections.favorites && userCollections.favorites.includes(memeId)) {
                 saveBtn.classList.add('saved');
                 if(saveBtnText) saveBtnText.textContent = 'Saved';
@@ -3001,39 +3300,40 @@
                 saveBtn.classList.remove('saved');
                 if(saveBtnText) saveBtnText.textContent = 'Save';
             }
-        });
-    };
-    
-    const tipMeme = async (card) => {
-      if (!checkAuth('tip memes')) return;
-      if (currentUser.cringeCoin < 5) { 
+        }
+    });
+};
+
+const tipMeme = async (card) => {
+    if (!checkAuth('tip memes')) return;
+    if (currentUser.cringeCoin < 5) { 
         showNotification('Insufficient Funds', 'You need at least 5 CringeCoin to tip.', 'error'); 
         return; 
-      }
-      
-      const creatorId = card.dataset.creatorId;
-      if (creatorId === userId) {
+    }
+    
+    const creatorId = card.dataset.creatorId;
+    if (creatorId === userId) {
         showNotification('Self-Tip', "You can't tip your own meme!", 'error');
         return;
-      }
-      
-      const memeId = card.dataset.docId;
-      const memeRef = paths.memeDoc(memeId);
-      const publicCreatorRef = paths.publicUser(creatorId);
-      
-      try {
+    }
+    
+    const memeId = card.dataset.docId;
+    const memeRef = paths.memeDoc(memeId);
+    const publicCreatorRef = paths.publicUser(creatorId);
+    
+    try {
         await runTransaction(db, async (transaction) => {
-          const userDoc = await transaction.get(paths.publicUser(userId)); // Get tipper's public doc
-          if (!userDoc.exists() || userDoc.data().cringeCoin < 5) { 
-            throw new Error("Insufficient funds."); 
-          }
-          
-          // 1. Decrement tipper's coin
-          transaction.update(paths.publicUser(userId), { cringeCoin: increment(-5) });
-          // 2. Increment meme tips (public)
-          transaction.update(memeRef, { tips: increment(5) });
-          // 3. Increment creator's coin (public)
-          transaction.update(publicCreatorRef, { cringeCoin: increment(5) });
+            const userDoc = await transaction.get(paths.publicUser(userId)); 
+            if (!userDoc.exists() || (userDoc.data().cringeCoin || 0) < 5) { 
+                throw new Error("Insufficient funds."); 
+            }
+            
+            // 1. Decrement tipper's coin
+            transaction.update(paths.publicUser(userId), { cringeCoin: increment(-5) });
+            // 2. Increment meme tips (public)
+            transaction.update(memeRef, { tips: increment(5) });
+            // 3. Increment creator's coin (public)
+            transaction.update(publicCreatorRef, { cringeCoin: increment(5) });
         });
         
         // Send notification to creator
@@ -3048,54 +3348,63 @@
         
         await updateQuestProgress('tip');
         showNotification('Tip Sent!', '5 CringeCoin sent to the meme creator!', 'success');
-      } catch (error) { 
+    } catch (error) { 
         console.error("Tip transaction failed: ", error); 
-        showNotification('Error', error.message, 'error'); 
-      }
-    };
-    
-    const remixMeme = (imageUrl) => {
-        if (!checkAuth('create memes')) return;
-        openMemeEditor(imageUrl);
-    };
-    
-    const shareMeme = (memeUrl) => {
-      if (navigator.share) {
+        showNotification('Error', error.message.includes('Insufficient funds') ? error.message : 'Tip transaction failed.', 'error'); 
+    }
+};
+
+const remixMeme = (imageUrl) => {
+    if (!checkAuth('create memes')) return;
+    openMemeEditor(imageUrl);
+};
+
+const shareMeme = (memeUrl) => {
+    if (navigator.share) {
         navigator.share({ 
-          title: 'CringeScroll Meme', 
-          text: 'Check out this hilarious meme on CringeScroll!', 
-          url: memeUrl 
+            title: 'CringeScroll Meme', 
+            text: 'Check out this hilarious meme on CringeScroll!', 
+            url: memeUrl 
         }).catch((error) => console.log('Error sharing:', error));
-      } else {
+    } else {
         navigator.clipboard.writeText(memeUrl)
-          .then(() => showNotification('Copied!', 'Meme link copied to clipboard!', 'success'))
-          .catch(() => showNotification('Error', 'Failed to copy to clipboard', 'error'));
-      }
-    };
+            .then(() => showNotification('Copied!', 'Meme link copied to clipboard!', 'success'))
+            .catch(() => showNotification('Error', 'Failed to copy to clipboard', 'error'));
+    }
+};
+
+const addReaction = async (card, reactionType) => {
+    if (!checkAuth('react to memes')) return;
     
-    const addReaction = async (card, reactionType) => {
-      if (!checkAuth('react to memes')) return;
-      
-      const btn = card.querySelector(`.reaction-btn[data-reaction="${reactionType}"]`);
-      const countEl = btn.querySelector('.reaction-count');
-      const currentVal = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
-      countEl.textContent = formatNumber(currentVal + 1);
-      btn.classList.add('active');
-      btn.style.transform = 'scale(1.2)';
-      setTimeout(() => { btn.style.transform = 'scale(1)'; }, 300);
-      
-      await updateQuestProgress('react');
-      
-      if (card.dataset.source === 'api') {
-        showNotification('Reaction Added!', '+1 CringeCoin for reacting!', 'success');
-        await updateDoc(paths.publicUser(userId), { cringeCoin: increment(1) });
+    const btn = card.querySelector(`.reaction-btn[data-reaction="${reactionType}"]`);
+    const countEl = btn.querySelector('.reaction-count');
+    const currentVal = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
+    
+    // Optimistic UI update
+    countEl.textContent = formatNumber(currentVal + 1);
+    btn.classList.add('active');
+    btn.style.transform = 'scale(1.2)';
+    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 300);
+    
+    await updateQuestProgress('react');
+    
+    // API Meme: Just give coin and update public user doc
+    if (card.dataset.source === 'api') {
+        try {
+             await updateDoc(paths.publicUser(userId), { cringeCoin: increment(1) });
+             showNotification('Reaction Added!', '+1 CringeCoin for reacting to an API meme!', 'success');
+        } catch (error) {
+             console.error('API meme reaction error:', error);
+             showNotification('Error', 'Could not save reaction reward.', 'error');
+        }
         return;
-      }
-      
-      const memeId = card.dataset.docId;
-      const memeRef = paths.memeDoc(memeId);
-      
-      try {
+    }
+    
+    // Firestore Meme: Use transaction for atomicity (reaction + coin reward)
+    const memeId = card.dataset.docId;
+    const memeRef = paths.memeDoc(memeId);
+    
+    try {
         await runTransaction(db, async (transaction) => {
             // 1. Give user 1 coin for reacting
             transaction.update(paths.publicUser(userId), { cringeCoin: increment(1) });
@@ -3103,223 +3412,224 @@
             transaction.update(memeRef, { [`reactions.${reactionType}`]: increment(1) });
         });
         showNotification('Reaction Added!', `You reacted! +1 CringeCoin`, 'success');
-      } catch (error) {
+    } catch (error) {
         console.error('Reaction update error:', error);
-        countEl.textContent = formatNumber(currentVal); // Revert count
+        // Revert optimistic UI update on failure
+        countEl.textContent = formatNumber(currentVal); 
         btn.classList.remove('active');
         showNotification('Error', 'Could not save reaction.', 'error');
-      }
-    };
-    
-    // ===== CHAT (UNCHANGED) =====
-    const toggleChatWindow = () => {
-      chatWindow.classList.toggle('active');
-      if (chatWindow.classList.contains('active')) { 
-        // Listeners are now attached globally
+    }
+};
+
+// ===== CHAT =====
+const toggleChatWindow = () => {
+    chatWindow.classList.toggle('active');
+    if (chatWindow.classList.contains('active')) { 
         const messagesContainer = $('chatMessages');
         setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
-      }
-    };
+    }
+};
+
+const renderChatMessages = (docs) => {
+    const messagesContainer = $('chatMessages');
+    messagesContainer.innerHTML = '';
+    if (docs.length === 0) { 
+        messagesContainer.innerHTML = '<div class="feed-message" style="font-size: 0.9rem; padding: 20px;">No messages yet. Be the first!</div>'; 
+        return; 
+    }
     
-    const renderChatMessages = (docs) => {
-        const messagesContainer = $('chatMessages');
-        messagesContainer.innerHTML = '';
-        if (docs.length === 0) { 
-          messagesContainer.innerHTML = '<div class="feed-message" style="font-size: 0.9rem; padding: 20px;">No messages yet. Be the first!</div>'; 
-          return; 
+    const messages = docs.map(doc => doc.data()).reverse();
+    messages.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        const isOutgoing = !isAnonymous && msg.userId === userId;
+        messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+        
+        let timeString = '...';
+        if (msg.timestamp) { 
+            timeString = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
         }
         
-        const messages = docs.map(doc => doc.data()).reverse();
-        messages.forEach(msg => {
-            const messageDiv = document.createElement('div');
-            const isOutgoing = !isAnonymous && msg.userId === userId;
-            messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
-            
-            let timeString = '...';
-            if (msg.timestamp) { 
-              timeString = msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-            }
-            
-            messageDiv.innerHTML = `
-              <div class="message-content">${escapeHtml(msg.text)}</div>
-              <div class="message-meta">
+        messageDiv.innerHTML = `
+            <div class="message-content">${escapeHtml(msg.text)}</div>
+            <div class="message-meta">
                 <span class="message-sender">${escapeHtml(msg.sender)}</span>
                 <span class="message-time">${timeString}</span>
-              </div>
-            `;
-            messagesContainer.appendChild(messageDiv);
-        });
-        
-        setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
-    };
+            </div>
+        `;
+        messagesContainer.appendChild(messageDiv);
+    });
     
-    const sendChatMessage = async () => {
-      const input = $('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-      if (!checkAuth('send chat messages')) return;
-      
-      input.disabled = true;
-      try {
+    setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
+};
+
+const sendChatMessage = async () => {
+    const input = $('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    if (!checkAuth('send chat messages')) return;
+    
+    input.disabled = true;
+    try {
         await addDoc(paths.chatCol(), { 
-          text: text, 
-          sender: currentUser.username, 
-          userId: userId, 
-          timestamp: serverTimestamp() 
+            text: text, 
+            sender: currentUser.username, 
+            userId: userId, 
+            timestamp: serverTimestamp() 
         });
         input.value = '';
-      } catch (error) { 
+    } catch (error) { 
         console.error('Send message error:', error); 
         showNotification('Error', 'Could not send message.', 'error'); 
-      }
-      input.disabled = false; 
-      input.focus();
-    };
+    }
+    input.disabled = false; 
+    input.focus();
+};
+
+// ===== MEME EDITOR (FIXED UPLOAD) =====
+let fabricCanvas = null;
+let activeTool = 'text';
+let history = [];
+let historyIndex = -1;
+let fabricHistoryLock = false;
+
+const openMemeEditor = (imageUrl = null) => {
+    if (!checkAuth('create memes')) return;
+    $('memeEditorModal').classList.add('active');
+    setTimeout(() => initMemeEditor(imageUrl), 100);
+};
+
+const initMemeEditor = (imageUrl) => {
+    const container = $('editorContainer');
+    const containerWidth = container.clientWidth - 10;
+    const containerHeight = container.clientHeight - 10;
     
-    // ===== MEME EDITOR (UPDATED WITH FIX) =====
-    let fabricCanvas = null;
-    let activeTool = 'text';
-    let history = [];
-    let historyIndex = -1;
-    let fabricHistoryLock = false; // Lock to prevent state saving loops
+    if (containerWidth <= 0 || containerHeight <= 0) {
+        setTimeout(() => initMemeEditor(imageUrl), 200);
+        return;
+    }
     
-    const openMemeEditor = (imageUrl = null) => {
-      if (!checkAuth('create memes')) return;
-      $('memeEditorModal').classList.add('active');
-      // Delay init to allow modal to render and get dimensions
-      setTimeout(() => initMemeEditor(imageUrl), 100);
-    };
-    
-    const initMemeEditor = (imageUrl) => {
-      const container = $('editorContainer');
-      const canvasEl = $('canvas');
-      
-      if (container.clientWidth === 0 || container.clientHeight === 0) {
-          setTimeout(() => initMemeEditor(imageUrl), 200);
-          return;
-      }
-      
-      const containerWidth = container.clientWidth - 10;
-      const containerHeight = container.clientHeight - 10;
-      
-      if (!fabricCanvas) {
+    if (!fabricCanvas) {
         fabricCanvas = new fabric.Canvas('canvas', { 
-          backgroundColor: '#0f0c29', 
-          selection: true, 
-          preserveObjectStacking: true 
+            backgroundColor: '#0f0c29', 
+            selection: true, 
+            preserveObjectStacking: true 
         });
         setupMemeEditorCanvasListeners();
-      } else {
+    } else {
         fabricCanvas.clear();
         fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
-      }
-      
-      fabricCanvas.setWidth(containerWidth);
-      fabricCanvas.setHeight(containerHeight);
-      history = []; 
-      historyIndex = -1;
-      
-      if (imageUrl) {
-        // Already includes crossOrigin: 'anonymous' for template/remix image
-        fabric.Image.fromURL(imageUrl, (img) => {
-          const scale = Math.min(containerWidth / img.width, containerHeight / img.height);
-          img.scale(scale);
-          img.set({ 
-            left: containerWidth / 2, 
-            top: containerHeight / 2, 
-            originX: 'center', 
-            originY: 'center', 
-            selectable: true, 
-            evented: true
-          });
-          fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
-          saveCanvasState();
+    }
+    
+    fabricCanvas.setWidth(containerWidth);
+    fabricCanvas.setHeight(containerHeight);
+    history = []; 
+    historyIndex = -1;
+    
+    const loadBackgroundImage = (url) => {
+        fabric.Image.fromURL(url, (img) => {
+            const scale = Math.min(containerWidth / img.width, containerHeight / img.height);
+            img.scale(scale);
+            img.set({ 
+                left: containerWidth / 2, 
+                top: containerHeight / 2, 
+                originX: 'center', 
+                originY: 'center', 
+                selectable: false, // Background image should not be selectable
+                evented: false
+            });
+            fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
+            saveCanvasState();
         }, { crossOrigin: 'anonymous' });
-      } else { 
+    }
+    
+    if (imageUrl) {
+        loadBackgroundImage(imageUrl);
+    } else { 
         fabricCanvas.setBackgroundImage(null, fabricCanvas.renderAll.bind(fabricCanvas));
         saveCanvasState(); 
-      }
-      
-      switchEditorTool('text');
-      updateEditorSettings();
-    };
+    }
     
-    const updateEditorSettings = () => {
-      if (!fabricCanvas) return;
-      const brushSize = parseInt($('brushSize').value);
-      const strokeWidth = parseInt($('strokeWidth').value);
-      const fillColor = $('textColorPicker').value;
-      const strokeColor = $('strokeColorPicker').value;
-      const fontFamily = $('fontFamilySelect').value;
-      
-      fabricCanvas.freeDrawingBrush.width = brushSize;
-      fabricCanvas.freeDrawingBrush.color = fillColor;
-      
-      const activeObj = fabricCanvas.getActiveObject();
-      if (activeObj) {
-          if (activeObj.type.includes('text')) {
-              activeObj.set({ 
-                  fill: fillColor, 
-                  stroke: strokeColor, 
-                  fontSize: brushSize,
-                  strokeWidth: strokeWidth,
-                  fontFamily: fontFamily
-              });
-          }
-          fabricCanvas.renderAll();
-      }
-    };
+    switchEditorTool('text');
+    updateEditorSettings();
+};
+
+const updateEditorSettings = () => {
+    if (!fabricCanvas) return;
+    const brushSize = parseInt($('brushSize').value);
+    const strokeWidth = parseInt($('strokeWidth').value);
+    const fillColor = $('textColorPicker').value;
+    const strokeColor = $('strokeColorPicker').value;
+    const fontFamily = $('fontFamilySelect').value;
     
-    const saveCanvasState = () => {
-      if (fabricHistoryLock) return;
-      if (!fabricCanvas) return;
-      history = history.slice(0, historyIndex + 1);
-      history.push(fabricCanvas.toJSON());
-      historyIndex = history.length - 1;
-    };
-    const undoCanvasAction = () => { 
-      if (historyIndex > 0) { 
+    fabricCanvas.freeDrawingBrush.width = brushSize;
+    fabricCanvas.freeDrawingBrush.color = fillColor;
+    
+    const activeObj = fabricCanvas.getActiveObject();
+    if (activeObj) {
+        if (activeObj.type.includes('text')) {
+            activeObj.set({ 
+                fill: fillColor, 
+                stroke: strokeColor, 
+                fontSize: brushSize,
+                strokeWidth: strokeWidth,
+                fontFamily: fontFamily
+            });
+        }
+        fabricCanvas.renderAll();
+    }
+};
+
+const saveCanvasState = () => {
+    if (fabricHistoryLock) return;
+    if (!fabricCanvas) return;
+    history = history.slice(0, historyIndex + 1);
+    history.push(fabricCanvas.toJSON());
+    historyIndex = history.length - 1;
+};
+
+const undoCanvasAction = () => { 
+    if (historyIndex > 0) { 
         fabricHistoryLock = true;
         historyIndex--; 
         fabricCanvas.loadFromJSON(history[historyIndex], () => {
             fabricCanvas.renderAll();
             fabricHistoryLock = false;
         }); 
-      } 
-    };
-    const redoCanvasAction = () => { 
-      if (historyIndex < history.length - 1) { 
+    } 
+};
+const redoCanvasAction = () => { 
+    if (historyIndex < history.length - 1) { 
         fabricHistoryLock = true;
         historyIndex++; 
         fabricCanvas.loadFromJSON(history[historyIndex], () => {
             fabricCanvas.renderAll();
             fabricHistoryLock = false;
         }); 
-      } 
-    };
-    const clearCanvas = async () => {
-      const confirmed = await showConfirmModal('Clear Canvas', 'Are you sure you want to clear the canvas? This cannot be undone.', 'Clear');
-      if (confirmed) {
+    } 
+};
+const clearCanvas = async () => {
+    const confirmed = await showConfirmModal('Clear Canvas', 'Are you sure you want to clear the canvas? This cannot be undone.', 'Clear');
+    if (confirmed) {
         fabricCanvas.clear();
         fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
         fabricCanvas.setBackgroundImage(null, fabricCanvas.renderAll.bind(fabricCanvas));
         saveCanvasState();
-      }
-    };
-    
-    const postMemeFromEditor = async () => {
-      if (!checkAuth('post memes')) return;
-      const title = $('memeTitleInput').value.trim();
-      if (!title) { 
+    }
+};
+
+const postMemeFromEditor = async () => {
+    if (!checkAuth('post memes')) return;
+    const title = $('memeTitleInput').value.trim();
+    if (!title) { 
         showNotification('Title Required', 'Please enter a title for your meme.', 'error'); 
         return; 
-      }
-      
-      const btn = $('postMemeBtn');
-      btn.disabled = true; 
-      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div> Posting...';
-      
-      try {
+    }
+    
+    const btn = $('postMemeBtn');
+    btn.disabled = true; 
+    btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div> Posting...';
+    
+    try {
         const dataURL = fabricCanvas.toDataURL({ format: 'png', quality: 0.9 });
         const memeId = `meme_${Date.now()}`;
         const storageRef = ref(storage, `memes/${userId}/${memeId}.png`);
@@ -3330,14 +3640,14 @@
         
         // Add meme to Firestore
         await addDoc(paths.memesCol(), {
-          title: title, 
-          imageUrl: downloadURL, 
-          userId: userId, 
-          username: currentUser.username,
-          createdAt: serverTimestamp(), 
-          isUserGenerated: true,
-          reactions: { cringe: 0, laugh: 0, cry: 0 }, 
-          tips: 0
+            title: title, 
+            imageUrl: downloadURL, 
+            userId: userId, 
+            username: currentUser.username,
+            createdAt: serverTimestamp(), 
+            isUserGenerated: true,
+            reactions: { cringe: 0, laugh: 0, cry: 0 }, 
+            tips: 0
         });
 
         // Update user's meme count
@@ -3350,184 +3660,187 @@
         
         switchTab('mymemes');
         showNotification('Meme Posted!', 'Your meme is live! +10 CringeCoin', 'success');
-      } catch (error) { 
+    } catch (error) { 
         console.error('Meme post error:', error); 
         showNotification('Error', 'Failed to post your meme. Please try again.', 'error');
-      } finally { 
+    } finally { 
         btn.disabled = false; 
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; 
-      }
-    };
+    }
+};
+
+// ===== MODAL FUNCTIONS (ALL FUNCTIONAL) =====
+
+const openModal = (modalId) => {
+    const modal = $(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        if (modalId === 'settingsModal') loadSettings();
+        if (modalId === 'collectionsModal') showCollections();
+        if (modalId === 'inventoryModal') showInventory();
+        if (modalId === 'leaderboardModal') showLeaderboard();
+        if (modalId === 'questsModal') showQuests();
+        if (modalId === 'notificationsModal') showNotifications();
+    }
+};
+
+const closeModal = (modalId) => {
+    const modal = $(modalId);
+    if (modal) modal.classList.remove('active');
+};
+
+const switchTab = (tab) => {
+    const tabEl = document.querySelector(`.nav-item[data-tab="${tab}"]`);
     
-    // ===== MODAL FUNCTIONS (UNCHANGED) =====
+    if (tab === 'mymemes' && !checkAuth('view your memes', true)) {
+        return; // Don't switch if auth fails
+    }
     
-    const openModal = (modalId) => {
-        const modal = $(modalId);
-        if (modal) {
-            modal.classList.add('active');
-            // Re-run modal-specific logic if needed
-            if (modalId === 'settingsModal') loadSettings();
-            if (modalId === 'collectionsModal') showCollections();
-            if (modalId === 'inventoryModal') showInventory();
-            if (modalId === 'leaderboardModal') showLeaderboard();
-            if (modalId === 'questsModal') showQuests();
-            if (modalId === 'notificationsModal') showNotifications();
-        }
-    };
+    if (currentTab === tab && tabEl && tabEl.classList.contains('active')) return;
     
-    const closeModal = (modalId) => {
-        const modal = $(modalId);
-        if (modal) modal.classList.remove('active');
-    };
+    currentTab = tab; 
+    $$('.nav-item').forEach(el => el.classList.remove('active')); 
+    if (tabEl) tabEl.classList.add('active');
     
-    const switchTab = (tab) => {
-        const tabEl = document.querySelector(`.nav-item[data-tab="${tab}"]`);
-        if (currentTab === tab && tabEl.classList.contains('active')) return;
-        
-        if (tab === 'mymemes' && !checkAuth('view your memes', false)) {
-            return; // Don't switch if auth fails
-        }
-        
-        currentTab = tab; 
-        $$('.nav-item').forEach(el => el.classList.remove('active')); 
-        if (tabEl) tabEl.classList.add('active');
-        
-        loadFeed(true);
-    };
+    // Reset cursor and load new feed
+    lastVisible = null;
+    loadFeed(true);
+};
 
-    const showSettings = () => {
-        if (!checkAuth('view settings')) return;
-        openModal('settingsModal');
-    };
+const showSettings = () => {
+    if (!checkAuth('view settings')) return;
+    openModal('settingsModal');
+};
 
-    const loadSettings = () => {
-        if (!currentUser) return;
-        
-        // Load Profile Tab
-        $('settingsAvatarImg').src = currentUser.avatar;
-        $('settingsUsername').textContent = currentUser.username;
-        $('settingsUsernameInput').value = currentUser.username;
-        $('settingsBioInput').value = currentUser.bio || '';
-        $('settingsCringeCoin').textContent = currentUser.cringeCoin;
-        $('settingsStreak').textContent = currentUser.streak;
-        
-        // Load Appearance Tab
-        $('themeSelect').value = userPreferences.theme;
-        $('fontSizeSelect').value = userPreferences.fontSize;
-        $('cardBgColor').value = userPreferences.cardBackground;
-        
-        // Load Account Tab
-        $('settingsEmailInput').value = currentUser.email;
-        $('settingsUserIdInput').value = userId;
-    };
+const loadSettings = () => {
+    if (!currentUser) return;
+    
+    // Load Profile Tab
+    $('settingsAvatarImg').src = currentUser.avatar;
+    $('settingsUsername').textContent = currentUser.username;
+    $('settingsUsernameInput').value = currentUser.username;
+    $('settingsBioInput').value = currentUser.bio || '';
+    $('settingsCringeCoin').textContent = formatNumber(currentUser.cringeCoin); // Use formatNumber
+    $('settingsStreak').textContent = currentUser.streak;
+    
+    // Load Appearance Tab
+    $('themeSelect').value = userPreferences.theme;
+    $('fontSizeSelect').value = userPreferences.fontSize;
+    $('cardBgColor').value = userPreferences.cardBackground;
+    
+    // Load Account Tab
+    $('settingsEmailInput').value = currentUser.email || 'N/A';
+    $('settingsUserIdInput').value = userId;
+};
 
-    const saveProfileSettings = async () => {
-        const newUsername = $('settingsUsernameInput').value.trim();
-        const newBio = $('settingsBioInput').value.trim();
-        const avatarFile = $('avatarUpload').files[0];
-        const btn = $('saveProfileSettingsBtn');
-        btn.disabled = true;
-        
-        try {
-            if (!currentUser) throw new Error('Not logged in.');
+const saveProfileSettings = async () => {
+    const newUsername = $('settingsUsernameInput').value.trim();
+    const newBio = $('settingsBioInput').value.trim();
+    const avatarFile = $('avatarUpload').files[0];
+    const btn = $('saveProfileSettingsBtn');
+    btn.disabled = true;
+    
+    try {
+        if (!currentUser) throw new Error('Not logged in.');
 
-            let avatarUrl = currentUser.avatar;
+        let avatarUrl = currentUser.avatar;
 
-            // Check if username changed and is available
-            if (newUsername !== currentUser.username) {
-                if (!/^[a-zA-Z0-9_]{2,15}$/.test(newUsername)) {
-                    throw new Error('Username: 2-15 chars (letters, numbers, _).');
-                }
-                const usernameQuery = query(paths.usersCol(), where('username', '==', newUsername));
-                const usernameSnapshot = await getDocs(usernameQuery);
-                if (!usernameSnapshot.empty) {
-                    throw new Error('Username is already taken.');
-                }
+        // Check if username changed and is available
+        if (newUsername !== currentUser.username) {
+            if (!/^[a-zA-Z0-9_]{2,15}$/.test(newUsername)) {
+                throw new Error('Username: 2-15 chars (letters, numbers, _).');
             }
-
-            // Upload new avatar if one is selected
-            if (avatarFile) {
-                const storageRef = ref(storage, `avatars/${userId}/${avatarFile.name}`);
-                const uploadResult = await uploadBytes(storageRef, avatarFile);
-                avatarUrl = await getDownloadURL(uploadResult.ref);
+            const usernameQuery = query(paths.usersCol(), where('username', '==', newUsername));
+            const usernameSnapshot = await getDocs(usernameQuery);
+            if (!usernameSnapshot.empty) {
+                throw new Error('Username is already taken.');
             }
-
-            // Update Firestore
-            await updateDoc(paths.publicUser(userId), {
-                username: newUsername,
-                bio: newBio,
-                avatar: avatarUrl
-            });
-            
-            // Update auth profile
-            await updateProfile(auth.currentUser, { displayName: newUsername });
-
-            // Update all of the user's memes with the new username
-            // This is a heavy operation, can be slow.
-            // Consider a Cloud Function for this in a real app.
-            const memesQuery = query(paths.memesCol(), where('userId', '==', userId));
-            const memesSnapshot = await getDocs(memesQuery);
-            const batch = writeBatch(db);
-            memesSnapshot.forEach(doc => {
-                batch.update(doc.ref, { username: newUsername });
-            });
-            await batch.commit();
-
-            showNotification('Profile Saved!', 'Your profile has been updated.', 'success');
-        } catch (error) {
-            console.error('Error saving profile:', error);
-            showNotification('Error', error.message, 'error');
-        } finally {
-            btn.disabled = false;
         }
-    };
 
-    const saveAppearanceSettings = async () => {
-      if (!checkAuth('save settings')) return;
-      userPreferences.theme = $('themeSelect').value;
-      userPreferences.fontSize = $('fontSizeSelect').value;
-      userPreferences.cardBackground = $('cardBgColor').value;
-      
-      applyUserPreferences(); // Apply changes locally
-      
-      try {
+        // Upload new avatar if one is selected
+        if (avatarFile) {
+            const storageRef = ref(storage, `avatars/${userId}/${avatarFile.name}`);
+            const uploadResult = await uploadBytes(storageRef, avatarFile);
+            avatarUrl = await getDownloadURL(uploadResult.ref);
+        }
+
+        // Update Firestore
+        await updateDoc(paths.publicUser(userId), {
+            username: newUsername,
+            bio: newBio,
+            avatar: avatarUrl
+        });
+        
+        // Update auth profile
+        if (newUsername !== auth.currentUser.displayName) {
+             await updateProfile(auth.currentUser, { displayName: newUsername });
+        }
+
+
+        // Update all of the user's memes with the new username (heavy)
+        const memesQuery = query(paths.memesCol(), where('userId', '==', userId));
+        const memesSnapshot = await getDocs(memesQuery);
+        const batch = writeBatch(db);
+        memesSnapshot.forEach(doc => {
+            batch.update(doc.ref, { username: newUsername });
+        });
+        await batch.commit();
+
+        showNotification('Profile Saved!', 'Your profile has been updated.', 'success');
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        showNotification('Error', error.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+const saveAppearanceSettings = async () => {
+    if (!checkAuth('save settings')) return;
+    userPreferences.theme = $('themeSelect').value;
+    userPreferences.fontSize = $('fontSizeSelect').value;
+    userPreferences.cardBackground = $('cardBgColor').value;
+    
+    applyUserPreferences(); 
+    
+    try {
         await updateDoc(paths.privateUser(userId), { preferences: userPreferences });
         showNotification('Saved!', 'Your UI preferences have been saved.', 'success');
-      } catch (error) {
+    } catch (error) {
         showNotification('Error', 'Could not save preferences.', 'error');
-      }
-    };
+    }
+};
+
+const showPublicProfile = async (profileUserId) => {
+    if (!profileUserId) {
+        if (!checkAuth('view your profile')) return;
+        profileUserId = userId; // Show own profile
+    }
     
-    const showPublicProfile = async (profileUserId) => {
-      if (!profileUserId) {
-          if (!checkAuth('view your profile')) return;
-          profileUserId = userId; // Show own profile
-      }
-      
-      openModal('profileModal');
-      const body = $('profileModalBody');
-      body.innerHTML = '<div class="loading-spinner"></div>';
-      
-      try {
-          const userDoc = await getDoc(paths.publicUser(profileUserId));
-          
-          if (!userDoc.exists()) {
-              body.innerHTML = '<div class="feed-message">User profile not found.</div>';
-              return;
-          }
-          
-          const user = userDoc.data();
-          
-          body.innerHTML = `
+    openModal('profileModal');
+    const body = $('profileModalBody');
+    body.innerHTML = '<div class="loading-spinner"></div>';
+    
+    try {
+        const userDoc = await getDoc(paths.publicUser(profileUserId));
+        
+        if (!userDoc.exists()) {
+            body.innerHTML = '<div class="feed-message">User profile not found.</div>';
+            return;
+        }
+        
+        const user = userDoc.data();
+        
+        body.innerHTML = `
             <div style="padding: 20px;">
-              <div class="profile-card-header">
-                <img src="${user.avatar}" alt="Avatar" class="profile-card-avatar">
-                <div>
-                  <h3 class="profile-card-name">${escapeHtml(user.username)}</h3>
-                  <p class="profile-card-joined">Joined: ${user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
+                <div class="profile-card-header">
+                    <img src="${user.avatar}" alt="Avatar" class="profile-card-avatar">
+                    <div>
+                        <h3 class="profile-card-name">${escapeHtml(user.username)}</h3>
+                        <p class="profile-card-joined">Joined: ${user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</p>
+                    </div>
                 </div>
-              </div>
-              <p class="profile-card-bio">${escapeHtml(user.bio)}</p>
+                <p class="profile-card-bio">${escapeHtml(user.bio)}</p>
             </div>
             
             <div class="modal-tabs">
@@ -3537,14 +3850,14 @@
             
             <div class="tab-content active" id="profileStats" style="padding: 20px;">
                 <div class="profile-card-stats">
-                  <div class="stat-item" id="profileCringeCoin">
-                    <div class="stat-value">${formatNumber(user.cringeCoin)}</div>
-                    <div class="stat-label">CringeCoin</div>
-                  </div>
-                  <div class="stat-item" id="profileMemes">
-                    <div class="stat-value">${formatNumber(user.memeCount)}</div>
-                    <div class="stat-label">Memes Posted</div>
-                  </div>
+                    <div class="stat-item" id="profileCringeCoin">
+                        <div class="stat-value">${formatNumber(user.cringeCoin)}</div>
+                        <div class="stat-label">CringeCoin</div>
+                    </div>
+                    <div class="stat-item" id="profileMemes">
+                        <div class="stat-value">${formatNumber(user.memeCount)}</div>
+                        <div class="stat-label">Memes Posted</div>
+                    </div>
                 </div>
             </div>
             <div class="tab-content" id="profileMemes" style="padding: 20px;">
@@ -3552,10 +3865,10 @@
                     <div class="loading-spinner"></div>
                 </div>
             </div>
-          `;
-          
-          // Add tab listeners
-          $$('#profileModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
+        `;
+        
+        // Add tab listeners
+        $$('#profileModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
             const tabId = e.currentTarget.dataset.tab;
             $$('#profileModal .tab-content').forEach(c => c.classList.remove('active'));
             $$('#profileModal .tab-btn').forEach(b => b.classList.remove('active'));
@@ -3565,91 +3878,92 @@
             if(tabId === 'profileMemes') {
                 loadProfileMemes(profileUserId);
             }
-          }));
-          
-      } catch (error) {
-          console.error("Error fetching public profile:", error);
-          body.innerHTML = '<div class="feed-message">Could not load profile.</div>';
-      }
-    };
-    
-    const loadProfileMemes = async (profileUserId) => {
-        const grid = document.querySelector('#profileMemes .profile-meme-grid');
-        grid.innerHTML = '<div class="loading-spinner"></div>';
-        try {
-            const q = query(paths.memesCol(), where('userId', '==', profileUserId), orderBy('createdAt', 'desc'), limit(12));
-            const snapshot = await getDocs(q);
-            if(snapshot.empty) {
-                grid.innerHTML = '<div class="feed-message" style="font-size: 0.9rem;">This user hasn\'t posted any memes yet.</div>';
-                return;
-            }
-            grid.innerHTML = '';
-            snapshot.forEach(doc => {
-                const meme = doc.data();
-                const item = document.createElement('div');
-                item.className = 'profile-meme-item';
-                item.innerHTML = `<img src="${meme.imageUrl}" alt="${escapeHtml(meme.title)}" loading="lazy">`;
-                grid.appendChild(item);
-            });
-        } catch (error) {
-            console.error('Error loading profile memes:', error);
-            grid.innerHTML = '<div class="feed-message" style="font-size: 0.9rem;">Could not load memes.</div>';
+        }));
+        
+    } catch (error) {
+        console.error("Error fetching public profile:", error);
+        body.innerHTML = '<div class="feed-message">Could not load profile.</div>';
+    }
+};
+
+const loadProfileMemes = async (profileUserId) => {
+    const grid = document.querySelector('#profileMemes .profile-meme-grid');
+    grid.innerHTML = '<div class="loading-spinner"></div>';
+    try {
+        const q = query(paths.memesCol(), where('userId', '==', profileUserId), orderBy('createdAt', 'desc'), limit(12));
+        const snapshot = await getDocs(q);
+        if(snapshot.empty) {
+            grid.innerHTML = '<div class="feed-message" style="font-size: 0.9rem;">This user hasn\'t posted any memes yet.</div>';
+            return;
         }
-    };
+        grid.innerHTML = '';
+        snapshot.forEach(doc => {
+            const meme = doc.data();
+            const item = document.createElement('div');
+            item.className = 'profile-meme-item';
+            item.innerHTML = `<img src="${meme.imageUrl}" alt="${escapeHtml(meme.title)}" loading="lazy">`;
+            grid.appendChild(item);
+        });
+    } catch (error) {
+        console.error('Error loading profile memes:', error);
+        grid.innerHTML = '<div class="feed-message" style="font-size: 0.9rem;">Could not load memes.</div>';
+    }
+};
 
-    const showCollections = async () => {
-      if (!checkAuth('view your collections')) return;
-      openModal('collectionsModal');
-      const grid = $('favoritesGrid');
-      grid.innerHTML = '<div class="loading-spinner"></div>';
-      
-      const q = query(paths.favoritesCol(userId));
-      
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) {
-          grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
-          return;
-      }
-      grid.innerHTML = '';
-      snapshot.forEach(doc => {
-          const meme = doc.data();
-          const item = document.createElement('div');
-          item.className = 'collection-item';
-          item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
-          item.onclick = () => { /* Maybe open full meme modal later */ };
-          grid.appendChild(item);
-      });
-    };
+const showCollections = async () => {
+    if (!checkAuth('view your collections')) return;
+    openModal('collectionsModal');
+    const grid = $('favoritesGrid');
+    grid.innerHTML = '<div class="loading-spinner"></div>';
+    
+    // Order by savedAt for user-friendly display
+    const q = query(paths.favoritesCol(userId), orderBy('savedAt', 'desc'));
+    
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+        grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
+        return;
+    }
+    grid.innerHTML = '';
+    snapshot.forEach(doc => {
+        const meme = doc.data();
+        const item = document.createElement('div');
+        item.className = 'collection-item';
+        item.innerHTML = `<img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy"><p>${escapeHtml(meme.title)}</p>`;
+        item.onclick = () => { /* Future: open full meme modal */ };
+        grid.appendChild(item);
+    });
+};
 
-    const showInventory = () => {
-      if (!checkAuth('view your inventory')) return;
-      openModal('inventoryModal');
-      const grid = $('badgeGrid');
-      grid.innerHTML = ''; // Clear old badges
-      
-      const createBadge = (icon, title, desc, earned) => {
+const showInventory = () => {
+    if (!checkAuth('view your inventory')) return;
+    openModal('inventoryModal');
+    const grid = $('badgeGrid');
+    grid.innerHTML = ''; 
+    
+    const createBadge = (icon, title, desc, earned) => {
         const item = document.createElement('div');
         item.className = 'grid-item';
         item.style.opacity = earned ? '1' : '0.4';
         item.innerHTML = `<i class="fas ${icon}" style="color: ${earned ? 'var(--gold)' : 'var(--text-secondary)'};"></i><div class="grid-item-title">${title}</div><div class="grid-item-meta">${desc}</div>`;
         grid.appendChild(item);
-      };
-
-      // Check for badges
-      createBadge('fa-user-plus', 'New Scroller', 'Joined CringeScroll', true);
-      createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', (userQuests.tipCount || 0) > 0);
-      createBadge('fa-paint-brush', 'Creator', 'Post a meme', (userQuests.postCount || 0) > 0);
-      createBadge('fa-fire', 'Hot Streak', '3-day streak', (currentUser.streak || 0) >= 3);
-      createBadge('fa-coins', 'Coin Hoarder', '100+ CringeCoin', (currentUser.cringeCoin || 0) >= 100);
-      createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', (currentUser.cringeCoin || 0) >= 1000);
     };
 
-    const showLeaderboard = async () => {
-      if (!checkAuth('view the leaderboard')) return;
-      openModal('leaderboardModal');
-      
-      // Setup tabs
-      $$('#leaderboardModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
+    // Check for badges
+    createBadge('fa-user-plus', 'New Scroller', 'Joined CringeScroll', true);
+    createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', (userQuests.tipCount || 0) > 0);
+    createBadge('fa-paint-brush', 'Creator', 'Post a meme', (userQuests.postCount || 0) > 0);
+    createBadge('fa-fire', 'Hot Streak', '3-day streak', (currentUser.streak || 0) >= 3);
+    createBadge('fa-coins', 'Coin Hoarder', '100+ CringeCoin', (currentUser.cringeCoin || 0) >= 100);
+    createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', (currentUser.cringeCoin || 0) >= 1000);
+};
+
+const showLeaderboard = async () => {
+    if (!checkAuth('view the leaderboard')) return;
+    openModal('leaderboardModal');
+    
+    // Setup tabs (only need to re-run load functions on click)
+    $$('#leaderboardModal .tab-btn').forEach(btn => btn.onclick = (e) => {
         const tabId = e.currentTarget.dataset.tab;
         $$('#leaderboardModal .tab-content').forEach(c => c.classList.remove('active'));
         $$('#leaderboardModal .tab-btn').forEach(b => b.classList.remove('active'));
@@ -3658,109 +3972,114 @@
         
         if (tabId === 'leaderboardUsers') loadLeaderboardUsers();
         if (tabId === 'leaderboardMemes') loadLeaderboardMemes();
-      }));
-      
-      // Load default tab
-      loadLeaderboardUsers();
-      $('leaderboardMemeGrid').innerHTML = '<div class="loading-spinner"></div>'; // Clear other tab
-    };
+    });
     
-    const loadLeaderboardUsers = async () => {
-        const list = $('leaderboardUserList');
-        list.innerHTML = '<div class="loading-spinner"></div>';
-        
-        const q = query(paths.usersCol(), orderBy('cringeCoin', 'desc'), limit(10));
-        const snapshot = await getDocs(q);
-        
-        list.innerHTML = '';
-        let rank = 1;
-        snapshot.forEach(doc => {
-            const user = doc.data();
-            const item = document.createElement('div');
-            item.className = `leaderboard-item rank-${rank}`;
-            item.innerHTML = `
-              <div class="leaderboard-rank">${rank}</div>
-              <img src="${user.avatar}" alt="avatar" class="leaderboard-avatar">
-              <div class="leaderboard-name">${escapeHtml(user.username)}</div>
-              <div class="leaderboard-score">${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i></div>
-            `;
-            list.appendChild(item);
-            rank++;
-        });
-    };
-    
-    const loadLeaderboardMemes = async () => {
-        const grid = $('leaderboardMemeGrid');
-        grid.innerHTML = '<div class="loading-spinner"></div>';
-        
-        const q = query(paths.memesCol(), orderBy('reactions.cringe', 'desc'), limit(12));
-        const snapshot = await getDocs(q);
-        
-        grid.innerHTML = '';
-        snapshot.forEach(doc => {
-            const meme = doc.data();
-            const item = document.createElement('div');
-            item.className = 'leaderboard-meme-item';
-            item.innerHTML = `
-              <img src="${meme.imageUrl}" alt="${escapeHtml(meme.title)}" loading="lazy">
-              <div class="leaderboard-meme-score">${formatNumber(meme.reactions.cringe)} <i class="fas fa-skull"></i></div>
-            `;
-            grid.appendChild(item);
-        });
-    };
+    // Load default tab
+    loadLeaderboardUsers();
+    $('leaderboardMemeGrid').innerHTML = '<div class="loading-spinner"></div>'; 
+};
 
-    const showQuests = () => {
-      if (!checkAuth('view quests')) return;
-      openModal('questsModal');
-      const list = $('questList');
-      list.innerHTML = ''; // Clear old quests
-      
-      const quests = [
+const loadLeaderboardUsers = async () => {
+    const list = $('leaderboardUserList');
+    list.innerHTML = '<div class="loading-spinner"></div>';
+    
+    const q = query(paths.usersCol(), orderBy('cringeCoin', 'desc'), limit(10));
+    const snapshot = await getDocs(q);
+    
+    list.innerHTML = '';
+    let rank = 1;
+    snapshot.forEach(doc => {
+        const user = doc.data();
+        const item = document.createElement('div');
+        item.className = `leaderboard-item rank-${rank}`;
+        item.onclick = () => showPublicProfile(doc.id); // View user profile
+        item.innerHTML = `
+            <div class="leaderboard-rank">${rank}</div>
+            <img src="${user.avatar}" alt="avatar" class="leaderboard-avatar">
+            <div class="leaderboard-name">${escapeHtml(user.username)}</div>
+            <div class="leaderboard-score">${formatNumber(user.cringeCoin)} <i class="fas fa-coins"></i></div>
+        `;
+        list.appendChild(item);
+        rank++;
+    });
+};
+
+const loadLeaderboardMemes = async () => {
+    const grid = $('leaderboardMemeGrid');
+    grid.innerHTML = '<div class="loading-spinner"></div>';
+    
+    // Order by total cringe reactions (primary social score)
+    const q = query(paths.memesCol(), orderBy('reactions.cringe', 'desc'), limit(12));
+    const snapshot = await getDocs(q);
+    
+    grid.innerHTML = '';
+    snapshot.forEach(doc => {
+        const meme = doc.data();
+        const totalReactions = (meme.reactions.cringe || 0) + (meme.reactions.laugh || 0) + (meme.reactions.cry || 0);
+        const item = document.createElement('div');
+        item.className = 'leaderboard-meme-item';
+        item.innerHTML = `
+            <img src="${meme.imageUrl}" alt="${escapeHtml(meme.title)}" loading="lazy">
+            <div class="leaderboard-meme-score">${formatNumber(totalReactions)} <i class="fas fa-skull"></i></div>
+        `;
+        // Future: Add click handler to view full meme
+        grid.appendChild(item);
+    });
+};
+
+const showQuests = () => {
+    if (!checkAuth('view quests')) return;
+    openModal('questsModal');
+    const list = $('questList');
+    list.innerHTML = ''; 
+    
+    // Quest data (should match the goals in checkDailyReset logic)
+    const quests = [
         { id: 'react', title: 'Daily Reactions', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed, reward: 10 },
         { id: 'post', title: 'Daily Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed, reward: 25 },
         { id: 'tip', title: 'Generous Tipper', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed, reward: 5 }
-      ];
+    ];
 
-      if (quests.length === 0) {
+    if (quests.length === 0) {
         list.innerHTML = '<div class="feed-message">No quests available.</div>';
         return;
-      }
+    }
 
-      quests.forEach(q => {
+    quests.forEach(q => {
         const item = document.createElement('div');
         const isComplete = q.progress >= q.goal;
         item.className = `quest-item ${isComplete ? 'completed' : ''}`;
         item.innerHTML = `
-          <div class="quest-header">
-            <div>
-              <h4 class="quest-title">${q.title}</h4>
-              <p class="quest-desc">${q.desc}</p>
+            <div class="quest-header">
+                <div>
+                    <h4 class="quest-title">${q.title}</h4>
+                    <p class="quest-desc">${q.desc}</p>
+                </div>
+                <div class="quest-reward">+${q.reward} <i class="fas fa-coins"></i></div>
             </div>
-            <div class="quest-reward">+${q.reward} <i class="fas fa-coins"></i></div>
-          </div>
-          <div class="progress-bar"><div class="progress-bar-inner" style="width: ${Math.min(100, (q.progress / q.goal) * 100)}%;"></div></div>
-          <div class="quest-footer">
-            <span>${q.progress}/${q.goal} completed</span>
-            <button class="btn btn-primary claim-btn btn-sm" data-quest-id="${q.id}" ${(!isComplete || q.claimed) ? 'disabled' : ''}>
-              ${q.claimed ? 'Claimed' : 'Claim'}
-            </button>
-          </div>
+            <div class="progress-bar"><div class="progress-bar-inner" style="width: ${Math.min(100, (q.progress / q.goal) * 100)}%;"></div></div>
+            <div class="quest-footer">
+                <span>${q.progress}/${q.goal} completed</span>
+                <button class="btn btn-primary claim-btn btn-sm" data-quest-id="${q.id}" ${(!isComplete || q.claimed) ? 'disabled' : ''}>
+                    ${q.claimed ? 'Claimed' : 'Claim'}
+                </button>
+            </div>
         `;
         list.appendChild(item);
-      });
-      
-      // Add event listeners to claim buttons
-      $$('.claim-btn').forEach(btn => {
-          btn.onclick = () => claimQuest(btn.dataset.questId, quests.find(q => q.id === btn.dataset.questId));
-      });
-    };
+    });
     
-    const showNotifications = async () => {
-        if (!checkAuth('view notifications')) return;
-        openModal('notificationsModal');
-        // Data is already loaded by `renderNotifications` via snapshot
-        
-        // Mark all as read when opening
+    $$('.claim-btn').forEach(btn => {
+        const questData = quests.find(q => q.id === btn.dataset.questId);
+        btn.onclick = () => claimQuest(btn.dataset.questId, questData);
+    });
+};
+
+const showNotifications = async () => {
+    if (!checkAuth('view notifications')) return;
+    openModal('notificationsModal');
+    
+    // Mark all as read when opening
+    try {
         const batch = writeBatch(db);
         const q = query(paths.notificationsCol(userId), where('read', '==', false));
         const snapshot = await getDocs(q);
@@ -3769,265 +4088,66 @@
         });
         await batch.commit();
         $('notificationsBadge').textContent = '';
-    };
+    } catch(e) {
+        console.error('Failed to mark notifications as read:', e);
+    }
+};
 
-    const renderNotifications = (docs) => {
-        const list = $('notificationsList');
-        if (!list) return;
-        list.innerHTML = '';
-        if (docs.length === 0) {
-            list.innerHTML = '<div class="feed-message" style="padding: 20px;">No notifications yet.</div>';
-            return;
+const renderNotifications = (docs) => {
+    const list = $('notificationsList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (docs.length === 0) {
+        list.innerHTML = '<div class="feed-message" style="padding: 20px;">No notifications yet.</div>';
+        return;
+    }
+    docs.forEach(doc => {
+        const notif = doc.data();
+        const item = document.createElement('div');
+        item.className = 'menu-item';
+        item.style.opacity = notif.read ? 0.6 : 1;
+        let icon = 'fa-info-circle';
+        let text = 'New notification';
+        
+        if (notif.type === 'tip') {
+            icon = 'fa-coins';
+            text = `<strong>${escapeHtml(notif.fromUser)}</strong> tipped you <strong>${notif.amount} CC</strong> on "${escapeHtml(notif.memeTitle)}"`;
+        } else if (notif.type === 'welcome') {
+            icon = 'fa-party-popper';
+            text = `Welcome to CringeScroll! You received <strong>${notif.amount} CC</strong>.`;
+        } else if (notif.text) { // Generic message if text property exists
+            icon = 'fa-bell';
+            text = notif.text;
         }
-        docs.forEach(doc => {
-            const notif = doc.data();
-            const item = document.createElement('div');
-            item.className = 'menu-item';
-            item.style.opacity = notif.read ? 0.6 : 1;
-            let icon = 'fa-info-circle';
-            let text = 'New notification';
-            
-            if (notif.type === 'tip') {
-                icon = 'fa-coins';
-                text = `<strong>${escapeHtml(notif.fromUser)}</strong> tipped you <strong>${notif.amount} CC</strong> on "${escapeHtml(notif.memeTitle)}"`;
-            } else if (notif.type === 'welcome') {
-                icon = 'fa-party-popper';
-                text = `Welcome to CringeScroll! You received <strong>${notif.amount} CC</strong>.`;
-            }
-            
-            item.innerHTML = `<i class="fas ${icon}" style="color: ${notif.type === 'tip' ? 'var(--gold)' : 'var(--accent-3)'};"></i><div>${text}<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">${notif.timestamp ? timeAgo(notif.timestamp.toDate()) : ''}</div></div>`;
-            list.appendChild(item);
-        });
-    };
+        
+        item.innerHTML = `<i class="fas ${icon}" style="color: ${notif.type === 'tip' ? 'var(--gold)' : 'var(--accent-3)'};"></i><div>${text}<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">${notif.timestamp ? timeAgo(notif.timestamp.toDate()) : ''}</div></div>`;
+        list.appendChild(item);
+    });
+};
+
+// Toggle theme (Corrected function definition)
+const toggleTheme = () => {
+    const themes = ['dark', 'light', 'blue', 'red', 'purple'];
+    const currentTheme = userPreferences.theme || 'dark';
+    const currentIndex = themes.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % themes.length;
+    userPreferences.theme = themes[nextIndex];
     
-    // ===== QUEST SYSTEM (UNCHANGED) =====
-    const checkDailyReset = async (privateUserRef, privateData) => {
-        const today = new Date().toISOString().split('T')[0];
-        const lastReset = privateData.quests?.lastReset;
-        
-        if (!lastReset || lastReset !== today) {
-            // Reset quests
-            const defaultQuests = {
-              lastReset: today,
-              reactCount: 0, postCount: 0, tipCount: 0,
-              reactClaimed: false, postClaimed: false, tipClaimed: false
-            };
-            
-            // Check streak
-            let newStreak = 1;
-            if (privateData.lastActive) {
-                const lastActiveDate = privateData.lastActive.toDate();
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                
-                if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) {
-                    newStreak = (privateData.streak || 0) + 1; // Continue streak
-                }
-            }
-            
-            await updateDoc(privateUserRef, { 
-                quests: defaultQuests,
-                streak: newStreak,
-                lastActive: serverTimestamp()
-            });
-            
-            if (newStreak > (privateData.streak || 0)) {
-                showNotification('Streak Continued!', `You're on a ${newStreak}-day streak!`, 'info');
-            }
-        }
-    };
-    
-    const updateQuestProgress = async (questType) => {
-        if (!currentUser || !userQuests) return;
-        
-        const fieldMap = {
-            'react': { count: 'reactCount', claimed: 'reactClaimed' },
-            'post': { count: 'postCount', claimed: 'postClaimed' },
-            'tip': { count: 'tipCount', claimed: 'tipClaimed' }
-        };
-        
-        const quest = fieldMap[questType];
-        if (!quest || userQuests[quest.claimed]) return; // Don't update if already claimed
-        
-        try {
-            await updateDoc(paths.privateUser(userId), {
-                [`quests.${quest.count}`]: increment(1)
-            });
-            // userQuests will update via onSnapshot
-        } catch (error) {
-            console.error('Quest update error:', error);
-        }
-    };
-
-    const claimQuest = async (questId, questData) => {
-        if (!currentUser || !questData || questData.claimed) return;
-        
-        try {
-            await runTransaction(db, async (transaction) => {
-                const privateDoc = await transaction.get(paths.privateUser(userId));
-                const quests = privateDoc.data().quests;
-                
-                const progress = quests[questId + 'Count'] || 0;
-                const claimed = quests[questId + 'Claimed'] || false;
-                
-                if (progress >= questData.goal && !claimed) {
-                    // Update private doc
-                    transaction.update(paths.privateUser(userId), {
-                        [`quests.${questId}Claimed`]: true
-                    });
-                    // Update public doc
-                    transaction.update(paths.publicUser(userId), {
-                        cringeCoin: increment(questData.reward)
-                    });
-                } else {
-                    throw new Error('Quest not completed or already claimed.');
-                }
-            });
-            showNotification('Reward Claimed!', `+${questData.reward} CringeCoin for completing ${questData.title}!`, 'success');
-            // UI will update via onSnapshot, which re-renders the quest modal
-            if ($('questsModal').classList.contains('active')) {
-                showQuests();
-            }
-        } catch (error) {
-            console.error('Claim quest error:', error);
-            showNotification('Error', error.message, 'error');
-        }
-    };
-
-    // ===== EVENT LISTENERS (UNCHANGED) =====
-    const setupEventListeners = () => {
-      feed = $('feed'); 
-      authModal = $('authModal'); 
-      chatWindow = $('chatWindow'); 
-      sidebar = $('sidebar');
-      
-      // Nav Tabs
-      $$('.nav-item[data-tab]').forEach(item => item.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        switchTab(item.dataset.tab);
-      }));
-      
-      // Header
-      $('menuToggleBtn').addEventListener('click', () => sidebar.classList.add('active'));
-      $('themeToggleBtn').addEventListener('click', toggleTheme);
-      $('notificationsBtn').addEventListener('click', () => { if(checkAuth('view notifications')) showNotifications(); });
-      $('chatToggleBtn').addEventListener('click', toggleChatWindow);
-      $('logoLink').addEventListener('click', (e) => { e.preventDefault(); switchTab('hot'); });
-      $('searchInput').addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') {
-          const searchTerm = e.target.value.trim();
-          if (!searchTerm) {
-            switchTab('hot'); // Go home if search is cleared
-            return;
-          }
-          currentTab = 'search'; // Don't use switchTab, just set and load
-          $$('.nav-item').forEach(el => el.classList.remove('active'));
-          loadFeed(true);
-        }
-      });
-      
-      // Sidebar
-      $('closeSidebar').addEventListener('click', () => sidebar.classList.remove('active'));
-      $('menuProfile').addEventListener('click', () => { if(checkAuth('view your profile')) { showPublicProfile(userId); sidebar.classList.remove('active'); } });
-      $('menuCollections').addEventListener('click', () => { if(checkAuth('view your collections')) { showCollections(); sidebar.classList.remove('active'); } });
-      $('menuInventory').addEventListener('click', () => { if(checkAuth('view your inventory')) { showInventory(); sidebar.classList.remove('active'); } });
-      $('menuChat').addEventListener('click', () => { toggleChatWindow(); sidebar.classList.remove('active'); });
-      $('menuLeaderboard').addEventListener('click', () => { if(checkAuth('view the leaderboard')) { showLeaderboard(); sidebar.classList.remove('active'); } });
-      $('menuQuests').addEventListener('click', () => { if(checkAuth('view quests')) { showQuests(); sidebar.classList.remove('active'); } });
-      $('menuCreateMeme').addEventListener('click', () => { if(checkAuth('create memes')) { openMemeEditor(); sidebar.classList.remove('active'); } });
-      $('menuMemeRoulette').addEventListener('click', () => { 
-        switchTab('hot');
-        showNotification('Meme Roulette', 'Loading fresh random memes!', 'info'); 
-        sidebar.classList.remove('active');
-      });
-      $('menuSettings').addEventListener('click', () => { if(checkAuth('view settings')) { showSettings(); sidebar.classList.remove('active'); } });
-      $('menuLogin').addEventListener('click', () => { showAuthModal(); sidebar.classList.remove('active'); });
-      $('menuLogout').addEventListener('click', logout);
-      
-      // Chat
-      $('closeChatWindow').addEventListener('click', toggleChatWindow);
-      $('sendChatMessage').addEventListener('click', sendChatMessage);
-      $('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
-      
-      // Auth Modal
-      $('signupTab').addEventListener('click', () => { 
-        $('signupForm').style.display = 'block'; 
-        $('loginForm').style.display = 'none'; 
-        $('signupTab').classList.add('active'); 
-        $('loginTab').classList.remove('active'); 
-      });
-      $('loginTab').addEventListener('click', () => { 
-        $('signupForm').style.display = 'none'; 
-        $('loginForm').style.display = 'block'; 
-        $('signupTab').classList.remove('active'); 
-        $('loginTab').classList.add('active'); 
-      });
-      $('signupBtn').addEventListener('click', signUpUser);
-      $('loginBtn').addEventListener('click', loginUser);
-      
-      // Generic Modal Closer
-      $$('.close-modal').forEach(btn => btn.addEventListener('click', (e) => {
-        const modalId = e.target.closest('.modal-overlay').id;
-        closeModal(modalId);
-      }));
-      
-      // Settings Modal
-      $$('#settingsModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
-        const tabId = e.currentTarget.dataset.tab;
-        $$('#settingsModal .tab-content').forEach(content => content.classList.remove('active'));
-        $$('#settingsModal .tab-btn').forEach(tab => tab.classList.remove('active'));
-        $(tabId).classList.add('active');
-        e.currentTarget.classList.add('active');
-      }));
-      $('saveProfileSettingsBtn').addEventListener('click', saveProfileSettings);
-      $('avatarUpload').addEventListener('change', (e) => {
-          const file = e.target.files[0];
-          if (file) {
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                  $('settingsAvatarImg').src = event.target.result;
-              };
-              reader.readAsDataURL(file);
-          }
-      });
-      $('saveAppearanceSettingsBtn').addEventListener('click', saveAppearanceSettings);
-      $('settingsLogoutBtn').addEventListener('click', logout);
-      $('deleteAccountBtn').addEventListener('click', deleteAccount);
-
-      // Infinite scroll
-      feed.addEventListener('scroll', () => {
-        if (isLoading || currentTab === 'mymemes' || currentTab === 'search') return;
-        const { scrollTop, scrollHeight, clientHeight } = feed;
-        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) { 
-          loadFeed(); 
-        }
-      });
-      
-      makeChatDraggable();
-      setupMemeEditorListeners();
-    };
-    
-    // Toggle theme
-    const toggleTheme = () => {
-      const themes = ['dark', 'light', 'blue', 'red', 'purple'];
-      const currentTheme = userPreferences.theme || 'dark';
-      const currentIndex = themes.indexOf(currentTheme);
-      const nextIndex = (currentIndex + 1) % themes.length;
-      userPreferences.theme = themes[nextIndex];
-      
-      if (!isAnonymous) {
+    if (!isAnonymous) {
         updateDoc(paths.privateUser(userId), { 'preferences.theme': userPreferences.theme });
-      }
-      applyUserPreferences();
-    };
-    
-    // Make chat window draggable (with touch support)
-    const makeChatDraggable = () => {
-      let isDragging = false;
-      let chatOffsetX = 0, chatOffsetY = 0;
-      const chatHeader = $('chatHeader');
+    }
+    applyUserPreferences();
+};
 
-      const onDragStart = (e) => {
+// Make chat window draggable (with touch support)
+const makeChatDraggable = () => {
+    let isDragging = false;
+    let chatOffsetX = 0, chatOffsetY = 0;
+    const chatHeader = $('chatHeader');
+    
+    if (!chatHeader) return; // Guard for existence
+
+    const onDragStart = (e) => {
         isDragging = true;
         const rect = chatWindow.getBoundingClientRect();
         const touch = e.touches ? e.touches[0] : e;
@@ -4035,11 +4155,11 @@
         chatOffsetY = touch.pageY - rect.top;
         chatWindow.style.transition = 'none';
         document.body.style.userSelect = 'none';
-      };
-      
-      const onDragMove = (e) => {
+    };
+    
+    const onDragMove = (e) => {
         if (!isDragging) return;
-        e.preventDefault(); // Prevent page scroll on touch
+        e.preventDefault(); 
         const touch = e.touches ? e.touches[0] : e;
         let newX = touch.pageX - chatOffsetX;
         let newY = touch.pageY - chatOffsetY;
@@ -4049,218 +4169,341 @@
         chatWindow.style.top = `${newY}px`;
         chatWindow.style.bottom = 'auto'; 
         chatWindow.style.right = 'auto';
-      };
-      
-      const onDragEnd = () => {
+    };
+    
+    const onDragEnd = () => {
         isDragging = false;
         chatWindow.style.transition = 'var(--transition)';
         document.body.style.userSelect = 'auto';
-      };
+    };
 
-      chatHeader.addEventListener('mousedown', onDragStart);
-      document.addEventListener('mousemove', onDragMove);
-      document.addEventListener('mouseup', onDragEnd);
-      
-      chatHeader.addEventListener('touchstart', onDragStart, { passive: false });
-      document.addEventListener('touchmove', onDragMove, { passive: false });
-      document.addEventListener('touchend', onDragEnd);
+    chatHeader.addEventListener('mousedown', onDragStart);
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+    
+    chatHeader.addEventListener('touchstart', onDragStart, { passive: false });
+    document.addEventListener('touchmove', onDragMove, { passive: false });
+    document.addEventListener('touchend', onDragEnd);
+};
+
+const switchEditorTool = (tool) => {
+    activeTool = tool;
+    $$('.editor-tool').forEach(b => b.classList.remove('active'));
+    $$('.editor-tool-group[id^="tool"]').forEach(g => g.style.display = 'none');
+    
+    const toolBtn = $(`.editor-tool[data-tool="${tool}"]`) || $(`label[for="${tool}Input"]`); // Handle label for file input
+    if (toolBtn) toolBtn.classList.add('active');
+    
+    const toolMap = {
+        'text': null,
+        'image': null, // Controlled by label/input
+        'image-url': $('toolImageUrl'),
+        'draw': null,
+        'sticker': $('toolSticker'),
+        'filter': $('toolFilter')
     };
     
-    const switchEditorTool = (tool) => {
-        activeTool = tool;
-        // Deactivate all tools
-        $$('.editor-tool').forEach(b => b.classList.remove('active'));
-        $$('.editor-tool-group[id^="tool"]').forEach(g => g.style.display = 'none');
-        
-        // Activate selected tool
-        const toolBtn = $(`.editor-tool[data-tool="${tool}"]`);
-        if (toolBtn) toolBtn.classList.add('active');
-        
-        const toolGroup = $(`tool${tool.charAt(0).toUpperCase() + tool.slice(1).replace('-', '')}`);
-        if(toolGroup) toolGroup.style.display = 'block';
+    const toolGroup = toolMap[tool];
+    if(toolGroup) toolGroup.style.display = 'block';
 
-        fabricCanvas.isDrawingMode = (activeTool === 'draw');
-    };
+    fabricCanvas.isDrawingMode = (activeTool === 'draw');
     
-    // Setup listeners for meme editor controls
-    const setupMemeEditorListeners = () => {
-      // Tool selection
-      $$('.editor-tool').forEach(btn => btn.addEventListener('click', () => {
+    // De-select active object when switching to draw mode
+    if (activeTool === 'draw') {
+        fabricCanvas.discardActiveObject().renderAll();
+    }
+};
+
+const setupMemeEditorListeners = () => {
+    // Tool selection
+    $$('.editor-tool').forEach(btn => btn.addEventListener('click', () => {
         switchEditorTool(btn.dataset.tool);
-      }));
-      
-      // Templates
-      $$('.template-btn').forEach(btn => btn.addEventListener('click', () => initMemeEditor(btn.dataset.url)));
-      
-      // Add Image by Upload
-      $('.editor-tool[data-tool="image"]').addEventListener('click', () => {
-        const input = document.createElement('input'); 
-        input.type = 'file'; 
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-          const file = e.target.files[0];
-          if (file) {
+    }));
+    
+    // Templates
+    $$('.template-btn').forEach(btn => btn.addEventListener('click', () => initMemeEditor(btn.dataset.url)));
+    
+    // FIX: Add Image by Upload
+    $('imageUploadInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
             const reader = new FileReader();
             reader.onload = (event) => fabric.Image.fromURL(event.target.result, (img) => { 
-              img.scaleToWidth(fabricCanvas.width / 2); 
-              img.set({ left: 50, top: 50 }); 
-              fabricCanvas.add(img); 
-              saveCanvasState(); 
-            // *** FIX 2: Added crossOrigin: 'anonymous' for file uploads to prevent canvas tainting ***
+                img.scaleToWidth(fabricCanvas.width / 2); 
+                img.set({ left: 50, top: 50 }); 
+                fabricCanvas.add(img); 
+                saveCanvasState();
+                switchEditorTool('text'); // Switch back to text/select tool
+                e.target.value = ''; // Clear file input
             }, { crossOrigin: 'anonymous' });
             reader.readAsDataURL(file);
-          }
-        };
-        input.click();
-      });
-      
-      // Add Image by URL
-      $('addImageUrlBtn').addEventListener('click', () => {
-          const url = $('imageUrlInput').value;
-          if (!url) return;
-          fabric.Image.fromURL(url, (img) => { 
-              img.scaleToWidth(fabricCanvas.width / 2); 
-              img.set({ left: 50, top: 50 }); 
-              fabricCanvas.add(img); 
-              saveCanvasState();
-              $('imageUrlInput').value = '';
-              switchEditorTool('text');
-          // *** FIX 2: Added crossOrigin: 'anonymous' for URL images ***
-          }, { crossOrigin: 'anonymous' });
-      });
-      
-      // Stickers
-      $$('.sticker-btn').forEach(btn => btn.addEventListener('click', () => {
-          const sticker = new fabric.IText(btn.textContent, {
-              left: fabricCanvas.width / 2, 
-              top: fabricCanvas.height / 2,
-              originX: 'center',
-              originY: 'center',
-              fontSize: 80,
-              transparentCorners: false,
-              cornerColor: 'var(--accent-3)',
-              borderColor: 'var(--accent-3)'
-          });
-          fabricCanvas.add(sticker);
-          fabricCanvas.setActiveObject(sticker);
-          saveCanvasState();
-      }));
-      
-      // Filters
-      $$('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
-          const obj = fabricCanvas.getActiveObject();
-          if (obj && obj.type === 'image') {
-              const filterType = btn.dataset.filter;
-              obj.filters = []; // Clear existing
-              if (filterType === 'grayscale') obj.filters.push(new fabric.Image.filters.Grayscale());
-              if (filterType === 'sepia') obj.filters.push(new fabric.Image.filters.Sepia());
-              if (filterType === 'invert') obj.filters.push(new fabric.Image.filters.Invert());
-              obj.applyFilters();
-              fabricCanvas.renderAll();
-              saveCanvasState();
-          } else {
-              showNotification('Select an Image', 'Please select an image to apply filters.', 'info');
-          }
-      }));
-      $('removeFiltersBtn').addEventListener('click', () => {
-          const obj = fabricCanvas.getActiveObject();
-          if (obj && obj.type === 'image') {
-              obj.filters = [];
-              obj.applyFilters();
-              fabricCanvas.renderAll();
-              saveCanvasState();
-          }
-      });
-      
-      // Controls
-      $('textColorPicker').addEventListener('input', updateEditorSettings);
-      $('strokeColorPicker').addEventListener('input', updateEditorSettings);
-      $('brushSize').addEventListener('input', (e) => {
-          $('brushSizeLabel').textContent = e.target.value;
-          updateEditorSettings();
-      });
-      $('strokeWidth').addEventListener('input', (e) => {
-          $('strokeWidthLabel').textContent = e.target.value;
-          updateEditorSettings();
-      });
-      $('fontFamilySelect').addEventListener('change', updateEditorSettings);
-      
-      // Object controls
-      $('bringForwardBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.bringForward(fabricCanvas.getActiveObject()); saveCanvasState(); } });
-      $('sendBackBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.sendBackwards(fabricCanvas.getActiveObject()); saveCanvasState(); } });
-      $('deleteObjBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.remove(fabricCanvas.getActiveObject()); saveCanvasState(); } });
-      
-      // Text controls
-      $('toggleBoldBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontWeight', obj.get('fontWeight') === 'bold' ? 'normal' : 'bold'); fabricCanvas.renderAll(); saveCanvasState(); } });
-      $('toggleItalicBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontStyle', obj.get('fontStyle') === 'italic' ? 'normal' : 'italic'); fabricCanvas.renderAll(); saveCanvasState(); } });
-      $('alignLeftBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'left'); fabricCanvas.renderAll(); saveCanvasState(); } });
-      $('alignCenterBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'center'); fabricCanvas.renderAll(); saveCanvasState(); } });
-
-      // History
-      $('undoBtn').addEventListener('click', undoCanvasAction);
-      $('redoBtn').addEventListener('click', redoCanvasAction);
-      $('clearCanvasBtn').addEventListener('click', clearCanvas);
-      
-      // Finish
-      $('postMemeBtn').addEventListener('click', postMemeFromEditor);
-    };
+        }
+    });
     
-    const setupMemeEditorCanvasListeners = () => {
-        if (!fabricCanvas) return;
-        
-        const update = () => saveCanvasState();
-        fabricCanvas.on('object:added', update);
-        fabricCanvas.on('object:modified', update);
-        fabricCanvas.on('object:removed', update);
-        
-        fabricCanvas.on('selection:created', (e) => {
-            const obj = e.target;
-            if (obj.type.includes('text')) {
-                $('brushSize').value = obj.get('fontSize');
-                $('brushSizeLabel').textContent = obj.get('fontSize');
-                $('textColorPicker').value = obj.get('fill');
-                $('strokeColorPicker').value = obj.get('stroke');
-                $('strokeWidth').value = obj.get('strokeWidth');
-                $('strokeWidthLabel').textContent = obj.get('strokeWidth');
-                $('fontFamilySelect').value = obj.get('fontFamily');
-            }
+    // Add Image by URL
+    $('addImageUrlBtn').addEventListener('click', () => {
+        const url = $('imageUrlInput').value;
+        if (!url) return;
+        fabric.Image.fromURL(url, (img) => { 
+            img.scaleToWidth(fabricCanvas.width / 2); 
+            img.set({ left: 50, top: 50 }); 
+            fabricCanvas.add(img); 
+            saveCanvasState();
+            $('imageUrlInput').value = '';
+            switchEditorTool('text');
+        }, { crossOrigin: 'anonymous' });
+    });
+    
+    // Stickers
+    $$('.sticker-btn').forEach(btn => btn.addEventListener('click', () => {
+        const sticker = new fabric.IText(btn.textContent, {
+            left: fabricCanvas.width / 2, 
+            top: fabricCanvas.height / 2,
+            originX: 'center',
+            originY: 'center',
+            fontSize: 80,
+            transparentCorners: false,
+            cornerColor: 'var(--accent-3)',
+            borderColor: 'var(--accent-3)'
         });
-        
-        fabricCanvas.on('mouse:down', (opt) => {
-          if (activeTool === 'text' && !opt.target) {
+        fabricCanvas.add(sticker);
+        fabricCanvas.setActiveObject(sticker);
+        saveCanvasState();
+    }));
+    
+    // Filters
+    $$('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
+        const obj = fabricCanvas.getActiveObject();
+        if (obj && obj.type === 'image') {
+            const filterType = btn.dataset.filter;
+            obj.filters = []; 
+            if (filterType === 'grayscale') obj.filters.push(new fabric.Image.filters.Grayscale());
+            if (filterType === 'sepia') obj.filters.push(new fabric.Image.filters.Sepia());
+            if (filterType === 'invert') obj.filters.push(new fabric.Image.filters.Invert());
+            obj.applyFilters();
+            fabricCanvas.renderAll();
+            saveCanvasState();
+        } else {
+            showNotification('Select an Image', 'Please select an image to apply filters.', 'info');
+        }
+    }));
+    $('removeFiltersBtn').addEventListener('click', () => {
+        const obj = fabricCanvas.getActiveObject();
+        if (obj && obj.type === 'image') {
+            obj.filters = [];
+            obj.applyFilters();
+            fabricCanvas.renderAll();
+            saveCanvasState();
+        }
+    });
+    
+    // Controls
+    $('textColorPicker').addEventListener('input', updateEditorSettings);
+    $('strokeColorPicker').addEventListener('input', updateEditorSettings);
+    $('brushSize').addEventListener('input', (e) => {
+        $('brushSizeLabel').textContent = e.target.value;
+        updateEditorSettings();
+    });
+    $('strokeWidth').addEventListener('input', (e) => {
+        $('strokeWidthLabel').textContent = e.target.value;
+        updateEditorSettings();
+    });
+    $('fontFamilySelect').addEventListener('change', updateEditorSettings);
+    
+    // Object controls
+    $('bringForwardBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.bringForward(fabricCanvas.getActiveObject()); saveCanvasState(); } });
+    $('sendBackBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.sendBackwards(fabricCanvas.getActiveObject()); saveCanvasState(); } });
+    $('deleteObjBtn').addEventListener('click', () => { if(fabricCanvas.getActiveObject()) { fabricCanvas.remove(fabricCanvas.getActiveObject()); saveCanvasState(); } });
+    
+    // Text controls
+    $('toggleBoldBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontWeight', obj.get('fontWeight') === 'bold' ? 'normal' : 'bold'); fabricCanvas.renderAll(); saveCanvasState(); } });
+    $('toggleItalicBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('fontStyle', obj.get('fontStyle') === 'italic' ? 'normal' : 'italic'); fabricCanvas.renderAll(); saveCanvasState(); } });
+    $('alignLeftBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'left'); fabricCanvas.renderAll(); saveCanvasState(); } });
+    $('alignCenterBtn').addEventListener('click', () => { const obj = fabricCanvas.getActiveObject(); if (obj?.type.includes('text')) { obj.set('textAlign', 'center'); fabricCanvas.renderAll(); saveCanvasState(); } });
+
+    // History
+    $('undoBtn').addEventListener('click', undoCanvasAction);
+    $('redoBtn').addEventListener('click', redoCanvasAction);
+    $('clearCanvasBtn').addEventListener('click', clearCanvas);
+    
+    // Finish
+    $('postMemeBtn').addEventListener('click', postMemeFromEditor);
+};
+
+const setupMemeEditorCanvasListeners = () => {
+    if (!fabricCanvas) return;
+    
+    const update = () => saveCanvasState();
+    fabricCanvas.on('object:added', update);
+    fabricCanvas.on('object:modified', update);
+    fabricCanvas.on('object:removed', update);
+    
+    fabricCanvas.on('selection:created', (e) => {
+        const obj = e.target;
+        if (obj.type.includes('text')) {
+            $('brushSize').value = obj.get('fontSize');
+            $('brushSizeLabel').textContent = obj.get('fontSize');
+            $('textColorPicker').value = obj.get('fill');
+            $('strokeColorPicker').value = obj.get('stroke');
+            $('strokeWidth').value = obj.get('strokeWidth');
+            $('strokeWidthLabel').textContent = obj.get('strokeWidth');
+            $('fontFamilySelect').value = obj.get('fontFamily');
+        }
+    });
+    
+    fabricCanvas.on('mouse:down', (opt) => {
+        if (activeTool === 'text' && !opt.target) {
             const text = new fabric.IText('Your text here', {
-              left: opt.pointer.x, 
-              top: opt.pointer.y,
-              fontFamily: $('fontFamilySelect').value,
-              fontSize: parseInt($('brushSize').value),
-              fill: $('textColorPicker').value,
-              stroke: $('strokeColorPicker').value,
-              strokeWidth: parseInt($('strokeWidth').value),
-              originX: 'left', 
-              originY: 'top',
-              padding: 5,
-              cornerColor: 'var(--accent-3)',
-              transparentCorners: false,
-              borderColor: 'var(--accent-3)'
+                left: opt.pointer.x, 
+                top: opt.pointer.y,
+                fontFamily: $('fontFamilySelect').value,
+                fontSize: parseInt($('brushSize').value),
+                fill: $('textColorPicker').value,
+                stroke: $('strokeColorPicker').value,
+                strokeWidth: parseInt($('strokeWidth').value),
+                originX: 'left', 
+                originY: 'top',
+                padding: 5,
+                cornerColor: 'var(--accent-3)',
+                transparentCorners: false,
+                borderColor: 'var(--accent-3)'
             });
             fabricCanvas.add(text);
             fabricCanvas.setActiveObject(text);
             text.enterEditing(); 
             text.selectAll();
-          }
-        });
-    };
-
-    // ===== APP INITIALIZATION (FIXED) =====
-    document.addEventListener('DOMContentLoaded', () => {
-      initFirebase();
-      
-      // *** FIX 1 & 3: Wait for Firebase Auth to initialize before setting up the UI and loading the feed. ***
-      authInitializedPromise.then(() => {
-        setupEventListeners();
-        loadFeed(); 
-      });
+        }
     });
+};
+
+// ===== EVENT LISTENERS (FINAL SETUP) =====
+const setupEventListeners = () => {
+    feed = $('feed'); 
+    authModal = $('authModal'); 
+    chatWindow = $('chatWindow'); 
+    sidebar = $('sidebar');
+    
+    // Nav Tabs
+    $$('.nav-item[data-tab]').forEach(item => item.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        switchTab(item.dataset.tab);
+    }));
+    
+    // Header
+    $('menuToggleBtn').addEventListener('click', () => sidebar.classList.add('active'));
+    $('themeToggleBtn').addEventListener('click', toggleTheme);
+    $('notificationsBtn').addEventListener('click', () => { if(checkAuth('view notifications')) showNotifications(); });
+    $('chatToggleBtn').addEventListener('click', toggleChatWindow);
+    $('logoLink').addEventListener('click', (e) => { e.preventDefault(); switchTab('hot'); });
+    $('searchInput').addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            const searchTerm = e.target.value.trim();
+            if (!searchTerm) {
+                switchTab('hot'); 
+                return;
+            }
+            currentTab = 'search';
+            $$('.nav-item').forEach(el => el.classList.remove('active'));
+            loadFeed(true);
+        }
+    });
+    
+    // Sidebar
+    $('closeSidebar').addEventListener('click', () => sidebar.classList.remove('active'));
+    $('menuProfile').addEventListener('click', () => { if(checkAuth('view your profile')) { showPublicProfile(userId); sidebar.classList.remove('active'); } });
+    $('menuCollections').addEventListener('click', () => { if(checkAuth('view your collections')) { showCollections(); sidebar.classList.remove('active'); } });
+    $('menuInventory').addEventListener('click', () => { if(checkAuth('view your inventory')) { showInventory(); sidebar.classList.remove('active'); } });
+    $('menuChat').addEventListener('click', () => { toggleChatWindow(); sidebar.classList.remove('active'); });
+    $('menuLeaderboard').addEventListener('click', () => { if(checkAuth('view the leaderboard')) { showLeaderboard(); sidebar.classList.remove('active'); } });
+    $('menuQuests').addEventListener('click', () => { if(checkAuth('view quests')) { showQuests(); sidebar.classList.remove('active'); } });
+    $('menuCreateMeme').addEventListener('click', () => { if(checkAuth('create memes')) { openMemeEditor(); sidebar.classList.remove('active'); } });
+    $('menuMemeRoulette').addEventListener('click', () => { 
+        switchTab('hot');
+        showNotification('Meme Roulette', 'Loading fresh random memes!', 'info'); 
+        sidebar.classList.remove('active');
+    });
+    $('menuSettings').addEventListener('click', () => { if(checkAuth('view settings')) { showSettings(); sidebar.classList.remove('active'); } });
+    $('menuLogin').addEventListener('click', () => { showAuthModal(); sidebar.classList.remove('active'); });
+    $('menuLogout').addEventListener('click', logout);
+    
+    // Chat
+    $('closeChatWindow').addEventListener('click', toggleChatWindow);
+    $('sendChatMessage').addEventListener('click', sendChatMessage);
+    $('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+    
+    // Auth Modal
+    $('signupTab').addEventListener('click', () => { 
+        $('signupForm').style.display = 'block'; 
+        $('loginForm').style.display = 'none'; 
+        $('signupTab').classList.add('active'); 
+        $('loginTab').classList.remove('active'); 
+    });
+    $('loginTab').addEventListener('click', () => { 
+        $('signupForm').style.display = 'none'; 
+        $('loginForm').style.display = 'block'; 
+        $('signupTab').classList.remove('active'); 
+        $('loginTab').classList.add('active'); 
+    });
+    $('signupBtn').addEventListener('click', signUpUser);
+    $('loginBtn').addEventListener('click', loginUser);
+    
+    // Generic Modal Closer
+    $$('.close-modal').forEach(btn => btn.addEventListener('click', (e) => {
+        const modal = e.target.closest('.modal-overlay');
+        if (modal) closeModal(modal.id);
+    }));
+    
+    // Settings Modal
+    $$('#settingsModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
+        const tabId = e.currentTarget.dataset.tab;
+        $$('#settingsModal .tab-content').forEach(content => content.classList.remove('active'));
+        $$('#settingsModal .tab-btn').forEach(tab => tab.classList.remove('active'));
+        $(tabId).classList.add('active');
+        e.currentTarget.classList.add('active');
+    }));
+    $('saveProfileSettingsBtn').addEventListener('click', saveProfileSettings);
+    $('avatarUpload').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                $('settingsAvatarImg').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    $('saveAppearanceSettingsBtn').addEventListener('click', saveAppearanceSettings);
+    $('settingsLogoutBtn').addEventListener('click', logout);
+    $('deleteAccountBtn').addEventListener('click', deleteAccount);
+
+    // Infinite scroll
+    feed.addEventListener('scroll', () => {
+        // Only load if not loading and the tab uses infinite scroll (i.e., not search)
+        if (isLoading || currentTab === 'search') return;
+        const { scrollTop, scrollHeight, clientHeight } = feed;
+        if (scrollHeight - scrollTop <= clientHeight + BUFFER_HEIGHT) { 
+            loadFeed(); 
+        }
+    });
+    
+    makeChatDraggable();
+    setupMemeEditorListeners();
+};
+
+// ===== APP INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', () => {
+    initFirebase();
+    setupEventListeners();
+});
+
+// Expose functions for Part 1 to use (no need to do this when combined)
+// We keep the declarations simple here for the purpose of the split.
+// const loadFeed = () => {};
+// const updateSavedButtons = () => {};
+// const renderChatMessages = () => {};
+// const renderNotifications = () => {};
+// const switchTab = () => {};
+// const showQuests = () => {};
 
   </script>
 </body>
