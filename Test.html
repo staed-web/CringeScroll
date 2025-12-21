@@ -32,7 +32,7 @@
       --info: #4dabf7;
       --border-color: rgba(106, 13, 173, 0.3);
       --border-radius: 16px;
-      --transition: all 0.3s ease;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Faster transition for chat/UI */
       --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
       --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.2);
       --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -50,7 +50,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     html { font-size: 16px; }
-
     html, body { height: 100%; width: 100%; overflow: hidden; }
     
     body {
@@ -62,7 +61,7 @@
       -webkit-font-smoothing: antialiased;
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
-      transition: var(--transition);
+      transition: background-color 0.3s ease, color 0.3s ease;
       font-size: var(--font-size-base, 1rem);
     }
     
@@ -233,7 +232,6 @@
     }
     .user-badge:hover { background: rgba(106, 13, 173, 0.4); }
     
-    /* Report Button Style */
     .report-btn {
       color: var(--text-secondary);
       background: none; border: none; cursor: pointer;
@@ -255,7 +253,7 @@
     }
     .meme-image.loaded, video.meme-image { opacity: 1; transform: scale(1); }
     
-    /* IMPROVEMENT: Video support styles */
+    /* FIX: Video support styles */
     video.meme-image { max-height: 600px; object-fit: contain; background: black; }
 
     .card-footer { padding: var(--card-padding); border-top: 1px solid var(--border-color); }
@@ -362,52 +360,59 @@
     .btn-sm { padding: 8px 12px; font-size: 0.9rem; width: auto; }
     .form-error { color: var(--error); font-size: 0.8rem; margin-top: -10px; margin-bottom: 15px; min-height: 1.2em; }
     
-    .modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-    .grid-item { background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: var(--transition); border: 1px solid transparent; }
-    .grid-item:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--border-color); }
-    .grid-item i { font-size: 1.5rem; color: var(--accent-3); margin-bottom: 10px; }
-    .grid-item-title { font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+    /* FIX: Inventory/Shop Grid Layout */
+    .modal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
+    .grid-item { background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: var(--transition); border: 1px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; }
+    .grid-item:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--border-color); transform: translateY(-2px); }
+    .grid-item i { font-size: 2rem; color: var(--accent-3); margin-bottom: 10px; }
+    .grid-item-title { font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; word-break: break-word; }
     .grid-item-meta { font-size: 0.75rem; color: var(--text-secondary); }
 
-    /* Shop Styles */
+    /* FIX: Shop Card Styling */
     .shop-item-card {
         background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
-        border-radius: 12px; padding: 16px; text-align: center;
-        display: flex; flex-direction: column; gap: 8px;
+        border-radius: 12px; padding: 12px; text-align: center;
+        display: flex; flex-direction: column; gap: 8px; justify-content: space-between;
+        height: 100%; transition: all 0.2s;
     }
-    .shop-price { color: var(--gold); font-weight: bold; font-size: 1.1rem; }
+    .shop-item-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); border-color: var(--accent-3); }
+    .shop-price { color: var(--gold); font-weight: bold; font-size: 1rem; margin: 4px 0; }
     .shop-preview {
-        height: 60px; width: 60px; margin: 0 auto; border-radius: 50%;
+        height: 50px; width: 50px; margin: 0 auto; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.2); font-weight: bold;
+        background: rgba(0,0,0,0.2); font-weight: bold; font-size: 1.2rem;
     }
 
-    /* ===== CHAT WINDOW ===== */
+    /* ===== CHAT WINDOW (FIXED & FASTER) ===== */
     .chat-window {
       position: fixed; bottom: 90px; right: 20px; 
       width: 350px; height: 500px; 
       background: var(--bg-secondary); border-radius: 20px; 
       box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); 
       z-index: 900; display: flex; flex-direction: column; 
-      overflow: hidden; transform: translateY(100px) scale(0.9);
-      opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none;
+      overflow: hidden; 
+      /* Fix: remove heavy transform animations that cause glitches */
+      opacity: 0; pointer-events: none;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
     }
-    .chat-window.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
-    .chat-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: move; touch-action: none; flex-shrink: 0; }
+    .chat-window.active { opacity: 1; pointer-events: all; visibility: visible; transform: translateY(0); }
+    .chat-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: move; touch-action: none; flex-shrink: 0; background: rgba(0,0,0,0.2); }
     .chat-title { font-size: 1.1rem; font-weight: 700; color: var(--accent-3); }
     .close-chat { background: none; border: none; color: var(--text-primary); font-size: 1.1rem; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0; }
     .close-chat:hover { background: rgba(255, 255, 255, 0.1); }
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-    .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.1); color: var(--text-primary); font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; }
+    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+    .message { max-width: 80%; padding: 10px 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     .message.incoming { align-self: flex-start; border-bottom-left-radius: 4px; }
     .message.outgoing { align-self: flex-end; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); color: white; border-bottom-right-radius: 4px; }
-    .message-meta { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; display: flex; justify-content: space-between; gap: 8px; }
-    .message.outgoing .message-meta { color: rgba(255, 255, 255, 0.8); }
-    .chat-input-container { padding: 16px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; flex-shrink: 0; }
-    .chat-input { flex: 1; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.1); color: var(--text-primary); font-size: 0.9rem; }
+    .message-meta { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; display: flex; justify-content: space-between; gap: 8px; opacity: 0.7; }
+    .message.outgoing .message-meta { color: rgba(255, 255, 255, 0.9); }
+    .chat-input-container { padding: 12px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; flex-shrink: 0; background: var(--bg-secondary); }
+    .chat-input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); color: var(--text-primary); font-size: 0.9rem; }
     .chat-input:focus { outline: none; border-color: var(--accent-3); }
-    .send-btn { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); border: none; color: white; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
-    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(106, 13, 173, 0.5); }
+    .send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-3); border: none; color: white; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
+    .send-btn:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(106, 13, 173, 0.4); }
 
     /* ===== NOTIFICATIONS ===== */
     .notification {
@@ -569,7 +574,7 @@
       .modal-overlay.active .modal-content.editor-modal, .modal-overlay.active #confirmModal .modal-content { transform: translateY(0); }
     }
     
-    /* IMPROVEMENT: Better mobile chat handling */
+    /* FIX: Mobile chat logic */
     @media (max-width: 480px) {
       html { font-size: 14px; }
       .header { padding: 0 12px; height: 64px; }
@@ -581,16 +586,10 @@
       .header-actions { gap: 8px; }
       .action-btn { width: 38px; height: 38px; font-size: 1rem; }
       
-      /* Fullscreen chat on mobile to avoid keyboard issues */
       .chat-window.active {
-        bottom: 0;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 100%; 
-        width: 100%;
-        border-radius: 0;
-        transform: none;
+        bottom: 0; top: 0; left: 0; right: 0;
+        height: 100%; width: 100%;
+        border-radius: 0; transform: none;
       }
 
       .modal-overlay { align-items: flex-end; }
@@ -600,6 +599,8 @@
       #confirmModal .modal-content { height: auto; max-height: 90vh; }
       .editor-tool-row { grid-template-columns: repeat(2, 1fr); }
       .editor-tool-row .btn { font-size: 0.75rem; }
+      
+      .modal-grid { grid-template-columns: repeat(2, 1fr); }
     }
     
     ::-webkit-scrollbar { width: 8px; }
@@ -1123,21 +1124,25 @@
     let notificationsListener = null;
     let collectionsListener = null;
 
-    // FIX: Shop Items Configuration (Hardcoded for security validation later)
+    // FIX: Shop Items Configuration
     const shopItems = [
       { id: 'color_gold', name: 'Golden Name', price: 50, type: 'nameColor', value: '#FFD700', icon: 'fa-crown', desc: 'Make your username shine.' },
       { id: 'border_fire', name: 'Fire Border', price: 100, type: 'border', value: '2px solid #ff4d4d', icon: 'fa-fire', desc: 'Hot border for your profile.' },
-      { id: 'color_neon', name: 'Neon Text', price: 75, type: 'textColor', value: '#00ff00', icon: 'fa-bolt', desc: 'Matrix style text.' }
+      { id: 'color_neon', name: 'Neon Text', price: 75, type: 'textColor', value: '#00ff00', icon: 'fa-bolt', desc: 'Matrix style text.' },
+      { id: 'bg_space', name: 'Space Card', price: 150, type: 'cardBg', value: '#0f0c29', icon: 'fa-rocket', desc: 'Deep space card background.' },
+      { id: 'badge_og', name: 'OG Badge', price: 500, type: 'badge', value: 'OG', icon: 'fa-medal', desc: 'Flex your wealth.' }
     ];
     
-    // Security Map for Prices
+    // FIX: Secure Price Map for Transaction Validation
     const SECURE_PRICES = {
         'color_gold': 50,
         'border_fire': 100,
-        'color_neon': 75
+        'color_neon': 75,
+        'bg_space': 150,
+        'badge_og': 500
     };
 
-    // EXPANDED MEME API SOURCES
+    // IMPROVEMENT: Expanded Meme API Sources (15+)
     const MEME_SOURCES = [
       'https://meme-api.com/gimme/memes',
       'https://meme-api.com/gimme/dankmemes',
@@ -1148,7 +1153,14 @@
       'https://meme-api.com/gimme/ProgrammerHumor',
       'https://meme-api.com/gimme/animemes',
       'https://meme-api.com/gimme/gaming',
-      'https://meme-api.com/gimme/PrequelMemes'
+      'https://meme-api.com/gimme/PrequelMemes',
+      'https://meme-api.com/gimme/terriblefacebookmemes',
+      'https://meme-api.com/gimme/pewdiepiesubmissions',
+      'https://meme-api.com/gimme/surrealmemes',
+      'https://meme-api.com/gimme/bonehurtingjuice',
+      'https://meme-api.com/gimme/starterpacks',
+      'https://meme-api.com/gimme/facepalm',
+      'https://meme-api.com/gimme/AdviceAnimals'
     ];
 
     // ===== FIRESTORE PATHS =====
@@ -1302,11 +1314,7 @@
 
         if (!authInitialized) {
             authInitialized = true;
-            // IMPROVEMENT: Deep link check happens in loadFeed/window load
-            // We just ensure loadFeed is called
-            checkDeepLink().then(isDeep => {
-               if(!isDeep) loadFeed(true);
-            });
+            checkDeepLink().then(isDeep => { if(!isDeep) loadFeed(true); });
         }
     };
 
@@ -1322,18 +1330,20 @@
       attachPublicListeners();
       attachPrivateListeners(user.uid); 
       
-      const publicUserDoc = await getDoc(paths.publicUser(user.uid));
-      if (!publicUserDoc.exists()) {
-          console.warn('User doc missing, creating...');
-      }
+      // Ensure public doc exists
+      try {
+          const publicUserDoc = await getDoc(paths.publicUser(user.uid));
+          if (!publicUserDoc.exists()) {
+             // Recovery: Create profile if missing
+             await createUserProfile(user, user.displayName || 'User_' + user.uid.substr(0,5));
+          }
+      } catch(e) { console.error("Profile check error", e); }
       
       $('authModal').classList.remove('active');
 
       if (!authInitialized) {
           authInitialized = true;
-          checkDeepLink().then(isDeep => {
-             if(!isDeep) loadFeed(true);
-          });
+          checkDeepLink().then(isDeep => { if(!isDeep) loadFeed(true); });
       } else {
           loadFeed(false); 
       }
@@ -1364,6 +1374,7 @@
     };
 
     const attachPrivateListeners = (uid) => {
+        // Listener for Coins/Avatar changes
         if (publicUserListener) publicUserListener();
         publicUserListener = onSnapshot(paths.publicUser(uid), (doc) => {
             if (doc.exists()) {
@@ -1371,19 +1382,30 @@
                 currentUser = { ...currentUser, ...publicData, uid: uid, email: auth.currentUser.email };
                 applyUserPreferences(); 
                 updateUIAfterLogin();
+                // Update Shop UI if open
+                if($('shopModal').classList.contains('active')) {
+                     $('shopBalance').textContent = `${currentUser.cringeCoin || 0} CC`;
+                }
             }
         });
 
+        // Listener for Inventory/Quests/Preferences
         if (privateUserListener) privateUserListener();
         privateUserListener = onSnapshot(paths.privateUser(uid), async (doc) => {
             if (doc.exists()) {
                 const privateData = doc.data();
+                // Merge carefully so we don't overwrite public data
                 currentUser = { ...currentUser, ...privateData };
                 userPreferences = privateData.preferences || userPreferences;
                 userQuests = privateData.quests || {};
+                
                 await checkDailyReset(paths.privateUser(uid), privateData); 
                 applyUserPreferences();
                 updateUIAfterLogin();
+                
+                // Update Inventory/Shop if open
+                if($('inventoryModal').classList.contains('active')) showInventory();
+                if($('shopModal').classList.contains('active')) showShop();
             }
         });
 
@@ -1400,10 +1422,7 @@
             userCollections.favorites = snapshot.docs.map(doc => doc.id);
             $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
             updateSavedButtons();
-            
-            if ($('collectionsModal').classList.contains('active')) {
-                showCollections(); 
-            }
+            if ($('collectionsModal').classList.contains('active')) { showCollections(); }
         });
     };
 
@@ -1415,7 +1434,7 @@
         
         const publicData = {
           username: username,
-          cringeCoin: 10,
+          cringeCoin: 50, // Give enough for first item
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=6a0dad&color=fff`,
           bio: 'New CringeScroller!',
           createdAt: serverTimestamp(),
@@ -1466,7 +1485,7 @@
         await updateProfile(userCredential.user, { displayName: username });
         await createUserProfile(userCredential.user, username);
         
-        showNotification('Account Created!', `Welcome ${username}! You've received 10 starter CringeCoin.`, 'success');
+        showNotification('Account Created!', `Welcome ${username}! You've received 50 starter CringeCoin.`, 'success');
       } catch (error) { 
         console.error('Sign up error:', error);
         errorEl.textContent = error.message.replace('Firebase: ', '');
@@ -1549,6 +1568,9 @@
       const fontSize = userPreferences.fontSize || 'medium';
       document.body.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
       document.body.classList.add(`font-size-${fontSize}`);
+      
+      // Apply purchased frame/color if equipped
+      if (userPreferences.nameColor) document.documentElement.style.setProperty('--username-color', userPreferences.nameColor);
     };
 
     const updateUIAfterLogin = () => {
@@ -1562,6 +1584,7 @@
         $('menuQuestsBadge').textContent = unclaimed > 0 ? unclaimed : '';
       }
     };
+    
     const showAuthModal = (tab = 'signup') => {
       $('authModal').classList.add('active');
       if(tab === 'login') {
@@ -1611,7 +1634,7 @@
       }
     };
 
-    // ===== COMMENT SYSTEM (IMPROVED SECURITY) =====
+    // ===== COMMENT SYSTEM (SECURE) =====
     const toggleComments = async (memeId) => {
       const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
       let commentSection = card.querySelector('.comment-section');
@@ -1648,7 +1671,7 @@
 
       const q = query(paths.commentsCol(memeId), orderBy('timestamp', 'asc'), limit(50));
       
-      onSnapshot(q, (snapshot) => {
+      const unsubscribe = onSnapshot(q, (snapshot) => {
         listEl.innerHTML = '';
         if(snapshot.empty) listEl.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-secondary); text-align: center;">No comments yet.</p>';
         snapshot.forEach(doc => {
@@ -1656,7 +1679,7 @@
             const row = document.createElement('div');
             row.style.marginBottom = '6px';
             
-            // SECURITY FIX: Using textContent instead of innerHTML
+            // SECURITY FIX: Use textContent to prevent XSS
             const userStrong = document.createElement('strong');
             userStrong.style.color = 'var(--accent-3)';
             userStrong.style.fontSize = '0.8rem';
@@ -1696,7 +1719,7 @@
       });
     };
 
-    // ===== FEED & MEME RENDERING (IMPROVED VIDEO SUPPORT) =====
+    // ===== FEED & MEME RENDERING (VIDEO SUPPORT) =====
     const renderMeme = (meme, index) => {
       const card = document.createElement('div');
       card.className = 'meme-card';
@@ -1720,7 +1743,7 @@
       const laughCount = meme.reactions?.laugh || 0;
       const cryCount = meme.reactions?.cry || 0;
 
-      // Detect Video
+      // FIX: Detect Video Extensions
       const isVideo = memeUrl.match(/\.(mp4|webm)$/i);
       let mediaHtml = '';
       
@@ -1768,7 +1791,7 @@
       `;
       feed.appendChild(card);
       
-      // Lazy Load Image
+      // Lazy Load Image logic (Video handles itself via preload="metadata")
       if (!isVideo) {
           const img = card.querySelector('.meme-image');
           const observer = new IntersectionObserver((entries) => {
@@ -1869,6 +1892,7 @@
     const loadApiMemes = async () => {
       const batchSize = window.innerWidth > 768 ? 6 : 4; 
       
+      // Load 3 from Firestore first to keep community content visible
       try {
         const q = query(paths.memesCol(), orderBy('createdAt', 'desc'), limit(3));
         const snapshot = await getDocs(q);
@@ -1877,6 +1901,7 @@
 
       let memesFetched = 0;
       let attempts = 0;
+      // Fetch from API
       while (memesFetched < batchSize && attempts < 15) {
         const meme = await fetchMeme();
         if (meme) { 
@@ -1889,6 +1914,7 @@
 
     const fetchMeme = async () => {
       try {
+        // IMPROVED: Randomly select from the expanded 15+ source list
         const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
         const response = await fetch(`${url}?_=${Date.now()}`); 
         if (!response.ok) throw new Error('API response not ok.');
@@ -2082,33 +2108,56 @@
         showNotification('Error', 'Could not save reaction.', 'error');
       }
     };
-
-    // ===== CHAT =====
+    // ===== CHAT (FAST & GLITCH-FREE) =====
     const toggleChatWindow = () => {
       chatWindow.classList.toggle('active');
       if (chatWindow.classList.contains('active')) { 
+        // Reset scroll to bottom immediately
         const messagesContainer = $('chatMessages');
-        setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        // Focus input for better UX
+        if(window.innerWidth > 480) $('chatInput').focus();
       }
     };
 
     const renderChatMessages = (docs) => {
         const messagesContainer = $('chatMessages');
+        // Store scroll position to decide if we should auto-scroll
+        const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 50;
+        
         messagesContainer.innerHTML = '';
         if (docs.length === 0) { 
           messagesContainer.innerHTML = '<div class="feed-message" style="font-size: 0.9rem; padding: 20px;">No messages yet. Be the first!</div>'; 
           return; 
         }
+        
+        // Reverse because Firestore gives us latest first (desc), but we want oldest at top visually
         const messages = docs.map(doc => doc.data()).reverse();
+        
         messages.forEach(msg => {
             const messageDiv = document.createElement('div');
             const isOutgoing = !isAnonymous && msg.userId === userId;
             messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
             let timeString = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...';
-            messageDiv.innerHTML = `<div class="message-content">${escapeHtml(msg.text)}</div><div class="message-meta"><span class="message-sender">${escapeHtml(msg.sender)}</span><span class="message-time">${timeString}</span></div>`;
+            
+            // Safe rendering
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = msg.text;
+            
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'message-meta';
+            metaDiv.innerHTML = `<span class="message-sender">${escapeHtml(msg.sender)}</span><span class="message-time">${timeString}</span>`;
+            
+            messageDiv.appendChild(contentDiv);
+            messageDiv.appendChild(metaDiv);
             messagesContainer.appendChild(messageDiv);
         });
-        setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 100);
+
+        // Auto-scroll only if user was already at bottom or it's the first load
+        if (isScrolledToBottom || docs.length < 10) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
     };
     
     const sendChatMessage = async () => {
@@ -2117,18 +2166,28 @@
       if (!text) return;
       if (!checkAuth('send chat messages')) return;
       
+      const btn = $('sendChatMessage');
       input.disabled = true;
       try {
-        await addDoc(paths.chatCol(), { text: text, sender: currentUser.username, userId: userId, timestamp: serverTimestamp() });
+        await addDoc(paths.chatCol(), { 
+            text: text, 
+            sender: currentUser.username, 
+            userId: userId, 
+            timestamp: serverTimestamp() 
+        });
         input.value = '';
+        // Optimistic scroll
+        const messagesContainer = $('chatMessages');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
       } catch (error) { 
         console.error('Send message error:', error);
         showNotification('Error', 'Could not send message.', 'error'); 
       }
-      input.disabled = false; input.focus();
+      input.disabled = false; 
+      input.focus();
     };
 
-    // ===== MEME EDITOR (IMPROVED + FIXES) =====
+    // ===== MEME EDITOR (FIXED UPLOAD & CANVAS) =====
     let fabricCanvas = null;
     let activeTool = 'text';
     let history = [];
@@ -2138,22 +2197,22 @@
     const openMemeEditor = (imageUrl = null) => {
       if (!checkAuth('create memes')) return;
       $('memeEditorModal').classList.add('active');
-      // Delay init to allow modal transition and proper container dimensions
-      setTimeout(() => initMemeEditor(imageUrl), 100);
+      // Timeout essential to allow CSS transition to finish so container has width
+      setTimeout(() => initMemeEditor(imageUrl), 300);
     };
     
     const initMemeEditor = (imageUrl) => {
       const container = $('editorContainer');
-      if (container.clientWidth === 0) { setTimeout(() => initMemeEditor(imageUrl), 200); return; }
+      const containerWidth = container.clientWidth - 4; // slight buffer
+      const containerHeight = container.clientHeight - 4;
       
-      const containerWidth = container.clientWidth - 10;
-      const containerHeight = container.clientHeight - 10;
-      
-      // FIX: Canvas not resetting properly
+      // Dispose existing to prevent multiple canvases
       if (fabricCanvas) {
          fabricCanvas.dispose();
       }
       
+      // Reset HTML canvas element
+      container.innerHTML = '<canvas id="canvas"></canvas>';
       const canvasEl = document.getElementById('canvas');
       canvasEl.width = containerWidth;
       canvasEl.height = containerHeight;
@@ -2167,10 +2226,18 @@
 
       if (imageUrl) {
         fabric.Image.fromURL(imageUrl, (img) => {
-          const scale = Math.min(containerWidth / img.width, containerHeight / img.height);
+          if(!img) return;
+          // Scale image to fit within canvas while maintaining aspect ratio
+          const scale = Math.min((containerWidth * 0.8) / img.width, (containerHeight * 0.8) / img.height);
           img.scale(scale);
-          img.set({ left: containerWidth / 2, top: containerHeight / 2, originX: 'center', originY: 'center' });
+          img.set({ 
+              left: containerWidth / 2, 
+              top: containerHeight / 2, 
+              originX: 'center', 
+              originY: 'center' 
+          });
           fabricCanvas.add(img);
+          fabricCanvas.setActiveObject(img);
           saveCanvasState();
         }, { crossOrigin: 'anonymous' }); 
       } else { 
@@ -2191,14 +2258,18 @@
       fabricCanvas.freeDrawingBrush.color = fillColor;
       
       const activeObj = fabricCanvas.getActiveObject();
-      if (activeObj && activeObj.type.includes('text')) {
+      if (activeObj && (activeObj.type === 'i-text' || activeObj.type === 'text')) {
           activeObj.set({ fill: fillColor, stroke: strokeColor, fontSize: brushSize, strokeWidth: strokeWidth, fontFamily: fontFamily });
           fabricCanvas.renderAll();
+          saveCanvasState();
       }
     };
 
     const saveCanvasState = () => {
       if (fabricHistoryLock || !fabricCanvas) return;
+      // Keep only last 10 states to save memory
+      if(history.length > 10) history.shift();
+      
       history = history.slice(0, historyIndex + 1);
       history.push(fabricCanvas.toJSON());
       historyIndex = history.length - 1;
@@ -2206,14 +2277,22 @@
 
     const undoCanvasAction = () => { 
       if (historyIndex > 0) { 
-        fabricHistoryLock = true; historyIndex--; 
-        fabricCanvas.loadFromJSON(history[historyIndex], () => { fabricCanvas.renderAll(); fabricHistoryLock = false; });
+        fabricHistoryLock = true; 
+        historyIndex--; 
+        fabricCanvas.loadFromJSON(history[historyIndex], () => { 
+            fabricCanvas.renderAll(); 
+            fabricHistoryLock = false; 
+        });
       } 
     };
     const redoCanvasAction = () => { 
       if (historyIndex < history.length - 1) { 
-        fabricHistoryLock = true; historyIndex++; 
-        fabricCanvas.loadFromJSON(history[historyIndex], () => { fabricCanvas.renderAll(); fabricHistoryLock = false; });
+        fabricHistoryLock = true; 
+        historyIndex++; 
+        fabricCanvas.loadFromJSON(history[historyIndex], () => { 
+            fabricCanvas.renderAll(); 
+            fabricHistoryLock = false; 
+        });
       } 
     };
     const clearCanvas = async () => {
@@ -2232,27 +2311,34 @@
       
       const btn = $('postMemeBtn');
       btn.disabled = true;
-      btn.innerHTML = 'Posting...';
+      btn.innerHTML = 'Compressing...';
+      
       try {
-        // IMAGE COMPRESSION (JPEG 80%)
-        const dataURL = fabricCanvas.toDataURL({ 
-            format: 'jpeg', 
-            quality: 0.8,
-            multiplier: 1 
-        });
-
-        const memeId = `meme_${Date.now()}`;
+        // High efficiency compression
+        const dataURL = fabricCanvas.toDataURL({ format: 'jpeg', quality: 0.75, multiplier: 1 });
+        
+        btn.innerHTML = 'Uploading...';
+        const memeId = `meme_${Date.now()}_${Math.floor(Math.random()*1000)}`;
         const storageRef = ref(storage, `memes/${userId}/${memeId}.jpg`); 
         
         const uploadResult = await uploadString(storageRef, dataURL, 'data_url');
         const downloadURL = await getDownloadURL(uploadResult.ref);
         
+        btn.innerHTML = 'Saving...';
         await addDoc(paths.memesCol(), {
-          title: title, imageUrl: downloadURL, userId: userId, username: currentUser.username,
-          createdAt: serverTimestamp(), isUserGenerated: true, reactions: { cringe: 0, laugh: 0, cry: 0 }, tips: 0
+          title: title, 
+          imageUrl: downloadURL, 
+          userId: userId, 
+          username: currentUser.username,
+          createdAt: serverTimestamp(), 
+          isUserGenerated: true, 
+          reactions: { cringe: 0, laugh: 0, cry: 0 }, 
+          tips: 0
         });
+        
         await updateDoc(paths.publicUser(userId), { memeCount: increment(1) });
         await updateQuestProgress('post');
+        
         $('memeEditorModal').classList.remove('active');
         $('memeTitleInput').value = '';
         switchTab('mymemes');
@@ -2261,14 +2347,16 @@
         console.error('Meme post error:', error);
         showNotification('Error', 'Failed to post. ' + error.message, 'error');
       } finally { 
-        btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; 
+        btn.disabled = false; 
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme'; 
       }
     };
 
-    // ===== SHOP LOGIC (SECURE) =====
+    // ===== SHOP LOGIC (SECURE & FIXED) =====
     const showShop = () => {
         if (!checkAuth('access the shop')) return;
         openModal('shopModal');
+        // Ensure balance is up to date
         $('shopBalance').textContent = `${currentUser.cringeCoin || 0} CC`;
         const grid = $('shopGrid');
         grid.innerHTML = '';
@@ -2282,6 +2370,7 @@
             if(item.type === 'nameColor') previewStyle = `color: ${item.value}`;
             if(item.type === 'textColor') previewStyle = `color: ${item.value}`;
             if(item.type === 'border') previewStyle = `border: ${item.value}`;
+            if(item.type === 'cardBg') previewStyle = `background: ${item.value}; border-radius: 50%;`;
 
             el.innerHTML = `
                 <div class="shop-preview" style="${previewStyle}"><i class="fas ${item.icon}"></i></div>
@@ -2300,7 +2389,6 @@
     };
 
     const purchaseItem = async (item) => {
-        // First check locally to save network request if obviously poor
         if (!currentUser || currentUser.cringeCoin < item.price) {
             showNotification('Too Poor', `You need ${item.price} CC. Go cringe at some memes!`, 'error');
             return;
@@ -2311,37 +2399,34 @@
 
         try {
             await runTransaction(db, async (transaction) => {
-                // SECURITY: Define price locally in transaction to prevent client tampering of item object
                 const actualPrice = SECURE_PRICES[item.id];
-                if (!actualPrice) throw new Error("Invalid item");
+                if (!actualPrice) throw new Error("Invalid item price");
 
                 const userRef = paths.publicUser(userId);
                 const userDoc = await transaction.get(userRef);
                 
                 if (userDoc.data().cringeCoin < actualPrice) throw new Error("Insufficient funds");
 
-                // Deduct coins
                 transaction.update(userRef, { cringeCoin: increment(-actualPrice) });
                 
-                // Add item to inventory and auto-equip
                 const privateRef = paths.privateUser(userId);
-                const updates = { 
-                    [`inventory.${item.id}`]: true 
-                };
+                const updates = { [`inventory.${item.id}`]: true };
+                
+                // Auto-equip logic
                 if(item.type === 'nameColor') updates['preferences.nameColor'] = item.value;
                 if(item.type === 'border') updates['preferences.border'] = item.value;
+                if(item.type === 'cardBg') updates['preferences.cardBackground'] = item.value;
                 
                 transaction.update(privateRef, updates);
             });
             showNotification('Purchase Successful', `You bought ${item.name}!`, 'success');
-            $('shopBalance').textContent = `${(currentUser.cringeCoin - item.price)} CC`;
-            showShop(); 
+            // UI updates automatically via listener
         } catch (e) {
             showNotification('Error', e.message, 'error');
         }
     };
 
-    // ===== MODAL FUNCTIONS =====
+    // ===== MODAL & VIEW FUNCTIONS =====
     const openModal = (modalId) => {
         const modal = $(modalId);
         if (modal) {
@@ -2378,9 +2463,9 @@
         $('settingsBioInput').value = currentUser.bio || '';
         $('settingsCringeCoin').textContent = currentUser.cringeCoin;
         $('settingsStreak').textContent = currentUser.streak;
-        $('themeSelect').value = userPreferences.theme;
-        $('fontSizeSelect').value = userPreferences.fontSize;
-        $('cardBgColor').value = userPreferences.cardBackground;
+        $('themeSelect').value = userPreferences.theme || 'dark';
+        $('fontSizeSelect').value = userPreferences.fontSize || 'medium';
+        $('cardBgColor').value = userPreferences.cardBackground || '#242152';
         $('settingsEmailInput').value = currentUser.email;
         $('settingsUserIdInput').value = userId;
     };
@@ -2478,7 +2563,7 @@
       const q = query(paths.favoritesCol(userId));
       const snapshot = await getDocs(q);
       if (snapshot.empty) {
-          grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes. Click the <i class="fas fa-bookmark"></i> button on a meme to save it.</div>';
+          grid.innerHTML = '<div class="feed-message" style="width: 100%;">You have no saved memes.</div>';
           return;
       }
       grid.innerHTML = '';
@@ -2489,31 +2574,22 @@
           item.innerHTML = `
             <img src="${meme.url}" alt="${escapeHtml(meme.title)}" loading="lazy">
             <p>${escapeHtml(meme.title)}</p>
-            <button class="collection-delete-btn" title="Remove from collection"><i class="fas fa-trash"></i></button>
+            <button class="collection-delete-btn" title="Remove"><i class="fas fa-trash"></i></button>
           `;
-          item.querySelector('.collection-delete-btn').onclick = (e) => {
-              e.stopPropagation(); 
-              deleteFromCollection(doc.id, item);
-          };
+          item.querySelector('.collection-delete-btn').onclick = (e) => { e.stopPropagation(); deleteFromCollection(doc.id, item); };
           grid.appendChild(item);
       });
     };
 
     const deleteFromCollection = async (memeId, itemElement) => {
-        if (!confirm('Remove this meme from your collection?')) return;
+        if (!confirm('Remove from collection?')) return;
         try {
             await deleteDoc(paths.favoriteDoc(userId, memeId));
             itemElement.remove();
-            showNotification('Removed', 'Meme removed from collection.', 'info');
+            showNotification('Removed', 'Meme removed.', 'info');
             const feedBtn = document.querySelector(`.meme-card[data-id="${memeId}"] .save-btn`);
-            if (feedBtn) {
-                feedBtn.classList.remove('saved');
-                feedBtn.querySelector('span').textContent = 'Save';
-            }
-        } catch (error) {
-            console.error(error);
-            showNotification('Error', 'Failed to remove meme.', 'error');
-        }
+            if (feedBtn) { feedBtn.classList.remove('saved'); feedBtn.querySelector('span').textContent = 'Save'; }
+        } catch (error) { showNotification('Error', 'Failed to remove.', 'error'); }
     };
 
     const showInventory = () => {
@@ -2528,24 +2604,21 @@
         item.innerHTML = `<i class="fas ${icon}" style="color: ${earned ? 'var(--gold)' : 'var(--text-secondary)'};"></i><div class="grid-item-title">${title}</div><div class="grid-item-meta">${desc}</div>`;
         grid.appendChild(item);
       };
-      // Badges
-      createBadge('fa-user-plus', 'New Scroller', 'Joined CringeScroll', true);
-      createBadge('fa-hand-holding-usd', 'Tipper', 'Tip a meme', (userQuests.tipCount || 0) > 0);
-      createBadge('fa-paint-brush', 'Creator', 'Post a meme', (userQuests.postCount || 0) > 0);
-      createBadge('fa-fire', 'Hot Streak', '3-day streak', (currentUser.streak || 0) >= 3);
-      createBadge('fa-gem', 'Richie Rich', '1000+ CringeCoin', (currentUser.cringeCoin || 0) >= 1000);
       
-      // Shop Items display
+      createBadge('fa-user-plus', 'Newbie', 'Joined', true);
+      createBadge('fa-hand-holding-usd', 'Tipper', 'Sent a Tip', (userQuests.tipCount || 0) > 0);
+      createBadge('fa-paint-brush', 'Artist', 'Posted Meme', (userQuests.postCount || 0) > 0);
+      
       if(currentUser.inventory) {
           Object.keys(currentUser.inventory).forEach(itemId => {
              const shopItem = shopItems.find(i => i.id === itemId);
-             if(shopItem) createBadge(shopItem.icon, shopItem.name, 'Shop Item', true);
+             if(shopItem) createBadge(shopItem.icon, shopItem.name, 'Purchased', true);
           });
       }
     };
 
     const showLeaderboard = async () => {
-      if (!checkAuth('view the leaderboard')) return;
+      if (!checkAuth('view leaderboard')) return;
       openModal('leaderboardModal');
       $$('#leaderboardModal .tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
         const tabId = e.currentTarget.dataset.tab;
@@ -2596,9 +2669,9 @@
       const list = $('questList');
       list.innerHTML = '';
       const quests = [
-        { id: 'react', title: 'Daily Reactions', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed, reward: 10 },
-        { id: 'post', title: 'Daily Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed, reward: 25 },
-        { id: 'tip', title: 'Generous Tipper', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed, reward: 5 }
+        { id: 'react', title: 'Reactor', desc: 'React to 5 memes', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed, reward: 10 },
+        { id: 'post', title: 'Creator', desc: 'Post 1 meme', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed, reward: 25 },
+        { id: 'tip', title: 'Philanthropist', desc: 'Tip 1 meme', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed, reward: 5 }
       ];
       quests.forEach(q => {
         const isComplete = q.progress >= q.goal;
@@ -2623,9 +2696,10 @@
                 if (quests[questId + 'Count'] >= questData.goal && !quests[questId + 'Claimed']) {
                     transaction.update(paths.privateUser(userId), { [`quests.${questId}Claimed`]: true });
                     transaction.update(paths.publicUser(userId), { cringeCoin: increment(questData.reward) });
-                } else { throw new Error('Quest invalid.'); }
+                } else { throw new Error('Quest not completed or already claimed.'); }
             });
             showNotification('Reward Claimed!', `+${questData.reward} CringeCoin!`, 'success');
+            // UI updates automatically
         } catch (error) { showNotification('Error', error.message, 'error'); }
     };
     
@@ -2666,6 +2740,7 @@
                 const lastActiveDate = privateData.lastActive.toDate();
                 const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
                 if (lastActiveDate.toISOString().split('T')[0] === yesterday.toISOString().split('T')[0]) { newStreak = (privateData.streak || 0) + 1; }
+                else if (lastActiveDate.toISOString().split('T')[0] === today) { newStreak = privateData.streak || 1; }
             }
             await updateDoc(privateUserRef, { quests: defaultQuests, streak: newStreak, lastActive: serverTimestamp() });
             if (newStreak > (privateData.streak || 0)) showNotification('Streak Continued!', `You're on a ${newStreak}-day streak!`, 'info');
@@ -2752,6 +2827,7 @@
     const makeChatDraggable = () => {
       let isDragging = false, chatOffsetX = 0, chatOffsetY = 0;
       const onDragStart = (e) => {
+        if(window.innerWidth <= 480) return; // Disable drag on mobile
         isDragging = true;
         const rect = chatWindow.getBoundingClientRect();
         const touch = e.touches ? e.touches[0] : e;
@@ -2770,7 +2846,7 @@
         chatWindow.style.top = `${newY}px`;
         chatWindow.style.bottom = 'auto'; chatWindow.style.right = 'auto';
       };
-      const onDragEnd = () => { isDragging = false; chatWindow.style.transition = 'var(--transition)'; document.body.style.userSelect = 'auto'; };
+      const onDragEnd = () => { if(isDragging) { isDragging = false; chatWindow.style.transition = 'opacity 0.2s, transform 0.2s'; document.body.style.userSelect = 'auto'; } };
       const chatHeader = $('chatHeader');
       chatHeader.addEventListener('mousedown', onDragStart);
       document.addEventListener('mousemove', onDragMove);
@@ -2797,16 +2873,23 @@
       
       const imageUploadInput = $('editorImageUpload');
       $('.editor-tool[data-tool="image"]').addEventListener('click', () => imageUploadInput.click());
+      
+      // FIX: Improved Image Upload Handler
       imageUploadInput.addEventListener('change', (e) => {
           const file = e.target.files[0];
           if (file) {
             const reader = new FileReader();
-            reader.onload = (event) => fabric.Image.fromURL(event.target.result, (img) => { 
-              img.scaleToWidth(fabricCanvas.width / 2); 
-              img.set({ left: 50, top: 50 }); 
-              fabricCanvas.add(img); 
-              saveCanvasState(); 
-            });
+            reader.onload = (event) => {
+                if(!fabricCanvas) initMemeEditor();
+                fabric.Image.fromURL(event.target.result, (img) => { 
+                  if(!img) return;
+                  img.scaleToWidth(fabricCanvas.width / 2); 
+                  img.set({ left: 50, top: 50 }); 
+                  fabricCanvas.add(img); 
+                  fabricCanvas.setActiveObject(img);
+                  saveCanvasState(); 
+                });
+            };
             reader.readAsDataURL(file);
           }
       });
