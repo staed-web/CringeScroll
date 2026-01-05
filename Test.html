@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js" defer></script>
+  
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
   <style>
     :root {
@@ -69,6 +71,34 @@
       font-size: var(--font-size-base, 1rem);
     }
     
+    /* Adsense Container Style */
+    .ad-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 16px;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+    .ad-card::before {
+        content: "Sponsored";
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        font-size: 0.7rem;
+        background: rgba(0,0,0,0.5);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #fff;
+        z-index: 5;
+    }
+
     /* Drag and Drop Overlay */
     .drag-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -83,10 +113,11 @@
 
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
-    /* Animated Border Styles */
+    /* Animations */
     @keyframes spin-border { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
     @keyframes glow { 0% { box-shadow: 0 0 5px var(--accent-3); } 50% { box-shadow: 0 0 20px var(--accent-3), 0 0 10px var(--accent-1); } 100% { box-shadow: 0 0 5px var(--accent-3); } }
     @keyframes pulse-border { 0% { border-color: var(--accent-1); } 50% { border-color: var(--gold); } 100% { border-color: var(--accent-1); } }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
 
     .anim-glow { animation: glow 2s infinite; border: 2px solid transparent; }
     .anim-pulse { animation: pulse-border 3s infinite; border-width: 3px; border-style: solid; }
@@ -98,8 +129,6 @@
     }
     
     .app-container { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; width: 100%; }
-    
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
 
     /* ===== HEADER ===== */
     .header {
@@ -132,8 +161,7 @@
     .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.1rem; }
     .header-actions { display: flex; align-items: center; gap: 12px; }
     .action-btn {
-      width: 42px; height: 42px;
-      border-radius: 12px; background: rgba(255, 255, 255, 0.1); 
+      width: 42px; height: 42px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); 
       border: 1px solid var(--border-color); color: var(--text-primary); 
       font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; flex-shrink: 0;
@@ -210,7 +238,8 @@
     }
     .meme-image, video.meme-image { 
       width: 100%; height: auto; display: block; 
-      transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: scale(1.02);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 0; transform: scale(1.02);
     }
     .meme-image.loaded, video.meme-image { opacity: 1; transform: scale(1); }
     video.meme-image { max-height: 600px; object-fit: contain; background: black; }
@@ -239,16 +268,6 @@
     .card-btn:active { transform: translateY(0); }
     .card-btn.saved { background: var(--accent-2); color: white; border-color: var(--accent-3); }
     .card-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-    /* Adsense Placeholder Styling */
-    .ad-card {
-        background: var(--card-bg); border-radius: var(--border-radius);
-        padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        text-align: center; border: 1px dashed var(--border-color);
-        margin-bottom: 16px; break-inside: avoid-column; min-height: 250px;
-    }
-    .ad-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-    .ad-content-box { width: 100%; height: 200px; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-secondary); }
 
     .comment-section { margin-top: 10px; border-radius: 8px; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -298,10 +317,9 @@
     }
     .menu-badge:empty { display: none; }
     
-    /* Install PWA Button Style */
     #installPwaBtn {
         background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
-        color: white; font-weight: bold; margin-bottom: 15px; display: none; /* hidden by default */
+        color: white; font-weight: bold; margin-bottom: 15px; display: none; /* controlled by JS */
     }
 
     /* ===== MODAL STYLES ===== */
@@ -335,30 +353,7 @@
     .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
     .modal-body .loading-spinner { margin-top: 40px; }
 
-    /* Roulette Dice Animation */
-    .dice-container { perspective: 1000px; width: 100px; height: 100px; margin: 30px auto; }
-    .dice {
-        width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
-        transform: translateZ(-50px); transition: transform 1s;
-    }
-    .dice.rolling { animation: roll 1s infinite linear; }
-    .dice-face {
-        position: absolute; width: 100px; height: 100px; border: 2px solid var(--accent-3);
-        background: rgba(106, 13, 173, 0.9); display: flex; align-items: center; justify-content: center;
-        font-size: 2rem; color: white; font-weight: bold;
-    }
-    .dice-face:nth-child(1) { transform: rotateY(0deg) translateZ(50px); }
-    .dice-face:nth-child(2) { transform: rotateY(90deg) translateZ(50px); }
-    .dice-face:nth-child(3) { transform: rotateY(180deg) translateZ(50px); }
-    .dice-face:nth-child(4) { transform: rotateY(-90deg) translateZ(50px); }
-    .dice-face:nth-child(5) { transform: rotateX(90deg) translateZ(50px); }
-    .dice-face:nth-child(6) { transform: rotateX(-90deg) translateZ(50px); }
-    
-    @keyframes roll {
-        0% { transform: translateZ(-50px) rotateX(0deg) rotateY(0deg); }
-        100% { transform: translateZ(-50px) rotateX(360deg) rotateY(360deg); }
-    }
-  /* Form Styles (Continued from Part 1 CSS) */
+    /* Form Styles */
     .form-group { margin-bottom: 20px; }
     .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
     .form-control { 
@@ -411,82 +406,6 @@
         display: flex; align-items: center; justify-content: center;
         background: rgba(0,0,0,0.2); font-weight: bold; font-size: 1.2rem;
     }
-    
-    /* Flex Slot Styling */
-    .flex-slot {
-      border: 2px dashed var(--border-color); border-radius: 12px;
-      height: 120px; display: flex; align-items: center; justify-content: center;
-      color: var(--text-secondary); cursor: pointer; transition: var(--transition);
-      margin-bottom: 10px; background: rgba(0,0,0,0.1);
-    }
-    .flex-slot:hover { border-color: var(--accent-3); color: var(--accent-3); background: rgba(106, 13, 173, 0.1); }
-    .flex-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
-    .flex-remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white;
-      border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-    }
-
-    /* ===== CHAT WINDOW ===== */
-    .chat-window {
-      position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px; 
-      background: var(--bg-secondary); border-radius: 20px; box-shadow: var(--shadow-lg); 
-      border: 1px solid var(--border-color); z-index: 900; display: flex; 
-      flex-direction: column; overflow: hidden; opacity: 0; pointer-events: none;
-      visibility: hidden; transform: translateY(20px); transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-    }
-    .chat-window.active { opacity: 1; pointer-events: all; visibility: visible; transform: translateY(0); }
-    .chat-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: move; touch-action: none; flex-shrink: 0; background: rgba(0,0,0,0.2); }
-    .chat-title { font-size: 1.1rem; font-weight: 700; color: var(--accent-3); }
-    .close-chat { background: none; border: none; color: var(--text-primary); font-size: 1.1rem; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0; }
-    .close-chat:hover { background: rgba(255, 255, 255, 0.1); }
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
-    .message { max-width: 80%; padding: 10px 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); color: var(--text-primary); font-size: 0.9rem; line-height: 1.4; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .message.incoming { align-self: flex-start; border-bottom-left-radius: 4px; }
-    .message.outgoing { align-self: flex-end; background: linear-gradient(135deg, var(--accent-1), var(--accent-3)); color: white; border-bottom-right-radius: 4px; }
-    .message-meta { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; display: flex; justify-content: space-between; gap: 8px; opacity: 0.7; }
-    .message.outgoing .message-meta { color: rgba(255, 255, 255, 0.9); }
-    .chat-input-container { padding: 12px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; flex-shrink: 0; background: var(--bg-secondary); }
-    .chat-input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); color: var(--text-primary); font-size: 0.9rem; }
-    .chat-input:focus { outline: none; border-color: var(--accent-3); }
-    .send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-3); border: none; color: white; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
-    .send-btn:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(106, 13, 173, 0.4); }
-
-    /* ===== NOTIFICATIONS ===== */
-    .notification {
-      position: fixed; bottom: 20px; right: 20px; 
-      background: var(--bg-secondary); border-radius: 16px; 
-      padding: 16px 24px; border-left: 4px solid var(--accent-3);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); z-index: 9001;
-      transform: translateX(120%); opacity: 0;
-      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      max-width: 350px; display: flex; align-items: center; gap: 16px;
-    }
-    .notification.show { transform: translateX(0); opacity: 1; }
-    .notification-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
-    .notification.success .notification-icon { background: rgba(0, 210, 106, 0.2); color: var(--success); }
-    .notification.error .notification-icon { background: rgba(255, 77, 77, 0.2); color: var(--error); }
-    .notification.info .notification-icon { background: rgba(77, 171, 247, 0.2); color: var(--info); }
-    .notification.success { border-left-color: var(--success); }
-    .notification.error { border-left-color: var(--error); }
-    .notification.info { border-left-color: var(--info); }
-    .notification-content { flex: 1; }
-    .notification-title { font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
-    .notification-message { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4; }
-    .notification-close { background: none; border: none; color: var(--text-secondary); font-size: 1rem; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: var(--transition); align-self: flex-start; }
-    .notification-close:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.1); }
-
-    /* ===== LOADING STATES & MISC ===== */
-    .skeleton-card { background: var(--card-bg); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow-md); animation: pulseSkeleton 1.5s infinite ease-in-out; margin-bottom: 16px; break-inside: avoid-column; }
-    @keyframes pulseSkeleton { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
-    .feed-message { padding: 40px 20px; text-align: center; color: var(--text-secondary); font-size: 1rem; border-radius: var(--border-radius); background: var(--card-bg); grid-column: 1 / -1; column-span: all; }
-    .feed-message a { color: var(--accent-3); font-weight: bold; text-decoration: none; cursor: pointer; }
-    .loading-spinner { width: 40px; height: 40px; border: 4px solid rgba(106, 13, 173, 0.2); border-top: 4px solid var(--accent-3); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* ... (Previous media queries remain valid) ... */
-    
-    .font-size-small { --font-size-base: 0.9rem; }
-    .font-size-medium { --font-size-base: 1rem; }
-    .font-size-large { --font-size-base: 1.1rem; }
   </style>
 </head>
 <body class="theme-dark font-size-medium">
@@ -572,15 +491,7 @@
       <button class="send-btn" id="sendChatMessage"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
-  
-  <div class="notification" id="notificationToast">
-    <div class="notification-icon"><i class="fas fa-check"></i></div>
-    <div class="notification-content">
-      <h4 class="notification-title" id="notificationTitle">Success!</h4>
-      <p class="notification-message" id="notificationMessage">Your action was completed successfully.</p>
-    </div>
-    <button class="notification-close" id="closeNotification"><i class="fas fa-times"></i></button>
-  </div>
+
   <div class="modal-overlay" id="authModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -592,35 +503,16 @@
           <button class="btn btn-secondary active" id="signupTab">Sign Up</button>
           <button class="btn btn-secondary" id="loginTab">Log In</button>
         </div>
-        
         <div id="signupForm">
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="signupEmailInput" placeholder="your@email.com" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Username</label>
-            <input type="text" class="form-control" id="signupUsernameInput" placeholder="your_username" required>
-            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Only letters, numbers, and underscores (2-15 characters)</p>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" id="signupPasswordInput" placeholder="••••••••" required>
-            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">At least 6 characters</p>
-          </div>
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="signupEmailInput" placeholder="your@email.com" required></div>
+          <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-control" id="signupUsernameInput" placeholder="your_username" required><p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">Only letters, numbers, and underscores (2-15 characters)</p></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="signupPasswordInput" placeholder="••••••••" required><p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">At least 6 characters</p></div>
           <div class="form-error" id="signupError"></div>
           <button class="btn btn-primary" id="signupBtn"><i class="fas fa-user-plus"></i> Create Account</button>
         </div>
-        
         <div id="loginForm" style="display: none;">
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" id="loginEmailInput" placeholder="your@email.com" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" id="loginPasswordInput" placeholder="••••••••" required>
-          </div>
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="loginEmailInput" placeholder="your@email.com" required></div>
+          <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="loginPasswordInput" placeholder="••••••••" required></div>
           <div class="form-error" id="loginError"></div>
           <button class="btn btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Log In</button>
         </div>
@@ -658,8 +550,8 @@
           <div class="editor-tool-group" id="toolImageUrl" style="display: none;">
             <div class="form-group">
                 <label class="form-label">Image URL</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="imageUrlInput" placeholder="https://i.imgur.com/...">
+                <div class="input-group" style="display:flex; gap:8px;">
+                    <input type="text" class="form-control" id="imageUrlInput" placeholder="https://...">
                     <button class="btn btn-primary btn-sm" id="addImageUrlBtn"><i class="fas fa-plus"></i></button>
                 </div>
             </div>
@@ -707,18 +599,17 @@
               <div style="flex: 1;"><label class="form-label" style="color: var(--text-secondary);">Fill</label><input type="color" id="textColorPicker" value="#FFFFFF" class="form-control"></div>
               <div style="flex: 1;"><label class="form-label" style="color: var(--text-secondary);">Stroke</label><input type="color" id="strokeColorPicker" value="#000000" class="form-control"></div>
             </div>
-            <div class="form-group">
-                <label class="form-label">Font Family</label>
-                <select id="fontFamilySelect" class="form-control">
-                    <option value="Impact">Impact</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Comic Sans MS">Comic Sans</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                </select>
-            </div>
-            <div class="form-group"><label class="form-label">Size: <span id="brushSizeLabel">40</span>px</label><input type="range" id="brushSize" min="1" max="100" value="40" class="form-control"></div>
-            <div class="form-group"><label class="form-label">Stroke: <span id="strokeWidthLabel">2</span>px</label><input type="range" id="strokeWidth" min="0" max="10" value="2" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Font Family</label><select id="fontFamilySelect" class="form-control">
+                <option value="Impact">Impact</option>
+                <option value="Arial">Arial</option>
+                <option value="Comic Sans MS">Comic Sans</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Arial Black">Arial Black</option>
+            </select></div>
+            <div class="form-group"><label class="form-label">Font / Brush Size: <span id="brushSizeLabel">40</span>px</label><input type="range" id="brushSize" min="1" max="100" value="40" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Stroke Width: <span id="strokeWidthLabel">2</span>px</label><input type="range" id="strokeWidth" min="0" max="10" value="2" class="form-control"></div>
             <div class="editor-tool-row" style="grid-template-columns: repeat(4, 1fr);">
               <button class="btn btn-secondary" id="toggleBoldBtn" title="Bold"><i class="fas fa-bold"></i></button>
               <button class="btn btn-secondary" id="toggleItalicBtn" title="Italic"><i class="fas fa-italic"></i></button>
@@ -746,29 +637,15 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="rouletteModal">
-    <div class="modal-content" style="background: rgba(15, 12, 41, 0.95); border: 1px solid var(--accent-3);">
-      <div class="modal-header">
-         <h2 class="modal-title"><i class="fas fa-dice"></i> Meme Roulette</h2>
-         <button class="close-modal" data-modal-id="rouletteModal"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body" style="display:flex; flex-direction:column; align-items:center; overflow-x:hidden;">
-         <div class="dice-container">
-            <div class="dice" id="rouletteDice">
-               <div class="dice-face"><i class="fas fa-question"></i></div>
-               <div class="dice-face"><i class="fas fa-skull"></i></div>
-               <div class="dice-face"><i class="fas fa-grin"></i></div>
-               <div class="dice-face"><i class="fas fa-fire"></i></div>
-               <div class="dice-face"><i class="fas fa-poop"></i></div>
-               <div class="dice-face"><i class="fas fa-ghost"></i></div>
-            </div>
-         </div>
-         <p style="text-align:center; color:var(--text-secondary); margin-bottom:20px;">Roll the dice to summon a random cringe meme!</p>
-         <button class="btn btn-primary" id="rollDiceBtn" style="margin-bottom: 20px; max-width: 200px;">Roll the Dice!</button>
-         <div id="rouletteResult" style="width: 100%; min-height: 250px; display: flex; justify-content: center; align-items: center;"></div>
-      </div>
+  <div class="notification" id="notificationToast">
+    <div class="notification-icon"><i class="fas fa-check"></i></div>
+    <div class="notification-content">
+      <h4 class="notification-title" id="notificationTitle">Success!</h4>
+      <p class="notification-message" id="notificationMessage">Your action was completed successfully.</p>
     </div>
+    <button class="notification-close" id="closeNotification"><i class="fas fa-times"></i></button>
   </div>
+  
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -777,11 +654,11 @@
       </div>
       <div class="modal-tabs">
         <button class="tab-btn active" data-tab="settingsProfile"><i class="fas fa-user-circle"></i> Profile</button>
-        <button class="tab-btn" data-tab="settingsAppearance"><i class="fas fa-palette"></i> Style</button>
+        <button class="tab-btn" data-tab="settingsAppearance"><i class="fas fa-palette"></i> Appearance</button>
+        <button class="tab-btn" data-tab="settingsNotifications"><i class="fas fa-bell"></i> Notifications</button>
         <button class="tab-btn" data-tab="settingsAccount"><i class="fas fa-key"></i> Account</button>
       </div>
       <div class="modal-body">
-        
         <div class="tab-content active" id="settingsProfile">
           <div class="profile-settings-header">
             <img src="https://placehold.co/80x80/6a0dad/fff?text=C" alt="Avatar" class="profile-avatar-lg" id="settingsAvatarImg">
@@ -834,8 +711,7 @@
             <label class="form-label">Profile Frame <i class="fas fa-crown" style="color:var(--gold)"></i></label>
             <select id="frameSelect" class="form-control">
                 <option value="none">None</option>
-            </select>
-            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:5px;">Buy frames in the Shop!</p>
+                </select>
           </div>
 
           <div class="form-group">
@@ -844,12 +720,25 @@
           </div>
           <button class="btn btn-primary" id="saveAppearanceSettingsBtn">Save Appearance</button>
         </div>
-
+        <div class="tab-content" id="settingsNotifications">
+          <div class="switch-toggle">
+            <div><div class="switch-toggle-label">Enable All Notifications</div><div class="switch-toggle-desc">Master control for all app notifications.</div></div>
+            <label class="switch"><input type="checkbox" id="notifToggleAll" checked><span class="slider"></span></label>
+          </div>
+          <div class="switch-toggle">
+            <div><div class="switch-toggle-label">Notify on Tips</div><div class="switch-toggle-desc">Get notified when someone tips your meme.</div></div>
+            <label class="switch"><input type="checkbox" id="notifToggleTips" checked><span class="slider"></span></label>
+          </div>
+          <div class="switch-toggle">
+            <div><div class="switch-toggle-label">Quest Reminders</div><div class="switch-toggle-desc">Remind you to complete your daily quests.</div></div>
+            <label class="switch"><input type="checkbox" id="notifToggleQuests" checked><span class="slider"></span></label>
+          </div>
+        </div>
         <div class="tab-content" id="settingsAccount">
           <div style="background: rgba(106, 13, 173, 0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--accent-3);">
             <h4 style="margin-bottom: 8px; color: var(--gold);"><i class="fas fa-gift"></i> Refer & Earn</h4>
             <p style="font-size: 0.85rem; margin-bottom: 10px;">Share this link. You get +50 CC when they join!</p>
-            <div class="input-group">
+            <div class="input-group" style="display:flex; gap:8px;">
                 <input type="text" class="form-control" id="referralLinkInput" readonly value="Loading..." style="font-size: 0.8rem;">
                 <button class="btn btn-primary btn-sm" id="copyReferralBtn"><i class="fas fa-copy"></i></button>
             </div>
@@ -861,6 +750,7 @@
           <hr style="border: 1px solid var(--border-color); margin: 25px 0;">
           <h4 style="color: var(--error); margin-bottom: 10px;">Danger Zone</h4>
           <button class="btn btn-danger" id="deleteAccountBtn"><i class="fas fa-trash"></i> Delete Account</button>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">This action is permanent and cannot be undone.</p>
         </div>
       </div>
     </div>
@@ -997,1129 +887,1173 @@
       </div>
     </div>
   </div>
-
+  
+  <div class="modal-overlay" id="rouletteModal">
+    <div class="modal-content" style="text-align: center; background: linear-gradient(135deg, #1a092d, #0f0c29);">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-dice"></i> Meme Roulette</h2>
+        <button class="close-modal" data-modal-id="rouletteModal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+         
+         <div id="diceContainer" style="perspective: 1000px; width: 100px; height: 100px; margin: 40px auto; cursor: pointer;">
+            <div id="dice" style="width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <div class="dice-face front" style="position: absolute; width: 100%; height: 100%; background: var(--accent-3); border: 2px solid white; border-radius: 10px; transform: translateZ(50px); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;"><i class="fas fa-skull"></i></div>
+                <div class="dice-face back" style="position: absolute; width: 100%; height: 100%; background: var(--accent-1); border: 2px solid white; border-radius: 10px; transform: rotateY(180deg) translateZ(50px); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;"><i class="fas fa-grin-squint"></i></div>
+                <div class="dice-face right" style="position: absolute; width: 100%; height: 100%; background: var(--accent-2); border: 2px solid white; border-radius: 10px; transform: rotateY(90deg) translateZ(50px); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;"><i class="fas fa-sad-cry"></i></div>
+                <div class="dice-face left" style="position: absolute; width: 100%; height: 100%; background: var(--gold); border: 2px solid white; border-radius: 10px; transform: rotateY(-90deg) translateZ(50px); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: black;"><i class="fas fa-bolt"></i></div>
+                <div class="dice-face top" style="position: absolute; width: 100%; height: 100%; background: var(--success); border: 2px solid white; border-radius: 10px; transform: rotateX(90deg) translateZ(50px); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;"><i class="fas fa-laugh"></i></div>
+                <div class="dice-face bottom" style="position: absolute; width: 100%; height: 100%; background: var(--error); border: 2px solid white; border-radius: 10px; transform: rotateX(-90deg) translateZ(50px); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white;"><i class="fas fa-poo"></i></div>
+            </div>
+         </div>
+         
+         <p style="color: var(--text-secondary); margin-bottom: 20px;">Tap the dice to roll for a random meme!</p>
+         
+         <div id="rouletteResult" style="width: 100%; min-height: 200px; display: none;">
+            </div>
+         
+         <button class="btn btn-primary" id="rollDiceBtn" style="margin-top: 20px;">Roll Dice</button>
+      </div>
+    </div>
+  </div>
   <script>
-    // REPLACE THESE WITH YOUR OWN FIREBASE CONFIGURATION
-    var __firebase_config = (typeof __firebase_config !== 'undefined') ? __firebase_config : '{"apiKey":"AIzaSyCc2YgZOUfKfDw7igOfZgfm3709nXTJTYI","authDomain":"cringescroll-meme.firebaseapp.com","projectId":"cringescroll-meme","storageBucket":"cringescroll-meme.firebasestorage.app","messagingSenderId":"952326661480","appId":"1:952326661480:web:366d94b478a6819168a2dd"}';
+    // FIREBASE CONFIGURATION
+    var __firebase_config = (typeof __firebase_config !== 'undefined') ?
+      __firebase_config : '{"apiKey":"AIzaSyCc2YgZOUfKfDw7igOfZgfm3709nXTJTYI","authDomain":"cringescroll-meme.firebaseapp.com","projectId":"cringescroll-meme","storageBucket":"cringescroll-meme.firebasestorage.app","messagingSenderId":"952326661480","appId":"1:952326661480:web:366d94b478a6819168a2dd"}';
     var __app_id = (typeof __app_id !== 'undefined') ? __app_id : 'cringescroll-app-dev';
   </script>
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, setDoc, query, where, orderBy, limit, increment, arrayUnion, arrayRemove, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, uploadString } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-    import { getDatabase, ref as dbRef, set, onValue, push, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    // ===== FIREBASE SDK IMPORTS =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, signOut, updateProfile, deleteUser, signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, collection, 
+      query, where, getDocs, onSnapshot, orderBy, serverTimestamp, 
+      increment, limit, runTransaction, writeBatch, deleteDoc 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadString, getDownloadURL, uploadBytes, deleteObject
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-    // 1. Initialize Firebase
-    const firebaseConfig = JSON.parse(__firebase_config);
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const rtdb = getDatabase(app);
+    // ===== GLOBAL APP STATE =====
+    let feed, authModal, chatWindow, sidebar;
+    let isLoading = false;
+    let loadCount = 0;
+    const BUFFER_HEIGHT = 400;
+    let currentTab = 'hot';
+    let seenUrls = new Set();
+    let authInitialized = false;
+    let installPrompt = null; // for PWA
 
-    // 2. Global State & DOM Elements
-    const $ = (id) => document.getElementById(id);
-    const $$ = (sel) => document.querySelectorAll(sel);
+    // Firebase instances
+    let app, db, auth, storage;
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'cringescroll-app-dev';
+    let userId = null;
     
-    const state = {
-      user: null, // Current Firebase User
-      userProfile: null, // Firestore Profile Data
-      currentTab: 'hot',
-      memes: [],
-      lastDoc: null, // For pagination
-      isLoading: false,
-      fabricCanvas: null,
-      activeObject: null,
-      theme: localStorage.getItem('cs_theme') || 'theme-dark',
-      notifications: [],
-      deferredPrompt: null, // For PWA Install
-      inviteCode: null, // Stored locally after fetch
-      adInterval: 6 // Show ad every 6 memes
+    // User state
+    let currentUser = null;
+    let isAnonymous = true;
+    let userPreferences = { theme: 'dark', fontSize: 'medium', cardBackground: '#242152', frame: 'none' };
+    let userQuests = {};
+    let userCollections = { favorites: [], albums: [] };
+    let userReferralCode = '';
+
+    // Real-time listeners
+    let chatListener = null;
+    let publicUserListener = null;
+    let privateUserListener = null;
+    let notificationsListener = null;
+    let collectionsListener = null;
+
+    // SHOP ITEMS (Including New Frames)
+    const shopItems = [
+      { id: 'color_gold', name: 'Golden Name', price: 50, type: 'nameColor', value: '#FFD700', icon: 'fa-crown', desc: 'Make your username shine.' },
+      { id: 'border_fire', name: 'Fire Border', price: 100, type: 'border', value: '2px solid #ff4d4d', icon: 'fa-fire', desc: 'Hot border for your profile.' },
+      { id: 'color_neon', name: 'Neon Text', price: 75, type: 'textColor', value: '#00ff00', icon: 'fa-bolt', desc: 'Matrix style text.' },
+      { id: 'bg_space', name: 'Space Card', price: 150, type: 'cardBg', value: '#0f0c29', icon: 'fa-rocket', desc: 'Deep space card background.' },
+      { id: 'badge_og', name: 'OG Badge', price: 500, type: 'badge', value: 'OG', icon: 'fa-medal', desc: 'Flex your wealth.' },
+      // ANIMATED FRAMES
+      { id: 'frame_glow', name: 'Neon Glow Frame', price: 800, type: 'frame', value: 'anim-glow', icon: 'fa-lightbulb', desc: 'Pulsing neon profile frame.' },
+      { id: 'frame_rainbow', name: 'Rainbow Spin', price: 1200, type: 'frame', value: 'anim-rainbow', icon: 'fa-spinner', desc: 'Spinning RGB gaming frame.' },
+      { id: 'frame_pulse', name: 'Golden Pulse', price: 1000, type: 'frame', value: 'anim-pulse', icon: 'fa-heartbeat', desc: 'Rich golden pulse effect.' }
+    ];
+    
+    const SECURE_PRICES = {
+        'color_gold': 50, 'border_fire': 100, 'color_neon': 75, 'bg_space': 150, 'badge_og': 500,
+        'frame_glow': 800, 'frame_rainbow': 1200, 'frame_pulse': 1000
     };
 
-    // 3. PWA Installation Logic (Fixed)
-    // We listen on the window for the event, then show the button in the sidebar
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      state.deferredPrompt = e;
-      // Update UI notify the user they can install the PWA
-      const installBtn = $('installPwaBtn');
-      if (installBtn) {
-        installBtn.style.display = 'flex'; // Show the button in the menu
-        console.log("PWA Install capability detected");
-      }
-    });
+    const MEME_SOURCES = [
+      'https://meme-api.com/gimme/memes', 'https://meme-api.com/gimme/dankmemes', 'https://meme-api.com/gimme/me_irl',
+      'https://meme-api.com/gimme/wholesomememes', 'https://meme-api.com/gimme/funny', 'https://meme-api.com/gimme/HistoryMemes',
+      'https://meme-api.com/gimme/ProgrammerHumor', 'https://meme-api.com/gimme/animemes', 'https://meme-api.com/gimme/gaming'
+    ];
 
-    $('installPwaBtn').addEventListener('click', async () => {
-      const promptEvent = state.deferredPrompt;
-      if (!promptEvent) return;
-      // Show the install prompt
-      promptEvent.prompt();
-      // Wait for the user to respond to the prompt
-      const { outcome } = await promptEvent.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      // We've used the prompt, and can't use it again, throw it away
-      state.deferredPrompt = null;
-      $('installPwaBtn').style.display = 'none';
-    });
-
-    // 4. Utility Functions
-    const utils = {
-      showToast: (title, message, type = 'success') => {
-        const toast = $('notificationToast');
-        $('notificationTitle').textContent = title;
-        $('notificationMessage').textContent = message;
-        toast.className = `notification ${type} show`;
-        
-        // Icon handling
-        const icon = toast.querySelector('i');
-        icon.className = type === 'success' ? 'fas fa-check' : (type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle');
-        
-        setTimeout(() => toast.classList.remove('show'), 3000);
-      },
-
-      debounce: (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
-          const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-          };
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
-        };
-      },
-      
-      formatDate: (timestamp) => {
-        if (!timestamp) return 'Just now';
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        const now = new Date();
-        const diff = (now - date) / 1000; // seconds
-        
-        if (diff < 60) return 'Just now';
-        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-        if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-        return date.toLocaleDateString();
-      },
-      
-      generateId: () => {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      },
-
-      // Fix for Invite Code Generation
-      generateInviteCode: (username) => {
-        const prefix = username.substring(0, 3).toUpperCase();
-        const random = Math.floor(1000 + Math.random() * 9000);
-        return `${prefix}-${random}`;
-      }
+    // ===== FIRESTORE PATHS =====
+    const paths = {
+        publicUser: (uid) => doc(db, `artifacts/${appId}/public/data/users/${uid}`),
+        privateUser: (uid) => doc(db, `artifacts/${appId}/users/${uid}/data/main`),
+        memesCol: () => collection(db, `artifacts/${appId}/public/data/memes`),
+        memeDoc: (id) => doc(db, `artifacts/${appId}/public/data/memes/${id}`),
+        usersCol: () => collection(db, `artifacts/${appId}/public/data/users`),
+        chatCol: () => collection(db, `artifacts/${appId}/public/data/chat`),
+        favoritesCol: (uid) => collection(paths.privateUser(uid), 'collections', 'favorites', 'memes'),
+        albumsCol: (uid) => collection(paths.privateUser(uid), 'collections', 'albums', 'lists'),
+        notificationsCol: (uid) => collection(paths.privateUser(uid), 'notifications'),
+        commentsCol: (memeId) => collection(db, `artifacts/${appId}/public/data/memes/${memeId}/comments`),
+        reportsCol: () => collection(db, `artifacts/${appId}/moderation/reports`)
     };
 
-    // 5. Auth State Listener
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        state.user = user;
-        // Fetch User Profile from Firestore
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            state.userProfile = docSnap.data();
-            updateUIForLogin();
-            loadUserSpecifics(); // Inventory, collections, etc.
+    // ===== UTILITY FUNCTIONS =====
+    const $ = (selector) => document.getElementById(selector);
+    const $$ = (selector) => document.querySelectorAll(selector);
+    const escapeHtml = (str) => {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
+    
+    const formatNumber = (num) => {
+      if (num === undefined || num === null) return 0;
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num;
+    };
+    
+    const timeAgo = (date) => {
+        if (!date) return '...';
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
+        if (interval > 1) return Math.floor(interval) + "y ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + "mo ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + "d ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + "h ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + "m ago";
+        return Math.floor(seconds) + "s ago";
+    };
+
+    const createPlaceholder = (width, height) => {
+      const bgColor = '#242152';
+      const accentColor = '#c46cff';
+      const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bgColor}"/><text x="50%" y="50%" fill="${accentColor}" font-size="16" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">Loading Meme...</text></svg>`;
+      return `data:image/svg+xml;base64,${btoa(svg)}`;
+    };
+
+    // ADSENSE HELPER
+    const getAdHtml = () => {
+        // Replace data-ad-client with your actual AdSense Pub ID
+        return `
+        <div class="ad-card">
+           <ins class="adsbygoogle"
+               style="display:block; width:100%; height:100%"
+               data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+               data-ad-slot="1234567890"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+           <script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>
+        </div>`;
+    };
+    
+    const showNotification = (title, message, type = 'success', duration = 3000) => {
+      const notification = $('notificationToast');
+      if (!notification) return;
+      $('notificationTitle').textContent = title;
+      $('notificationMessage').textContent = message;
+      const iconEl = notification.querySelector('.notification-icon i');
+      notification.className = 'notification';
+      if (type === 'error') { 
+        iconEl.className = 'fas fa-exclamation-circle';
+        notification.classList.add('error');
+      } else if (type === 'info') { 
+        iconEl.className = 'fas fa-info-circle';
+        notification.classList.add('info');
+      } else { 
+        iconEl.className = 'fas fa-check'; 
+        notification.classList.add('success');
+      }
+      
+      notification.classList.add('show');
+      const timer = setTimeout(() => notification.classList.remove('show'), duration);
+      $('closeNotification').onclick = () => { clearTimeout(timer); notification.classList.remove('show'); };
+    };
+
+    const showConfirmModal = (title, message, confirmText = 'Confirm') => {
+        return new Promise((resolve) => {
+            const modal = $('confirmModal');
+            $('confirmModalTitle').innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${escapeHtml(title)}`;
+            $('confirmModalBody').textContent = message;
+            const confirmBtn = $('confirmOkBtn');
+            const cancelBtn = $('confirmCancelBtn');
+            confirmBtn.textContent = confirmText;
+            
+            const close = (result) => {
+                modal.classList.remove('active');
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+                resolve(result);
+            };
+
+            confirmBtn.onclick = () => close(true);
+            cancelBtn.onclick = () => close(false);
+            modal.classList.add('active');
+        });
+    };
+
+    // ===== FIREBASE & AUTH =====
+    const initFirebase = () => {
+      try {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        storage = getStorage(app);
+
+        // PWA Install Handler (Fixed)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            installPrompt = e;
+            const btn = $('installPwaBtn');
+            if(btn) {
+                btn.style.display = 'inline-flex';
+                btn.onclick = async () => {
+                    if(!installPrompt) return;
+                    installPrompt.prompt();
+                    const { outcome } = await installPrompt.userChoice;
+                    if (outcome === 'accepted') btn.style.display = 'none';
+                    installPrompt = null;
+                };
+            }
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            userId = user.uid;
+            isAnonymous = user.isAnonymous;
+            if (isAnonymous) {
+              handleAnonymousLogin(user);
+            } else {
+              await handleUserLogin(user);
+            }
           } else {
-            // Edge case: Auth exists but Firestore doc missing
-            console.error("No user profile found!");
-            await signOut(auth);
+            signInAnonymously(auth).catch(error => {
+                console.error('Anonymous sign-in failed:', error);
+                showNotification('Fatal Error', 'Could not connect to service.', 'error', 10000);
+            });
           }
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        }
-      } else {
-        state.user = null;
-        state.userProfile = null;
-        updateUIForLogout();
+        });
+      } catch (error) { 
+        console.error('Firebase initialization error:', error);
+        showNotification('Fatal Error', 'Failed to initialize app.', 'error', 10000); 
       }
-    });
+    };
 
-    // 6. UI Updates for Auth
-    function updateUIForLogin() {
+    const handleAnonymousLogin = (user) => {
+        currentUser = null;
+        isAnonymous = true;
+        userId = user.uid;
+        
+        $('menuLogin').style.display = 'flex';
+        $('menuLogout').style.display = 'none';
+        $('menuInvite').style.display = 'none';
+        
+        detachAllListeners();
+        attachPublicListeners();
+        
+        $('notificationsBadge').textContent = '';
+        $('menuCollectionsBadge').textContent = '';
+        $('menuQuestsBadge').textContent = '';
+        updateSavedButtons();
+
+        if (!authInitialized) {
+            authInitialized = true;
+            checkDeepLink().then(isDeep => { if(!isDeep) loadFeed(true); });
+        }
+    };
+
+    const handleUserLogin = async (user) => {
+      isAnonymous = false;
+      userId = user.uid;
+      
       $('menuLogin').style.display = 'none';
       $('menuLogout').style.display = 'flex';
-      $('settingsEmailInput').value = state.user.email;
-      $('settingsUserIdInput').value = state.user.uid;
-      $('settingsUsernameInput').value = state.userProfile.username;
-      $('settingsBioInput').value = state.userProfile.bio || "";
-      $('settingsUsername').textContent = state.userProfile.username;
+      $('menuInvite').style.display = 'flex';
       
-      if(state.userProfile.avatar) $('settingsAvatarImg').src = state.userProfile.avatar;
+      detachAllListeners();
+      attachPublicListeners();
+      attachPrivateListeners(user.uid);
+
+      // Ensure public doc exists
+      try {
+          const publicUserDoc = await getDoc(paths.publicUser(user.uid));
+          if (!publicUserDoc.exists()) {
+             // Check for Referral
+             const urlParams = new URLSearchParams(window.location.search);
+             const referrerCode = urlParams.get('ref');
+             await createUserProfile(user, user.displayName || 'User_' + user.uid.substr(0,5), referrerCode);
+          }
+      } catch(e) { console.error("Profile check error", e); }
       
-      // Update badges
-      if(state.userProfile.unreadNotifications > 0) {
-        $('notificationsBadge').textContent = state.userProfile.unreadNotifications;
-        $('notificationsBadge').style.display = 'flex';
+      $('authModal').classList.remove('active');
+      if (!authInitialized) {
+          authInitialized = true;
+          checkDeepLink().then(isDeep => { if(!isDeep) loadFeed(true); });
+      } else {
+          loadFeed(false); 
+      }
+    };
+
+    const detachAllListeners = () => {
+        if (chatListener) chatListener();
+        if (publicUserListener) publicUserListener();
+        if (privateUserListener) privateUserListener();
+        if (notificationsListener) notificationsListener();
+        if (collectionsListener) collectionsListener();
+    };
+
+    const attachPublicListeners = () => {
+        if (chatListener) return;
+        const q = query(paths.chatCol(), orderBy('timestamp', 'desc'), limit(50));
+        chatListener = onSnapshot(q, (snapshot) => {
+            renderChatMessages(snapshot.docs);
+            const unreadCount = snapshot.size; 
+            $('chatBadge').textContent = unreadCount > 0 ? unreadCount : '';
+            $('menuChatBadge').textContent = unreadCount > 0 ? unreadCount : '';
+        }, (error) => console.error("Error listening to chat: ", error));
+    };
+
+    const attachPrivateListeners = (uid) => {
+        if (publicUserListener) publicUserListener();
+        publicUserListener = onSnapshot(paths.publicUser(uid), (doc) => {
+            if (doc.exists()) {
+                const publicData = doc.data();
+                currentUser = { ...currentUser, ...publicData, uid: uid, email: auth.currentUser.email };
+                applyUserPreferences(); 
+                updateUIAfterLogin();
+                if($('shopModal').classList.contains('active')) {
+                      $('shopBalance').textContent = `${currentUser.cringeCoin || 0} CC`;
+                }
+            }
+        });
+
+        if (privateUserListener) privateUserListener();
+        privateUserListener = onSnapshot(paths.privateUser(uid), async (doc) => {
+            if (doc.exists()) {
+                const privateData = doc.data();
+                currentUser = { ...currentUser, ...privateData };
+                userPreferences = privateData.preferences || userPreferences;
+                userQuests = privateData.quests || {};
+                userReferralCode = privateData.referralCode || '';
+                
+                // Update Referral Link
+                const refLink = `${window.location.origin}${window.location.pathname}?ref=${userReferralCode}`;
+                if($('referralLinkInput')) $('referralLinkInput').value = userReferralCode ? refLink : 'Generating...';
+                
+                await checkDailyReset(paths.privateUser(uid), privateData); 
+                applyUserPreferences();
+                updateUIAfterLogin();
+                
+                if($('inventoryModal').classList.contains('active')) showInventory();
+                if($('shopModal').classList.contains('active')) showShop();
+                updateFrameSelect();
+            }
+        });
+
+        if (notificationsListener) notificationsListener();
+        const notifQuery = query(paths.notificationsCol(uid), orderBy('timestamp', 'desc'), limit(10));
+        notificationsListener = onSnapshot(notifQuery, (snapshot) => {
+            const unread = snapshot.docs.filter(doc => !doc.data().read).length;
+            $('notificationsBadge').textContent = unread > 0 ? unread : '';
+            renderNotifications(snapshot.docs);
+        });
+
+        if (collectionsListener) collectionsListener();
+        collectionsListener = onSnapshot(paths.favoritesCol(uid), (snapshot) => {
+            userCollections.favorites = snapshot.docs.map(doc => doc.id);
+            $('menuCollectionsBadge').textContent = snapshot.size > 0 ? snapshot.size : '';
+            updateSavedButtons();
+            if ($('collectionsModal').classList.contains('active')) { showCollections(); }
+        });
+    };
+
+    const createUserProfile = async (user, username, referrerCode = null) => {
+      try {
+        const publicUserRef = paths.publicUser(user.uid);
+        const privateUserRef = paths.privateUser(user.uid);
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Generate unique referral code (Fixed logic)
+        const myReferralCode = username.substring(0, 3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+        
+        const publicData = {
+          username: username,
+          cringeCoin: 50,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=6a0dad&color=fff`,
+          bio: 'New CringeScroller!',
+          createdAt: serverTimestamp(),
+          memeCount: 0,
+          flexSlots: [null, null, null]
+        };
+        const privateData = {
+          email: user.email,
+          streak: 1,
+          lastActive: serverTimestamp(),
+          preferences: userPreferences,
+          referralCode: myReferralCode, // Ensure this is saved
+          quests: {
+              lastReset: today,
+              reactCount: 0, postCount: 0, tipCount: 0,
+              reactClaimed: false, postClaimed: false, tipClaimed: false
+          },
+          inventory: {} 
+        };
+        await runTransaction(db, async (transaction) => {
+            transaction.set(publicUserRef, publicData);
+            transaction.set(privateUserRef, privateData);
+
+            // Handle Referral Reward
+            if (referrerCode) {
+                // Simplified referral lookup for this structure
+                const refMapDoc = doc(db, `artifacts/${appId}/public/data/referrals/${referrerCode}`);
+                const refMap = await transaction.get(refMapDoc);
+                
+                if (refMap.exists()) {
+                    const referrerId = refMap.data().uid;
+                    const referrerPubRef = paths.publicUser(referrerId);
+                    transaction.update(referrerPubRef, { cringeCoin: increment(50) });
+                    
+                    const notifRef = doc(collection(paths.privateUser(referrerId), 'notifications'));
+                    transaction.set(notifRef, {
+                        type: 'referral',
+                        fromUser: username,
+                        amount: 50,
+                        timestamp: serverTimestamp(),
+                        read: false
+                    });
+                }
+            }
+            // Save my referral mapping
+            transaction.set(doc(db, `artifacts/${appId}/public/data/referrals/${myReferralCode}`), { uid: user.uid });
+        });
+        
+      } catch (error) { 
+        console.error('User profile creation error:', error);
+        showNotification('Error', 'Failed to create user profile.', 'error');
+      }
+    };
+    const signUpUser = async () => {
+      const email = $('signupEmailInput').value.trim();
+      const username = $('signupUsernameInput').value.trim();
+      const password = $('signupPasswordInput').value;
+      const errorEl = $('signupError');
+      const btn = $('signupBtn');
+      errorEl.textContent = '';
+      if (!email || !username || !password) { errorEl.textContent = 'All fields are required.'; return; }
+      if (!/^[a-zA-Z0-9_]{2,15}$/.test(username)) { errorEl.textContent = 'Username: 2-15 chars (letters, numbers, _).'; return; }
+      if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; return; }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+      try {
+        const usernameQuery = query(paths.usersCol(), where('username', '==', username));
+        if (!(await getDocs(usernameQuery)).empty) { throw new Error('Username is already taken.'); }
+        
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: username });
+        
+        // Check for referral code in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        
+        await createUserProfile(userCredential.user, username, refCode);
+        
+        showNotification('Account Created!', `Welcome ${username}! +50 Starter CC.`, 'success');
+      } catch (error) { 
+        console.error('Sign up error:', error);
+        errorEl.textContent = error.message.replace('Firebase: ', '');
+      } finally { 
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account'; 
+      }
+    };
+
+    const loginUser = async () => {
+      const email = $('loginEmailInput').value.trim();
+      const password = $('loginPasswordInput').value;
+      const errorEl = $('loginError');
+      const btn = $('loginBtn');
+      errorEl.textContent = '';
+      if (!email || !password) { errorEl.textContent = 'Both email and password are required.'; return; }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; margin: 0;"></div>';
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        showNotification('Logged In!', 'Welcome back!', 'success');
+      } catch (error) { 
+        console.error('Login error:', error); 
+        errorEl.textContent = error.message.replace('Firebase: ', '');
+      } finally { 
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In'; 
+      }
+    };
+
+    const logout = async () => {
+      const confirmed = await showConfirmModal('Logout', 'Are you sure you want to log out?', 'Logout');
+      if (confirmed) {
+        signOut(auth).then(() => {
+            showNotification('Logged Out', 'You have been logged out successfully.', 'info');
+            authInitialized = false; 
+            location.reload(); // Reload to reset anonymous state cleanly
+        }).catch(error => showNotification('Error', 'Failed to log out.', 'error'));
+      }
+    };
+
+    const deleteAccount = async () => {
+        if (!currentUser || isAnonymous) return;
+        const confirmed = await showConfirmModal('Delete Account', 'Are you ABSOLUTELY sure? This will permanently delete your profile, memes, and all data.', 'Delete My Account');
+        if (!confirmed) return;
+
+        showNotification('Deleting...', 'Your account is being deleted.', 'info', 5000);
+        try {
+            const uid = currentUser.uid;
+            // Simplified cleanup for demo - in prod use Cloud Functions
+            await deleteDoc(paths.publicUser(uid));
+            await deleteDoc(paths.privateUser(uid));
+            if (userReferralCode) {
+                 await deleteDoc(doc(db, `artifacts/${appId}/public/data/referrals/${userReferralCode}`));
+            }
+            await deleteUser(auth.currentUser);
+            showNotification('Account Deleted', 'Your account has been deleted.', 'success');
+            setTimeout(() => location.reload(), 2000);
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            showNotification('Error', 'Failed to delete account. Please log in again and retry.', 'error');
+        }
+    };
+
+    const applyUserPreferences = () => {
+      document.body.className = `theme-${userPreferences.theme || 'dark'}`;
+      const themeIcon = $('themeToggleBtn')?.querySelector('i');
+      if (themeIcon) { themeIcon.className = (userPreferences.theme || 'dark') === 'light' ? 'fas fa-sun' : 'fas fa-moon'; }
+      document.documentElement.style.setProperty('--card-bg', userPreferences.cardBackground || '#242152');
+      const fontSize = userPreferences.fontSize || 'medium';
+      document.body.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
+      document.body.classList.add(`font-size-${fontSize}`);
+      
+      // Apply Frame to Profile Avatar in Settings
+      const avatarImg = $('settingsAvatarImg');
+      if(avatarImg) {
+          avatarImg.className = 'profile-avatar-lg'; // reset
+          if(userPreferences.frame && userPreferences.frame !== 'none') {
+              avatarImg.classList.add(userPreferences.frame);
+          }
+      }
+    };
+
+    const updateUIAfterLogin = () => {
+      if (currentUser && !isAnonymous) {
+        const quests = [
+            { id: 'react', goal: 5, progress: userQuests.reactCount || 0, claimed: userQuests.reactClaimed },
+            { id: 'post', goal: 1, progress: userQuests.postCount || 0, claimed: userQuests.postClaimed },
+            { id: 'tip', goal: 1, progress: userQuests.tipCount || 0, claimed: userQuests.tipClaimed }
+        ];
+        const unclaimed = quests.filter(q => q.progress >= q.goal && !q.claimed).length;
+        $('menuQuestsBadge').textContent = unclaimed > 0 ? unclaimed : '';
+      }
+    };
+
+    const showAuthModal = (tab = 'signup') => {
+      $('authModal').classList.add('active');
+      if(tab === 'login') {
+        $('signupForm').style.display = 'none'; $('loginForm').style.display = 'block'; 
+        $('signupTab').classList.remove('active'); $('loginTab').classList.add('active');
+      } else {
+        $('signupForm').style.display = 'block'; $('loginForm').style.display = 'none';
+        $('signupTab').classList.add('active'); $('loginTab').classList.remove('active');
+      }
+    };
+
+    const checkAuth = (action = 'this action', allowAnonymous = false) => {
+      if (isAnonymous && !allowAnonymous) {
+        showNotification('Login Required', `You must log in or sign up to ${action}.`, 'info');
+        showAuthModal('signup');
+        return false;
+      }
+      return true;
+    };
+    
+    // ===== MODERATION & COMMENTS =====
+    const reportMeme = async (memeId) => {
+      if (!checkAuth('report content')) return;
+      const confirmed = await showConfirmModal('Report Content', 'Flag this content for moderation?', 'Report');
+      if (!confirmed) return;
+      try {
+        await addDoc(paths.reportsCol(), { memeId, reporterId: userId, timestamp: serverTimestamp(), status: 'pending' });
+        showNotification('Reported', 'Thank you for keeping CringeScroll safe.', 'info');
+      } catch (error) { showNotification('Error', 'Could not submit report.', 'error'); }
+    };
+
+    const toggleComments = async (memeId) => {
+      const card = document.querySelector(`.meme-card[data-id="${memeId}"]`);
+      let commentSection = card.querySelector('.comment-section');
+
+      if (commentSection) { commentSection.remove(); return; }
+
+      commentSection = document.createElement('div');
+      commentSection.className = 'comment-section';
+      commentSection.style.padding = '10px';
+      commentSection.style.background = 'rgba(0,0,0,0.2)';
+      commentSection.innerHTML = `
+        <div class="comments-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 10px;">
+            <div class="loading-spinner" style="width: 20px; height: 20px;"></div>
+        </div>
+        <div style="display: flex; gap: 5px;">
+            <input type="text" class="form-control comment-input" placeholder="Say something cringe...">
+            <button class="btn btn-primary btn-sm send-comment-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      `;
+      card.querySelector('.card-footer').appendChild(commentSection);
+
+      const listEl = commentSection.querySelector('.comments-list');
+      const isFirestore = card.dataset.source === 'firestore';
+      if (!isFirestore) {
+          listEl.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-secondary); text-align: center;">Comments disabled for external memes.</p>';
+          commentSection.querySelector('.comment-input').disabled = true;
+          commentSection.querySelector('.send-comment-btn').disabled = true;
+          return;
+      }
+
+      const q = query(paths.commentsCol(memeId), orderBy('timestamp', 'asc'), limit(50));
+      onSnapshot(q, (snapshot) => {
+        listEl.innerHTML = '';
+        if(snapshot.empty) listEl.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-secondary); text-align: center;">No comments yet.</p>';
+        snapshot.forEach(doc => {
+            const c = doc.data();
+            const row = document.createElement('div');
+            row.style.marginBottom = '6px';
+            const userStrong = document.createElement('strong');
+            userStrong.style.color = 'var(--accent-3)';
+            userStrong.style.fontSize = '0.8rem';
+            userStrong.textContent = c.username + ': ';
+            const textSpan = document.createElement('span');
+            textSpan.style.fontSize = '0.9rem';
+            textSpan.style.color = 'var(--text-primary)';
+            textSpan.textContent = c.text;
+            row.appendChild(userStrong);
+            row.appendChild(textSpan);
+            listEl.appendChild(row);
+        });
+        listEl.scrollTop = listEl.scrollHeight;
+      });
+      
+      commentSection.querySelector('.send-comment-btn').onclick = async () => {
+        const input = commentSection.querySelector('.comment-input');
+        const text = input.value.trim();
+        if(!text) return;
+        if(!checkAuth('comment')) return;
+        try {
+            await addDoc(paths.commentsCol(memeId), { text, userId, username: currentUser.username, timestamp: serverTimestamp() });
+            input.value = '';
+        } catch(e) { console.error(e); }
+      };
+    };
+
+    // ===== FEED & RENDER =====
+    const renderMeme = (meme, index) => {
+      const card = document.createElement('div');
+      card.className = 'meme-card';
+      const isFirestore = !!meme.createdAt;
+      const memeId = isFirestore ? meme.id : btoa(encodeURIComponent(meme.url)); 
+      const memeUrl = isFirestore ? meme.imageUrl : meme.url;
+      const title = isFirestore ? meme.title : (meme.title || 'Cringe');
+      
+      card.dataset.id = memeId;
+      card.dataset.source = isFirestore ? 'firestore' : 'api';
+      card.dataset.docId = isFirestore ? meme.id : ''; 
+      card.dataset.url = memeUrl;
+      card.dataset.title = title;
+      card.dataset.creatorId = isFirestore ? meme.userId : '';
+      
+      const isSaved = userCollections.favorites && userCollections.favorites.includes(memeId);
+      const isVideo = memeUrl.match(/\.(mp4|webm)$/i);
+      
+      let mediaHtml = isVideo ? 
+        `<video class="meme-image" controls loop muted playsinline preload="metadata"><source src="${memeUrl}" type="video/mp4"></video>` : 
+        `<img class="meme-image" src="${createPlaceholder(300, 300)}" data-src="${memeUrl}" loading="${index < 3 ? 'eager' : 'lazy'}" alt="${escapeHtml(title)}">`;
+
+      card.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div class="meme-title">${escapeHtml(title)}</div>
+            <div class="meme-meta">
+              <span class="user-badge" ${isFirestore ? `data-user-id="${meme.userId}"` : ''}>
+                <i class="fas fa-${isFirestore ? 'user' : 'robot'}"></i> ${escapeHtml(isFirestore ? meme.username : 'API')}
+              </span>
+            </div>
+          </div>
+          <button class="report-btn"><i class="fas fa-flag"></i></button>
+        </div>
+        <div class="meme-image-container">${mediaHtml}</div>
+        <div class="card-footer">
+          <div class="reaction-bar">
+            <button class="reaction-btn" data-reaction="cringe"><i class="fas fa-skull"></i><span class="reaction-count">${formatNumber(meme.reactions?.cringe || 0)}</span></button>
+            <button class="reaction-btn" data-reaction="laugh"><i class="fas fa-grin"></i><span class="reaction-count">${formatNumber(meme.reactions?.laugh || 0)}</span></button>
+          </div>
+          <div class="action-buttons">
+            <button class="card-btn save-btn ${isSaved ? 'saved' : ''}"><i class="fas fa-bookmark"></i><span>${isSaved ? 'Saved' : 'Save'}</span></button>
+            <button class="card-btn comment-btn"><i class="fas fa-comment"></i>Comment</button>
+            <button class="card-btn tip-btn" ${!isFirestore ? 'disabled' : ''}><i class="fas fa-coins"></i>Tip</button>
+            <button class="card-btn remix-btn"><i class="fas fa-sync-alt"></i>Remix</button>
+            <button class="card-btn share-btn"><i class="fas fa-share-alt"></i>Share</button>
+          </div>
+        </div>
+      `;
+      
+      // ADSENSE INJECTION (Every 6 memes)
+      if (index > 0 && index % 6 === 0) {
+          const adContainer = document.createElement('div');
+          adContainer.innerHTML = getAdHtml();
+          feed.appendChild(adContainer);
+      }
+
+      feed.appendChild(card);
+      
+      if (!isVideo) {
+          const img = card.querySelector('.meme-image');
+          const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+              img.src = img.dataset.src;
+              img.onload = () => img.classList.add('loaded');
+              observer.disconnect();
+            }
+          }, { threshold: 0.1 });
+          observer.observe(img);
+      }
+
+      card.querySelector('.save-btn').onclick = () => saveMeme(card);
+      card.querySelector('.comment-btn').onclick = () => toggleComments(memeId);
+      card.querySelector('.report-btn').onclick = () => reportMeme(memeId);
+      card.querySelector('.tip-btn').onclick = () => tipMeme(card);
+      card.querySelector('.remix-btn').onclick = () => {
+          if(!isVideo) remixMeme(memeUrl);
+          else showNotification('Video Remix', 'Video remixing not supported yet.', 'info');
+      };
+      card.querySelector('.share-btn').onclick = () => shareMeme(memeUrl, memeId);
+      card.querySelectorAll('.reaction-btn').forEach(btn => btn.onclick = () => addReaction(card, btn.dataset.reaction));
+      const userBadge = card.querySelector('.user-badge');
+      if (userBadge && isFirestore) { userBadge.onclick = () => showPublicProfile(meme.userId); }
+    };
+
+    const loadFeed = async (clear = false) => {
+      if (isLoading) return;
+      isLoading = true;
+      if (clear) { feed.innerHTML = ''; loadCount = 0; seenUrls.clear(); }
+      if (loadCount === 0) { 
+           // Skeletons
+           for(let i=0; i<3; i++) {
+               const skel = document.createElement('div');
+               skel.className = 'skeleton-card';
+               skel.style.height = '400px';
+               feed.appendChild(skel);
+           }
       }
       
-      utils.showToast('Welcome back!', `Logged in as ${state.userProfile.username}`);
-      
-      // Load Invite Code logic
-      loadInviteCode();
-    }
+      try {
+        if (currentTab === 'mymemes') { await loadMyMemes(); } 
+        else if (currentTab === 'search') { await loadSearchResults($('searchInput').value.trim()); } 
+        else { await loadApiMemes(); }
+      } catch (error) { 
+        console.error('Error loading feed:', error);
+        feed.innerHTML = '<div class="feed-message">Could not load memes.</div>';
+      } finally { 
+        $$('.skeleton-card').forEach(el => el.remove());
+        isLoading = false;
+      }
+    };
 
-    function updateUIForLogout() {
-      $('menuLogin').style.display = 'flex';
-      $('menuLogout').style.display = 'none';
-      $('settingsUsername').textContent = "Guest";
-      $('settingsAvatarImg').src = "https://placehold.co/80x80/6a0dad/fff?text=G";
-      utils.showToast('Logged Out', 'See you next time!', 'info');
-    }
-    
-    // Fix: Invite Code Logic
-    // We check if the user has a code in their private sub-collection or root doc.
-    // If not, we generate one and save it.
-    async function loadInviteCode() {
-        if (!state.user) return;
-        
-        // Check if code exists in profile
-        if (state.userProfile.inviteCode) {
-            state.inviteCode = state.userProfile.inviteCode;
-            $('referralLinkInput').value = `${window.location.origin}?invite=${state.inviteCode}`;
-        } else {
-            // Generate new code
-            const newCode = utils.generateInviteCode(state.userProfile.username);
-            try {
-                await updateDoc(doc(db, "users", state.user.uid), {
-                    inviteCode: newCode
-                });
-                state.userProfile.inviteCode = newCode;
-                state.inviteCode = newCode;
-                $('referralLinkInput').value = `${window.location.origin}?invite=${state.inviteCode}`;
-            } catch (e) {
-                console.error("Error generating invite code", e);
-                $('referralLinkInput').value = "Error generating code";
-            }
-        }
-    }
-    // 7. MEME EDITOR ENGINE (Fixed)
-    let canvas = null; // Local reference for speed
-
-    function initMemeEditor() {
-      if (state.fabricCanvas) {
-        state.fabricCanvas.clear();
-        state.fabricCanvas.setBackgroundColor('#ffffff', state.fabricCanvas.renderAll.bind(state.fabricCanvas));
+    const loadMyMemes = async () => {
+      if (!checkAuth('view your memes')) { 
+        feed.innerHTML = '<div class="feed-message">Please <a href="#" id="loginLinkMyMemes">log in</a>.</div>';
+        $('loginLinkMyMemes').onclick = () => showAuthModal(); 
+        return; 
+      }
+      const q = query(paths.memesCol(), where('userId', '==', userId), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) { 
+        feed.innerHTML = '<div class="feed-message">No memes yet. <a href="#" onclick="openMemeEditor(); return false;">Create one!</a></div>';
         return;
       }
+      querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
+    };
 
-      const container = document.getElementById('editorContainer');
-      const canvasEl = document.getElementById('canvas');
-      
-      // Responsive sizing
-      const width = Math.min(container.clientWidth, 500); // Max width 500
-      canvasEl.width = width;
-      canvasEl.height = width; // Start square
+    const loadSearchResults = async (username) => {
+      if (!username) return;
+      const q = query(paths.memesCol(), where('username', '==', username), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) { feed.innerHTML = '<div class="feed-message">No memes found.</div>'; return; }
+      querySnapshot.forEach((doc) => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
+    };
 
-      canvas = new fabric.Canvas('canvas', {
-        width: width,
-        height: width,
-        backgroundColor: '#ffffff',
-        preserveObjectStacking: true
-      });
-      state.fabricCanvas = canvas;
+    const loadApiMemes = async () => {
+      // Mixed Feed: Firestore + API
+      try {
+        const q = query(paths.memesCol(), orderBy('createdAt', 'desc'), limit(3));
+        const snapshot = await getDocs(q);
+        snapshot.forEach(doc => renderMeme({ id: doc.id, ...doc.data() }, loadCount++));
+      } catch(e) {}
 
-      // Event: Update UI when object is selected
-      canvas.on('selection:created', updateToolUI);
-      canvas.on('selection:updated', updateToolUI);
-      canvas.on('selection:cleared', () => {
-         $('brushSize').value = 5; // Default for drawing
-         state.activeObject = null;
-      });
-    }
+      let fetched = 0;
+      while (fetched < 6) {
+        const meme = await fetchMeme();
+        if (meme) { renderMeme(meme, loadCount++); fetched++; }
+      }
+    };
 
-    function updateToolUI(e) {
-        const obj = e.selected[0];
-        state.activeObject = obj;
-        if (obj.type === 'i-text') {
-             $('textColorPicker').value = obj.fill;
-             $('brushSize').value = obj.fontSize;
-             $('brushSizeLabel').textContent = obj.fontSize;
-        }
-    }
+    const fetchMeme = async () => {
+      try {
+        const url = MEME_SOURCES[Math.floor(Math.random() * MEME_SOURCES.length)];
+        const response = await fetch(`${url}?_=${Date.now()}`); 
+        if (!response.ok) return null;
+        const data = await response.json();
+        let memeData = data.memes ? data.memes[0] : (Array.isArray(data) ? data[0] : data);
+        if (!memeData?.url || memeData.nsfw || seenUrls.has(memeData.url)) return null; 
+        seenUrls.add(memeData.url);
+        return { 
+          url: memeData.url, title: memeData.title || 'Cringe', 
+          reactions: { cringe: Math.floor(Math.random()*100), laugh: Math.floor(Math.random()*150) } 
+        };
+      } catch (e) { return null; }
+    };
 
-    // --- FIX: Image Upload Handling ---
-    function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+    const checkDeepLink = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const memeId = params.get('m');
+      if (memeId) {
+        $('feed').innerHTML = ''; isLoading = true;
+        try {
+          const docSnap = await getDoc(paths.memeDoc(memeId));
+          if (docSnap.exists()) {
+             const btn = document.createElement('button');
+             btn.className = 'btn btn-secondary';
+             btn.innerHTML = 'Back to Feed';
+             btn.onclick = () => { window.history.pushState({}, '', window.location.pathname); loadFeed(true); };
+             $('feed').appendChild(btn);
+             renderMeme({ id: docSnap.id, ...docSnap.data() }, 0);
+          } else { loadFeed(true); }
+        } catch(e) { loadFeed(true); } 
+        finally { isLoading = false; }
+        return true; 
+      }
+      return false; 
+    };
 
-      const reader = new FileReader();
-      reader.onload = function(f) {
-        const data = f.target.result;
-        fabric.Image.fromURL(data, function(img) {
-          // Resize image to fit canvas width if too big
-          if (img.width > canvas.width) {
-            img.scaleToWidth(canvas.width);
+    // ===== MEME INTERACTIONS =====
+    const saveMeme = async (card) => {
+      if (!checkAuth('save memes')) return;
+      const memeId = card.dataset.id;
+      const saveBtn = card.querySelector('.save-btn');
+      const memeData = { title: card.dataset.title, url: card.dataset.url, source: card.dataset.source };
+      const favRef = paths.favoriteDoc(userId, memeId);
+      try {
+          if (saveBtn.classList.contains('saved')) {
+              await deleteDoc(favRef);
+              saveBtn.classList.remove('saved');
+              saveBtn.querySelector('span').textContent = 'Save';
+          } else {
+              await setDoc(favRef, memeData);
+              saveBtn.classList.add('saved');
+              saveBtn.querySelector('span').textContent = 'Saved';
+              showNotification('Saved!', 'Added to collection.', 'success');
           }
-          canvas.add(img);
-          canvas.centerObject(img);
-          canvas.setActiveObject(img);
-          canvas.renderAll();
-        });
-      };
-      reader.readAsDataURL(file);
-      // Reset input so same file can be selected again
-      e.target.value = ''; 
-    }
-
-    // --- FIX: URL Image Loading (CORS safe) ---
-    function addImageFromUrl(url) {
-      if (!url) return;
-      
-      const btn = $('addImageUrlBtn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-      // usage of anonymous crossOrigin is crucial for remixing
-      fabric.Image.fromURL(url, function(img) {
-         if(!img) {
-             utils.showToast("Error", "Could not load image. Check URL.", "error");
-             btn.innerHTML = originalText;
-             return;
-         }
-         if (img.width > canvas.width) img.scaleToWidth(canvas.width);
-         canvas.add(img);
-         canvas.centerObject(img);
-         canvas.renderAll();
-         btn.innerHTML = originalText;
-         $('imageUrlInput').value = ''; // clear input
-      }, { crossOrigin: 'anonymous' });
-    }
-
-    // --- Editor Tools Setup ---
-    function setupEditorEvents() {
-        // Tool Switching
-        $$('.editor-tool').forEach(btn => {
-            btn.addEventListener('click', () => {
-                $$('.editor-tool').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const tool = btn.dataset.tool;
-                
-                // Toggle specific panels
-                $('toolImageUrl').style.display = tool === 'image-url' ? 'block' : 'none';
-                $('toolSticker').style.display = tool === 'sticker' ? 'block' : 'none';
-                $('toolFilter').style.display = tool === 'filter' ? 'block' : 'none';
-
-                // Drawing Mode Logic
-                canvas.isDrawingMode = (tool === 'draw');
-                if (canvas.isDrawingMode) {
-                   canvas.freeDrawingBrush.width = parseInt($('brushSize').value, 10) || 5;
-                   canvas.freeDrawingBrush.color = $('textColorPicker').value;
-                }
-                
-                // Specific Actions
-                if (tool === 'text') addText();
-                if (tool === 'image') $('editorImageUpload').click();
-            });
-        });
-
-        // 1. Upload Input
-        $('editorImageUpload').addEventListener('change', handleImageUpload);
-
-        // 2. URL Input
-        $('addImageUrlBtn').addEventListener('click', () => addImageFromUrl($('imageUrlInput').value));
-
-        // 3. Text Controls
-        $('textColorPicker').addEventListener('input', (e) => {
-            const obj = canvas.getActiveObject();
-            if (obj && (obj.type === 'i-text' || obj.type === 'text')) {
-                obj.set('fill', e.target.value);
-                canvas.renderAll();
-            } else if (canvas.isDrawingMode) {
-                canvas.freeDrawingBrush.color = e.target.value;
-            }
-        });
-
-        $('brushSize').addEventListener('input', (e) => {
-            const val = parseInt(e.target.value, 10);
-            $('brushSizeLabel').textContent = val;
-            const obj = canvas.getActiveObject();
-            
-            if (canvas.isDrawingMode) {
-                canvas.freeDrawingBrush.width = val;
-            } else if (obj && (obj.type === 'i-text')) {
-                obj.set('fontSize', val);
-                canvas.renderAll();
-            }
-        });
-
-        // 4. Object Controls
-        $('deleteObjBtn').addEventListener('click', () => {
-            const obj = canvas.getActiveObject();
-            if(obj) canvas.remove(obj);
-        });
-        $('bringForwardBtn').addEventListener('click', () => {
-            const obj = canvas.getActiveObject();
-            if(obj) canvas.bringForward(obj);
-        });
-        $('sendBackBtn').addEventListener('click', () => {
-            const obj = canvas.getActiveObject();
-            if(obj) canvas.sendBackwards(obj);
-        });
-
-        // 5. Stickers
-        $$('.sticker-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const text = new fabric.Text(btn.textContent, {
-                    fontSize: 60,
-                    left: canvas.width / 2,
-                    top: canvas.height / 2,
-                    originX: 'center',
-                    originY: 'center'
-                });
-                canvas.add(text);
-                canvas.setActiveObject(text);
-            });
-        });
-        
-        // 6. Templates
-        $$('.template-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-               // Confirm if canvas is not empty
-               if(canvas.getObjects().length > 0) {
-                   if(!confirm("Replace current canvas with template?")) return;
-               }
-               canvas.clear();
-               canvas.setBackgroundColor('#ffffff');
-               addImageFromUrl(btn.dataset.url); 
-            });
-        });
-
-        // 7. Filters (Basic Implementation)
-        $$('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const obj = canvas.getActiveObject();
-                if (!obj || obj.type !== 'image') {
-                    utils.showToast("Select Image", "Please select an image to filter", "info");
-                    return;
-                }
-                
-                const filterType = btn.dataset.filter;
-                let filter;
-                
-                if (filterType === 'grayscale') filter = new fabric.Image.filters.Grayscale();
-                if (filterType === 'sepia') filter = new fabric.Image.filters.Sepia();
-                if (filterType === 'invert') filter = new fabric.Image.filters.Invert();
-
-                obj.filters = [filter];
-                obj.applyFilters();
-                canvas.renderAll();
-            });
-        });
-        
-        $('removeFiltersBtn').addEventListener('click', () => {
-            const obj = canvas.getActiveObject();
-            if (obj && obj.type === 'image') {
-                obj.filters = [];
-                obj.applyFilters();
-                canvas.renderAll();
-            }
-        });
-    }
-
-    function addText() {
-        const text = new fabric.IText('Tap to Edit', {
-            left: canvas.width / 2,
-            top: canvas.height / 2,
-            fontFamily: $('fontFamilySelect').value,
-            fill: $('textColorPicker').value,
-            fontSize: 40,
-            originX: 'center',
-            originY: 'center'
-        });
-        canvas.add(text);
-        canvas.setActiveObject(text);
-    }
-
-    // --- Saving & Publishing ---
-    async function publishMeme() {
-        if (!state.user) {
-            utils.showToast("Login Required", "You must be logged in to post.", "error");
-            openModal('authModal');
-            return;
-        }
-
-        const title = $('memeTitleInput').value.trim();
-        if (!title) {
-            utils.showToast("Missing Title", "Please enter a title for your meme.", "error");
-            $('memeTitleInput').focus();
-            return;
-        }
-
-        const btn = $('postMemeBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-
-        try {
-            // 1. Get Data URL (High quality)
-            // Ensure background is white if transparent
-            if(!canvas.backgroundColor) canvas.setBackgroundColor('#ffffff');
-            
-            const dataUrl = canvas.toDataURL({
-                format: 'png',
-                quality: 0.8,
-                multiplier: 1 // 1x scale
-            });
-
-            // 2. Convert to Blob
-            const response = await fetch(dataUrl);
-            const blob = await response.blob();
-
-            // 3. Upload to Firebase Storage
-            const filename = `memes/${state.user.uid}/${Date.now()}_meme.png`;
-            const storageRef = ref(storage, filename);
-            await uploadBytes(storageRef, blob);
-            const downloadUrl = await getDownloadURL(storageRef);
-
-            // 4. Save to Firestore
-            await addDoc(collection(db, "memes"), {
-                imageUrl: downloadUrl,
-                title: title,
-                userId: state.user.uid,
-                username: state.userProfile.username,
-                avatar: state.userProfile.avatar || null,
-                createdAt: serverTimestamp(),
-                likes: 0,
-                views: 0,
-                saves: 0,
-                likeIds: [],
-                saveIds: [],
-                tags: [] // Future: Add tags
-            });
-
-            // 5. Cleanup
-            utils.showToast("Success!", "Meme published to the multiverse!", "success");
-            closeModal('memeEditorModal');
-            canvas.clear();
-            $('memeTitleInput').value = '';
-            
-            // 6. Refresh Feed
-            loadFeed(state.currentTab, true);
-
-        } catch (error) {
-            console.error("Upload failed", error);
-            utils.showToast("Error", "Failed to upload meme. " + error.message, "error");
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Meme';
-        }
-    }
-    // 8. MEME ROULETTE LOGIC (Innovative 3D Dice)
-    const diceEl = document.getElementById('rouletteDice');
-    const rouletteResult = document.getElementById('rouletteResult');
-    let isRolling = false;
-
-    $('rollDiceBtn').addEventListener('click', async () => {
-        if (isRolling) return;
-        isRolling = true;
-        
-        // 1. Start Animation
-        diceEl.classList.add('rolling');
-        rouletteResult.innerHTML = '<div class="loading-spinner"></div>';
-        $('rollDiceBtn').disabled = true;
-
-        // 2. Fetch Random Meme in background while rolling
-        // (Firestore workaround for random: generate random ID and look for >=)
-        const randomId = utils.generateId(); // Simple random string
-        let memeData = null;
-
-        try {
-            const q = query(collection(db, "memes"), where('__name__', '>=', randomId), limit(1));
-            const snapshot = await getDocs(q);
-            
-            if (!snapshot.empty) {
-                memeData = snapshot.docs[0].data();
+      } catch(e) { showNotification('Error', 'Update failed.', 'error'); }
+    };
+    
+    const updateSavedButtons = () => {
+        $$('.meme-card').forEach(card => {
+            const saveBtn = card.querySelector('.save-btn');
+            if (userCollections.favorites && userCollections.favorites.includes(card.dataset.id)) {
+                saveBtn.classList.add('saved'); saveBtn.querySelector('span').textContent = 'Saved';
             } else {
-                // Fallback if index allows or wrap around
-                const q2 = query(collection(db, "memes"), limit(1));
-                const snap2 = await getDocs(q2);
-                if (!snap2.empty) memeData = snap2.docs[0].data();
+                saveBtn.classList.remove('saved'); saveBtn.querySelector('span').textContent = 'Save';
             }
-        } catch (e) {
-            console.error("Roulette fetch error", e);
-        }
+        });
+    };
 
-        // 3. Stop Animation after 1.5s and show result
+    const tipMeme = async (card) => {
+      if (!checkAuth('tip memes')) return;
+      if (currentUser.cringeCoin < 5) { showNotification('Insufficient Funds', 'Need 5 CC.', 'error'); return; }
+      const creatorId = card.dataset.creatorId;
+      if (creatorId === userId) return;
+      
+      try {
+        await runTransaction(db, async (transaction) => {
+          const userDoc = await transaction.get(paths.publicUser(userId));
+          if (userDoc.data().cringeCoin < 5) throw new Error("Insufficient funds");
+          transaction.update(paths.publicUser(userId), { cringeCoin: increment(-5) });
+          transaction.update(paths.memeDoc(card.dataset.docId), { tips: increment(5) });
+          transaction.update(paths.publicUser(creatorId), { cringeCoin: increment(5) });
+        });
+        await addDoc(paths.notificationsCol(creatorId), { type: 'tip', fromUser: currentUser.username, amount: 5, memeTitle: card.dataset.title, timestamp: serverTimestamp(), read: false });
+        updateQuestProgress('tip');
+        showNotification('Tip Sent!', '5 CC sent!', 'success');
+      } catch (e) { showNotification('Error', e.message, 'error'); }
+    };
+
+    const remixMeme = (imageUrl) => {
+        if (!checkAuth('create memes')) return;
+        openMemeEditor(imageUrl);
+    };
+
+    const shareMeme = (memeUrl, memeId) => {
+      const shareLink = memeId && !memeId.includes('http') ? `${window.location.origin}${window.location.pathname}?m=${memeId}` : memeUrl;
+      if (navigator.share) { navigator.share({ title: 'CringeScroll', url: shareLink }); }
+      else { navigator.clipboard.writeText(shareLink).then(() => showNotification('Copied', 'Link copied!', 'success')); }
+    };
+    
+    const addReaction = async (card, type) => {
+      if (!checkAuth('react')) return;
+      const btn = card.querySelector(`.reaction-btn[data-reaction="${type}"]`);
+      btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 500); // Visual only for spam
+      
+      await updateQuestProgress('react');
+      if (card.dataset.source === 'api') {
+        await updateDoc(paths.publicUser(userId), { cringeCoin: increment(1) });
+        return;
+      }
+      try {
+        await runTransaction(db, async (t) => {
+            t.update(paths.publicUser(userId), { cringeCoin: increment(1) });
+            t.update(paths.memeDoc(card.dataset.docId), { [`reactions.${type}`]: increment(1) });
+        });
+        const count = btn.querySelector('.reaction-count');
+        count.textContent = formatNumber(parseInt(count.textContent || 0) + 1);
+      } catch(e) {}
+    };
+
+    // ===== MEME EDITOR (FIXED) =====
+    let fabricCanvas = null;
+    let activeTool = 'text';
+
+    const openMemeEditor = (imageUrl = null) => {
+      if (!checkAuth('create memes')) return;
+      $('memeEditorModal').classList.add('active');
+      setTimeout(() => initMemeEditor(imageUrl), 300);
+    };
+
+    const initMemeEditor = (imageUrl) => {
+      const container = $('editorContainer');
+      const w = container.clientWidth - 4;
+      const h = container.clientHeight - 4;
+
+      if (!fabricCanvas) {
+         // IMPORTANT: Don't destroy innerHTML, just setup canvas once
+         const canvasEl = $('canvas');
+         canvasEl.width = w; canvasEl.height = h;
+         fabricCanvas = new fabric.Canvas('canvas', { backgroundColor: '#0f0c29', selection: true });
+         setupEditorListeners();
+      } else {
+         fabricCanvas.clear();
+         fabricCanvas.setBackgroundColor('#0f0c29', fabricCanvas.renderAll.bind(fabricCanvas));
+      }
+      
+      fabricCanvas.setWidth(w); fabricCanvas.setHeight(h);
+
+      if (imageUrl) {
+        fabric.Image.fromURL(imageUrl, (img) => {
+          if(!img) return;
+          const scale = Math.min((w * 0.8) / img.width, (h * 0.8) / img.height);
+          img.scale(scale);
+          img.set({ left: w/2, top: h/2, originX: 'center', originY: 'center' });
+          fabricCanvas.add(img);
+          fabricCanvas.setActiveObject(img);
+        }, { crossOrigin: 'anonymous' }); // Fix CORS
+      }
+      switchEditorTool('text');
+    };
+
+    const switchEditorTool = (tool) => {
+        activeTool = tool;
+        $$('.editor-tool').forEach(b => b.classList.remove('active'));
+        $(`.editor-tool[data-tool="${tool}"]`).classList.add('active');
+        $$('.editor-tool-group[id^="tool"]').forEach(g => g.style.display = 'none');
+        const grp = $(`tool${tool.charAt(0).toUpperCase() + tool.slice(1).replace('-', '')}`);
+        if(grp) grp.style.display = 'block';
+        if(fabricCanvas) fabricCanvas.isDrawingMode = (tool === 'draw');
+    };
+
+    const setupEditorListeners = () => {
+        fabricCanvas.on('selection:created', (e) => {
+            const obj = e.target;
+            if(obj.type === 'i-text') {
+                $('textColorPicker').value = obj.fill;
+                $('brushSize').value = obj.fontSize;
+            }
+        });
+        
+        fabricCanvas.on('mouse:down', (opt) => {
+            if(activeTool === 'text' && !opt.target) {
+                const text = new fabric.IText('Text', { 
+                    left: opt.pointer.x, top: opt.pointer.y, 
+                    fill: $('textColorPicker').value, fontSize: parseInt($('brushSize').value) 
+                });
+                fabricCanvas.add(text); fabricCanvas.setActiveObject(text); text.enterEditing();
+            }
+        });
+    };
+
+    const postMemeFromEditor = async () => {
+      const title = $('memeTitleInput').value.trim();
+      if (!title) { showNotification('Title Required', 'Enter a title.', 'error'); return; }
+      
+      const btn = $('postMemeBtn');
+      btn.disabled = true; btn.innerHTML = 'Publishing...';
+      
+      try {
+        const dataURL = fabricCanvas.toDataURL({ format: 'jpeg', quality: 0.8 });
+        const memeId = `meme_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+        const storageRef = ref(storage, `memes/${userId}/${memeId}.jpg`);
+        await uploadString(storageRef, dataURL, 'data_url');
+        const url = await getDownloadURL(storageRef);
+        
+        await addDoc(paths.memesCol(), {
+            title, imageUrl: url, userId, username: currentUser.username, 
+            createdAt: serverTimestamp(), isUserGenerated: true, 
+            reactions: { cringe: 0, laugh: 0 }, tips: 0
+        });
+        
+        await updateDoc(paths.publicUser(userId), { memeCount: increment(1) });
+        updateQuestProgress('post');
+        $('memeEditorModal').classList.remove('active');
+        switchTab('mymemes');
+        showNotification('Posted!', '+10 CC', 'success');
+      } catch (e) { showNotification('Error', e.message, 'error'); }
+      finally { btn.disabled = false; btn.innerHTML = 'Post Meme'; }
+    };
+    
+    // ===== ROULETTE LOGIC (NEW) =====
+    const openRoulette = () => {
+        if(!checkAuth('play roulette')) return;
+        $('rouletteModal').classList.add('active');
+        $('rouletteResult').style.display = 'none';
+        $('rouletteResult').innerHTML = '';
+        $('rollDiceBtn').style.display = 'block';
+    };
+
+    const rollDice = async () => {
+        const dice = $('dice');
+        const btn = $('rollDiceBtn');
+        btn.disabled = true;
+        
+        // Random spin
+        const xRot = Math.floor(Math.random() * 4 + 4) * 90;
+        const yRot = Math.floor(Math.random() * 4 + 4) * 90;
+        dice.style.transform = `rotateX(${xRot}deg) rotateY(${yRot}deg)`;
+        
+        const meme = await fetchMeme();
+        
         setTimeout(() => {
-            diceEl.classList.remove('rolling');
-            isRolling = false;
-            $('rollDiceBtn').disabled = false;
-            
-            if (memeData) {
-                // Render the meme directly in the modal
-                rouletteResult.innerHTML = `
-                    <div class="meme-card" style="width:100%; margin:0;">
-                        <div class="meme-image-container">
-                            <img src="${memeData.imageUrl}" class="meme-image loaded" style="max-height: 300px;">
-                        </div>
-                        <div class="card-footer">
-                            <h4 style="color:white; text-align:center;">${memeData.title}</h4>
-                        </div>
+            if(meme) {
+                const resDiv = $('rouletteResult');
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = `
+                    <div style="margin-top:20px; animation: fadeIn 0.5s;">
+                        <h3 style="margin-bottom:10px;">${meme.title}</h3>
+                        <img src="${meme.url}" style="max-width:100%; max-height:300px; border-radius:12px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
                     </div>
                 `;
-            } else {
-                rouletteResult.innerHTML = '<p>The dice rolled off the table... (No memes found)</p>';
             }
-        }, 1500);
-    });
-
-    // 9. MENU & FEATURE LOGIC (Fixed Loading Issues)
-
-    // --- Shop Logic ---
-    async function loadShop() {
-        const grid = $('shopGrid');
-        grid.innerHTML = '<div class="loading-spinner"></div>';
-        
-        // Update Balance Display
-        if(state.userProfile) {
-            $('shopBalance').textContent = `${state.userProfile.cringeCoin || 0} CC`;
-        }
-
-        // Simulating Shop Items (In production, fetch from 'shop_items' collection)
-        // We use hardcoded items here to ensure the menu works immediately for you
-        const items = [
-            { id: 'frame_gold', name: 'Golden Frame', price: 500, icon: '👑', type: 'frame' },
-            { id: 'badge_pro', name: 'Pro Badge', price: 1000, icon: '🔥', type: 'badge' },
-            { id: 'color_neon', name: 'Neon Theme', price: 2000, icon: '🌈', type: 'theme' },
-            { id: 'boost_xp', name: 'XP Boost (1h)', price: 100, icon: '⚡', type: 'consumable' }
-        ];
-
-        grid.innerHTML = '';
-        items.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'shop-item-card';
-            el.innerHTML = `
-                <div class="shop-preview">${item.icon}</div>
-                <div class="grid-item-title">${item.name}</div>
-                <div class="shop-price">${item.price} CC</div>
-                <button class="btn btn-sm btn-primary buy-btn" data-id="${item.id}" data-price="${item.price}">Buy</button>
-            `;
-            grid.appendChild(el);
-        });
-
-        // Buy Logic
-        $$('.buy-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                if(!state.user) return utils.showToast("Login", "Please login first", "error");
-                
-                const price = parseInt(e.target.dataset.price);
-                const itemId = e.target.dataset.id;
-                
-                if((state.userProfile.cringeCoin || 0) < price) {
-                    utils.showToast("Too Poor", "You need more CringeCoins!", "error");
-                    return;
-                }
-
-                // Deduct & Add Item
-                try {
-                    const userRef = doc(db, "users", state.user.uid);
-                    await updateDoc(userRef, {
-                        cringeCoin: increment(-price),
-                        inventory: arrayUnion(itemId)
-                    });
-                    state.userProfile.cringeCoin -= price;
-                    $('shopBalance').textContent = `${state.userProfile.cringeCoin} CC`;
-                    utils.showToast("Sold!", "Item added to inventory.", "success");
-                } catch(err) {
-                    console.error(err);
-                }
-            });
-        });
-    }
-
-    // --- Inventory Logic ---
-    async function loadInventory() {
-        const grid = $('badgeGrid');
-        if (!state.userProfile || !state.userProfile.inventory) {
-            grid.innerHTML = '<p style="color:var(--text-secondary);">Your inventory is empty.</p>';
-            return;
-        }
-
-        grid.innerHTML = '';
-        state.userProfile.inventory.forEach(itemId => {
-            const el = document.createElement('div');
-            el.className = 'grid-item';
-            // Simple mapping for display
-            let icon = '📦';
-            if(itemId.includes('frame')) icon = '👑';
-            if(itemId.includes('badge')) icon = 'mV';
-            
-            el.innerHTML = `
-                <i class="fas fa-box"></i>
-                <div class="grid-item-title">${itemId}</div>
-                <button class="btn btn-sm btn-secondary equip-btn" data-id="${itemId}">Equip</button>
-            `;
-            grid.appendChild(el);
-        });
-    }
-
-    // --- Leaderboard Logic ---
-    async function loadLeaderboard() {
-        const userList = $('leaderboardUserList');
-        userList.innerHTML = '<div class="loading-spinner"></div>';
-
-        try {
-            const q = query(collection(db, "users"), orderBy("cringeCoin", "desc"), limit(10));
-            const snapshot = await getDocs(q);
-            
-            userList.innerHTML = '';
-            let rank = 1;
-            
-            snapshot.forEach(doc => {
-                const u = doc.data();
-                const div = document.createElement('div');
-                div.className = 'menu-item';
-                div.style.cursor = 'default';
-                div.innerHTML = `
-                    <span style="font-weight:bold; width:20px; color:var(--accent-3);">${rank++}.</span>
-                    <img src="${u.avatar || 'https://placehold.co/40'}" style="width:30px; height:30px; border-radius:50%; margin-right:10px;">
-                    <span style="flex:1;">${u.username}</span>
-                    <span style="color:var(--gold); font-weight:bold;">${u.cringeCoin || 0} CC</span>
-                `;
-                userList.appendChild(div);
-            });
-        } catch (e) {
-            console.error(e);
-            userList.innerHTML = '<p>Failed to load leaderboard.</p>';
-        }
-    }
-
-    // --- Quests Logic ---
-    function loadQuests() {
-        const list = $('questList');
-        // Static Daily Quests for now
-        const quests = [
-            { title: "Daily Login", reward: 50, completed: true },
-            { title: "Post a Meme", reward: 100, completed: false },
-            { title: "Like 10 Memes", reward: 30, completed: false }
-        ];
-
-        list.innerHTML = '';
-        quests.forEach(q => {
-            const div = document.createElement('div');
-            div.style.background = 'rgba(255,255,255,0.05)';
-            div.style.padding = '12px';
-            div.style.borderRadius = '10px';
-            div.style.display = 'flex';
-            div.style.justifyContent = 'space-between';
-            div.style.alignItems = 'center';
-            
-            div.innerHTML = `
-                <div>
-                    <div style="font-weight:bold;">${q.title}</div>
-                    <div style="font-size:0.8rem; color:var(--gold);">+${q.reward} CC</div>
-                </div>
-                <button class="btn btn-sm ${q.completed ? 'btn-secondary' : 'btn-primary'}" ${q.completed ? 'disabled' : ''}>
-                    ${q.completed ? '<i class="fas fa-check"></i>' : 'Claim'}
-                </button>
-            `;
-            list.appendChild(div);
-        });
-    }
-
-    // 10. MENU EVENT LISTENERS (Wiring it all up)
-    
-    // Sidebar Toggles
-    $('menuToggleBtn').addEventListener('click', () => $('sidebar').classList.add('active'));
-    $('closeSidebar').addEventListener('click', () => $('sidebar').classList.remove('active'));
-    
-    // Menu Item Clicks - Open Modals and Load Data
-    const menuMap = {
-        'menuSettings': 'settingsModal',
-        'menuCollections': 'collectionsModal',
-        'menuInventory': 'inventoryModal',
-        'menuShop': 'shopModal',
-        'menuQuests': 'questsModal',
-        'menuLeaderboard': 'leaderboardModal',
-        'menuCreateMeme': 'memeEditorModal',
-        'menuMemeRoulette': 'rouletteModal',
-        'menuNotifications': 'notificationsModal' // if exists in menu
+            btn.disabled = false;
+        }, 1200); // Wait for animation
     };
 
-    Object.keys(menuMap).forEach(id => {
-        const el = document.getElementById(id);
-        if(el) {
-            el.addEventListener('click', () => {
-                const modalId = menuMap[id];
-                
-                // Specific Loading triggers
-                if(modalId === 'memeEditorModal') {
-                     // Check auth
-                     // if(!state.user) return openModal('authModal'); // Optional: force login to create
-                     setTimeout(initMemeEditor, 100); // Wait for modal animation
-                }
-                if(modalId === 'shopModal') loadShop();
-                if(modalId === 'inventoryModal') loadInventory();
-                if(modalId === 'leaderboardModal') loadLeaderboard();
-                if(modalId === 'questsModal') loadQuests();
-                
-                $('sidebar').classList.remove('active'); // Close sidebar
-                openModal(modalId);
-            });
-        }
-    });
-
-    // Profile Menu Click
-    $('menuProfile').addEventListener('click', () => {
-        if(!state.user) {
-            openModal('authModal');
-        } else {
-            // Open settings to profile tab
-            openModal('settingsModal');
-            document.querySelector('[data-tab="settingsProfile"]').click();
-        }
-        $('sidebar').classList.remove('active');
-    });
-
-    // Invite Friend Click
-    $('menuInvite').addEventListener('click', () => {
-         if(!state.user) return openModal('authModal');
-         openModal('settingsModal');
-         document.querySelector('[data-tab="settingsAccount"]').click();
-         $('sidebar').classList.remove('active');
-    });
-
-    // Copy Referral
-    $('copyReferralBtn').addEventListener('click', () => {
-        const input = $('referralLinkInput');
-        input.select();
-        document.execCommand('copy');
-        utils.showToast("Copied!", "Referral link copied to clipboard.");
-    });
-    // 11. FEED & ADSENSE LOGIC
-
-    // --- Helper: Create AdSense Card ---
-    function createAdCard() {
-        const div = document.createElement('div');
-        div.className = 'meme-card';
-        div.innerHTML = `
-            <div class="card-header">
-                <span class="meme-title" style="font-size: 0.9rem; color: var(--text-secondary);">Sponsored</span>
-                <i class="fas fa-ad" style="color: var(--gold);"></i>
-            </div>
-            <div class="meme-image-container" style="min-height: 250px; background: rgba(0,0,0,0.2); display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                <p style="color:var(--text-secondary); margin-bottom:10px;">Ad Space</p>
-                <div style="border: 1px dashed var(--text-secondary); padding: 20px; text-align: center;">
-                   Google AdSense<br>Display Ad
-                </div>
-            </div>
-            <div class="card-footer">
-                <button class="btn btn-sm btn-secondary" style="width:100%">Learn More</button>
-            </div>
-        `;
-        return div;
-    }
-
-    // --- Core: Load Feed ---
-    async function loadFeed(tab = 'hot', refresh = false) {
-        const feedEl = $('feed');
-        if (refresh) {
-            feedEl.innerHTML = '';
-            state.memes = [];
-            state.lastDoc = null;
-        }
-
-        // Show loading if empty
-        if (feedEl.children.length === 0) {
-            feedEl.innerHTML = '<div class="loading-spinner"></div>';
-        }
-
-        state.isLoading = true;
-        state.currentTab = tab;
-
-        try {
-            // Build Query based on Tab
-            let q;
-            const memesCol = collection(db, "memes");
-            
-            if (tab === 'hot') {
-                q = query(memesCol, orderBy("likes", "desc"), limit(12));
-            } else if (tab === 'fresh') {
-                q = query(memesCol, orderBy("createdAt", "desc"), limit(12));
-            } else if (tab === 'mymemes') {
-                if(!state.user) {
-                    feedEl.innerHTML = '<div class="feed-message">Please <a onclick="openModal(\'authModal\')">Login</a> to view your memes.</div>';
-                    return;
-                }
-                q = query(memesCol, where("userId", "==", state.user.uid), orderBy("createdAt", "desc"), limit(12));
-            } else {
-                // Default
-                q = query(memesCol, orderBy("createdAt", "desc"), limit(12));
-            }
-
-            // Pagination (Start After)
-            // Note: For simple implementation, we stick to initial load. 
-            // Pagination requires preserving the lastDoc reference in 'q'.
-            
-            const snapshot = await getDocs(q);
-            
-            if (refresh) feedEl.innerHTML = ''; // Clear spinner
-
-            if (snapshot.empty && state.memes.length === 0) {
-                feedEl.innerHTML = '<div class="feed-message">No memes found here... Be the first to post!</div>';
-                return;
-            }
-
-            let memeCounter = 0;
-
-            snapshot.forEach(docSnap => {
-                const meme = { id: docSnap.id, ...docSnap.data() };
-                state.memes.push(meme);
-                
-                // 1. Render Meme Card
-                const card = createMemeCard(meme);
-                feedEl.appendChild(card);
-                
-                // 2. AdSense Injection Logic (Every 6th meme)
-                memeCounter++;
-                if (memeCounter % state.adInterval === 0) {
-                    const adCard = createAdCard();
-                    feedEl.appendChild(adCard);
-                }
-            });
-
-            state.lastDoc = snapshot.docs[snapshot.docs.length - 1];
-
-        } catch (error) {
-            console.error("Feed error:", error);
-            feedEl.innerHTML = `<div class="feed-message" style="color:var(--error)">Error loading feed: ${error.message}</div>`;
-        } finally {
-            state.isLoading = false;
-        }
-    }
-
-    function createMemeCard(meme) {
-        const el = document.createElement('div');
-        el.className = 'meme-card';
-        // Check if user liked/saved
-        const isLiked = state.user && meme.likeIds && meme.likeIds.includes(state.user.uid);
-        const isSaved = state.user && meme.saveIds && meme.saveIds.includes(state.user.uid);
-
-        el.innerHTML = `
-            <div class="card-header">
-                <div class="meme-title">${meme.title}</div>
-                <div class="meme-meta">
-                    <span class="user-badge"><i class="fas fa-user"></i> ${meme.username || 'Anon'}</span>
-                    <span>${utils.formatDate(meme.createdAt)}</span>
-                </div>
-            </div>
-            <div class="meme-image-container">
-                <img src="${meme.imageUrl}" class="meme-image" loading="lazy" onload="this.classList.add('loaded')" alt="${meme.title}">
-            </div>
-            <div class="card-footer">
-                <div class="reaction-bar">
-                    <button class="reaction-btn ${isLiked ? 'active' : ''}" onclick="toggleLike('${meme.id}', this)">
-                        <i class="${isLiked ? 'fas' : 'far'} fa-grin-squint-tears"></i>
-                        <span class="reaction-count">${meme.likes || 0}</span>
-                    </button>
-                    <button class="reaction-btn" onclick="openComments('${meme.id}')">
-                        <i class="far fa-comments"></i>
-                        <span class="reaction-count">Comment</span>
-                    </button>
-                    <button class="reaction-btn" onclick="shareMeme('${meme.id}')">
-                        <i class="fas fa-share"></i>
-                        <span class="reaction-count">Share</span>
-                    </button>
-                </div>
-                <div class="action-buttons">
-                    <button class="card-btn" onclick="remixMeme('${meme.imageUrl}')"><i class="fas fa-paint-brush"></i> Remix</button>
-                    <button class="card-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave('${meme.id}', this)"><i class="fas fa-bookmark"></i> Save</button>
-                    <button class="card-btn" onclick="downloadMeme('${meme.imageUrl}', '${meme.title}')"><i class="fas fa-download"></i> Save Img</button>
-                    <button class="card-btn" onclick="reportMeme('${meme.id}')" style="color:var(--error)"><i class="fas fa-flag"></i> Report</button>
-                </div>
-            </div>
-        `;
-        return el;
-    }
-
-    // 12. INTERACTION FUNCTIONS
-
-    // --- FIX: Remix Logic ---
-    // Expose to window for inline onclick
-    window.remixMeme = async function(url) {
-        if (!state.user) return openModal('authModal');
-        
-        // 1. Open Editor
-        openModal('memeEditorModal');
-        
-        // 2. Initialize Canvas
-        setTimeout(() => {
-            initMemeEditor();
-            // 3. Load the image via the CORS-safe function we wrote in Part 6
-            addImageFromUrl(url);
-            utils.showToast("Remix Mode", "Template loaded!", "info");
-        }, 300);
-    };
-
-    window.toggleLike = async function(memeId, btn) {
-        if (!state.user) return openModal('authModal');
-        const icon = btn.querySelector('i');
-        const countSpan = btn.querySelector('span');
-        let count = parseInt(countSpan.textContent);
-        const isLiked = btn.classList.contains('active');
-
-        // Optimistic UI update
-        btn.classList.toggle('active');
-        icon.className = isLiked ? 'far fa-grin-squint-tears' : 'fas fa-grin-squint-tears';
-        countSpan.textContent = isLiked ? count - 1 : count + 1;
-
-        try {
-            const memeRef = doc(db, "memes", memeId);
-            if (isLiked) {
-                await updateDoc(memeRef, { likes: increment(-1), likeIds: arrayRemove(state.user.uid) });
-            } else {
-                await updateDoc(memeRef, { likes: increment(1), likeIds: arrayUnion(state.user.uid) });
-            }
-        } catch (e) {
-            console.error("Like failed", e);
-            // Revert UI
-            btn.classList.toggle('active');
-            countSpan.textContent = count;
-        }
-    };
-
-    window.downloadMeme = async (url, title) => {
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = `CringeScroll_${title}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(blobUrl);
-            utils.showToast("Downloaded", "Saved to your device.");
-        } catch(e) {
-            window.open(url, '_blank');
-        }
-    };
-    
-    window.shareMeme = (id) => {
-        if(navigator.share) {
-            navigator.share({
-                title: 'Check out this meme on CringeScroll!',
-                url: window.location.href // In real app: /meme/id
-            });
-        } else {
-            utils.showToast("Link Copied", "Share this link with friends!");
-        }
-    };
-
-    // 13. GLOBAL INITIALIZATION
-
-    // Helper to open/close modals
-    window.openModal = (id) => {
-        const m = document.getElementById(id);
-        if(m) m.classList.add('active');
-    };
-    
-    // Attach Close events to all close buttons
-    $$('.close-modal, .modal-overlay').forEach(el => {
-        el.addEventListener('click', (e) => {
-            if (e.target === el || el.classList.contains('close-modal') || el.parentElement.classList.contains('close-modal')) {
-                // Find parent modal
-                const modal = el.closest('.modal-overlay');
-                if(modal) modal.classList.remove('active');
-            }
-        });
-    });
-
-    // Navigation Tabs
-    $$('.nav-item').forEach(nav => {
-        nav.addEventListener('click', (e) => {
-            e.preventDefault();
-            $$('.nav-item').forEach(n => n.classList.remove('active'));
-            nav.classList.add('active'); // Use nav variable which is the anchor
-            
-            const tab = nav.dataset.tab;
-            loadFeed(tab, true);
-        });
-    });
-
-    // Auth Form Logic
-    $('signupBtn').addEventListener('click', async () => {
-        const email = $('signupEmailInput').value;
-        const pass = $('signupPasswordInput').value;
-        const username = $('signupUsernameInput').value;
-        
-        try {
-            const res = await createUserWithEmailAndPassword(auth, email, pass);
-            // Create Firestore Profile
-            await setDoc(doc(db, "users", res.user.uid), {
-                username: username,
-                email: email,
-                cringeCoin: 100, // Sign up bonus
-                createdAt: serverTimestamp(),
-                inventory: [],
-                unreadNotifications: 0
-            });
-            closeModal('authModal');
-            utils.showToast("Welcome!", "Account created successfully.");
-        } catch (e) {
-            $('signupError').textContent = e.message;
-        }
-    });
-
-    $('loginBtn').addEventListener('click', async () => {
-        try {
-            await signInWithEmailAndPassword(auth, $('loginEmailInput').value, $('loginPasswordInput').value);
-            closeModal('authModal');
-        } catch (e) {
-            $('loginError').textContent = "Invalid email or password.";
-        }
-    });
-
-    $('settingsLogoutBtn').addEventListener('click', () => {
-        signOut(auth);
-        closeModal('settingsModal');
-    });
-
-    $('postMemeBtn').addEventListener('click', publishMeme);
-    
-    // Toggle Login/Signup tabs
-    $('loginTab').addEventListener('click', () => {
-        $('loginTab').classList.add('active');
-        $('signupTab').classList.remove('active');
-        $('loginForm').style.display = 'block';
-        $('signupForm').style.display = 'none';
-    });
-    $('signupTab').addEventListener('click', () => {
-        $('signupTab').classList.add('active');
-        $('loginTab').classList.remove('active');
-        $('signupForm').style.display = 'block';
-        $('loginForm').style.display = 'none';
-    });
-
-    // Init App
+    // ===== INIT =====
     document.addEventListener('DOMContentLoaded', () => {
-        loadFeed('hot', true);
-        
-        // Theme init
-        document.body.className = state.theme + " " + (localStorage.getItem('cs_fontSize') || 'font-size-medium');
-        
-        $('themeToggleBtn').addEventListener('click', () => {
-            const themes = ['theme-dark', 'theme-light', 'theme-blue', 'theme-red', 'theme-purple'];
-            let current = themes.indexOf(state.theme);
-            let next = (current + 1) % themes.length;
-            state.theme = themes[next];
-            document.body.className = state.theme + " " + (localStorage.getItem('cs_fontSize') || 'font-size-medium');
-            localStorage.setItem('cs_theme', state.theme);
-        });
+      initFirebase();
+      feed = $('feed'); sidebar = $('sidebar');
+      
+      // Listeners
+      $$('.nav-item').forEach(el => el.onclick = (e) => { e.preventDefault(); switchTab(el.dataset.tab); });
+      $('menuToggleBtn').onclick = () => sidebar.classList.add('active');
+      $('closeSidebar').onclick = () => sidebar.classList.remove('active');
+      
+      $('menuLogin').onclick = () => showAuthModal();
+      $('menuLogout').onclick = logout;
+      $('menuCreateMeme').onclick = () => openMemeEditor();
+      $('menuMemeRoulette').onclick = openRoulette;
+      $('menuChat').onclick = () => { $('chatWindow').classList.toggle('active'); sidebar.classList.remove('active'); };
+      $('menuSettings').onclick = () => { $('settingsModal').classList.add('active'); loadSettings(); sidebar.classList.remove('active'); };
+      
+      $('rollDiceBtn').onclick = rollDice;
+      
+      // Editor Listeners
+      $$('.editor-tool').forEach(b => b.onclick = () => switchEditorTool(b.dataset.tool));
+      $('postMemeBtn').onclick = postMemeFromEditor;
+      $('editorImageUpload').onchange = (e) => {
+          const r = new FileReader();
+          r.onload = (ev) => initMemeEditor(ev.target.result);
+          if(e.target.files[0]) r.readAsDataURL(e.target.files[0]);
+      };
+      $('addImageUrlBtn').onclick = () => {
+          const url = $('imageUrlInput').value;
+          if(url) initMemeEditor(url);
+      };
+      
+      // Auth Listeners
+      $('signupBtn').onclick = signUpUser;
+      $('loginBtn').onclick = loginUser;
+      $('deleteAccountBtn').onclick = deleteAccount;
+      
+      $$('.close-modal').forEach(b => b.onclick = (e) => $(e.currentTarget.dataset.modalId).classList.remove('active'));
+      
+      // Keyboard
+      document.addEventListener('keydown', (e) => {
+          if(e.target.tagName === 'INPUT') return;
+          if(e.key === 'j') feed.scrollTop += 300;
+          if(e.key === 'k') feed.scrollTop -= 300;
+      });
+      
+      // Drag & Drop
+      document.body.ondragenter = (e) => { e.preventDefault(); $('dragOverlay').classList.add('active'); };
+      document.body.ondragover = (e) => e.preventDefault();
+      document.body.ondrop = (e) => {
+          e.preventDefault(); $('dragOverlay').classList.remove('active');
+          if(e.dataTransfer.files[0]?.type.startsWith('image/')) {
+              const r = new FileReader();
+              r.onload = (ev) => openMemeEditor(ev.target.result);
+              r.readAsDataURL(e.dataTransfer.files[0]);
+          }
+      };
+      
+      // Chat
+      $('chatToggleBtn').onclick = () => $('chatWindow').classList.toggle('active');
+      $('closeChatWindow').onclick = () => $('chatWindow').classList.remove('active');
+      $('sendChatMessage').onclick = async () => {
+          const txt = $('chatInput').value.trim();
+          if(!txt || !checkAuth('chat')) return;
+          await addDoc(paths.chatCol(), { text: txt, sender: currentUser.username, userId, timestamp: serverTimestamp() });
+          $('chatInput').value = '';
+      };
     });
+    
+    // Helper stubs
+    const loadSettings = () => { if(currentUser) { $('settingsUsername').textContent = currentUser.username; } };
+    const updateQuestProgress = async (type) => { 
+        if(currentUser && !isAnonymous) try { await updateDoc(paths.privateUser(userId), { [`quests.${type}Count`]: increment(1) }); } catch(e){} 
+    };
+    const showPublicProfile = (uid) => { $('profileModal').classList.add('active'); };
+    const switchTab = (tab) => {
+        currentTab = tab;
+        $$('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === tab));
+        loadFeed(true);
+    };
 
   </script>
 </body>
