@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium PDF Editor - Merge PDFs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        /* Custom styles for the drag-and-drop zone */
+        .drag-over {
+            border-color: #3b82f6 !important;
+            background-color: #eff6ff !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center cursor-pointer">
+                    <span class="text-2xl font-bold text-blue-600">PDF<span class="text-gray-800">Master</span></span>
+                </div>
+                <div class="hidden sm:flex space-x-8">
+                    <a href="#" class="text-blue-600 font-medium">Merge PDF</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-900 transition">Split PDF</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-900 transition">Compress PDF</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="w-full bg-gray-200 py-4 text-center text-gray-500 text-sm border-b border-gray-300">
+        [ ADVERTISEMENT BANNER - 728x90 ]
+        </div>
+
+    <main class="flex-grow flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-4">Merge PDF Files</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Combine multiple PDFs into one unified document instantly. 100% free, secure, and processes directly on your device.</p>
+        </div>
+
+        <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            
+            <div id="drop-zone" class="p-12 border-2 border-dashed border-gray-300 rounded-xl m-6 text-center transition-colors duration-200">
+                <svg class="mx-auto h-16 w-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Drag & Drop your PDFs here</h3>
+                <p class="text-gray-500 mb-6">or</p>
+                <input type="file" id="file-input" class="hidden" multiple accept="application/pdf">
+                <button onclick="document.getElementById('file-input').click()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1">
+                    Select PDF Files
+                </button>
+            </div>
+
+            <div id="file-list-container" class="hidden px-6 pb-6">
+                <h4 class="font-semibold text-gray-700 mb-3 border-b pb-2">Selected Files:</h4>
+                <ul id="file-list" class="space-y-2 mb-6 text-sm text-gray-600"></ul>
+                
+                <div class="flex justify-center">
+                    <button id="merge-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition flex items-center">
+                        <span id="btn-text">Merge PDFs Now</span>
+                        <svg id="loading-spinner" class="hidden animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="w-full bg-gray-200 py-6 text-center text-gray-500 text-sm border-t border-gray-300 mt-8">
+        [ ADVERTISEMENT BANNER - Responsive ]
+        </div>
+
+    <footer class="bg-white border-t border-gray-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            &copy; 2026 PDFMaster. All rights reserved. <br>
+            <a href="#" class="hover:text-blue-600">Privacy Policy</a> | <a href="#" class="hover:text-blue-600">Terms of Service</a>
+        </div>
+    </footer>
+
+    <script>
+        let selectedFiles = [];
+
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const fileListContainer = document.getElementById('file-list-container');
+        const fileList = document.getElementById('file-list');
+        const mergeBtn = document.getElementById('merge-btn');
+        const btnText = document.getElementById('btn-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        // Handle File Selection
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and Drop Effects
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        function handleFiles(files) {
+            // Filter only PDFs
+            const newFiles = Array.from(files).filter(file => file.type === 'application/pdf');
+            if (newFiles.length === 0) {
+                alert('Please select valid PDF files.');
+                return;
+            }
+            
+            selectedFiles = [...selectedFiles, ...newFiles];
+            updateFileListUI();
+        }
+
+        function updateFileListUI() {
+            if (selectedFiles.length > 0) {
+                fileListContainer.classList.remove('hidden');
+                dropZone.classList.add('mb-0', 'border-b-0', 'rounded-b-none', 'p-6'); // Shrink drop zone
+            }
+            
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded';
+                li.innerHTML = `
+                    <span class="truncate pr-4">${file.name}</span>
+                    <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700 font-bold text-lg">&times;</button>
+                `;
+                fileList.appendChild(li);
+            });
+        }
+
+        window.removeFile = function(index) {
+            selectedFiles.splice(index, 1);
+            if(selectedFiles.length === 0) {
+                fileListContainer.classList.add('hidden');
+                dropZone.classList.remove('mb-0', 'border-b-0', 'rounded-b-none', 'p-6');
+            }
+            updateFileListUI();
+        }
+
+        // Merge Logic using pdf-lib
+        mergeBtn.addEventListener('click', async () => {
+            if (selectedFiles.length < 2) {
+                alert('Please select at least 2 PDF files to merge.');
+                return;
+            }
+
+            // UI Loading state
+            btnText.innerText = 'Merging...';
+            loadingSpinner.classList.remove('hidden');
+            mergeBtn.disabled = true;
+
+            try {
+                const PDFDocument = PDFLib.PDFDocument;
+                const mergedPdf = await PDFDocument.create();
+
+                for (let file of selectedFiles) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(arrayBuffer);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => {
+                        mergedPdf.addPage(page);
+                    });
+                }
+
+                const pdfBytes = await mergedPdf.save();
+                
+                // Trigger Download
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'merged_PDFMaster.pdf';
+                link.click();
+
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred while merging the PDFs.');
+            } finally {
+                // Reset UI state
+                btnText.innerText = 'Merge PDFs Now';
+                loadingSpinner.classList.add('hidden');
+                mergeBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
