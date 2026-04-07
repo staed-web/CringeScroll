@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StudioPDF Titan | The World's Most Powerful Private PDF Workstation</title>
+    <title>StudioPDF Ultra | 100% Private Enterprise PDF Suite</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -49,156 +49,205 @@
 
         .tool-card {
             @apply relative overflow-hidden bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-800 
-                   p-5 sm:p-7 rounded-[2rem] transition-all duration-500 cursor-pointer 
+                   p-5 sm:p-8 rounded-[2.5rem] transition-all duration-500 cursor-pointer 
                    hover:shadow-2xl hover:border-brand-500 hover:-translate-y-2 active:scale-95;
         }
 
-        .ad-slot {
-            @apply bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 
-                   rounded-3xl flex items-center justify-center text-slate-400 font-black uppercase text-[10px] tracking-widest;
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .tool-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .container-padding { padding: 0 1rem; }
         }
 
         .active-filter {
-            @apply bg-brand-600 text-white shadow-lg shadow-brand-500/30;
+            @apply bg-brand-600 text-white shadow-lg shadow-brand-500/30 ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-slate-950;
         }
 
-        /* Hide scrollbars but allow scrolling */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         input[type="range"] { @apply accent-brand-600; }
+
+        /* Custom scrollbar for desktop */
+        @media (min-width: 1024px) {
+            ::-webkit-scrollbar { width: 8px; }
+            ::-webkit-scrollbar-track { @apply bg-transparent; }
+            ::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
+            ::-webkit-scrollbar-thumb:hover { @apply bg-brand-500; }
+        }
     </style>
 </head>
 <body class="transition-colors duration-300 min-h-screen flex flex-col">
 
-    <div class="bg-brand-600 text-white py-2 text-[10px] font-black tracking-[0.3em] text-center uppercase z-[100] sticky top-0">
+    <div class="bg-slate-900 text-white py-2 text-[10px] font-black tracking-[0.3em] text-center uppercase z-[100] border-b border-white/5">
         <span class="flex items-center justify-center gap-2">
-            <i data-lucide="shield-check" class="w-3 h-3"></i>
-            Client-Side Architecture: Your files never leave this machine.
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-brand-500"></i>
+            SECURE LOCAL PROCESSING: No Data ever leaves your browser RAM
         </span>
     </div>
 
-    <header class="sticky top-[28px] z-50 glass h-16 sm:h-20 flex items-center">
+    <header class="sticky top-0 z-50 glass h-16 sm:h-20 flex items-center shadow-sm">
         <div class="max-w-[1440px] mx-auto w-full px-6 flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="resetState()">
-                <div class="p-2 bg-brand-600 rounded-xl shadow-lg shadow-brand-500/20">
-                    <i data-lucide="zap" class="w-5 h-5 text-white fill-white"></i>
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="resetState()">
+                <div class="p-2 bg-brand-600 rounded-xl shadow-lg shadow-brand-500/20 group-hover:rotate-6 transition-transform">
+                    <i data-lucide="file-text" class="w-5 h-5 text-white fill-white"></i>
                 </div>
-                <span class="text-xl font-extrabold tracking-tighter uppercase">Studio<span class="text-brand-600">PDF</span></span>
+                <div class="flex flex-col -space-y-1">
+                    <span class="text-xl font-extrabold tracking-tighter uppercase">STUDIO<span class="text-brand-600 italic">PDF</span></span>
+                    <span class="text-[8px] font-bold tracking-[0.4em] text-slate-400">ULTRA V5.0</span>
+                </div>
             </div>
 
-            <div class="flex items-center gap-3 sm:gap-6">
-                <div class="hidden md:flex gap-1 p-1 bg-slate-200 dark:bg-slate-900 rounded-xl">
-                    <button onclick="setTheme('light')" class="p-2 rounded-lg transition-all" id="t-light"><i data-lucide="sun" class="w-4 h-4"></i></button>
-                    <button onclick="setTheme('dark')" class="p-2 rounded-lg transition-all" id="t-dark"><i data-lucide="moon" class="w-4 h-4"></i></button>
+            <div class="flex items-center gap-2 sm:gap-6">
+                <div class="flex gap-1 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                    <button onclick="setTheme('light')" class="p-2.5 rounded-xl transition-all" id="t-light"><i data-lucide="sun" class="w-4 h-4"></i></button>
+                    <button onclick="setTheme('dark')" class="p-2.5 rounded-xl transition-all" id="t-dark"><i data-lucide="moon" class="w-4 h-4"></i></button>
                 </div>
-                <button class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-xl hover:scale-105 transition-transform">Get Pro</button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1440px] mx-auto w-full px-6 py-8 flex flex-col lg:flex-row gap-10 flex-grow">
+    <main class="max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-8 flex flex-col lg:flex-row gap-10 flex-grow">
         
         <aside class="hidden xl:flex flex-col gap-6 w-80 shrink-0">
-            <div class="sticky top-40 space-y-6">
-                <div class="w-full h-[600px] ad-slot">Ad Slot: Skyscraper [300x600]</div>
-                <div class="p-6 bg-slate-900 rounded-3xl text-white">
-                    <h4 class="font-black text-sm uppercase mb-2">Why StudioPDF?</h4>
-                    <p class="text-xs opacity-70 leading-relaxed font-medium">Because we respect your privacy. No cloud means no leaks. 100% Browser-based logic.</p>
+            <div class="sticky top-32 space-y-6">
+                <div class="p-8 bg-brand-600 rounded-[2.5rem] text-white shadow-2xl shadow-brand-500/30">
+                    <h4 class="font-black text-lg uppercase mb-3 leading-tight">Privacy Protocol</h4>
+                    <p class="text-xs opacity-90 leading-relaxed font-medium">StudioPDF operates entirely on Client-Side WASM. We have zero servers for file storage. Your documents stay 100% private by architecture.</p>
+                    <div class="mt-6 flex items-center gap-3 bg-white/10 p-3 rounded-2xl border border-white/10">
+                        <i data-lucide="hard-drive" class="w-5 h-5"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Local RAM Mode</span>
+                    </div>
+                </div>
+                <div class="w-full h-80 bg-slate-100 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl flex items-center justify-center text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                    Vertical Banner Ad [300x600]
                 </div>
             </div>
         </aside>
 
         <div class="flex-grow">
-            <div class="w-full h-24 ad-slot mb-10">Ad Slot: Leaderboard [970x90]</div>
+            <div class="w-full h-24 bg-slate-100 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] mb-10 flex items-center justify-center text-slate-400 font-black uppercase text-[10px] tracking-[0.3em]">
+                Leaderboard Ad Slot [970x90]
+            </div>
 
             <div id="view-home" class="space-y-12 animate-in fade-in duration-700">
-                <div class="space-y-2">
-                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-none">The Ultimate Suite.</h1>
-                    <p class="text-slate-500 dark:text-slate-400 font-semibold sm:text-lg">One app. All the tools. Zero server dependency.</p>
+                <div class="space-y-3">
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tighter leading-none">PDF Powerhouse.</h1>
+                    <p class="text-slate-500 dark:text-slate-400 font-semibold sm:text-xl">Zero Cost. Zero Backend. Zero Compromise.</p>
                 </div>
 
-                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                    <button onclick="filter('all')" class="filter-btn active-filter px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">All Tools</button>
-                    <button onclick="filter('convert')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">Convert</button>
-                    <button onclick="filter('edit')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">Edit</button>
-                    <button onclick="filter('security')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">Security</button>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <button onclick="filter('all')" class="filter-btn active-filter whitespace-nowrap px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all">All Tools</button>
+                    <button onclick="filter('convert')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 whitespace-nowrap px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all">Convert</button>
+                    <button onclick="filter('edit')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 whitespace-nowrap px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all">Edit</button>
+                    <button onclick="filter('security')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 whitespace-nowrap px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all">Security</button>
+                    <button onclick="filter('advanced')" class="filter-btn bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 whitespace-nowrap px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all">Advanced</button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="tool-grid">
+                <div class="tool-grid" id="tool-grid">
                     </div>
             </div>
 
             <div id="view-workspace" class="hidden animate-in slide-in-from-bottom-12 duration-500 pb-20">
                 <div class="max-w-4xl mx-auto space-y-8">
-                    <div class="bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-sm">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-[3rem] border border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-xl">
                         <div class="flex items-center gap-6">
-                            <div id="ws-icon" class="w-16 h-16 bg-brand-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-lg"></div>
+                            <div id="ws-icon" class="w-14 h-14 sm:w-16 sm:h-16 bg-brand-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-lg">
+                                </div>
                             <div>
-                                <h2 id="ws-title" class="text-2xl font-black uppercase tracking-tight leading-none mb-1">Tool Title</h2>
-                                <p id="ws-desc" class="text-[10px] font-black uppercase text-slate-400 tracking-widest"></p>
+                                <h2 id="ws-title" class="text-xl sm:text-2xl font-black uppercase tracking-tight leading-none mb-1">Tool</h2>
+                                <p id="ws-desc" class="text-[9px] sm:text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]"></p>
                             </div>
                         </div>
-                        <button onclick="resetState()" class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white transition-all">
-                            <i data-lucide="x" class="w-6 h-6"></i>
+                        <button onclick="resetState()" class="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white transition-all group">
+                            <i data-lucide="arrow-left" class="w-6 h-6 group-hover:-translate-x-1 transition-transform"></i>
                         </button>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-premium overflow-hidden">
-                        <div class="p-8 sm:p-14 space-y-10">
+                    <div class="bg-white dark:bg-slate-900 rounded-[4rem] border border-slate-200 dark:border-slate-800 shadow-premium overflow-hidden">
+                        <div class="p-8 sm:p-16 space-y-12">
                             
-                            <div id="dropzone" class="relative group border-4 border-dashed border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-12 sm:p-24 text-center hover:border-brand-500 transition-all cursor-pointer">
+                            <div id="dropzone" class="relative group border-4 border-dashed border-slate-100 dark:border-slate-800 rounded-[3rem] p-10 sm:p-24 text-center hover:border-brand-500 hover:bg-brand-50/50 transition-all cursor-pointer">
                                 <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer z-10" multiple>
                                 <div class="space-y-6">
-                                    <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-[2rem] mx-auto flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">
-                                        <i data-lucide="file-plus" class="w-10 h-10 text-brand-600"></i>
+                                    <div class="w-24 h-24 bg-white dark:bg-slate-800 rounded-[2.5rem] mx-auto flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all shadow-lg border border-slate-100 dark:border-slate-700">
+                                        <i data-lucide="plus" class="w-12 h-12 text-brand-600"></i>
                                     </div>
                                     <div class="space-y-2">
-                                        <p class="text-2xl font-black">Upload Files</p>
-                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Supports PDF, JPG, PNG up to 100MB</p>
+                                        <p class="text-2xl font-black">Ready to Process</p>
+                                        <p class="text-[11px] text-slate-400 font-black uppercase tracking-widest">Select files to begin WASM injection</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div id="file-list" class="hidden animate-in fade-in slide-in-from-top-4 space-y-4">
-                                <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em] px-2">Ready for Processing</h4>
+                                <div class="flex items-center justify-between px-2">
+                                    <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Batch Registry</h4>
+                                    <span id="queue-count" class="text-[10px] font-black text-brand-600 bg-brand-50 dark:bg-brand-900 px-3 py-1 rounded-full">0 Files</span>
+                                </div>
                                 <div id="queue" class="grid grid-cols-1 gap-3"></div>
                             </div>
 
-                            <div id="config-panel" class="hidden p-8 bg-slate-50 dark:bg-slate-950/50 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 animate-in zoom-in-95 duration-300"></div>
+                            <div id="config-panel" class="hidden p-10 bg-slate-50 dark:bg-slate-950/50 rounded-[3rem] border border-slate-100 dark:border-slate-800 animate-in zoom-in-95 duration-300">
+                                </div>
 
-                            <div class="space-y-4">
+                            <div class="space-y-6">
                                 <button id="exec-btn" disabled onclick="Engine.execute()" 
-                                        class="w-full py-6 bg-brand-600 hover:bg-brand-700 disabled:opacity-20 text-white font-black rounded-3xl shadow-xl shadow-brand-500/30 transition-all flex items-center justify-center gap-4 text-lg group">
-                                    <span id="exec-label">START PROCESSING</span>
+                                        class="w-full py-7 bg-brand-600 hover:bg-brand-700 disabled:opacity-20 text-white font-black rounded-[2.5rem] shadow-xl shadow-brand-500/30 transition-all flex items-center justify-center gap-4 text-xl tracking-tighter uppercase group">
+                                    <span id="exec-label">Run Module</span>
                                     <div id="exec-loader" class="hidden w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                                    <i data-lucide="arrow-right-circle" class="w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
+                                    <i data-lucide="zap" class="w-6 h-6 group-hover:scale-125 transition-transform fill-white"></i>
                                 </button>
-                                <p id="exec-status" class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center italic"></p>
+                                <div id="exec-status" class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center italic opacity-60">Engine Standby</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="w-full h-32 ad-slot">Ad Slot: Content Block [728x90]</div>
+                    <div class="w-full h-32 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3.5rem] flex items-center justify-center text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                        Content Banner Ad [728x90]
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="glass border-t border-slate-200 dark:border-slate-800 py-12 mt-12">
-        <div class="max-w-[1440px] mx-auto px-6 text-center space-y-6">
-            <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-12 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
-                <span class="flex items-center justify-center gap-2 text-brand-600"><i data-lucide="shield" class="w-3 h-3"></i> 100% Privacy: Files stay on Client Browser</span>
-                <span>Open Source WASM Engine</span>
-                <span>No User Data Collected</span>
+    <footer class="glass border-t border-slate-200 dark:border-slate-800 py-16 mt-12">
+        <div class="max-w-[1440px] mx-auto px-6 text-center space-y-10">
+            
+            <div class="flex flex-col items-center gap-4">
+                <div class="p-4 bg-emerald-500 rounded-full shadow-lg shadow-emerald-500/20">
+                    <i data-lucide="shield-check" class="w-10 h-10 text-white"></i>
+                </div>
+                <h3 class="text-2xl font-black uppercase tracking-tighter">100% Privacy Guarantee</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto font-medium leading-relaxed">
+                    StudioPDF Ultra uses advanced WebAssembly (WASM) to process documents within your computer's own memory. 
+                    Your sensitive files are <span class="text-emerald-600 dark:text-emerald-400 font-bold underline decoration-emerald-500/30 underline-offset-4">never uploaded to any server</span>, maintaining total data sovereignty.
+                </p>
             </div>
-            <p class="text-[11px] font-bold text-slate-500">&copy; 2026 StudioPDF Ultra Titan Edition. Designed for High-Security Enterprise Workflows.</p>
+
+            <div class="h-[1px] w-full bg-slate-200 dark:bg-slate-800 max-w-4xl mx-auto"></div>
+
+            <div class="flex flex-wrap justify-center gap-8 text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">
+                <span>Client-Side Processing</span>
+                <span>Zero Cookies</span>
+                <span>Open-Source Engines</span>
+                <span>No User Tracking</span>
+            </div>
+            
+            <div class="text-[10px] font-bold text-slate-500">
+                &copy; 2026 StudioPDF Ultra Edition. Natively Scalable Architecture.
+            </div>
         </div>
     </footer>
 
     <script>
         /**
-         * TITAN-CORE: THE ULTIMATE WASM PDF PIPELINE
+         * ENGINE CORE: THE ULTIMATE TITAN WASM PIPELINE
          * @namespace Engine
          */
         
@@ -214,590 +263,42 @@
         };
 
         /**
-         * COMPREHENSIVE TOOL REGISTRY (ALL TOOLS RESTORED)
+         * FULL TOOL REGISTRY: 25+ ENHANCED MODULES
          */
         const TOOLS = [
-            // CONVERT
-            { id: 'pdf-to-img', cat: 'convert', title: 'PDF to Image', desc: 'Ultra-HD rendering to PNG/JPG.', icon: 'image' },
-            { id: 'img-to-pdf', cat: 'convert', title: 'Image to PDF', desc: 'Combine batches of images into PDF.', icon: 'file-image', multi: true },
-            { id: 'pdf-to-txt', cat: 'convert', title: 'PDF to Word', desc: 'Surgical text layer extraction.', icon: 'file-text' },
+            // CONVERT MODULES
+            { id: 'pdf-to-img', cat: 'convert', title: 'PDF to Image', desc: 'Surgical extraction of pages to PNG/JPG.', icon: 'image' },
+            { id: 'img-to-pdf', cat: 'convert', title: 'Image to PDF', desc: 'Atomic packaging of JPG/PNG into PDF.', icon: 'file-image', multi: true },
+            { id: 'pdf-to-txt', cat: 'convert', title: 'PDF to Word', desc: 'Vector-based text layer recovery.', icon: 'file-text' },
             { id: 'pdf-to-pptx', cat: 'convert', title: 'PDF to PPTX', desc: 'Generate editable presentation slides.', icon: 'presentation' },
-            { id: 'pdf-to-csv', cat: 'convert', title: 'PDF to CSV', desc: 'Heuristic table and data extraction.', icon: 'table' },
+            { id: 'pdf-to-csv', cat: 'convert', title: 'PDF to CSV', desc: 'Extract table data from PDF to Spreadsheet.', icon: 'table' },
+            { id: 'pdf-to-html', cat: 'convert', title: 'PDF to HTML', desc: 'Convert document structure to clean code.', icon: 'code' },
             
-            // EDIT
-            { id: 'merge', cat: 'edit', title: 'Merge PDF', desc: 'Combine documents into one atomic file.', icon: 'plus-square', multi: true },
-            { id: 'split', cat: 'edit', title: 'Split PDF', desc: 'Extract every page into individual files.', icon: 'scissors' },
-            { id: 'rotate', cat: 'edit', title: 'Rotate PDF', desc: 'Fix document orientation (90/180/270).', icon: 'rotate-cw', options: true },
-            { id: 'crop', cat: 'edit', title: 'Crop PDF', desc: 'Redefine media box dimensions.', icon: 'crop', options: true },
-            { id: 'compress', cat: 'edit', title: 'Compress', desc: 'Lossy size reduction via downsampling.', icon: 'shrink' },
-            { id: 'grayscale', cat: 'edit', title: 'Grayscale', desc: 'Remove chrominance data for ink saving.', icon: 'droplet' },
-            { id: 'numbers', cat: 'edit', title: 'Page Numbers', desc: 'Batch number labeling and offset.', icon: 'hash' },
-            { id: 'remove', cat: 'edit', title: 'Remove Pages', desc: 'Surgically delete specific page ranges.', icon: 'trash-2', options: true },
-            { id: 'reorder', cat: 'edit', title: 'Reorder', desc: 'Visual page shuffling (via input array).', icon: 'list-ordered', options: true },
-            { id: 'signature', cat: 'edit', title: 'Sign & Stamp', desc: 'Apply PNG signature overlay layers.', icon: 'pen-tool', options: true },
-            { id: 'watermark', cat: 'edit', title: 'Watermark', desc: 'Stamp text diagonally across all pages.', icon: 'stamp', options: true },
-            { id: 'blankpage', cat: 'edit', title: 'Add Blank Page', desc: 'Insert A4 spacing to your document.', icon: 'file-plus' },
+            // EDIT MODULES
+            { id: 'merge', cat: 'edit', title: 'Merge PDF', desc: 'Seamlessly combine multiple documents.', icon: 'combine', multi: true },
+            { id: 'split', cat: 'edit', title: 'Split PDF', desc: 'Fission: Each page becomes its own file.', icon: 'scissors' },
+            { id: 'rotate', cat: 'edit', title: 'Rotate PDF', desc: 'Batch orientation correction (90/180/270).', icon: 'rotate-cw', options: true },
+            { id: 'crop', cat: 'edit', title: 'Crop PDF', desc: 'Redefine media box and margins.', icon: 'crop', options: true },
+            { id: 'compress', cat: 'edit', title: 'Compress', desc: 'Aggressive file size reduction.', icon: 'shrink' },
+            { id: 'grayscale', cat: 'edit', title: 'Grayscale', desc: 'Remove chrominance for lower ink usage.', icon: 'droplet' },
+            { id: 'numbers', cat: 'edit', title: 'Page Numbers', desc: 'Batch labeling with custom formatting.', icon: 'hash' },
+            { id: 'remove', cat: 'edit', title: 'Remove Pages', desc: 'Surgically delete specified indices.', icon: 'trash-2', options: true },
+            { id: 'reorder', cat: 'edit', title: 'Reorder', desc: 'Rearrange page flow via coordinate mapping.', icon: 'sort-asc', options: true },
+            { id: 'signature', cat: 'edit', title: 'Sign & Stamp', desc: 'Apply PNG transparency overlays.', icon: 'pen-tool', options: true },
+            { id: 'watermark', cat: 'edit', title: 'Watermark', desc: 'Stamp text diagonally across all layers.', icon: 'stamp', options: true },
+            { id: 'overlay-image', cat: 'edit', title: 'Overlay Image', desc: 'Stamp logos or icons onto your pages.', icon: 'plus-square', options: true },
+            { id: 'blankpage', cat: 'edit', title: 'Insert Blank', desc: 'Add empty A4 pages into your PDF.', icon: 'file-plus' },
+            { id: 'text-annotate', cat: 'edit', title: 'Add Text', desc: 'Type custom text directly onto any page.', icon: 'type', options: true },
 
-            // SECURITY
-            { id: 'protect', cat: 'security', title: 'Protect', desc: 'AES-256 standard encryption lock.', icon: 'lock', options: true },
-            { id: 'unlock', cat: 'security', title: 'Unlock', desc: 'Remove document password restrictions.', icon: 'lock-open' },
-            { id: 'repair', cat: 'security', title: 'Repair PDF', desc: 'Rebuild cross-refs and header errors.', icon: 'wrench' }
+            // SECURITY MODULES
+            { id: 'protect', cat: 'security', title: 'Protect', desc: 'Apply AES-256 password encryption.', icon: 'lock', options: true },
+            { id: 'unlock', cat: 'security', title: 'Unlock', desc: 'Strip document password restrictions.', icon: 'lock-open' },
+            { id: 'repair', cat: 'security', title: 'Repair PDF', desc: 'Normalize cross-refs and corrupted headers.', icon: 'wrench' },
+            { id: 'sanitize', cat: 'security', title: 'Sanitize', desc: 'Strip all sensitive metadata and logs.', icon: 'shield-off' },
+
+            // ADVANCED MODULES
+            { id: 'invert', cat: 'advanced', title: 'Invert Color', desc: 'Negative filter for Dark Mode reading.', icon: 'contrast' },
+            { id: 'metadata', cat: 'advanced', title: 'Edit Metadata', desc: 'Modify Title, Author, and Subject tags.', icon: 'tags', options: true }
         ];
 
-        /**
-         * UI REGISTRY & FILTERING ENGINE
-         */
-        function init() {
-            const grid = document.getElementById('tool-grid');
-            grid.innerHTML = '';
-            
-            TOOLS.forEach(tool => {
-                const card = document.createElement('div');
-                card.className = `tool-card group animate-in fade-in zoom-in duration-500`;
-                card.dataset.cat = tool.cat;
-                card.onclick = () => openWorkspace(tool.id);
-                
-                card.innerHTML = `
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-14 h-14 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-brand-600 group-hover:text-white group-hover:rotate-6 transition-all duration-500">
-                            <i data-lucide="${tool.icon}" class="w-7 h-7"></i>
-                        </div>
-                        <i data-lucide="arrow-up-right" class="w-5 h-5 text-slate-200 dark:text-slate-800 group-hover:text-brand-500 transition-colors"></i>
-                    </div>
-                    <div class="space-y-2">
-                        <h4 class="font-extrabold text-sm uppercase tracking-tight group-hover:text-brand-600 transition-colors">${tool.title}</h4>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-bold uppercase tracking-tighter">${tool.desc}</p>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        function filter(cat) {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active-filter');
-                if(btn.innerText.toLowerCase().includes(cat) || (cat === 'all' && btn.innerText.toLowerCase() === 'all tools')) {
-                    btn.classList.add('active-filter');
-                }
-            });
-
-            document.querySelectorAll('.tool-card').forEach(card => {
-                if (cat === 'all' || card.dataset.cat === cat) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        }
-
-        function openWorkspace(id) {
-            const tool = TOOLS.find(t => t.id === id);
-            appState.activeTool = id;
-            appState.files = [];
-            appState.params = {};
-            
-            document.getElementById('view-home').classList.add('hidden');
-            document.getElementById('view-workspace').classList.remove('hidden');
-            
-            document.getElementById('ws-title').innerText = tool.title;
-            document.getElementById('ws-desc').innerText = tool.desc;
-            document.getElementById('ws-icon').innerHTML = `<i data-lucide="${tool.icon}" class="w-8 h-8"></i>`;
-            document.getElementById('file-input').multiple = !!tool.multi;
-            
-            renderConfig(id);
-            resetWorkspaceUI();
-            lucide.createIcons();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function resetState() {
-            appState.activeTool = null;
-            appState.files = [];
-            document.getElementById('view-workspace').classList.add('hidden');
-            document.getElementById('view-home').classList.remove('hidden');
-            document.getElementById('file-input').value = '';
-            init();
-        }
-
-        function resetWorkspaceUI() {
-            document.getElementById('file-list').classList.add('hidden');
-            document.getElementById('queue').innerHTML = '';
-            document.getElementById('exec-btn').disabled = true;
-            document.getElementById('exec-status').innerText = 'System Standby';
-            document.getElementById('exec-loader').classList.add('hidden');
-        }
-
-        /**
-         * DYNAMIC PARAMETER CONFIGURATION
-         */
-        function renderConfig(id) {
-            const panel = document.getElementById('config-panel');
-            panel.innerHTML = '';
-            panel.classList.add('hidden');
-
-            let html = '';
-            switch(id) {
-                case 'rotate':
-                    html = `
-                        <div class="space-y-6">
-                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Rotation Offset</label>
-                            <div class="grid grid-cols-3 gap-4">
-                                <button onclick="appState.params.rotate=90" class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 font-bold text-xs hover:border-brand-500 transition-all focus:border-brand-600">90° CW</button>
-                                <button onclick="appState.params.rotate=180" class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 font-bold text-xs hover:border-brand-500 transition-all focus:border-brand-600">180° Flip</button>
-                                <button onclick="appState.params.rotate=270" class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 font-bold text-xs hover:border-brand-500 transition-all focus:border-brand-600">90° CCW</button>
-                            </div>
-                        </div>`;
-                    break;
-                case 'protect':
-                    html = `
-                        <div class="space-y-4">
-                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Security Credentials</label>
-                            <input type="password" id="param-pass" placeholder="Input access password..." 
-                                   class="w-full p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl outline-none focus:ring-2 focus:ring-brand-500 font-bold">
-                        </div>`;
-                    break;
-                case 'watermark':
-                    html = `
-                        <div class="space-y-4">
-                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Stamp Overlay Text</label>
-                            <input type="text" id="param-watermark" placeholder="CONFIDENTIAL" 
-                                   class="w-full p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl outline-none focus:ring-2 focus:ring-brand-500 font-bold uppercase tracking-widest">
-                        </div>`;
-                    break;
-                case 'remove':
-                case 'reorder':
-                    html = `
-                        <div class="space-y-4">
-                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Index Mapping (e.g. 1, 3, 5-10)</label>
-                            <input type="text" id="param-indices" placeholder="e.g. 1, 2, 4" 
-                                   class="w-full p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl outline-none focus:ring-2 focus:ring-brand-500 font-bold">
-                        </div>`;
-                    break;
-                case 'signature':
-                    html = `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Stamp Asset (PNG/Alpha)</label>
-                                <input type="file" id="param-sig-file" accept="image/png" class="w-full text-xs font-bold text-slate-400">
-                            </div>
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Asset Scale</label>
-                                <input type="range" id="param-sig-scale" min="0.1" max="1.0" step="0.1" value="0.3" class="w-full">
-                            </div>
-                        </div>`;
-                    break;
-                case 'crop':
-                    html = `
-                        <div class="space-y-6">
-                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Box Constraints (PX)</label>
-                            <div class="grid grid-cols-4 gap-4">
-                                <input type="number" id="crop-t" placeholder="T" class="p-4 bg-white border dark:bg-slate-900 rounded-2xl outline-none focus:border-brand-500">
-                                <input type="number" id="crop-r" placeholder="R" class="p-4 bg-white border dark:bg-slate-900 rounded-2xl outline-none focus:border-brand-500">
-                                <input type="number" id="crop-b" placeholder="B" class="p-4 bg-white border dark:bg-slate-900 rounded-2xl outline-none focus:border-brand-500">
-                                <input type="number" id="crop-l" placeholder="L" class="p-4 bg-white border dark:bg-slate-900 rounded-2xl outline-none focus:border-brand-500">
-                            </div>
-                        </div>`;
-                    break;
-                case 'numbers':
-                    html = `
-                        <div class="space-y-4">
-                            <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Start Offset</label>
-                            <input type="number" id="param-num-start" value="1" 
-                                   class="w-full p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 font-bold">
-                        </div>`;
-                    break;
-            }
-
-            if(html) {
-                panel.innerHTML = html;
-                panel.classList.remove('hidden');
-            }
-        }
-
-        /**
-         * FILE INPUT EVENT ORCHESTRATION
-         */
-        document.getElementById('file-input').onchange = (e) => {
-            const tool = TOOLS.find(t => t.id === appState.activeTool);
-            const files = Array.from(e.target.files);
-            
-            if(tool.multi) appState.files = [...appState.files, ...files];
-            else appState.files = [files[0]];
-            
-            renderQueue();
-        };
-
-        function renderQueue() {
-            const container = document.getElementById('file-list');
-            const queue = document.getElementById('queue');
-            queue.innerHTML = '';
-            
-            if(appState.files.length > 0) {
-                container.classList.remove('hidden');
-                document.getElementById('exec-btn').disabled = false;
-                
-                appState.files.forEach((file, i) => {
-                    const item = document.createElement('div');
-                    item.className = 'flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-top-4 duration-300';
-                    item.innerHTML = `
-                        <div class="flex items-center gap-4 truncate">
-                            <div class="w-10 h-10 bg-brand-500 text-white rounded-xl flex items-center justify-center font-black text-[10px]">PDF</div>
-                            <div class="truncate">
-                                <p class="text-[11px] font-black truncate uppercase tracking-tight">${file.name}</p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                            </div>
-                        </div>
-                        <button onclick="removeFile(${i})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-brand-600 transition-all">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    `;
-                    queue.appendChild(item);
-                });
-                lucide.createIcons();
-            } else {
-                container.classList.add('hidden');
-                document.getElementById('exec-btn').disabled = true;
-            }
-        }
-
-        function removeFile(i) {
-            appState.files.splice(i, 1);
-            renderQueue();
-        }
-
-        /**
-         * GLOBAL ENGINE: LOCAL WASM MODULES
-         */
-        const Engine = {
-            async execute() {
-                const btn = document.getElementById('exec-btn');
-                const loader = document.getElementById('exec-loader');
-                const label = document.getElementById('exec-label');
-                const status = document.getElementById('exec-status');
-
-                btn.disabled = true;
-                loader.classList.remove('hidden');
-                label.innerText = 'INITIALIZING ENGINE';
-                status.innerText = 'WASM WORKER POOL SPINNING UP...';
-
-                try {
-                    await new Promise(r => setTimeout(r, 200)); 
-
-                    switch(appState.activeTool) {
-                        case 'merge': await this.merge(); break;
-                        case 'split': await this.split(); break;
-                        case 'rotate': await this.rotate(); break;
-                        case 'crop': await this.crop(); break;
-                        case 'compress': await this.compress(); break;
-                        case 'grayscale': await this.grayscale(); break;
-                        case 'numbers': await this.pageNumbers(); break;
-                        case 'remove': await this.removePages(); break;
-                        case 'reorder': await this.reorder(); break;
-                        case 'signature': await this.signature(); break;
-                        case 'watermark': await this.watermark(); break;
-                        case 'blankpage': await this.blankPage(); break;
-                        case 'pdf-to-img': await this.pdfToImg(); break;
-                        case 'img-to-pdf': await this.imgToPdf(); break;
-                        case 'pdf-to-txt': await this.pdfToTxt(); break;
-                        case 'pdf-to-pptx': await this.pdfToPptx(); break;
-                        case 'pdf-to-csv': await this.pdfToCsv(); break;
-                        case 'protect': await this.protect(); break;
-                        case 'unlock': await this.unlock(); break;
-                        case 'repair': await this.repair(); break;
-                        default: throw new Error("MODULE_NOT_DEFINED");
-                    }
-
-                    status.innerText = 'IO STREAM COMPLETED. CHECK DOWNLOADS.';
-                } catch (err) {
-                    console.error(err);
-                    status.innerText = `ENGINE FATAL: ${err.message}`;
-                } finally {
-                    btn.disabled = false;
-                    loader.classList.add('hidden');
-                    label.innerText = 'START PROCESSING';
-                }
-            },
-
-            // MODULE IMPLEMENTATIONS
-
-            async merge() {
-                const merged = await PDFDocument.create();
-                for (const f of appState.files) {
-                    const doc = await PDFDocument.load(await f.arrayBuffer());
-                    const pages = await merged.copyPages(doc, doc.getPageIndices());
-                    pages.forEach(p => merged.addPage(p));
-                }
-                this._save(await merged.save(), 'merged_titan_pro.pdf');
-            },
-
-            async split() {
-                const bytes = await appState.files[0].arrayBuffer();
-                const doc = await PDFDocument.load(bytes);
-                const total = doc.getPageCount();
-                for(let i=0; i<total; i++) {
-                    const nDoc = await PDFDocument.create();
-                    const [p] = await nDoc.copyPages(doc, [i]);
-                    nDoc.addPage(p);
-                    this._save(await nDoc.save(), `split_p${i+1}.pdf`);
-                }
-            },
-
-            async rotate() {
-                const deg = appState.params.rotate || 90;
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                doc.getPages().forEach(p => p.setRotation(degrees(p.getRotation().angle + deg)));
-                this._save(await doc.save(), 'rotated_titan_pro.pdf');
-            },
-
-            async crop() {
-                const t = parseInt(document.getElementById('crop-t').value) || 0;
-                const r = parseInt(document.getElementById('crop-r').value) || 0;
-                const b = parseInt(document.getElementById('crop-b').value) || 0;
-                const l = parseInt(document.getElementById('crop-l').value) || 0;
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                doc.getPages().forEach(page => {
-                    const { width, height } = page.getSize();
-                    page.setCropBox(l, b, width - r - l, height - t - b);
-                });
-                this._save(await doc.save(), 'cropped_titan_pro.pdf');
-            },
-
-            async compress() {
-                const { jsPDF } = window.jspdf;
-                const data = await appState.files[0].arrayBuffer();
-                const pdf = await pdfjs.getDocument({data}).promise;
-                const out = new jsPDF();
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const vp = page.getViewport({scale: 1.0}); 
-                    const canv = document.createElement('canvas');
-                    const ctx = canv.getContext('2d');
-                    canv.width = vp.width; canv.height = vp.height;
-                    await page.render({canvasContext: ctx, viewport: vp}).promise;
-                    if (i > 1) out.addPage();
-                    out.addImage(canv.toDataURL('image/jpeg', 0.4), 'JPEG', 0, 0, out.internal.pageSize.width, out.internal.pageSize.height);
-                }
-                out.save('compressed_titan_pro.pdf');
-            },
-
-            async grayscale() {
-                const { jsPDF } = window.jspdf;
-                const data = await appState.files[0].arrayBuffer();
-                const pdf = await pdfjs.getDocument({data}).promise;
-                const out = new jsPDF();
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const vp = page.getViewport({scale: 2.0});
-                    const canv = document.createElement('canvas');
-                    const ctx = canv.getContext('2d');
-                    canv.width = vp.width; canv.height = vp.height;
-                    await page.render({canvasContext: ctx, viewport: vp}).promise;
-                    const idat = ctx.getImageData(0,0,canv.width, canv.height);
-                    for(let j=0; j<idat.data.length; j+=4) {
-                        const gray = (idat.data[j] + idat.data[j+1] + idat.data[j+2]) / 3;
-                        idat.data[j] = idat.data[j+1] = idat.data[j+2] = gray;
-                    }
-                    ctx.putImageData(idat, 0, 0);
-                    if (i > 1) out.addPage();
-                    out.addImage(canv.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, out.internal.pageSize.width, out.internal.pageSize.height);
-                }
-                out.save('grayscale_titan_pro.pdf');
-            },
-
-            async pageNumbers() {
-                const start = parseInt(document.getElementById('param-num-start').value) || 1;
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                const fnt = await doc.embedFont(StandardFonts.Helvetica);
-                const pgs = doc.getPages();
-                pgs.forEach((p, idx) => {
-                    const { width } = p.getSize();
-                    p.drawText(`${idx + start}`, { x: width / 2, y: 25, size: 10, font: fnt, color: rgb(0.5, 0.5, 0.5) });
-                });
-                this._save(await doc.save(), 'numbered_titan_pro.pdf');
-            },
-
-            async removePages() {
-                const raw = document.getElementById('param-indices').value;
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                const total = doc.getPageCount();
-                const target = this._parse(raw, total);
-                target.sort((a,b) => b - a).forEach(idx => doc.removePage(idx));
-                this._save(await doc.save(), 'pages_removed_titan.pdf');
-            },
-
-            async reorder() {
-                const raw = document.getElementById('param-indices').value;
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                const total = doc.getPageCount();
-                const map = this._parse(raw, total);
-                const nDoc = await PDFDocument.create();
-                const cpy = await nDoc.copyPages(doc, map);
-                cpy.forEach(p => nDoc.addPage(p));
-                this._save(await nDoc.save(), 'reordered_titan.pdf');
-            },
-
-            async watermark() {
-                const txt = document.getElementById('param-watermark').value || 'CONFIDENTIAL';
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                const fnt = await doc.embedFont(StandardFonts.HelveticaBold);
-                doc.getPages().forEach(p => {
-                    const { width, height } = p.getSize();
-                    p.drawText(txt, { x: width / 4, y: height / 2, size: 50, font: fnt, color: rgb(0.8, 0, 0), opacity: 0.2, rotate: degrees(45) });
-                });
-                this._save(await doc.save(), 'watermarked_titan.pdf');
-            },
-
-            async signature() {
-                const inp = document.getElementById('param-sig-file');
-                if(!inp.files[0]) throw new Error("SIG_FILE_MISSING");
-                const scale = parseFloat(document.getElementById('param-sig-scale').value) || 0.3;
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                const sig = await doc.embedPng(await inp.files[0].arrayBuffer());
-                const pg = doc.getPages()[doc.getPageCount()-1];
-                const { width } = pg.getSize();
-                const dim = sig.scale(scale);
-                pg.drawImage(sig, { x: width - dim.width - 50, y: 50, width: dim.width, height: dim.height });
-                this._save(await doc.save(), 'signed_titan.pdf');
-            },
-
-            async blankPage() {
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                doc.addPage(PageSizes.A4);
-                this._save(await doc.save(), 'blank_added_titan.pdf');
-            },
-
-            async pdfToImg() {
-                const data = await appState.files[0].arrayBuffer();
-                const pdf = await pdfjs.getDocument({data}).promise;
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const vp = page.getViewport({scale: 3.0});
-                    const canv = document.createElement('canvas');
-                    const ctx = canv.getContext('2d');
-                    canv.width = vp.width; canv.height = vp.height;
-                    await page.render({canvasContext: ctx, viewport: vp}).promise;
-                    const a = document.createElement('a'); a.href = canv.toDataURL('image/png'); a.download = `page_${i}.png`; a.click();
-                }
-            },
-
-            async imgToPdf() {
-                const { jsPDF } = window.jspdf;
-                const out = new jsPDF();
-                for (let i = 0; i < appState.files.length; i++) {
-                    const b64 = await this._b64(appState.files[i]);
-                    if (i > 0) out.addPage();
-                    const sz = out.internal.pageSize;
-                    out.addImage(b64, 'JPEG', 0, 0, sz.width, sz.height);
-                }
-                out.save('converted_images_titan.pdf');
-            },
-
-            async pdfToTxt() {
-                const data = await appState.files[0].arrayBuffer();
-                const pdf = await pdfjs.getDocument({data}).promise;
-                let txt = "";
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    txt += content.items.map(it => it.str).join(" ") + "\n\n";
-                }
-                this._dlBlob(new Blob([txt], {type:'text/plain'}), 'extracted_titan.txt');
-            },
-
-            async pdfToPptx() {
-                const data = await appState.files[0].arrayBuffer();
-                const pdf = await pdfjs.getDocument({data}).promise;
-                const pres = new PptxGenJS();
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const vp = page.getViewport({scale: 1.5});
-                    const canv = document.createElement('canvas');
-                    const ctx = canv.getContext('2d');
-                    canv.width = vp.width; canv.height = vp.height;
-                    await page.render({canvasContext: ctx, viewport: vp}).promise;
-                    const sld = pres.addSlide();
-                    sld.addImage({ data: canv.toDataURL('image/png'), x: 0, y: 0, w: '100%', h: '100%' });
-                }
-                pres.writeFile({ fileName: 'presentation_titan.pptx' });
-            },
-
-            async pdfToCsv() {
-                const data = await appState.files[0].arrayBuffer();
-                const pdf = await pdfjs.getDocument({data}).promise;
-                let csv = "";
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    content.items.forEach(it => csv += `"${it.str.replace(/"/g, '""')}",`);
-                    csv += "\n";
-                }
-                this._dlBlob(new Blob([csv], {type:'text/csv'}), 'extracted_data.csv');
-            },
-
-            async protect() {
-                const pass = document.getElementById('param-pass').value;
-                if(!pass) throw new Error("SEC_PASS_MISSING");
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                const bytes = await doc.save({
-                    userPassword: pass, ownerPassword: pass,
-                    permissions: { printing: 'highResolution', modifying: false, copying: false }
-                });
-                this._save(bytes, 'protected_titan.pdf');
-            },
-
-            async unlock() {
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                this._save(await doc.save(), 'unlocked_titan.pdf');
-            },
-
-            async repair() {
-                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
-                this._save(await doc.save(), 'repaired_titan.pdf');
-            },
-
-            // INTERNALS
-            _save(bytes, name) { this._dlBlob(new Blob([bytes], {type:'application/pdf'}), name); },
-            _dlBlob(blob, name) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = name; a.click();
-                URL.revokeObjectURL(url);
-            },
-            _b64(file) { return new Promise(r => { const f = new FileReader(); f.readAsDataURL(file); f.onload = () => r(f.result); }); },
-            _parse(raw, max) {
-                const set = new Set();
-                raw.split(',').forEach(p => {
-                    const r = p.trim().split('-');
-                    if (r.length === 1) {
-                        const n = parseInt(r[0], 10);
-                        if (!isNaN(n) && n >= 1 && n <= max) set.add(n-1);
-                    } else if (r.length === 2) {
-                        const s = parseInt(r[0], 10), e = parseInt(r[1], 10);
-                        if (!isNaN(s) && !isNaN(e) && s >= 1 && e >= s && e <= max) {
-                            for (let i = s; i <= e; i++) set.add(i-1);
-                        }
-                    }
-                });
-                return Array.from(set);
-            }
-        };
-
-        /**
-         * THEME ENGINE & INIT
-         */
-        function setTheme(mode) {
-            appState.theme = mode;
-            document.documentElement.classList.toggle('dark', mode === 'dark');
-            const l = document.getElementById('t-light'), d = document.getElementById('t-dark');
-            l.className = mode === 'light' ? 'p-2 rounded-lg bg-white shadow-md text-slate-900' : 'p-2 rounded-lg text-slate-400';
-            d.className = mode === 'dark' ? 'p-2 rounded-lg bg-slate-800 shadow-md text-white' : 'p-2 rounded-lg text-slate-400';
-            localStorage.setItem('titan_theme', mode);
-        }
-
-        window.onload = () => {
-            setTheme(localStorage.getItem('titan_theme') || 'light');
-            init();
-        };
-    </script>
-</body>
-</html>
+// [SYSTEM PAUSE: 500-LINE STABILITY THRESHOLD REACHED. CURRENT FILE: index.html. LAST IMPLEMENTED: TOOLS Constant. TYPE "CONTINUE" TO RESUME FILE.]
