@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StudioPDF Titan Ultra V7 | Enterprise PDF Processing</title>
+    <title>StudioPDF Ultra | Enterprise WASM Suite</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -18,17 +18,18 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 500: '#10b981', 600: '#059669', 700: '#047857' }, // Upgraded to Trust Green
+                        brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }, /* Updated to a high-trust enterprise blue */
                         zinc: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46', 800: '#27272a', 900: '#18181b', 950: '#09090b' }
                     },
-                    borderRadius: { '4xl': '2rem', '5xl': '3rem' }
+                    borderRadius: { '4xl': '2rem', '5xl': '3rem' },
+                    boxShadow: { 'brand-glow': '0 0 20px rgba(59, 130, 246, 0.5)' }
                 }
             }
         }
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         :root {
             --bg-primary: #ffffff;
@@ -43,27 +44,31 @@
         }
 
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-family: 'Inter', sans-serif; 
             -webkit-font-smoothing: antialiased; 
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            @apply transition-colors duration-300;
+            @apply transition-colors duration-500;
         }
 
         .glass-nav {
-            @apply sticky top-0 z-[100] border-b backdrop-blur-2xl transition-all duration-300;
+            @apply sticky top-0 z-[100] border-b backdrop-blur-2xl transition-all duration-500;
             background: rgba(var(--bg-primary), 0.85);
             border-color: var(--border-primary);
         }
 
         .tool-card {
             @apply relative overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 
-                   p-5 sm:p-6 rounded-3xl transition-all duration-300 cursor-pointer 
-                   hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-xl hover:-translate-y-1 group;
+                   p-6 sm:p-8 rounded-3xl transition-all duration-300 cursor-pointer 
+                   hover:border-brand-500 dark:hover:border-brand-500 hover:shadow-xl hover:-translate-y-1 active:scale-95 group flex flex-col justify-between h-full;
         }
 
         .active-filter {
-            @apply bg-brand-600 text-white shadow-lg shadow-brand-500/20 ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-zinc-950;
+            @apply bg-brand-600 text-white shadow-lg shadow-brand-500/30 ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-zinc-950;
+        }
+
+        .workspace-modal {
+            @apply bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -71,285 +76,305 @@
 
         .btn-primary {
             @apply bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl transition-all 
-                   flex items-center justify-center gap-3 shadow-lg shadow-brand-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+                   flex items-center justify-center gap-3 shadow-lg shadow-brand-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
         }
 
         input, select, textarea {
-            @apply bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all;
+            @apply bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent rounded-xl;
         }
 
-        /* Optimized Ad Zones */
-        .ad-container {
-            @apply bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center overflow-hidden relative;
+        .ad-zone {
+            @apply relative bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 
+                   rounded-2xl flex items-center justify-center text-zinc-400 font-bold uppercase text-[10px] tracking-widest overflow-hidden;
         }
-        .ad-label {
-            @apply absolute top-0 right-0 bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 text-[8px] font-black uppercase px-2 py-0.5 rounded-bl-lg;
+        
+        .ad-zone::after {
+            content: 'ADVERTISEMENT';
+            @apply absolute top-2 right-2 text-[8px] text-zinc-300 dark:text-zinc-600 tracking-wider;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <div class="bg-brand-600 text-white py-1.5 text-[10px] font-bold tracking-widest text-center uppercase z-[110]">
-        <span class="flex items-center justify-center gap-2">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-            100% Client-Side Processing • Zero Data Retention
-        </span>
+    <div class="bg-brand-600 text-white py-2 text-[10px] font-bold tracking-widest text-center uppercase z-[110] px-4 flex justify-center items-center gap-2">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        <span>Zero-Server Architecture: 100% Client-Side Processing</span>
     </div>
 
     <header class="glass-nav h-16 sm:h-20 flex items-center">
         <div class="max-w-[1600px] mx-auto w-full px-4 sm:px-8 flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer group" onclick="EngineUI.resetState()">
-                <div class="p-2 bg-zinc-900 dark:bg-white rounded-xl shadow-md group-hover:rotate-3 transition-transform">
-                    <i data-lucide="layers" class="w-5 h-5 text-white dark:text-zinc-900"></i>
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="resetState()">
+                <div class="p-2 bg-brand-600 rounded-xl shadow-md group-hover:scale-105 transition-transform">
+                    <i data-lucide="cpu" class="w-6 h-6 text-white"></i>
                 </div>
                 <div class="flex flex-col -space-y-0.5">
-                    <span class="text-xl font-black tracking-tight text-zinc-900 dark:text-white">STUDIO<span class="text-brand-600">PDF</span></span>
-                    <span class="text-[9px] font-bold tracking-[0.2em] text-zinc-500">TITAN V7</span>
+                    <span class="text-xl font-black tracking-tight uppercase">STUDIO<span class="text-brand-600">PDF</span></span>
+                    <span class="text-[9px] font-bold tracking-widest text-zinc-500">ENTERPRISE EDITION</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <button onclick="EngineUI.toggleTheme()" class="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
-                    <i id="theme-icon" data-lucide="sun" class="w-4 h-4 text-zinc-600 dark:text-zinc-300"></i>
-                </button>
-                <button class="hidden sm:flex bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-5 py-2.5 rounded-xl text-xs font-bold shadow-md hover:scale-105 transition-transform">
-                    Pro Access
+                <button onclick="ThemeEngine.toggle()" class="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700" id="theme-toggle-btn" aria-label="Toggle Theme">
+                    <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1600px] mx-auto w-full px-4 sm:px-8 py-8 flex flex-col lg:flex-row gap-8 flex-grow">
-        
-        <div class="flex-grow w-full lg:w-3/4 max-w-5xl mx-auto lg:mx-0">
-            
-            <div class="ad-container w-full h-[90px] mb-8 hidden sm:flex">
-                <span class="ad-label">Advertisement</span>
-                <span class="text-zinc-400 font-bold text-sm">Leaderboard Ad Unit [728x90]</span>
-            </div>
+    <div class="w-full max-w-[728px] h-[90px] mx-auto mt-6 hidden sm:flex ad-zone shadow-sm">
+        Premium Sponsorship Placement (728x90)
+    </div>
 
+    <main class="max-w-[1600px] mx-auto w-full px-4 sm:px-8 py-8 sm:py-12 flex flex-col lg:flex-row gap-8 lg:gap-12 flex-grow">
+        
+        <div class="flex-grow w-full max-w-7xl mx-auto lg:mx-0">
+            
             <div id="view-home" class="space-y-10 animate-in fade-in duration-500">
-                
-                <div class="space-y-3 text-center sm:text-left">
-                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
-                        Next-Gen PDF <span class="text-brand-500">Workstation.</span>
+                <div class="space-y-3">
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] text-zinc-950 dark:text-white">
+                        Uncompromising <span class="text-brand-600">Document Control.</span>
                     </h1>
-                    <p class="text-zinc-500 dark:text-zinc-400 text-sm sm:text-lg font-medium max-w-2xl mx-auto sm:mx-0">
-                        Enterprise-grade document manipulation running natively in your browser memory. Uncompromising privacy and speed.
+                    <p class="text-zinc-500 dark:text-zinc-400 font-medium sm:text-xl leading-relaxed max-w-3xl">
+                        High-performance WebAssembly modules executing natively in your browser. Total data sovereignty.
                     </p>
                 </div>
 
-                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-2 snap-x">
-                    <button onclick="EngineUI.filter('all')" class="filter-btn active-filter snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all">All Tools</button>
-                    <button onclick="EngineUI.filter('innovation')" class="filter-btn bg-brand-500/10 text-brand-600 dark:text-brand-500 snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all">Titan Exclusive</button>
-                    <button onclick="EngineUI.filter('convert')" class="filter-btn bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all">Convert</button>
-                    <button onclick="EngineUI.filter('edit')" class="filter-btn bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all">Edit</button>
-                    <button onclick="EngineUI.filter('security')" class="filter-btn bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all">Security</button>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-2">
+                    <button onclick="filter('all')" class="filter-btn active-filter whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">All</button>
+                    <button onclick="filter('convert')" class="filter-btn bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Convert</button>
+                    <button onclick="filter('edit')" class="filter-btn bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Edit</button>
+                    <button onclick="filter('security')" class="filter-btn bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Security</button>
+                    <button onclick="filter('innovation')" class="filter-btn bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-900 text-brand-600 whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">Innovation</button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="tool-grid">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" id="tool-grid">
                     </div>
             </div>
 
-            <div id="view-workspace" class="hidden animate-in slide-in-from-bottom-8 duration-300">
-                
-                <button onclick="EngineUI.resetState()" class="mb-6 flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors lg:hidden font-bold text-sm">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Tools
-                </button>
-
-                <div class="bg-white dark:bg-zinc-900 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden flex flex-col">
+            <div id="view-workspace" class="hidden animate-in slide-in-from-bottom-8 duration-300 pb-12">
+                <div class="space-y-6">
                     
-                    <div class="p-6 sm:p-8 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <div class="bg-white dark:bg-zinc-900 p-5 rounded-3xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-sm">
                         <div class="flex items-center gap-5">
-                            <div id="ws-icon" class="w-14 h-14 bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center"></div>
+                            <div id="ws-icon" class="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-md"></div>
                             <div>
-                                <h2 id="ws-title" class="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white">Tool</h2>
-                                <p id="ws-desc" class="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-0.5"></p>
+                                <h2 id="ws-title" class="text-2xl font-black uppercase tracking-tight mb-0.5">Tool</h2>
+                                <p id="ws-desc" class="text-[11px] font-bold uppercase text-zinc-500 tracking-wider"></p>
                             </div>
                         </div>
-                        <button onclick="EngineUI.resetState()" class="hidden lg:flex w-10 h-10 rounded-full items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
-                            <i data-lucide="x" class="w-5 h-5"></i>
+                        <button onclick="resetState()" class="p-3 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors group">
+                            <i data-lucide="x" class="w-6 h-6 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white"></i>
                         </button>
                     </div>
 
-                    <div class="p-6 sm:p-10 space-y-8">
+                    <div class="workspace-modal p-6 sm:p-10 space-y-8">
                         
-                        <div id="dropzone" class="relative group border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-3xl p-10 sm:p-16 text-center hover:border-brand-500 hover:bg-brand-50/5 dark:hover:bg-brand-900/10 transition-all cursor-pointer">
-                            <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer z-10" multiple>
-                            <div class="flex flex-col items-center space-y-4">
-                                <div class="w-16 h-16 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                                    <i data-lucide="upload-cloud" class="w-8 h-8 text-brand-500"></i>
+                        <div id="dropzone" class="relative group border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-3xl p-10 sm:p-20 text-center hover:border-brand-500 hover:bg-brand-50/5 dark:hover:bg-brand-900/10 transition-all cursor-pointer">
+                            <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full" multiple>
+                            <div class="space-y-4 pointer-events-none">
+                                <div class="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:text-brand-600 transition-transform duration-300">
+                                    <i data-lucide="upload-cloud" class="w-8 h-8"></i>
                                 </div>
                                 <div>
-                                    <p class="text-lg font-bold text-zinc-900 dark:text-white">Select PDF Files</p>
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">or drop them directly here</p>
+                                    <p class="text-lg font-bold">Select or drag files here</p>
+                                    <p class="text-xs text-zinc-500 mt-1">Maximum client-side payload: 150MB</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="file-list" class="hidden space-y-3">
-                            <div class="flex items-center justify-between px-1">
-                                <h4 class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Queue Cache</h4>
-                                <span id="file-count" class="text-xs font-bold text-brand-600 bg-brand-500/10 px-2 py-0.5 rounded-md">0 Files</span>
+                        <div id="file-list" class="hidden space-y-3 animate-in fade-in">
+                            <div class="flex items-center justify-between px-2">
+                                <h4 class="text-xs font-bold uppercase text-zinc-500 tracking-wider">Processing Queue</h4>
+                                <span id="queue-count" class="text-xs font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/30 px-2 py-1 rounded-md">0 Files</span>
                             </div>
-                            <div id="queue" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                            <div id="queue" class="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto no-scrollbar pr-2"></div>
                         </div>
 
-                        <div id="config-panel" class="hidden p-6 sm:p-8 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200 dark:border-zinc-800"></div>
+                        <div id="config-panel" class="hidden p-6 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 animate-in zoom-in-95"></div>
 
-                        <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                            <button id="exec-btn" disabled onclick="EngineCore.execute()" class="w-full py-5 btn-primary text-sm sm:text-base tracking-wide uppercase">
-                                <i data-lucide="zap" class="w-5 h-5"></i>
-                                <span id="exec-label">Run Processor</span>
-                                <div id="exec-loader" class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin ml-2"></div>
+                        <div class="space-y-4 pt-4">
+                            <button id="exec-btn" disabled onclick="Engine.execute()" 
+                                    class="w-full py-5 btn-primary text-lg uppercase tracking-wide group">
+                                <span id="exec-label">Initialize Engine</span>
+                                <div id="exec-loader" class="hidden w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
                             </button>
+                            <div class="flex items-center justify-center gap-2 text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
+                                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <span id="exec-status">System Standby</span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="bg-zinc-100 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-800 p-4 flex justify-center">
-                        <div class="ad-container w-full max-w-[728px] h-[90px] text-xs">
-                            <span class="ad-label">Ad</span>
-                            <span class="text-zinc-400 font-bold">In-App Banner [728x90]</span>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
 
         <aside class="hidden lg:flex flex-col gap-6 w-[300px] shrink-0">
-            <div class="sticky top-28 space-y-6">
-                
-                <div class="bg-gradient-to-br from-zinc-900 to-black dark:from-zinc-800 dark:to-zinc-900 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden border border-zinc-800">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500 rounded-full blur-[80px] opacity-20"></div>
-                    <h4 class="font-black text-xl mb-2 flex items-center gap-2">
-                        Titan Pro <i data-lucide="crown" class="w-5 h-5 text-yellow-400"></i>
-                    </h4>
-                    <p class="text-xs text-zinc-400 font-medium mb-5 leading-relaxed">Unlock multi-threading, unlimited file sizes, and priority WASM execution.</p>
-                    <button class="w-full py-3 bg-white text-black text-sm font-bold rounded-xl hover:bg-zinc-200 transition-colors">Upgrade Now</button>
-                </div>
+            <div class="w-full h-[250px] ad-zone shadow-sm">
+                Sponsor Content (300x250)
+            </div>
 
-                <div class="ad-container w-full h-[600px] shadow-sm">
-                    <span class="ad-label">Advertisement</span>
-                    <span class="text-zinc-400 font-bold text-sm text-center px-4">Skyscraper Unit<br>[300x600]</span>
+            <div class="p-6 bg-zinc-900 rounded-3xl text-white shadow-xl border border-zinc-800">
+                <div class="w-10 h-10 bg-brand-600/20 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="lock" class="w-5 h-5 text-brand-500"></i>
                 </div>
+                <h4 class="font-bold text-base mb-2 tracking-tight">Zero Data Telemetry</h4>
+                <p class="text-xs text-zinc-400 leading-relaxed mb-4">
+                    Files are processed entirely within the memory constraints of your active browser session. 
+                    Network requests are solely utilized for fetching core dependency libraries.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2 py-1 bg-zinc-800 rounded text-[9px] font-bold tracking-wider">AES-256</span>
+                    <span class="px-2 py-1 bg-zinc-800 rounded text-[9px] font-bold tracking-wider">WASM</span>
+                    <span class="px-2 py-1 bg-zinc-800 rounded text-[9px] font-bold tracking-wider">SANDBOXED</span>
+                </div>
+            </div>
+
+            <div class="w-full h-[600px] ad-zone shadow-sm sticky top-24">
+                Vertical Display Ad (300x600)
             </div>
         </aside>
     </main>
 
-    <div id="toast-container" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-2"></div>
+    <footer class="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 mt-auto">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+                <i data-lucide="cpu" class="w-5 h-5 text-zinc-400"></i>
+                <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest">StudioPDF V3.1. Engine: Gemini-Optimized</span>
+            </div>
+            <div class="flex items-center gap-6 text-xs font-bold text-zinc-400">
+                <a href="#" class="hover:text-brand-500 transition-colors">Privacy Protocol</a>
+                <a href="#" class="hover:text-brand-500 transition-colors">Terms of Execution</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
         /**
-         * CORE LOGIC: TITAN V7
-         * Strict Typing, Robust Error Handling, Client-Side Execution Guarantee
+         * @typedef {Object} AppState
+         * @property {string|null} activeTool
+         * @property {File[]} files
+         * @property {string} theme
+         * @property {Record<string, any>} params
          */
-        
-        const { PDFDocument, rgb, StandardFonts } = PDFLib;
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // TYPE DEFINITIONS & STATE
-        const AppState = {
+        /** @type {AppState} */
+        const appState = {
             activeTool: null,
             files: [],
-            params: {},
-            theme: 'dark'
+            theme: 'dark',
+            params: {}
         };
 
-        // REGISTRY
-        const TOOLS = [
-            // --- NEW INNOVATION MODULES ---
-            { id: 'redact', cat: 'innovation', title: 'Smart Redact', desc: 'Find and blackout specific text structurally.', icon: 'eraser', options: true },
-            { id: 'stegano', cat: 'innovation', title: 'PDF Steganography', desc: 'Embed AES-encrypted text into invisible dicts.', icon: 'ghost', options: true },
-            { id: 'dna-clean', cat: 'innovation', title: 'Metadata Sanitizer', desc: 'Purge author, application, and XMP breadcrumbs.', icon: 'wind' },
-            
-            // --- CONVERSION MODULES ---
-            { id: 'pdf-to-img', cat: 'convert', title: 'PDF to Image', desc: 'High-res rasterization to PNG format.', icon: 'image' },
-            { id: 'img-to-pdf', cat: 'convert', title: 'Image to PDF', desc: 'Compile JPG/PNG assets into vector doc.', icon: 'file-image', multi: true },
-            { id: 'pdf-to-txt', cat: 'convert', title: 'Extract Text', desc: 'Raw string extraction across all pages.', icon: 'file-text' },
-            { id: 'pdf-to-csv', cat: 'convert', title: 'Extract Tables', desc: 'Heuristic structural parsing to CSV.', icon: 'table' },
-
-            // --- EDITING MODULES ---
-            { id: 'merge', cat: 'edit', title: 'Merge PDFs', desc: 'Combine documents preserving outlines.', icon: 'layers', multi: true },
-            { id: 'split', cat: 'edit', title: 'Split Pages', desc: 'Explode document into individual files.', icon: 'scissors' },
-            { id: 'rotate', cat: 'edit', title: 'Rotate Docs', desc: 'Matrix transformation (90/180/270).', icon: 'rotate-cw', options: true },
-            { id: 'compress', cat: 'edit', title: 'Compress', desc: 'Lossy size reduction pipeline.', icon: 'shrink' },
-            { id: 'bates', cat: 'edit', title: 'Bates Stamping', desc: 'Legal indexing prefix overlay.', icon: 'hash', options: true },
-
-            // --- SECURITY MODULES ---
-            { id: 'protect', cat: 'security', title: 'Encrypt PDF', desc: 'AES-256 standard password enforcement.', icon: 'lock', options: true },
-            { id: 'unlock', cat: 'security', title: 'Decrypt PDF', desc: 'Strip permissions (requires master key).', icon: 'unlock', options: true }
-        ];
+        const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+        const pdfjs = window['pdfjs-dist/build/pdf'];
+        pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         /**
-         * UI CONTROLLER
+         * TOOL REGISTRY INCLUDES NOVEL CLIENT-SIDE FEATURES
+         * @type {Array<Object>}
          */
-        const EngineUI = {
-            init() {
-                this.applyTheme();
-                this.renderGrid();
-                lucide.createIcons();
-            },
+        const TOOLS = [
+            // --- NOVEL INNOVATION MODULES ---
+            { id: 'auto-redact', cat: 'innovation', title: 'Smart Auto-Redact', desc: 'Regex-based PII identification and visual redaction.', icon: 'scan-line', options: true },
+            { id: 'pdf-glitch', cat: 'innovation', title: 'Byte Corruptor', desc: 'Inject cryptographic noise for aesthetic document glitching.', icon: 'binary', options: true },
+            { id: 'stegano', cat: 'innovation', title: 'Steganography', desc: 'Embed imperceptible encrypted payloads in XMP tables.', icon: 'fingerprint', options: true },
+            { id: 'dna-clean', cat: 'innovation', title: 'Metadata Sanitizer', desc: 'Recursive wipe of all authoring and system origin trails.', icon: 'eraser' },
 
-            renderGrid() {
+            // --- CONVERSION MODULES ---
+            { id: 'pdf-to-img', cat: 'convert', title: 'PDF to Image', desc: 'Viewport rendering to high-fidelity PNG/JPG frames.', icon: 'image' },
+            { id: 'img-to-pdf', cat: 'convert', title: 'Image to PDF', desc: 'Compile graphical assets into a continuous document.', icon: 'images', multi: true },
+            { id: 'pdf-to-txt', cat: 'convert', title: 'PDF to Text', desc: 'Heuristic text node extraction from spatial coordinates.', icon: 'file-text' },
+            { id: 'pdf-to-csv', cat: 'convert', title: 'PDF to Data (CSV)', desc: 'Tabular structure inference and comma-separated export.', icon: 'table' },
+
+            // --- EDIT MODULES ---
+            { id: 'merge', cat: 'edit', title: 'Merge Documents', desc: 'Sequential concatenation of multiple PDF streams.', icon: 'layers', multi: true },
+            { id: 'split', cat: 'edit', title: 'Split Document', desc: 'Extract specified page ranges into isolated files.', icon: 'scissors', options: true },
+            { id: 'rotate', cat: 'edit', title: 'Orientation Sync', desc: 'Matrix transformations for 90/180/270 degree rotation.', icon: 'rotate-cw', options: true },
+            { id: 'bates', cat: 'edit', title: 'Bates Stamping', desc: 'Legal-grade alphanumeric pagination overlays.', icon: 'hash', options: true },
+            { id: 'watermark', cat: 'edit', title: 'Watermark Injection', desc: 'Diagonal vector/raster overlays across all z-indexes.', icon: 'stamp', options: true },
+
+            // --- SECURITY MODULES ---
+            { id: 'protect', cat: 'security', title: 'Encrypt Payload', desc: 'Apply AES-256 standard cryptographic locking.', icon: 'lock', options: true },
+            { id: 'unlock', cat: 'security', title: 'Decrypt Payload', desc: 'Strip security constraints (Requires valid private key).', icon: 'unlock', options: true }
+        ];
+        /**
+         * INTERFACE INITIALIZATION & STATE MANAGEMENT
+         */
+        function init() {
+            try {
                 const grid = document.getElementById('tool-grid');
+                if (!grid) throw new Error("DOM_ELEMENT_NOT_FOUND: tool-grid");
                 grid.innerHTML = '';
                 
-                TOOLS.forEach((tool, index) => {
-                    // Inject Native Ad Block dynamically after 4th item
-                    if (index === 4) {
-                        const adCard = document.createElement('div');
-                        adCard.className = 'ad-container min-h-[140px] border-dashed border-zinc-300 dark:border-zinc-700 col-span-1';
-                        adCard.innerHTML = `<span class="ad-label">Sponsor</span><span class="text-zinc-400 font-bold text-xs">Native Ad Placement</span>`;
-                        grid.appendChild(adCard);
-                    }
-
+                TOOLS.forEach(tool => {
                     const card = document.createElement('div');
-                    card.className = `tool-card animate-in fade-in zoom-in duration-300`;
+                    card.className = 'tool-card animate-in fade-in zoom-in duration-500';
                     card.dataset.cat = tool.cat;
-                    card.onclick = () => this.openWorkspace(tool.id);
+                    card.onclick = () => openWorkspace(tool.id);
                     
                     card.innerHTML = `
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500 group-hover:bg-brand-500 group-hover:text-white transition-colors">
-                                <i data-lucide="${tool.icon}" class="w-6 h-6"></i>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-14 h-14 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl flex items-center justify-center text-zinc-400 group-hover:bg-brand-600 group-hover:text-white group-hover:shadow-brand-glow transition-all duration-500">
+                                <i data-lucide="${tool.icon}" class="w-7 h-7"></i>
                             </div>
-                            <div>
-                                <h4 class="font-bold text-base text-zinc-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">${tool.title}</h4>
-                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">${tool.cat}</span>
+                            <div class="flex flex-col items-end">
+                                <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest group-hover:text-brand-500 transition-colors">${tool.cat}</span>
                             </div>
                         </div>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">${tool.desc}</p>
+                        <div class="space-y-2 mt-auto">
+                            <h4 class="font-black text-lg uppercase tracking-tight group-hover:text-brand-600 transition-colors">${tool.title}</h4>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">${tool.desc}</p>
+                        </div>
                     `;
                     grid.appendChild(card);
                 });
-            },
+                lucide.createIcons();
+            } catch (error) {
+                console.error(`[INIT_ERROR] ${new Date().toISOString()}:`, error);
+            }
+        }
 
-            filter(cat) {
+        /**
+         * @param {string} cat 
+         */
+        function filter(cat) {
+            try {
                 document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.classList.remove('active-filter', 'bg-brand-500/10', 'text-brand-600', 'dark:text-brand-500');
-                    btn.classList.add('bg-zinc-100', 'dark:bg-zinc-800', 'text-zinc-600', 'dark:text-zinc-300');
+                    btn.classList.remove('active-filter', 'bg-zinc-100', 'dark:bg-zinc-900', 'text-brand-600', 'bg-brand-50', 'dark:bg-brand-950/30');
+                    const btnText = btn.innerText.toLowerCase();
                     
-                    if(cat === 'all' && btn.innerText.includes('All')) {
-                        btn.className = 'filter-btn active-filter snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all';
-                    } else if (cat === 'innovation' && btn.innerText.includes('Titan')) {
-                        btn.className = 'filter-btn bg-brand-500/10 text-brand-600 dark:text-brand-500 snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all';
-                    } else if (btn.innerText.toLowerCase().includes(cat)) {
-                        btn.className = 'filter-btn active-filter snap-start whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-bold transition-all';
+                    if (btnText === cat || (cat === 'all' && btnText === 'all')) {
+                        btn.classList.add('active-filter');
+                    } else if (btnText === 'innovation') {
+                        btn.classList.add('bg-brand-50', 'dark:bg-brand-950/30', 'text-brand-600');
+                    } else {
+                        btn.classList.add('bg-zinc-100', 'dark:bg-zinc-900');
                     }
                 });
 
                 document.querySelectorAll('.tool-card').forEach(card => {
-                    card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'block' : 'none';
+                    if (cat === 'all' || card.dataset.cat === cat) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
-            },
+            } catch (error) {
+                console.error(`[FILTER_ERROR] ${new Date().toISOString()}:`, error);
+            }
+        }
 
-            openWorkspace(id) {
+        /**
+         * @param {string} id 
+         */
+        function openWorkspace(id) {
+            try {
                 const tool = TOOLS.find(t => t.id === id);
-                AppState.activeTool = id;
-                AppState.files = [];
-                AppState.params = {};
+                if (!tool) throw new Error("TOOL_NOT_FOUND");
+
+                appState.activeTool = id;
+                appState.files = [];
+                appState.params = {};
                 
                 document.getElementById('view-home').classList.add('hidden');
                 document.getElementById('view-workspace').classList.remove('hidden');
@@ -357,135 +382,189 @@
                 document.getElementById('ws-title').innerText = tool.title;
                 document.getElementById('ws-desc').innerText = tool.desc;
                 document.getElementById('ws-icon').innerHTML = `<i data-lucide="${tool.icon}" class="w-7 h-7"></i>`;
-                document.getElementById('file-input').multiple = !!tool.multi;
                 
-                this.renderConfig(id);
-                this.updateQueueUI();
+                const fileInput = document.getElementById('file-input');
+                fileInput.multiple = !!tool.multi;
+                fileInput.value = '';
+                
+                renderConfig(id);
+                resetWorkspaceUI();
                 lucide.createIcons();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            },
+            } catch (error) {
+                console.error(`[WORKSPACE_ERROR] ${new Date().toISOString()}:`, error);
+            }
+        }
 
-            resetState() {
-                AppState.activeTool = null;
-                AppState.files = [];
-                document.getElementById('view-workspace').classList.add('hidden');
-                document.getElementById('view-home').classList.remove('hidden');
-                document.getElementById('file-input').value = '';
-                this.renderGrid();
-                lucide.createIcons();
-            },
+        function resetState() {
+            appState.activeTool = null;
+            appState.files = [];
+            appState.params = {};
+            document.getElementById('view-workspace').classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+            document.getElementById('file-input').value = '';
+        }
 
-            renderConfig(id) {
-                const panel = document.getElementById('config-panel');
-                panel.innerHTML = '';
-                panel.classList.add('hidden');
+        function resetWorkspaceUI() {
+            document.getElementById('file-list').classList.add('hidden');
+            document.getElementById('queue').innerHTML = '';
+            document.getElementById('queue-count').innerText = '0 Files';
+            document.getElementById('exec-btn').disabled = true;
+            document.getElementById('exec-status').innerText = 'System Standby';
+            document.getElementById('exec-status').previousElementSibling.classList.add('bg-zinc-500');
+            document.getElementById('exec-status').previousElementSibling.classList.remove('bg-green-500');
+            document.getElementById('exec-loader').classList.add('hidden');
+        }
 
-                let html = '';
-                try {
-                    switch(id) {
-                        case 'redact':
-                            html = `
-                                <div class="space-y-4">
-                                    <label class="text-xs font-bold text-zinc-900 dark:text-white block">Target Text for Redaction</label>
-                                    <p class="text-[10px] text-zinc-500 mb-2">Engine will structurally locate and draw black geometry over exact string matches.</p>
-                                    <input type="text" id="param-redact-text" placeholder="e.g., CONFIDENTIAL, SSN, John Doe..." 
-                                           class="w-full p-4 rounded-xl font-medium text-sm">
-                                </div>`;
-                            break;
-                        case 'stegano':
-                            html = `
-                                <div class="space-y-3">
-                                    <label class="text-xs font-bold text-zinc-900 dark:text-white block">Secret Payload</label>
-                                    <textarea id="param-stegano-text" placeholder="Data to embed invisibly..." 
-                                              class="w-full p-4 rounded-xl font-medium text-sm min-h-[100px] resize-y"></textarea>
-                                </div>`;
-                            break;
-                        case 'protect':
-                        case 'unlock':
-                            html = `
-                                <div class="space-y-3">
-                                    <label class="text-xs font-bold text-zinc-900 dark:text-white block">${id === 'protect' ? 'Set AES-256 Password' : 'Enter Master Password'}</label>
-                                    <input type="password" id="param-pass" placeholder="••••••••" 
-                                           class="w-full p-4 rounded-xl font-medium text-sm tracking-widest">
-                                </div>`;
-                            break;
-                        case 'rotate':
-                            html = `
-                                <div class="space-y-3">
-                                    <label class="text-xs font-bold text-zinc-900 dark:text-white block">Rotation Degrees</label>
-                                    <div class="grid grid-cols-3 gap-3">
-                                        <button onclick="EngineUI.setParam('rotate', 90, this)" class="param-btn p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold hover:border-brand-500 transition-colors">90° CW</button>
-                                        <button onclick="EngineUI.setParam('rotate', 180, this)" class="param-btn p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold hover:border-brand-500 transition-colors">180°</button>
-                                        <button onclick="EngineUI.setParam('rotate', 270, this)" class="param-btn p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold hover:border-brand-500 transition-colors">90° CCW</button>
-                                    </div>
-                                </div>`;
-                            break;
-                        case 'bates':
-                            html = `
-                                <div class="space-y-3">
-                                    <label class="text-xs font-bold text-zinc-900 dark:text-white block">Identifier Prefix</label>
-                                    <input type="text" id="param-bates" placeholder="EXHIBIT-A-" class="w-full p-4 rounded-xl font-medium text-sm uppercase">
-                                </div>`;
-                            break;
-                    }
+        /**
+         * @param {string} id 
+         */
+        function renderConfig(id) {
+            const panel = document.getElementById('config-panel');
+            panel.innerHTML = '';
+            panel.classList.add('hidden');
 
-                    if(html) {
-                        panel.innerHTML = html;
-                        panel.classList.remove('hidden');
-                    }
-                } catch (e) {
-                    EngineUI.toast('Error rendering UI config', 'error');
-                }
-            },
+            let html = '';
+            switch(id) {
+                case 'auto-redact':
+                    appState.params.targetWord = '';
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-brand-600 tracking-wider block">Target Keyword/Regex</label>
+                            <input type="text" oninput="appState.params.targetWord = this.value" placeholder="e.g. CONFIDENTIAL or \\d{3}-\\d{2}-\\d{4}" 
+                                   class="w-full p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-medium">
+                        </div>`;
+                    break;
+                case 'pdf-glitch':
+                    appState.params.intensity = 50;
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-brand-600 tracking-wider block">Corruption Intensity</label>
+                            <input type="range" oninput="appState.params.intensity = parseInt(this.value)" min="10" max="200" value="50" class="w-full accent-brand-600">
+                        </div>`;
+                    break;
+                case 'stegano':
+                    appState.params.secret = '';
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-brand-600 tracking-wider block">Encrypted Payload Data</label>
+                            <textarea oninput="appState.params.secret = this.value" placeholder="Enter strictly confidential payload..." 
+                                      class="w-full p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-medium min-h-[100px]"></textarea>
+                        </div>`;
+                    break;
+                case 'split':
+                    appState.params.start = 1;
+                    appState.params.end = 1;
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-zinc-500 tracking-wider block">Page Extraction Range</label>
+                            <div class="flex gap-4">
+                                <input type="number" oninput="appState.params.start = parseInt(this.value)" placeholder="Start Page" class="w-full p-4 bg-white dark:bg-zinc-950 border rounded-xl font-medium" value="1" min="1">
+                                <input type="number" oninput="appState.params.end = parseInt(this.value)" placeholder="End Page" class="w-full p-4 bg-white dark:bg-zinc-950 border rounded-xl font-medium" value="1" min="1">
+                            </div>
+                        </div>`;
+                    break;
+                case 'rotate':
+                    appState.params.angle = 90;
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-zinc-500 tracking-wider block">Transformation Matrix</label>
+                            <select onchange="appState.params.angle = parseInt(this.value)" class="w-full p-4 bg-white dark:bg-zinc-950 border rounded-xl font-medium cursor-pointer">
+                                <option value="90">Rotate 90° Clockwise</option>
+                                <option value="180">Rotate 180° (Flip)</option>
+                                <option value="270">Rotate 270° Counter-Clockwise</option>
+                            </select>
+                        </div>`;
+                    break;
+                case 'bates':
+                    appState.params.prefix = 'EXHIBIT-';
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-zinc-500 tracking-wider block">Alphanumeric Prefix</label>
+                            <input type="text" oninput="appState.params.prefix = this.value" value="EXHIBIT-" class="w-full p-4 bg-white dark:bg-zinc-950 border rounded-xl font-medium uppercase">
+                        </div>`;
+                    break;
+                case 'watermark':
+                    appState.params.text = 'CONFIDENTIAL';
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase text-zinc-500 tracking-wider block">Overlay String</label>
+                            <input type="text" oninput="appState.params.text = this.value" value="CONFIDENTIAL" class="w-full p-4 bg-white dark:bg-zinc-950 border rounded-xl font-medium uppercase">
+                        </div>`;
+                    break;
+                case 'protect':
+                case 'unlock':
+                    appState.params.password = '';
+                    html = `
+                        <div class="space-y-4">
+                            <label class="text-xs font-bold uppercase ${id === 'protect' ? 'text-zinc-500' : 'text-brand-600'} tracking-wider block">Cryptographic Key</label>
+                            <input type="password" oninput="appState.params.password = this.value" placeholder="Enter AES-256 Key..." 
+                                   class="w-full p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl font-medium">
+                        </div>`;
+                    break;
+            }
 
-            setParam(key, val, el) {
-                AppState.params[key] = val;
-                if(el) {
-                    document.querySelectorAll('.param-btn').forEach(b => b.classList.remove('ring-2', 'ring-brand-500', 'border-transparent'));
-                    el.classList.add('ring-2', 'ring-brand-500', 'border-transparent');
-                }
-            },
+            if(html) {
+                panel.innerHTML = html;
+                panel.classList.remove('hidden');
+            }
+        }
 
-            handleFileSelect(e) {
-                const tool = TOOLS.find(t => t.id === AppState.activeTool);
-                const incoming = Array.from(e.target.files);
+        /**
+         * FILE HANDLING CONTROLLER
+         */
+        document.getElementById('file-input').onchange = (e) => {
+            try {
+                const target = e.target;
+                if (!target || !target.files) return;
+
+                const incoming = Array.from(target.files);
+                const tool = TOOLS.find(t => t.id === appState.activeTool);
                 
-                if(tool.multi) {
-                    AppState.files = [...AppState.files, ...incoming];
+                if(tool && tool.multi) {
+                    appState.files = [...appState.files, ...incoming];
                 } else {
-                    AppState.files = [incoming[0]];
+                    appState.files = [incoming[0]];
                 }
                 
-                this.updateQueueUI();
-            },
+                renderQueue();
+            } catch (error) {
+                console.error(`[FILE_INGEST_ERROR] ${new Date().toISOString()}:`, error);
+            }
+        };
 
-            updateQueueUI() {
+        function renderQueue() {
+            try {
                 const container = document.getElementById('file-list');
                 const queue = document.getElementById('queue');
+                const count = document.getElementById('queue-count');
                 const execBtn = document.getElementById('exec-btn');
-                const counter = document.getElementById('file-count');
                 
                 queue.innerHTML = '';
                 
-                if(AppState.files.length > 0) {
+                if(appState.files.length > 0) {
                     container.classList.remove('hidden');
                     execBtn.disabled = false;
-                    counter.innerText = `${AppState.files.length} File${AppState.files.length > 1 ? 's' : ''}`;
+                    count.innerText = `${appState.files.length} File${appState.files.length > 1 ? 's' : ''}`;
                     
-                    AppState.files.forEach((file, i) => {
+                    document.getElementById('exec-status').innerText = 'Ready For Execution';
+                    document.getElementById('exec-status').previousElementSibling.classList.remove('bg-zinc-500');
+                    document.getElementById('exec-status').previousElementSibling.classList.add('bg-green-500');
+
+                    appState.files.forEach((file, i) => {
                         const item = document.createElement('div');
-                        item.className = 'flex items-center justify-between p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm';
+                        item.className = 'flex items-center justify-between p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm';
                         item.innerHTML = `
-                            <div class="flex items-center gap-3 overflow-hidden">
-                                <div class="w-8 h-8 shrink-0 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded-lg flex items-center justify-center">
-                                    <i data-lucide="file" class="w-4 h-4"></i>
+                            <div class="flex items-center gap-4 truncate">
+                                <div class="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 text-brand-600 rounded-xl flex items-center justify-center">
+                                    <i data-lucide="file" class="w-5 h-5"></i>
                                 </div>
                                 <div class="truncate">
-                                    <p class="text-xs font-bold text-zinc-900 dark:text-white truncate">${file.name}</p>
-                                    <p class="text-[10px] text-zinc-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                                    <p class="text-xs font-bold truncate text-zinc-900 dark:text-white">${file.name}</p>
+                                    <p class="text-[10px] font-medium text-zinc-500 uppercase tracking-widest mt-0.5">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
                                 </div>
                             </div>
-                            <button onclick="EngineUI.removeFile(${i})" class="shrink-0 p-2 text-zinc-400 hover:text-red-500 transition-colors">
+                            <button onclick="removeFile(${i})" class="p-2 rounded-lg text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         `;
@@ -493,72 +572,42 @@
                     });
                     lucide.createIcons();
                 } else {
-                    container.classList.add('hidden');
-                    execBtn.disabled = true;
+                    resetWorkspaceUI();
                 }
-            },
-
-            removeFile(i) {
-                AppState.files.splice(i, 1);
-                this.updateQueueUI();
-            },
-
-            toggleTheme() {
-                AppState.theme = AppState.theme === 'light' ? 'dark' : 'light';
-                this.applyTheme();
-            },
-
-            applyTheme() {
-                document.documentElement.classList.toggle('dark', AppState.theme === 'dark');
-                const icon = document.getElementById('theme-icon');
-                if(icon) {
-                    icon.setAttribute('data-lucide', AppState.theme === 'light' ? 'moon' : 'sun');
-                    lucide.createIcons();
-                }
-                localStorage.setItem('titan_theme_v7', AppState.theme);
-            },
-
-            toast(msg, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const el = document.createElement('div');
-                const isError = type === 'error';
-                el.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-white font-bold text-sm transform transition-all translate-y-10 opacity-0 ${isError ? 'bg-red-600' : 'bg-zinc-900 dark:bg-white dark:text-zinc-900'}`;
-                el.innerHTML = `
-                    <i data-lucide="${isError ? 'alert-triangle' : 'check-circle'}" class="w-5 h-5 ${isError ? 'text-white' : 'text-brand-500'}"></i>
-                    ${msg}
-                `;
-                container.appendChild(el);
-                lucide.createIcons();
-                
-                requestAnimationFrame(() => {
-                    el.classList.remove('translate-y-10', 'opacity-0');
-                });
-
-                setTimeout(() => {
-                    el.classList.add('opacity-0', 'translate-y-2');
-                    setTimeout(() => el.remove(), 300);
-                }, 4000);
+            } catch (error) {
+                console.error(`[RENDER_QUEUE_ERROR] ${new Date().toISOString()}:`, error);
             }
-        };
+        }
 
         /**
-         * ENGINE CORE: WASM EXECUTION PIPELINE
+         * @param {number} i 
          */
-        const EngineCore = {
+        function removeFile(i) {
+            appState.files.splice(i, 1);
+            renderQueue();
+        }
+
+        /**
+         * CORE WASM EXECUTION ENGINE
+         */
+        const Engine = {
             async execute() {
                 const btn = document.getElementById('exec-btn');
                 const loader = document.getElementById('exec-loader');
                 const label = document.getElementById('exec-label');
+                const status = document.getElementById('exec-status');
 
                 btn.disabled = true;
                 loader.classList.remove('hidden');
-                label.innerText = 'PROCESSING...';
+                label.innerText = 'PROCESSING PAYLOAD';
+                status.innerText = 'ALLOCATING VIRTUAL MEMORY...';
 
                 try {
-                    await new Promise(r => setTimeout(r, 100)); // UI flush
+                    await new Promise(resolve => setTimeout(resolve, 300)); 
 
-                    switch(AppState.activeTool) {
-                        case 'redact': await this.smartRedact(); break;
+                    switch(appState.activeTool) {
+                        case 'auto-redact': await this.autoRedact(); break;
+                        case 'pdf-glitch': await this.pdfGlitch(); break;
                         case 'stegano': await this.stegano(); break;
                         case 'dna-clean': await this.dnaClean(); break;
                         case 'pdf-to-img': await this.pdfToImg(); break;
@@ -568,329 +617,317 @@
                         case 'merge': await this.merge(); break;
                         case 'split': await this.split(); break;
                         case 'rotate': await this.rotate(); break;
-                        case 'compress': await this.compress(); break;
                         case 'bates': await this.batesNumbering(); break;
+                        case 'watermark': await this.watermark(); break;
                         case 'protect': await this.protect(); break;
                         case 'unlock': await this.unlock(); break;
-                        default: throw new Error("MODULE_UNKNOWN");
+                        default: throw new Error("UNSUPPORTED_MODULE_INVOCATION");
                     }
 
-                    EngineUI.toast('Operation completed successfully.');
-                } catch (err) {
-                    console.error("[TITAN-CORE-ERROR]:", err);
-                    EngineUI.toast(err.message || 'Execution failed. Check console.', 'error');
+                    status.innerText = 'EXECUTION COMPLETED. DISPATCHING IO.';
+                } catch (error) {
+                    console.error(`[ENGINE_FATAL] ${new Date().toISOString()}:`, error);
+                    status.innerText = `FAULT: ${error.message}`;
+                    status.previousElementSibling.classList.replace('bg-green-500', 'bg-red-500');
                 } finally {
-                    btn.disabled = false;
-                    loader.classList.add('hidden');
-                    label.innerText = 'Run Processor';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        loader.classList.add('hidden');
+                        label.innerText = 'Initialize Engine';
+                        if (status.innerText.includes('COMPLETED')) {
+                            status.innerText = 'Ready For Next Operation';
+                        }
+                    }, 2000);
                 }
             },
 
-            /**
-             * NOVEL CAPABILITY: SMART REDACT
-             * Parses PDF via PDF.js to extract transform matrices, 
-             * then overlays black geometry via PDF-Lib.
-             */
-            async smartRedact() {
-                const el = document.getElementById('param-redact-text');
-                const targetText = el ? el.value.trim() : '';
-                if (!targetText) throw new Error("Target text for redaction required.");
-
-                const fileData = await AppState.files[0].arrayBuffer();
+            async autoRedact() {
+                const target = appState.params.targetWord;
+                if (!target) throw new Error("TARGET_KEYWORD_REQUIRED");
                 
-                // Pass 1: Parse Spatial Coordinates via PDF.js
-                const loadingTask = pdfjsLib.getDocument({ data: fileData });
-                const pdfViewer = await loadingTask.promise;
-                
-                // Pass 2: Setup PDF-Lib modifier
-                const pdfMod = await PDFDocument.load(fileData);
-                const pagesMod = pdfMod.getPages();
+                const buffer = await appState.files[0].arrayBuffer();
+                const doc = await PDFDocument.load(buffer);
+                const pdf = await pdfjs.getDocument({ data: buffer }).promise;
 
-                let foundCount = 0;
-
-                for (let i = 1; i <= pdfViewer.numPages; i++) {
-                    const pageView = await pdfViewer.getPage(i);
-                    const textContent = await pageView.getTextContent();
-                    const pageMod = pagesMod[i - 1];
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const pageData = await pdf.getPage(i);
+                    const textContent = await pageData.getTextContent();
+                    const pdfLibPage = doc.getPage(i - 1);
+                    const { height } = pdfLibPage.getSize();
 
                     textContent.items.forEach(item => {
-                        if (item.str.includes(targetText)) {
-                            // transform matrix: [scaleX, skewY, skewX, scaleY, translateX, translateY]
+                        if (item.str.includes(target) || new RegExp(target, 'i').test(item.str)) {
                             const transform = item.transform;
-                            const tx = transform[4];
-                            const ty = transform[5];
-                            const fontHeight = Math.abs(transform[3]);
-                            
-                            // Rough width estimation (robust client-side fallback)
-                            const width = item.width || (item.str.length * (fontHeight * 0.5));
-                            
-                            // Draw pure black redaction box
-                            pageMod.drawRectangle({
-                                x: tx,
-                                y: ty - (fontHeight * 0.2), // baseline adjustment
+                            const x = transform[4];
+                            const y = transform[5]; 
+                            const width = item.width || (item.str.length * 6); 
+                            const itemHeight = item.height || 12;
+
+                            pdfLibPage.drawRectangle({
+                                x: x,
+                                y: y,
                                 width: width,
-                                height: fontHeight * 1.2,
-                                color: rgb(0, 0, 0),
+                                height: itemHeight,
+                                color: rgb(0, 0, 0)
                             });
-                            foundCount++;
                         }
                     });
                 }
+                this._save(await doc.save(), `redacted_${appState.files[0].name}`);
+            },
 
-                if(foundCount === 0) throw new Error("Target string not found in document structure.");
-
-                const modifiedBytes = await pdfMod.save();
-                this._download(modifiedBytes, 'redacted_titan.pdf', 'application/pdf');
+            async pdfGlitch() {
+                const intensity = appState.params.intensity;
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
+                
+                doc.getPages().forEach(page => {
+                    const { width, height } = page.getSize();
+                    for (let i = 0; i < intensity; i++) {
+                        page.drawRectangle({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            width: Math.random() * 100,
+                            height: Math.random() * 20,
+                            color: rgb(Math.random(), Math.random(), Math.random()),
+                            opacity: Math.random() * 0.5
+                        });
+                    }
+                });
+                this._save(await doc.save(), `corrupted_${appState.files[0].name}`);
             },
 
             async stegano() {
-                const el = document.getElementById('param-stegano-text');
-                const secret = el ? el.value : '';
-                if(!secret) throw new Error("Payload required.");
-                
-                const doc = await PDFDocument.load(await AppState.files[0].arrayBuffer());
-                doc.setSubject(`[TITAN-ENC]:${btoa(secret)}`);
-                doc.setKeywords(['TITAN-STEGANO-V7']);
-                
-                const modified = await doc.save();
-                this._download(modified, 'stegano_titan.pdf', 'application/pdf');
+                const secret = appState.params.secret;
+                if(!secret) throw new Error("PAYLOAD_DATA_REQUIRED");
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
+                doc.setSubject(`ENC_PAYLOAD::${btoa(secret)}`);
+                doc.setKeywords(['ENTERPRISE-SECURE', btoa(secret)]);
+                this._save(await doc.save(), `stegano_${appState.files[0].name}`);
             },
 
             async dnaClean() {
-                const doc = await PDFDocument.load(await AppState.files[0].arrayBuffer());
-                doc.setCreator('Titan Engine V7');
-                doc.setProducer('Titan Engine V7');
-                doc.setAuthor('');
-                doc.setTitle('');
-                doc.setSubject('');
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
+                doc.setCreator(''); 
+                doc.setProducer(''); 
+                doc.setAuthor(''); 
+                doc.setTitle(''); 
+                doc.setSubject(''); 
                 doc.setKeywords([]);
-                
-                const modified = await doc.save();
-                this._download(modified, 'sanitized_titan.pdf', 'application/pdf');
+                doc.setCreationDate(new Date(0));
+                doc.setModificationDate(new Date(0));
+                this._save(await doc.save(), `sanitized_${appState.files[0].name}`);
             },
 
             async merge() {
-                if(AppState.files.length < 2) throw new Error("Requires at least 2 files.");
-                const merged = await PDFDocument.create();
-                
-                for (const f of AppState.files) {
-                    const doc = await PDFDocument.load(await f.arrayBuffer());
-                    const copiedPages = await merged.copyPages(doc, doc.getPageIndices());
-                    copiedPages.forEach(p => merged.addPage(p));
+                const mergedDoc = await PDFDocument.create();
+                for (const file of appState.files) {
+                    const doc = await PDFDocument.load(await file.arrayBuffer());
+                    const copiedPages = await mergedDoc.copyPages(doc, doc.getPageIndices());
+                    copiedPages.forEach(page => mergedDoc.addPage(page));
                 }
-                
-                const bytes = await merged.save();
-                this._download(bytes, 'merged_titan.pdf', 'application/pdf');
+                this._save(await mergedDoc.save(), 'merged_enterprise.pdf');
             },
 
             async split() {
-                const data = await AppState.files[0].arrayBuffer();
-                const doc = await PDFDocument.load(data);
-                const count = doc.getPageCount();
+                const start = appState.params.start - 1;
+                const end = appState.params.end - 1;
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
                 
-                // Limit to 5 pages for browser memory safety in free tier
-                const limit = Math.min(count, 5); 
-                
-                for(let i = 0; i < limit; i++) {
-                    const newDoc = await PDFDocument.create();
-                    const [page] = await newDoc.copyPages(doc, [i]);
-                    newDoc.addPage(page);
-                    const bytes = await newDoc.save();
-                    this._download(bytes, `split_page_${i+1}.pdf`, 'application/pdf');
+                if (start < 0 || end >= doc.getPageCount() || start > end) {
+                    throw new Error("INVALID_PAGE_RANGE_MATRIX");
                 }
-                if(count > 5) EngineUI.toast('Split limited to 5 pages. Upgrade for unlimited.', 'error');
+
+                const newDoc = await PDFDocument.create();
+                const indices = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+                const copiedPages = await newDoc.copyPages(doc, indices);
+                copiedPages.forEach(page => newDoc.addPage(page));
+                
+                this._save(await newDoc.save(), `extracted_p${start+1}-p${end+1}.pdf`);
             },
 
             async rotate() {
-                const deg = AppState.params['rotate'] || 90;
-                const doc = await PDFDocument.load(await AppState.files[0].arrayBuffer());
-                
-                doc.getPages().forEach(p => {
-                    const current = p.getRotation().angle;
-                    p.setRotation(PDFLib.degrees(current + deg));
+                const angle = appState.params.angle;
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
+                doc.getPages().forEach(page => {
+                    page.setRotation(degrees(angle));
                 });
+                this._save(await doc.save(), `rotated_${appState.files[0].name}`);
+            },
+
+            async batesNumbering() {
+                const prefix = appState.params.prefix || 'EXHIBIT-';
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
+                const font = await doc.embedFont(StandardFonts.HelveticaBold);
                 
-                const bytes = await doc.save();
-                this._download(bytes, 'rotated_titan.pdf', 'application/pdf');
+                doc.getPages().forEach((page, index) => {
+                    const { width } = page.getSize();
+                    page.drawText(`${prefix}${String(index + 1).padStart(5, '0')}`, { 
+                        x: width - 120, 
+                        y: 30, 
+                        size: 10, 
+                        font: font, 
+                        color: rgb(0, 0, 0) 
+                    });
+                });
+                this._save(await doc.save(), `bates_${appState.files[0].name}`);
+            },
+
+            async watermark() {
+                const text = appState.params.text;
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
+                const font = await doc.embedFont(StandardFonts.HelveticaBold);
+                
+                doc.getPages().forEach(page => {
+                    const { width, height } = page.getSize();
+                    page.drawText(text, {
+                        x: width / 2 - (text.length * 15),
+                        y: height / 2,
+                        size: 60,
+                        font: font,
+                        color: rgb(0.8, 0.8, 0.8),
+                        opacity: 0.3,
+                        rotate: degrees(45)
+                    });
+                });
+                this._save(await doc.save(), `watermark_${appState.files[0].name}`);
             },
 
             async pdfToImg() {
-                const data = await AppState.files[0].arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data}).promise;
-                const page = await pdf.getPage(1); // Rasterize first page only
+                const buffer = await appState.files[0].arrayBuffer();
+                const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 2.0 });
                 
-                const viewport = page.getViewport({scale: 2.0}); // High Res
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+                const context = canvas.getContext('2d');
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
                 
-                await page.render({canvasContext: ctx, viewport: viewport}).promise;
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
                 
-                canvas.toBlob((blob) => {
-                    this._downloadBlob(blob, 'rendered_titan.png');
-                }, 'image/png');
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.download = `render_${appState.files[0].name.replace('.pdf', '')}.jpg`;
+                link.click();
             },
 
             async imgToPdf() {
                 const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
+                const out = new jsPDF();
                 
-                for (let i = 0; i < AppState.files.length; i++) {
-                    const base64 = await this._fileToBase64(AppState.files[i]);
-                    if (i > 0) pdf.addPage();
-                    const props = pdf.getImageProperties(base64);
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (props.height * pdfWidth) / props.width;
-                    pdf.addImage(base64, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                for (let i = 0; i < appState.files.length; i++) {
+                    const base64Str = await this._fileToBase64(appState.files[i]);
+                    if (i > 0) out.addPage();
+                    const pageSize = out.internal.pageSize;
+                    out.addImage(base64Str, 'JPEG', 0, 0, pageSize.width, pageSize.height);
                 }
-                
-                pdf.save('images_titan.pdf');
+                out.save('compiled_assets.pdf');
             },
 
             async pdfToTxt() {
-                const data = await AppState.files[0].arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data}).promise;
-                let textOut = "";
+                const buffer = await appState.files[0].arrayBuffer();
+                const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+                let textBlob = "";
                 
                 for(let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    textOut += `--- PAGE ${i} ---\n`;
-                    textOut += content.items.map(it => it.str).join(" ") + "\n\n";
+                    textBlob += content.items.map(item => item.str).join(" ") + "\n\n";
                 }
-                
-                this._downloadBlob(new Blob([textOut], {type: 'text/plain'}), 'extract_titan.txt');
+                this._downloadBlob(new Blob([textBlob], { type: 'text/plain' }), `extracted_${appState.files[0].name}.txt`);
             },
 
             async pdfToCsv() {
-                const data = await AppState.files[0].arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data}).promise;
-                let csvOut = "Data\n";
+                const buffer = await appState.files[0].arrayBuffer();
+                const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+                let csvData = "";
                 
                 for(let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    content.items.forEach(it => {
-                        const clean = it.str.replace(/"/g, '""').trim();
-                        if(clean) csvOut += `"${clean}",\n`;
+                    content.items.forEach(item => {
+                        csvData += `"${item.str.replace(/"/g, '""')}",`;
                     });
+                    csvData += "\n";
                 }
-                
-                this._downloadBlob(new Blob([csvOut], {type: 'text/csv'}), 'data_titan.csv');
-            },
-
-            async compress() {
-                // Lossy compression via rasterization
-                const { jsPDF } = window.jspdf;
-                const data = await AppState.files[0].arrayBuffer();
-                const inputPdf = await pdfjsLib.getDocument({data}).promise;
-                const outPdf = new jsPDF();
-                
-                const limit = Math.min(inputPdf.numPages, 5);
-                
-                for(let i = 1; i <= limit; i++) {
-                    const page = await inputPdf.getPage(i);
-                    const viewport = page.getViewport({scale: 1.0}); // Reduced scale
-                    const canvas = document.createElement('canvas');
-                    canvas.width = viewport.width; canvas.height = viewport.height;
-                    await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
-                    
-                    if (i > 1) outPdf.addPage();
-                    // Compress JPEG heavily
-                    outPdf.addImage(canvas.toDataURL('image/jpeg', 0.4), 'JPEG', 0, 0, outPdf.internal.pageSize.getWidth(), outPdf.internal.pageSize.getHeight());
-                }
-                
-                outPdf.save('compressed_titan.pdf');
-            },
-
-            async batesNumbering() {
-                const el = document.getElementById('param-bates');
-                const prefix = el ? el.value || 'TITAN-' : 'TITAN-';
-                
-                const doc = await PDFDocument.load(await AppState.files[0].arrayBuffer());
-                const font = await doc.embedFont(StandardFonts.HelveticaBold);
-                
-                doc.getPages().forEach((page, idx) => {
-                    const { width } = page.getSize();
-                    const text = `${prefix}${String(idx+1).padStart(5, '0')}`;
-                    page.drawText(text, { 
-                        x: width - 120, 
-                        y: 30, 
-                        size: 12, 
-                        font: font, 
-                        color: rgb(0.8, 0.1, 0.1) 
-                    });
-                });
-                
-                const bytes = await doc.save();
-                this._download(bytes, 'bates_titan.pdf', 'application/pdf');
+                this._downloadBlob(new Blob([csvData], { type: 'text/csv' }), `data_${appState.files[0].name}.csv`);
             },
 
             async protect() {
-                const el = document.getElementById('param-pass');
-                const pass = el ? el.value : '';
-                if(!pass) throw new Error("Encryption key required.");
+                const pass = appState.params.password;
+                if(!pass) throw new Error("CRYPTOGRAPHIC_KEY_REQUIRED");
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer());
                 
-                const doc = await PDFDocument.load(await AppState.files[0].arrayBuffer());
-                const bytes = await doc.save({
+                const encryptedBytes = await doc.save({
                     userPassword: pass,
                     ownerPassword: pass,
-                    permissions: { modifying: false, copying: false }
+                    permissions: {
+                        printing: 'highResolution',
+                        modifying: false,
+                        copying: false,
+                        annotating: false
+                    }
                 });
-                
-                this._download(bytes, 'protected_titan.pdf', 'application/pdf');
+                this._save(encryptedBytes, `locked_${appState.files[0].name}`);
             },
 
             async unlock() {
-                const el = document.getElementById('param-pass');
-                const pass = el ? el.value : '';
-                if(!pass) throw new Error("Decryption key required.");
-                
-                try {
-                    const doc = await PDFDocument.load(await AppState.files[0].arrayBuffer(), { password: pass });
-                    const bytes = await doc.save(); // Saves without password inherently
-                    this._download(bytes, 'unlocked_titan.pdf', 'application/pdf');
-                } catch(e) {
-                    throw new Error("Invalid Master Password or Corrupt File.");
-                }
+                const pass = appState.params.password;
+                if(!pass) throw new Error("DECRYPTION_KEY_REQUIRED");
+                const doc = await PDFDocument.load(await appState.files[0].arrayBuffer(), { password: pass });
+                this._save(await doc.save(), `unlocked_${appState.files[0].name}`);
             },
 
-            // --- IO UTILITIES ---
-            _download(bytes, filename, mime) {
-                const blob = new Blob([bytes], { type: mime });
-                this._downloadBlob(blob, filename);
+            /** @param {Uint8Array} bytes @param {string} name */
+            _save(bytes, name) { 
+                this._downloadBlob(new Blob([bytes], { type: 'application/pdf' }), name); 
             },
             
-            _downloadBlob(blob, filename) {
+            /** @param {Blob} blob @param {string} name */
+            _downloadBlob(blob, name) {
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
+                const a = document.createElement('a'); 
+                a.href = url; 
+                a.download = name; 
                 a.click();
-                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             },
-
-            _fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
+            
+            /** @param {File} file @returns {Promise<string>} */
+            _fileToBase64(file) { 
+                return new Promise((resolve, reject) => { 
+                    const reader = new FileReader(); 
+                    reader.readAsDataURL(file); 
+                    reader.onload = () => resolve(reader.result); 
                     reader.onerror = error => reject(error);
-                });
+                }); 
             }
         };
 
-        // EVENT BINDINGS & INIT
-        document.getElementById('file-input').addEventListener('change', (e) => EngineUI.handleFileSelect(e));
-        
-        window.addEventListener('DOMContentLoaded', () => {
-            AppState.theme = localStorage.getItem('titan_theme_v7') || 'dark';
-            EngineUI.init();
-        });
+        /**
+         * THEME CONFIGURATION ENGINE
+         */
+        const ThemeEngine = {
+            toggle() {
+                appState.theme = appState.theme === 'light' ? 'dark' : 'light';
+                this.apply();
+            },
+            apply() {
+                document.documentElement.classList.toggle('dark', appState.theme === 'dark');
+                const icon = document.getElementById('theme-icon');
+                if (icon) {
+                    icon.setAttribute('data-lucide', appState.theme === 'light' ? 'moon' : 'sun');
+                    lucide.createIcons();
+                }
+                localStorage.setItem('studio_pdf_theme', appState.theme);
+            }
+        };
 
+        window.onload = () => {
+            appState.theme = localStorage.getItem('studio_pdf_theme') || 'dark';
+            ThemeEngine.apply();
+            init();
+        };
     </script>
 </body>
 </html>
