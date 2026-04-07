@@ -3,185 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PremiumPDF - Ultimate Free PDF Tools</title>
+    <title>Premium PDF Studio | Free Online PDF Editor</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/pdf-lib@1.17.1"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
     <style>
-        .drag-over { border-color: #3b82f6; background-color: #eff6ff; }
-        .tool-active { border-bottom: 2px solid #2563eb; color: #2563eb; }
+        /* Custom scrollbar for a premium feel */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        
+        .ad-placeholder {
+            background-color: #f3f4f6;
+            border: 2px dashed #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
-    <nav class="bg-white shadow-sm py-4 px-8 flex flex-wrap justify-between items-center">
-        <div class="text-2xl font-bold text-blue-600 mr-8">PremiumPDF</div>
-        <div class="space-x-6 text-sm font-medium mt-4 sm:mt-0" id="tool-menu">
-            <button onclick="selectTool('merge')" id="btn-merge" class="tool-active hover:text-blue-600 pb-1">Merge PDF</button>
-            <button onclick="selectTool('split')" id="btn-split" class="hover:text-blue-600 pb-1">Split PDF</button>
-            <button onclick="selectTool('watermark')" id="btn-watermark" class="hover:text-blue-600 pb-1">Watermark</button>
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    <span class="ml-2 text-xl font-bold text-gray-900">PDF Studio Pro</span>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-red-600 font-medium px-3 py-2">Merge PDF</a>
+                    <a href="#" class="text-gray-600 hover:text-red-600 font-medium px-3 py-2">Split PDF</a>
+                    <a href="#" class="text-gray-600 hover:text-red-600 font-medium px-3 py-2">Watermark</a>
+                </nav>
+            </div>
         </div>
-    </nav>
+    </header>
 
-    <div class="w-full max-w-4xl mx-auto mt-6 h-24 bg-gray-200 border border-gray-300 flex items-center justify-center text-gray-500 text-sm">
-        [ AdSense Banner 728x90 ]
+    <div class="w-full max-w-7xl mx-auto mt-4 px-4 h-24 ad-placeholder">
+        <span>Google AdSense / Banner Ad Space (728x90)</span>
     </div>
 
-    <main class="max-w-4xl mx-auto mt-10 px-4">
-        <div class="text-center mb-10">
-            <h1 id="tool-title" class="text-4xl font-extrabold text-gray-900 mb-4">Merge PDF Files</h1>
-            <p id="tool-desc" class="text-lg text-gray-600">Combine multiple PDFs into one unified document.</p>
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+        
+        <aside class="hidden lg:block w-64 h-[600px] ad-placeholder flex-shrink-0">
+            <span>Sidebar Ad (160x600)</span>
+        </aside>
+
+        <div class="flex-grow bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="p-8">
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2" id="tool-title">Merge PDF Files</h1>
+                <p class="text-gray-500 mb-8" id="tool-desc">Combine multiple PDFs into a single document entirely in your browser. No files are uploaded to any server.</p>
+
+                <div class="mb-8 flex space-x-4 border-b border-gray-200 pb-4">
+                    <button onclick="switchTool('merge')" class="bg-red-50 text-red-700 px-4 py-2 rounded-md font-semibold transition hover:bg-red-100" id="btn-merge">Merge</button>
+                    <button onclick="switchTool('split')" class="bg-gray-50 text-gray-700 px-4 py-2 rounded-md font-semibold transition hover:bg-gray-100" id="btn-split">Split</button>
+                    <button onclick="switchTool('watermark')" class="bg-gray-50 text-gray-700 px-4 py-2 rounded-md font-semibold transition hover:bg-gray-100" id="btn-watermark">Watermark</button>
+                </div>
+
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center hover:border-red-500 transition cursor-pointer bg-gray-50 relative" id="dropzone">
+                    <input type="file" id="file-input" multiple accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    <p class="text-xl font-medium text-gray-700">Select PDF files</p>
+                    <p class="text-sm text-gray-500 mt-2">or drop PDFs here</p>
+                </div>
+
+                <div id="file-list" class="mt-6 space-y-2 hidden"></div>
+
+                <div id="tool-options" class="mt-6 hidden">
+                    <div id="watermark-options" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Watermark Text</label>
+                        <input type="text" id="watermark-text" class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500" value="CONFIDENTIAL">
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button id="execute-btn" onclick="executeProcess()" disabled class="bg-red-600 text-white text-lg font-bold py-4 px-12 rounded-full shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                        Process Files
+                    </button>
+                </div>
+                
+                <div id="status-message" class="mt-4 text-center text-sm font-medium"></div>
+            </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl p-8">
-            <div id="drop-zone" class="border-4 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer hover:bg-gray-50 transition-colors">
-                <p class="text-xl font-semibold text-gray-700">Choose PDF file(s)</p>
-                <input type="file" id="file-input" class="hidden" multiple accept="application/pdf">
-            </div>
-
-            <ul id="file-list" class="mt-6 space-y-2 text-sm text-gray-600"></ul>
-
-            <div class="mt-8 text-center hidden" id="action-area">
-                <button id="process-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                    Process PDF
-                </button>
-            </div>
-            
-            <p id="status-text" class="mt-4 text-center text-blue-600 font-semibold hidden">Processing...</p>
-        </div>
+        <aside class="hidden xl:block w-64 h-[600px] ad-placeholder flex-shrink-0">
+            <span>Sidebar Ad (160x600)</span>
+        </aside>
     </main>
 
+    <div class="w-full max-w-7xl mx-auto mb-8 px-4 h-24 ad-placeholder">
+        <span>Google AdSense / Banner Ad Space (728x90)</span>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm text-gray-400">&copy; 2026 PDF Studio Pro. All rights reserved. Client-side processing ensures 100% data privacy.</p>
+        </div>
+    </footer>
+
     <script>
-        const { PDFDocument, rgb, degrees } = PDFLib;
-        
+        /** * STATE MANAGEMENT 
+         * @type {'merge' | 'split' | 'watermark'}
+         */
         let currentTool = 'merge';
-        let selectedFiles = [];
+        /** @type {File[]} */
+        let uploadedFiles = [];
 
-        // UI Elements
-        const dropZone = document.getElementById('drop-zone');
+        // DOM Elements
         const fileInput = document.getElementById('file-input');
-        const fileList = document.getElementById('file-list');
-        const actionArea = document.getElementById('action-area');
-        const processBtn = document.getElementById('process-btn');
-        const statusText = document.getElementById('status-text');
+        const fileListContainer = document.getElementById('file-list');
+        const executeBtn = document.getElementById('execute-btn');
+        const statusMessage = document.getElementById('status-message');
+        const toolOptions = document.getElementById('tool-options');
+        const watermarkOptions = document.getElementById('watermark-options');
 
-        // Tool Selection Logic
-        function selectTool(tool) {
+        /**
+         * Switches the active tool configuration
+         * @param {'merge' | 'split' | 'watermark'} tool 
+         */
+        function switchTool(tool) {
             currentTool = tool;
-            selectedFiles = []; // Reset files when changing tools
-            updateUI();
+            uploadedFiles = [];
+            updateFileList();
             
-            // Update UI text based on tool
-            const title = document.getElementById('tool-title');
-            const desc = document.getElementById('tool-desc');
-            
-            document.querySelectorAll('#tool-menu button').forEach(btn => btn.classList.remove('tool-active'));
-            document.getElementById(`btn-${tool}`).classList.add('tool-active');
+            // Reset UI
+            document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+                btn.className = "bg-gray-50 text-gray-700 px-4 py-2 rounded-md font-semibold transition hover:bg-gray-100";
+            });
+            document.getElementById(`btn-${tool}`).className = "bg-red-50 text-red-700 px-4 py-2 rounded-md font-semibold transition hover:bg-red-100";
 
-            if(tool === 'merge') {
-                title.textContent = 'Merge PDF Files';
-                desc.textContent = 'Combine multiple PDFs into one unified document.';
+            const titles = {
+                'merge': { title: 'Merge PDF Files', desc: 'Combine multiple PDFs into a single document entirely in your browser.' },
+                'split': { title: 'Split PDF', desc: 'Extract the first page of a PDF document instantly.' },
+                'watermark': { title: 'Add Watermark', desc: 'Stamp text onto your PDF document.' }
+            };
+
+            document.getElementById('tool-title').innerText = titles[tool].title;
+            document.getElementById('tool-desc').innerText = titles[tool].desc;
+
+            // Handle Input Modes
+            if (tool === 'merge') {
                 fileInput.multiple = true;
-            } else if (tool === 'split') {
-                title.textContent = 'Split PDF (Extract Page 1)';
-                desc.textContent = 'Extracts the first page of your PDF into a new document.';
+                watermarkOptions.classList.add('hidden');
+                toolOptions.classList.add('hidden');
+            } else {
                 fileInput.multiple = false;
-            } else if (tool === 'watermark') {
-                title.textContent = 'Add Watermark';
-                desc.textContent = 'Stamp "PremiumPDF" across your document.';
-                fileInput.multiple = false;
+                if(tool === 'watermark') {
+                    toolOptions.classList.remove('hidden');
+                    watermarkOptions.classList.remove('hidden');
+                } else {
+                    toolOptions.classList.add('hidden');
+                    watermarkOptions.classList.add('hidden');
+                }
             }
         }
 
-        // File Handling
-        dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
-        
-        function handleFiles(files) {
-            selectedFiles = Array.from(files);
-            updateUI();
-        }
+        // File Input Event Listener
+        fileInput.addEventListener('change', (e) => {
+            const newFiles = Array.from(e.target.files);
+            if (currentTool === 'merge') {
+                uploadedFiles = [...uploadedFiles, ...newFiles];
+            } else {
+                uploadedFiles = [newFiles[0]]; // Only allow 1 file for split/watermark
+            }
+            updateFileList();
+            fileInput.value = ''; // Reset input
+        });
 
-        function updateUI() {
-            fileList.innerHTML = '';
-            selectedFiles.forEach(file => {
-                let li = document.createElement('li');
-                li.textContent = `📄 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                fileList.appendChild(li);
+        /**
+         * Updates the UI to reflect currently selected files
+         */
+        function updateFileList() {
+            if (uploadedFiles.length === 0) {
+                fileListContainer.classList.add('hidden');
+                executeBtn.disabled = true;
+                return;
+            }
+
+            fileListContainer.classList.remove('hidden');
+            fileListContainer.innerHTML = '';
+            
+            uploadedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex justify-between items-center bg-gray-100 p-3 rounded-md border border-gray-200';
+                fileItem.innerHTML = `
+                    <span class="text-sm font-medium text-gray-700 truncate w-3/4">${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700 text-sm font-bold">X</button>
+                `;
+                fileListContainer.appendChild(fileItem);
             });
 
-            if ((currentTool === 'merge' && selectedFiles.length > 1) || 
-                (currentTool !== 'merge' && selectedFiles.length === 1)) {
-                actionArea.classList.remove('hidden');
-            } else {
-                actionArea.classList.add('hidden');
+            executeBtn.disabled = false;
+        }
+
+        /**
+         * Removes a file from the selection array
+         * @param {number} index 
+         */
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        /**
+         * Orchestrates the execution based on the selected tool
+         */
+        async function executeProcess() {
+            if (uploadedFiles.length === 0) return;
+
+            executeBtn.disabled = true;
+            setStatus('Processing...', 'text-blue-600');
+
+            try {
+                if (currentTool === 'merge') {
+                    await handleMerge();
+                } else if (currentTool === 'split') {
+                    await handleSplit();
+                } else if (currentTool === 'watermark') {
+                    await handleWatermark();
+                }
+            } catch (error) {
+                console.error(error);
+                setStatus(`Error: ${error.message}`, 'text-red-600');
+            } finally {
+                executeBtn.disabled = false;
             }
         }
 
-        // Processing Logic Engine
-        processBtn.addEventListener('click', async () => {
-            statusText.classList.remove('hidden');
-            processBtn.disabled = true;
+        /**
+         * HELPER: Trigger file download in browser
+         * @param {Uint8Array} pdfBytes 
+         * @param {string} fileName 
+         */
+        function downloadPdf(pdfBytes, fileName) {
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            setStatus('Success! File downloaded.', 'text-green-600');
+        }
 
-            try {
-                let finalPdfBytes;
-                let fileName = 'Processed.pdf';
+        /**
+         * HELPER: Set Status Message
+         * @param {string} msg 
+         * @param {string} colorClass 
+         */
+        function setStatus(msg, colorClass) {
+            statusMessage.className = `mt-4 text-center text-sm font-bold ${colorClass}`;
+            statusMessage.innerText = msg;
+        }
 
-                if (currentTool === 'merge') {
-                    const mergedPdf = await PDFDocument.create();
-                    for (let file of selectedFiles) {
-                        const pdf = await PDFDocument.load(await file.arrayBuffer());
-                        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                        copiedPages.forEach((page) => mergedPdf.addPage(page));
-                    }
-                    finalPdfBytes = await mergedPdf.save();
-                    fileName = 'Merged.pdf';
-
-                } else if (currentTool === 'split') {
-                    // MVP Split: Extracts just the first page
-                    const originalPdf = await PDFDocument.load(await selectedFiles[0].arrayBuffer());
-                    const newPdf = await PDFDocument.create();
-                    const [firstPage] = await newPdf.copyPages(originalPdf, [0]);
-                    newPdf.addPage(firstPage);
-                    finalPdfBytes = await newPdf.save();
-                    fileName = 'Split_Page1.pdf';
-
-                } else if (currentTool === 'watermark') {
-                    const pdfDoc = await PDFDocument.load(await selectedFiles[0].arrayBuffer());
-                    const pages = pdfDoc.getPages();
-                    pages.forEach(page => {
-                        const { width, height } = page.getSize();
-                        page.drawText('PremiumPDF', {
-                            x: width / 4,
-                            y: height / 2,
-                            size: 50,
-                            color: rgb(0.95, 0.1, 0.1),
-                            opacity: 0.3,
-                            rotate: degrees(45),
-                        });
-                    });
-                    finalPdfBytes = await pdfDoc.save();
-                    fileName = 'Watermarked.pdf';
-                }
-
-                // Trigger Download
-                const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = fileName;
-                link.click();
-
-                statusText.textContent = "Done! Downloading...";
-            } catch (error) {
-                console.error(error);
-                alert('An error occurred.');
+        /**
+         * PDF-LIB LOGIC: Merge multiple PDFs
+         */
+        async function handleMerge() {
+            if (uploadedFiles.length < 2) {
+                throw new Error("Please select at least 2 PDFs to merge.");
             }
 
-            setTimeout(() => { 
-                statusText.classList.add('hidden'); 
-                statusText.textContent = "Processing..."; 
-                processBtn.disabled = false; 
-            }, 2000);
-        });
+            const { PDFDocument } = PDFLib;
+            const mergedPdf = await PDFDocument.create();
+
+            for (const file of uploadedFiles) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(arrayBuffer);
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                copiedPages.forEach((page) => mergedPdf.addPage(page));
+            }
+
+            const pdfBytes = await mergedPdf.save();
+            downloadPdf(pdfBytes, 'merged_document.pdf');
+        }
+
+        /**
+         * PDF-LIB LOGIC: Extract first page (Basic Split Example)
+         */
+        async function handleSplit() {
+            const { PDFDocument } = PDFLib;
+            const file = uploadedFiles[0];
+            const arrayBuffer = await file.arrayBuffer();
+            const originalPdf = await PDFDocument.load(arrayBuffer);
+            
+            const newPdf = await PDFDocument.create();
+            const [firstPage] = await newPdf.copyPages(originalPdf, [0]);
+            newPdf.addPage(firstPage);
+
+            const pdfBytes = await newPdf.save();
+            downloadPdf(pdfBytes, 'split_page_1.pdf');
+        }
+
+        /**
+         * PDF-LIB LOGIC: Add Diagonal Watermark to all pages
+         */
+        async function handleWatermark() {
+            const textToStamp = document.getElementById('watermark-text').value;
+            const { PDFDocument, rgb, degrees } = PDFLib;
+            
+            const file = uploadedFiles[0];
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(arrayBuffer);
+            
+            const pages = pdfDoc.getPages();
+            
+            pages.forEach((page) => {
+                const { width, height } = page.getSize();
+                page.drawText(textToStamp, {
+                    x: width / 2 - 150,
+                    y: height / 2,
+                    size: 50,
+                    color: rgb(0.95, 0.1, 0.1),
+                    opacity: 0.5,
+                    rotate: degrees(45),
+                });
+            });
+
+            const pdfBytes = await pdfDoc.save();
+            downloadPdf(pdfBytes, 'watermarked_document.pdf');
+        }
     </script>
 </body>
 </html>
