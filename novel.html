@@ -1,0 +1,317 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovelVerse - Read & Publish Web Novels</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .ad-placeholder {
+            background: repeating-linear-gradient(
+                45deg,
+                #f3f4f6,
+                #f3f4f6 10px,
+                #e5e7eb 10px,
+                #e5e7eb 20px
+            );
+            border: 1px dashed #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 300ms ease-out; }
+        .toast-exit { transform: translateY(0); opacity: 1; }
+        .toast-exit-active { transform: translateY(100%); opacity: 0; transition: all 300ms ease-in; }
+    </style>
+
+    <!-- Google AdSense Script (Replace client ID when ready) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigate('home')">
+                    <i class="ph-fill ph-book-open text-brand-600 text-3xl mr-2"></i>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">NovelVerse</span>
+                </div>
+                <div class="flex items-center space-x-4 sm:space-x-8">
+                    <button onclick="navigate('home')" class="nav-btn text-gray-600 hover:text-brand-600 font-medium transition flex items-center gap-1">
+                        <i class="ph ph-house text-lg"></i> <span class="hidden sm:inline">Browse</span>
+                    </button>
+                    <button onclick="navigate('write')" class="nav-btn text-gray-600 hover:text-brand-600 font-medium transition flex items-center gap-1">
+                        <i class="ph ph-pencil-simple text-lg"></i> <span class="hidden sm:inline">Publish</span>
+                    </button>
+                    <button class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-full text-sm font-medium transition shadow-sm">
+                        Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Top Ad Banner -->
+    <div class="max-w-7xl mx-auto w-full px-4 py-4">
+        <div class="ad-placeholder w-full h-[90px] rounded text-center relative overflow-hidden">
+            <!-- Actual AdSense Code structure -->
+            <ins class="adsbygoogle w-full h-full block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="XXXXXXX"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <span class="absolute z-10 pointer-events-none bg-white/80 px-2 py-1 rounded shadow-sm">AdSense Banner (728x90)</span>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- ==================== HOME VIEW ==================== -->
+        <section id="view-home" class="view-section hidden">
+            <!-- Hero -->
+            <div class="bg-gradient-to-r from-brand-900 to-brand-600 rounded-2xl p-8 sm:p-12 text-white mb-10 shadow-lg relative overflow-hidden">
+                <div class="relative z-10 max-w-2xl">
+                    <h1 class="text-3xl sm:text-5xl font-bold mb-4 leading-tight">Discover Infinite Worlds. <br>Share Your Own.</h1>
+                    <p class="text-brand-100 text-lg mb-8">Join thousands of readers and writers on the premier platform for serialized web fiction. Read for free, write for glory.</p>
+                    <div class="flex gap-4">
+                        <button onclick="document.getElementById('library').scrollIntoView({behavior: 'smooth'})" class="bg-white text-brand-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition shadow-md">Start Reading</button>
+                        <button onclick="navigate('write')" class="bg-brand-500 bg-opacity-30 border border-brand-400 text-white px-6 py-3 rounded-full font-semibold hover:bg-opacity-50 transition">Start Writing</button>
+                    </div>
+                </div>
+                <i class="ph-fill ph-planet absolute -right-20 -bottom-20 text-[300px] text-white opacity-10 rotate-12"></i>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Library Grid -->
+                <div id="library" class="flex-grow">
+                    <div class="flex justify-between items-end mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Featured Novels</h2>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-brand-100 text-brand-800 rounded-full text-sm font-medium cursor-pointer">All</span>
+                            <span class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-full text-sm font-medium cursor-pointer transition">Fantasy</span>
+                            <span class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-full text-sm font-medium cursor-pointer transition">Sci-Fi</span>
+                        </div>
+                    </div>
+                    
+                    <div id="novel-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Novel Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Sidebar Ads & Widgets -->
+                <div class="w-full lg:w-72 flex-shrink-0 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i class="ph-fill ph-trend-up text-brand-500"></i> Trending Writers</h3>
+                        <ul class="space-y-3 text-sm" id="trending-writers">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Sidebar Ad -->
+                    <div class="ad-placeholder w-full h-[600px] rounded-xl relative overflow-hidden sticky top-24">
+                         <ins class="adsbygoogle w-full h-full block"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="XXXXXXX"
+                             data-ad-format="vertical"
+                             data-full-width-responsive="true"></ins>
+                        <span class="absolute z-10 pointer-events-none bg-white/80 px-2 py-1 rounded shadow-sm">Sidebar AdSense</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== NOVEL DETAILS VIEW ==================== -->
+        <section id="view-details" class="view-section hidden">
+            <button onclick="navigate('home')" class="text-gray-500 hover:text-brand-600 mb-6 flex items-center gap-1 transition">
+                <i class="ph ph-arrow-left"></i> Back to Library
+            </button>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row">
+                <div class="md:w-1/3 lg:w-1/4">
+                    <img id="detail-cover" src="" alt="Cover" class="w-full h-full object-cover min-h-[300px]">
+                </div>
+                <div class="p-6 md:p-8 md:w-2/3 lg:w-3/4 flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="detail-genre" class="px-2.5 py-0.5 bg-brand-100 text-brand-800 rounded text-xs font-semibold uppercase tracking-wide">Genre</span>
+                        <span class="text-gray-400 text-sm flex items-center gap-1"><i class="ph-fill ph-star text-yellow-400"></i> 4.8</span>
+                    </div>
+                    <h1 id="detail-title" class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Novel Title</h1>
+                    <p class="text-gray-600 mb-6 flex items-center gap-2">
+                        <i class="ph ph-user"></i> <span id="detail-author" class="font-medium">Author Name</span>
+                    </p>
+                    <p id="detail-synopsis" class="text-gray-700 leading-relaxed mb-8">Synopsis goes here...</p>
+                    
+                    <div class="mt-auto flex gap-4">
+                        <button onclick="startReading()" class="bg-brand-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-brand-700 transition shadow-sm flex items-center gap-2">
+                            <i class="ph-fill ph-book-open"></i> Start Reading
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-col lg:flex-row gap-8">
+                <div class="flex-grow bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 border-b pb-2">Table of Contents</h3>
+                    <ul id="detail-chapters" class="space-y-1">
+                        <!-- Chapters injected via JS -->
+                    </ul>
+                </div>
+                <!-- Inline Content Ad -->
+                <div class="w-full lg:w-72 flex-shrink-0">
+                    <div class="ad-placeholder w-full h-[250px] rounded-xl relative overflow-hidden">
+                        <ins class="adsbygoogle w-full h-full block"
+                             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                             data-ad-slot="XXXXXXX"
+                             data-ad-format="rectangle"
+                             data-full-width-responsive="true"></ins>
+                        <span class="absolute z-10 pointer-events-none bg-white/80 px-2 py-1 rounded shadow-sm text-xs">Content Ad</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== READER VIEW ==================== -->
+        <section id="view-reader" class="view-section hidden max-w-4xl mx-auto">
+            <!-- Reader Toolbar -->
+            <div class="bg-white rounded-t-xl border border-gray-200 border-b-0 p-4 flex flex-wrap justify-between items-center sticky top-16 z-40 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button onclick="navigate('details')" class="text-gray-500 hover:text-brand-600 p-2 rounded-full hover:bg-gray-100 transition" title="Back to Novel">
+                        <i class="ph ph-arrow-left text-xl"></i>
+                    </button>
+                    <div>
+                        <h2 id="reader-novel-title" class="text-sm text-gray-500 font-medium hidden sm:block">Novel Title</h2>
+                        <h1 id="reader-chapter-title" class="font-bold text-gray-900">Chapter Title</h1>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 border-l pl-4 border-gray-200">
+                    <button onclick="changeFontSize(-1)" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="Decrease Font Size"><i class="ph ph-text-aa text-sm"></i></button>
+                    <button onclick="changeFontSize(1)" class="p-2 text-gray-600 hover:bg-gray-100 rounded" title="Increase Font Size"><i class="ph ph-text-aa text-lg"></i></button>
+                    <button onclick="toggleReaderTheme()" class="p-2 text-gray-600 hover:bg-gray-100 rounded ml-2" title="Toggle Light/Dark"><i class="ph ph-moon text-lg"></i></button>
+                </div>
+            </div>
+
+            <!-- Reader Content -->
+            <div id="reader-content-container" class="bg-white border border-gray-200 rounded-b-xl p-6 sm:p-12 min-h-[60vh] transition-colors duration-300">
+                <div id="reader-text" class="font-serif text-lg leading-loose text-gray-800 whitespace-pre-wrap transition-all duration-300">
+                    <!-- Text injected via JS -->
+                </div>
+                
+                <!-- In-chapter Ad -->
+                <div class="my-10 ad-placeholder w-full h-[90px] rounded relative overflow-hidden mx-auto max-w-2xl">
+                    <ins class="adsbygoogle w-full h-full block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="XXXXXXX"
+                         data-ad-format="horizontal"
+                         data-full-width-responsive="true"></ins>
+                    <span class="absolute z-10 pointer-events-none bg-white/80 px-2 py-1 rounded shadow-sm text-xs">In-Chapter Ad</span>
+                </div>
+
+                <!-- Navigation between chapters -->
+                <div class="mt-12 pt-8 border-t border-gray-200 flex justify-between items-center" id="reader-nav-footer">
+                    <button id="btn-prev-chapter" class="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full font-medium transition disabled:opacity-50 flex items-center gap-2">
+                        <i class="ph ph-caret-left"></i> Previous
+                    </button>
+                    <button id="btn-next-chapter" class="px-6 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-medium transition disabled:opacity-50 flex items-center gap-2">
+                        Next <i class="ph ph-caret-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== WRITE/PUBLISH VIEW ==================== -->
+        <section id="view-write" class="view-section hidden max-w-3xl mx-auto">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Writer's Studio</h1>
+                <p class="text-gray-600">Publish a new novel or add chapters to an existing one.</p>
+            </div>
+
+            <!-- Tab Navigation for Writer -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="switchWriteTab('new-novel')" id="tab-new-novel" class="px-6 py-3 border-b-2 border-brand-600 text-brand-600 font-medium">Create Novel</button>
+                <button onclick="switchWriteTab('new-chapter')" id="tab-new-chapter" class="px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">Add Chapter</button>
+            </div>
+
+            <!-- Form: Create New Novel -->
+            <div id="form-new-novel" class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100">
+                <form onsubmit="handleCreateNovel(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Novel Title *</label>
+                            <input type="text" id="wn-title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" placeholder="e.g., The Silent Echo">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Author Name *</label>
+                            <input type="text" id="wn-author" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" placeholder="Your pen name">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Genre</label>
+                            <select id="wn-genre" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                                <option>Fantasy</option>
+                                <option>Sci-Fi</option>
+                                <option>Romance</option>
+                                <option>Mystery</option>
+                                <option>Horror</option>
+                                <option>LitRPG</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Cover Image URL</label>
+                            <input type="url" id="wn-cover" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" placeholder="https://...">
+                            <p class="text-xs text-gray-500">Leave blank for an auto-generated cover.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Synopsis *</label>
+                        <textarea id="wn-synopsis" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition resize-none" placeholder="What is your story about?"></textarea>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">First Chapter</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="wn-chap-title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" placeholder="Chapter Title (e.g., Chapter 1: The Awakening)">
+                            <textarea id="wn-chap-content" required rows="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition resize-y font-serif" placeholder="Write your chapter content here.
